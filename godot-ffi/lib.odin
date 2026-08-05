@@ -319,6 +319,22 @@ check_version :: proc "contextless" (major, minor, patch: u32) -> bool {
 	return var.major > major || (var.major == major && var.minor >= minor)
 }
 
+// ---------------------------------------------------------------------------
+// Logging (bypasses Godot's print_error / print_warning prefix)
+// ---------------------------------------------------------------------------
+
+// Write a line to stdout. Avoids the ERROR:/WARNING: prefix that
+// print_error / print_warning add. In headless mode stdout is the terminal;
+// in the editor it goes to the terminal that launched Godot.
+// TODO: replace with godot.print() once the high-level godot package
+// is generated. Uses Odin's fmt under the hood; callers must have set
+// context = godot_context() first.
+import "core:fmt"
+
+debug_print :: proc(msg: string) {
+	fmt.println(msg)
+}
+
 /*
 	Copyright 2026 David Moulin
 
