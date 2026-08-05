@@ -20,24 +20,14 @@ make hello
 make test-hello
 ```
 
+``` sh
+ # to test
+ make clean && rm -f bin/godot-codegen godot-ffi/interface*.odin && make hello && godot --headless --path examples/hello --import && godot --headless --path examples/hello --quit
+ ```
+ 
 ## Architecture
 
-```
-thirdparty/gdextension_interface.json   ← vendored from Godot source
-        │
-        │  godot-codegen/main.odin
-        ▼
-godot-ffi/interface_defs.odin    ─┐  generated: proc types, enums, bit_sets,
-godot-ffi/interface.odin         ─┘  structs, global proc vars + init()
-godot-ffi/lib.odin               ← hand-written: aliases, ptrcall helpers,
-                                   class registration, object construction
-godot-ffi/context.odin            ← hand-written: Godot-backed Odin allocator
-        │
-        ▼
-examples/hello/                  ← minimal working GDExtension (proves
-                                   end-to-end: loads in Godot 4.7, registers
-                                   a class, fires _ready notification)
-```
+`godot-codegen/main.odin` reads `thirdparty/gdextension_interface.json` and generates `godot-ffi/interface_defs.odin` and `godot-ffi/interface.odin`. Those files, together with the hand-written `godot-ffi/lib.odin` and `godot-ffi/context.odin`, form the `godot-ffi` package that extensions link against. `examples/hello/` is a minimal extension that proves the pipeline works end-to-end in Godot 4.7.
 
 ### Layers (mirroring [godot-rust/gdext](https://github.com/godot-rust/gdext))
 
