@@ -1,0 +1,28 @@
+# odin
+*.out
+*.o
+*.a
+*.so
+*.dll
+*.dylib
+*.exe
+*.obj
+*.lib
+*.pdb
+
+# generated bindings (godot-ffi)
+/godot-ffi/interface_defs.odin
+/godot-ffi/interface.odin
+
+# future: generated high-level bindings
+/godot/*.gen.odin
+/godot/classes/
+
+# build output
+/bin/
+/examples/**/bin/
+.explorer/
+
+# godot
+.godot/
+*.uid
