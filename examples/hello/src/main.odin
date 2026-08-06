@@ -69,6 +69,16 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 		v := gt.object_to_variant(obj)
 		back := gt.object_from_variant(v)
 		gd.debug_print(fmt.bprintf(buf[:], "variant roundtrip: %v (expect true)", back == obj))
+
+		// Utility functions
+		gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
+		gd.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
+		gd.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
+
+		// var_to_str on a float variant
+		fv := gt.variant_from_float(42.0)
+		gt.var_to_str(cast(gt.VariantBytes)fv)
+		gd.debug_print("var_to_str(42.0): ok")
 	}
 }
 
