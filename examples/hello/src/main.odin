@@ -123,6 +123,7 @@ add_arg_meta := [2]gd.ClassMethodArgumentMetadata{.None, .None}
 add_return_info := gd.PropertyInfo {
 	type = .Float,
 }
+add_method_info: gd.ClassMethodInfo
 
 add_arg_a_name_data: [8]u8
 add_arg_a_name := gd.StringNamePtr(&add_arg_a_name_data[0])
@@ -165,7 +166,7 @@ register_methods :: proc() {
 	add_arg_info[1].hint_string = empty_str
 	add_return_info.class_name = empty_name
 	add_return_info.hint_string = empty_str
-	info := new(gd.ClassMethodInfo)
+	info := &add_method_info
 	info.name = add_method_name
 	info.has_return_value = true
 	info.return_value_info = &add_return_info
@@ -182,7 +183,6 @@ register_methods :: proc() {
 
 	gd.classdb_register_extension_class_method(gd.library, hello_class_name, info)
 	gd.debug_print("[odin-gdext] Method add registered!")
-	free(info)
 }
 
 // ---- Storage for StringNames (8 bytes each) ----
