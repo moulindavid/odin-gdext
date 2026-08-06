@@ -1,8 +1,8 @@
 package hello
 
 import "core:fmt"
-import gd "godot:godot-ffi"
 import gt "godot:godot"
+import gd "godot:godot-ffi"
 
 // ---- Per-instance data ----
 
@@ -34,6 +34,109 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 	if what == 13 {
 		gd.debug_print("Hello from Odin!")
 	}
+}
+
+// ---- Method: add(a, b) -> a + b ----
+
+add_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: gd.ClassInstancePtr,
+	p_args: [^]gd.ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: gd.VariantPtr,
+	r_error: ^gd.CallError,
+) {
+	context = gd.godot_context()
+	a := gt.variant_to_float(cast(^[24]u8)p_args[0])
+	b := gt.variant_to_float(cast(^[24]u8)p_args[1])
+	buf: [64]u8
+	gd.debug_print(fmt.bprintf(buf[:], "add_call a=%v b=%v", a, b))
+	rv := gt.variant_from_float(a + b)
+	gd.variant_new_copy(r_return, cast(gd.ConstVariantPtr)&rv[0])
+	gt.variant_free(&rv)
+}
+
+add_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: rawptr,
+	p_args: [^]rawptr,
+	r_ret: rawptr,
+) {
+	context = gd.godot_context()
+	a := (cast(^f64)p_args[0])^
+	b := (cast(^f64)p_args[1])^
+	buf: [64]u8
+	gd.debug_print(fmt.bprintf(buf[:], "add_ptrcall a=%v b=%v", a, b))
+	(cast(^f64)r_ret)^ = a + b
+}
+
+add_method_name_data: [8]u8
+add_method_name := gd.StringNamePtr(&add_method_name_data[0])
+add_arg_info := [2]gd.PropertyInfo{{type = .Float}, {type = .Float}}
+add_arg_meta := [2]gd.ClassMethodArgumentMetadata{.None, .None}
+add_return_info := gd.PropertyInfo {
+	type = .Float,
+}
+
+add_arg_a_name_data: [8]u8
+add_arg_a_name := gd.StringNamePtr(&add_arg_a_name_data[0])
+add_arg_b_name_data: [8]u8
+add_arg_b_name := gd.StringNamePtr(&add_arg_b_name_data[0])
+
+empty_name_data: [8]u8
+empty_name := gd.StringNamePtr(&empty_name_data[0])
+empty_str_data: [8]u8
+empty_str := gd.StringPtr(&empty_str_data[0])
+
+register_methods :: proc() {
+	gd.string_name_new_with_latin1_chars(
+		cast(gd.UninitializedStringNamePtr)&add_method_name_data[0],
+		cstring("add"),
+		true,
+	)
+	gd.string_name_new_with_latin1_chars(
+		cast(gd.UninitializedStringNamePtr)&add_arg_a_name_data[0],
+		cstring("a"),
+		true,
+	)
+	gd.string_name_new_with_latin1_chars(
+		cast(gd.UninitializedStringNamePtr)&add_arg_b_name_data[0],
+		cstring("b"),
+		true,
+	)
+	gd.string_name_new_with_latin1_chars(
+		cast(gd.UninitializedStringNamePtr)&empty_name_data[0],
+		cstring(""),
+		true,
+	)
+	gd.string_new_with_latin1_chars(cast(gd.UninitializedStringPtr)&empty_str_data[0], cstring(""))
+
+	add_arg_info[0].name = add_arg_a_name
+	add_arg_info[0].class_name = empty_name
+	add_arg_info[0].hint_string = empty_str
+	add_arg_info[1].name = add_arg_b_name
+	add_arg_info[1].class_name = empty_name
+	add_arg_info[1].hint_string = empty_str
+	add_return_info.class_name = empty_name
+	add_return_info.hint_string = empty_str
+	info := new(gd.ClassMethodInfo)
+	info.name = add_method_name
+	info.has_return_value = true
+	info.return_value_info = &add_return_info
+	info.return_value_metadata = .None
+	info.argument_count = 2
+	info.arguments_info = &add_arg_info[0]
+	info.arguments_metadata = &add_arg_meta[0]
+	add_return_info.name = add_method_name
+
+	fn_call: gd.GDExtensionClassMethodCall = add_call
+	fn_ptr: gd.GDExtensionClassMethodPtrCall = add_ptrcall
+	(cast(^rawptr)(cast(uintptr)info + 16))^ = cast(rawptr)fn_call
+	(cast(^rawptr)(cast(uintptr)info + 24))^ = cast(rawptr)fn_ptr
+
+	gd.classdb_register_extension_class_method(gd.library, hello_class_name, info)
+	gd.debug_print("[odin-gdext] Method add registered!")
+	free(info)
 }
 
 // ---- Storage for StringNames (8 bytes each) ----
@@ -92,8 +195,39 @@ register_classes :: proc() {
 	)
 	gd.debug_print("[odin-gdext] HelloNode registered!")
 
-	// Test: variant round-trip (float, int, bool)
+	gd.debug_print("[odin-gdext] Checking sizes...")
 	buf: [64]u8
+	gd.debug_print(fmt.bprintf(buf[:], "  MethodInfo: %v", size_of(gd.ClassMethodInfo)))
+	gd.debug_print(fmt.bprintf(buf[:], "  PropertyInfo: %v", size_of(gd.PropertyInfo)))
+	gd.debug_print(
+		fmt.bprintf(buf[:], "  call_func offset: %v", offset_of(gd.ClassMethodInfo, call_func)),
+	)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"  ptrcall_func offset: %v",
+			offset_of(gd.ClassMethodInfo, ptrcall_func),
+		),
+	)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"  GDExtensionClassMethodCall size: %v",
+			size_of(gd.GDExtensionClassMethodCall),
+		),
+	)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"  GDExtensionClassMethodPtrCall size: %v",
+			size_of(gd.GDExtensionClassMethodPtrCall),
+		),
+	)
+	gd.debug_print("[odin-gdext] Sizes printed.")
+
+	register_methods()
+
+	// Test: variant round-trip (float, int, bool)
 	vf := gt.variant_from_float(3.14)
 	vi := gt.variant_from_int(-42)
 	vb := gt.variant_from_bool(true)
