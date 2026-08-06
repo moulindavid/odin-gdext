@@ -11,7 +11,7 @@
 // TODO: might need changes
 
 
-package gdextension
+package godot_core
 
 
 // ---------------------------------------------------------------------------
