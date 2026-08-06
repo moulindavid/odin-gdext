@@ -1,6 +1,8 @@
 package hello
 
+import "core:fmt"
 import gd "godot:godot-ffi"
+import gt "godot:godot"
 
 // ---- Per-instance data ----
 
@@ -89,6 +91,36 @@ register_classes :: proc() {
 		&class_info,
 	)
 	gd.debug_print("[odin-gdext] HelloNode registered!")
+
+	// Test: variant round-trip (float, int, bool)
+	buf: [64]u8
+	vf := gt.variant_from_float(3.14)
+	vi := gt.variant_from_int(-42)
+	vb := gt.variant_from_bool(true)
+	gd.debug_print(fmt.bprintf(buf[:], "Float: %v (expect 3.14)", gt.variant_to_float(&vf)))
+	gd.debug_print(fmt.bprintf(buf[:], "Int:   %v (expect -42)", gt.variant_to_int(&vi)))
+	gd.debug_print(fmt.bprintf(buf[:], "Bool:  %v (expect true)", gt.variant_to_bool(&vb)))
+	gt.variant_free(&vf)
+	gt.variant_free(&vi)
+	gt.variant_free(&vb)
+
+	// Test: Array variant
+	arr := gt.array_new()
+	v1 := gt.variant_from_float(10.0)
+	v2 := gt.variant_from_float(20.0)
+	gt.array_push(&arr, &v1)
+	gt.array_push(&arr, &v2)
+	size := gt.array_size(&arr)
+	gd.debug_print(fmt.bprintf(buf[:], "Array size: %v (expect 2)", size))
+	gt.variant_free(&v1)
+	gt.variant_free(&v2)
+	gt.variant_free(&arr)
+
+	// Test: print utility function
+	gt.print_init()
+	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
+	gt.print(cast(gd.TypePtr)&vs[0])
+	gt.variant_free(&vs)
 }
 
 // ---- Entry point ----
