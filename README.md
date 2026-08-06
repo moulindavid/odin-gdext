@@ -30,7 +30,7 @@ make clean && rm -f bin/godot-codegen godot-ffi/interface*.odin && make hello &&
 
 - `godot-codegen/main.odin` reads `thirdparty/gdextension_interface.json` and generates `godot-ffi/interface_defs.odin` + `godot-ffi/interface.odin`.
 - `godot-ffi/` is the low-level C-ABI package: generated proc types/enums/structs + hand-written helpers (`lib.odin`, `context.odin`).
-- `godot/` is the ergonomic Odin layer: Variant marshaling (`variant.odin`), typed object handles (`types.odin`), print utility function. Class bindings and utility function codegen from `extension_api.json` planned.
+- `godot/` is the ergonomic Odin layer: Variant marshaling (`variant.odin`), typed object handles (`types.odin`), utility function bindings (`utilities.odin`). Full class bindings codegen from `extension_api.json` planned.
 - `examples/hello/` is a minimal extension that proves the pipeline works in Godot 4.7: registers `HelloNode` extending `Node`, exports `add(a, b)` callable from GDScript, exercises `is_nil`/`is_class`/variant round-trip at startup.
 
 ### Layers
@@ -41,7 +41,8 @@ make clean && rm -f bin/godot-codegen godot-ffi/interface*.odin && make hello &&
 | `godot-codegen/` | Generates `godot-ffi/interface*.odin` from `gdextension_interface.json` | WIP |
 | `godot/variant.odin` | Variant marshaling (float, int, bool, string, array, object) | WIP |
 | `godot/types.odin` | Typed handles (`distinct ObjectPtr`), `is_class` casting, variant conversion | WIP |
-| `godot/**` | Utility function codegen, per-class API generation | Planned |
+| `godot/utilities.odin` | Utility function bindings (sin, cos, var_to_str, etc.) | WIP |
+| `godot/**` (rest) | Utility function codegen, per-class API generation | Planned |
 
 ## License
 

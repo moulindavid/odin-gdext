@@ -26,3 +26,4 @@
 # godot
 .godot/
 *.uid
+extension_api.json

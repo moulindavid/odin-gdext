@@ -18,6 +18,7 @@ endif
 INTERFACE_JSON := thirdparty/gdextension_interface.json
 INTERFACE_OUT  := godot-ffi/interface_defs.odin godot-ffi/interface.odin
 CODEGEN        := bin/godot-codegen
+EXTENSION_API  := thirdparty/extension_api.json
 
 # Build the codegen tool itself.
 $(CODEGEN): $(wildcard godot-codegen/*.odin)
@@ -29,13 +30,20 @@ $(INTERFACE_OUT): $(INTERFACE_JSON) $(CODEGEN)
 	@echo ">> Generating interface bindings..."
 	$(CODEGEN) $(INTERFACE_JSON)
 
-.PHONY: codegen interface check hello test-hello clean
+.PHONY: codegen interface extension-api check hello test-hello clean
 
 # Build the codegen tool.
 codegen: $(CODEGEN)
 
 # Generate the FFI interface.
 interface: $(INTERFACE_OUT)
+
+# Dump the full Godot extension API (builtin classes, utility functions, etc.).
+$(EXTENSION_API):
+	@echo ">> Dumping extension API..."
+	godot --dump-extension-api $(EXTENSION_API)
+
+extension-api: $(EXTENSION_API)
 
 # Type-check the godot-ffi package.
 check:
@@ -57,4 +65,5 @@ test-hello: hello
 clean:
 	rm -rf examples/hello/bin/
 	rm -f godot-ffi/interface_defs.odin godot-ffi/interface.odin
+	rm -f thirdparty/extension_api.json
 	rm -f bin/godot-codegen

@@ -23,3 +23,21 @@ make interface
 ```
 
 Then re-check with `make check`.
+
+## extension_api.json
+
+A machine-readable dump of Godot's full extension API — built-in classes,
+utility functions, global enums, singletons, native structures, and more.
+
+Generated locally from a Godot binary (not vendored from source):
+
+```sh
+make extension-api
+# equivalent to: godot --dump-extension-api thirdparty/extension_api.json
+```
+
+This file is ~7 MB and is git-ignored. It does not change between minor
+patch releases, but should be re-dumped when moving to a new Godot minor.
+
+We consume it in `godot-codegen` to generate:
+- `godot/utilities.odin` — typed wrappers for @GlobalScope utility functions
