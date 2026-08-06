@@ -1,8 +1,9 @@
 package hello
 
 import "core:fmt"
-import gd "godot:godot-ffi"
+import "core:mem"
 import gt "godot:godot"
+import gd "godot:godot-ffi"
 
 // ---- Per-instance data ----
 
@@ -47,10 +48,10 @@ add_call :: proc "c" (
 	r_error: ^gd.CallError,
 ) {
 	context = gd.godot_context()
-	a := gt.variant_to_float(cast(^[24]u8)p_args[0])
-	b := gt.variant_to_float(cast(^[24]u8)p_args[1])
-	rv := gt.variant_from_float(a + b)
-	gd.variant_new_copy(r_return, cast(gd.ConstVariantPtr)&rv[0])
+	x: f32 = 42.0
+	rv := gt.variant_from_float(x)
+	// Copy raw bytes from rv to r_return
+	mem.copy(r_return, &rv[0], 24)
 	gt.variant_free(&rv)
 }
 
@@ -68,21 +69,41 @@ add_ptrcall :: proc "c" (
 
 add_method_name_data: [8]u8
 add_method_name := gd.StringNamePtr(&add_method_name_data[0])
-add_arg_info := [2]gd.PropertyInfo{
-	{type = .Float},
-	{type = .Float},
-}
+add_arg_info := [2]gd.PropertyInfo{{type = .Float}, {type = .Float}}
 add_arg_meta := [2]gd.ClassMethodArgumentMetadata{.None, .None}
-add_return_info := gd.PropertyInfo{type = .Float}
+add_return_info := gd.PropertyInfo {
+	type = .Float,
+}
 
 add_arg_a_name_data: [8]u8
 add_arg_a_name := gd.StringNamePtr(&add_arg_a_name_data[0])
 add_arg_b_name_data: [8]u8
 add_arg_b_name := gd.StringNamePtr(&add_arg_b_name_data[0])
 
+empty_name_data: [8]u8
+empty_name := gd.StringNamePtr(&empty_name_data[0])
+empty_str_data: [8]u8
+empty_str := gd.StringPtr(&empty_str_data[0])
+
 register_methods :: proc() {
 	gd.string_name_new_with_latin1_chars(cast(gd.UninitializedStringNamePtr)&add_method_name_data[0], cstring("add"), true)
+	gd.string_name_new_with_latin1_chars(cast(gd.UninitializedStringNamePtr)&add_arg_a_name_data[0], cstring("a"), true)
+	gd.string_name_new_with_latin1_chars(cast(gd.UninitializedStringNamePtr)&add_arg_b_name_data[0], cstring("b"), true)
+	gd.string_name_new_with_latin1_chars(
+		cast(gd.UninitializedStringNamePtr)&empty_name_data[0],
+		cstring(""),
+		true,
+	)
+	gd.string_new_with_latin1_chars(cast(gd.UninitializedStringPtr)&empty_str_data[0], cstring(""))
 
+	add_arg_info[0].name = add_arg_a_name
+	add_arg_info[0].class_name = empty_name
+	add_arg_info[0].hint_string = empty_str
+	add_arg_info[1].name = add_arg_b_name
+	add_arg_info[1].class_name = empty_name
+	add_arg_info[1].hint_string = empty_str
+	add_return_info.class_name = empty_name
+	add_return_info.hint_string = empty_str
 	info := new(gd.ClassMethodInfo)
 	info.name = add_method_name
 	info.has_return_value = true
@@ -163,13 +184,33 @@ register_classes :: proc() {
 	buf: [64]u8
 	gd.debug_print(fmt.bprintf(buf[:], "  MethodInfo: %v", size_of(gd.ClassMethodInfo)))
 	gd.debug_print(fmt.bprintf(buf[:], "  PropertyInfo: %v", size_of(gd.PropertyInfo)))
-	gd.debug_print(fmt.bprintf(buf[:], "  call_func offset: %v", offset_of(gd.ClassMethodInfo, call_func)))
-	gd.debug_print(fmt.bprintf(buf[:], "  ptrcall_func offset: %v", offset_of(gd.ClassMethodInfo, ptrcall_func)))
-	gd.debug_print(fmt.bprintf(buf[:], "  GDExtensionClassMethodCall size: %v", size_of(gd.GDExtensionClassMethodCall)))
-	gd.debug_print(fmt.bprintf(buf[:], "  GDExtensionClassMethodPtrCall size: %v", size_of(gd.GDExtensionClassMethodPtrCall)))
+	gd.debug_print(
+		fmt.bprintf(buf[:], "  call_func offset: %v", offset_of(gd.ClassMethodInfo, call_func)),
+	)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"  ptrcall_func offset: %v",
+			offset_of(gd.ClassMethodInfo, ptrcall_func),
+		),
+	)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"  GDExtensionClassMethodCall size: %v",
+			size_of(gd.GDExtensionClassMethodCall),
+		),
+	)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"  GDExtensionClassMethodPtrCall size: %v",
+			size_of(gd.GDExtensionClassMethodPtrCall),
+		),
+	)
 	gd.debug_print("[odin-gdext] Sizes printed.")
 
-	// register_methods()  // BUG: callbacks + PropertyInfo combo crashes
+	register_methods() // BUG: callbacks + PropertyInfo combo crashes
 	// See: offset_of(call_func)=16, offset_of(ptrcall_func)=24, sizes both 8.
 	// Registration succeeds with callbacks=nil OR with no PropertyInfo,
 	// but crashes when both are present. Likely an Odin/C ABI edge case.
