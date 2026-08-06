@@ -33,7 +33,7 @@ make clean && rm -f bin/godot-codegen godot-ffi/interface*.odin && make hello &&
 - `godot/` is the ergonomic layer: Variant marshaling, utility functions, and eventually generated class bindings. Currently manual prototypes; codegen planned.
 - `examples/hello/` is a minimal extension that proves the pipeline works in Godot 4.7.
 
-### Layers (mirroring [godot-rust/gdext](https://github.com/godot-rust/gdext))
+### Layers
 
 | Layer | Description | Status |
 |-------|-------------|--------|
