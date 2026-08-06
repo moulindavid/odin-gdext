@@ -46,8 +46,29 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 	context = gd.godot_context()
 	if what == 13 {
 		hn := hello_node_unwrap(instance)
-		_ = hn
 		gd.debug_print("Hello from Odin!")
+
+		obj := hello_node_object(hn)
+		buf: [128]u8
+		gd.debug_print(fmt.bprintf(buf[:], "is_nil: %v (expect false)", gt.is_nil(gt.Object(obj))))
+		gd.debug_print(
+			fmt.bprintf(
+				buf[:],
+				"is_class Node: %v (expect true)",
+				gt.is_class(obj, node_class_name),
+			),
+		)
+		gd.debug_print(
+			fmt.bprintf(
+				buf[:],
+				"is_class Node2D: %v (expect false)",
+				gt.is_class(obj, node2d_class_name),
+			),
+		)
+
+		v := gt.object_to_variant(obj)
+		back := gt.object_from_variant(v)
+		gd.debug_print(fmt.bprintf(buf[:], "variant roundtrip: %v (expect true)", back == obj))
 	}
 }
 
@@ -162,6 +183,10 @@ hello_name_data: [8]u8
 parent_name_data: [8]u8
 hello_class_name := gd.StringNamePtr(&hello_name_data[0])
 hello_parent_name := gd.StringNamePtr(&parent_name_data[0])
+node_class_name_data: [8]u8
+node_class_name := gd.StringNamePtr(&node_class_name_data[0])
+node2d_class_name_data: [8]u8
+node2d_class_name := gd.StringNamePtr(&node2d_class_name_data[0])
 
 hello_instance_binding_callbacks := gd.InstanceBindingCallbacks {
 	create_callback    = nil,
@@ -175,6 +200,9 @@ register_classes :: proc() {
 
 	gd.string_name_new_with_latin1_chars(hello_class_name, cstring("HelloNode"), true)
 	gd.string_name_new_with_latin1_chars(hello_parent_name, cstring("Node"), true)
+	gd.string_name_new_with_latin1_chars(node_class_name, cstring("Node"), true)
+	gd.string_name_new_with_latin1_chars(node2d_class_name, cstring("Node2D"), true)
+	gt.init_class_casting()
 
 	class_info := gd.ClassCreationInfo {
 		is_virtual                  = false,
