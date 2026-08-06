@@ -4,6 +4,19 @@ import "core:fmt"
 import gt "godot:godot"
 import gd "godot:godot-ffi"
 
+// ---- Typed handle ----
+
+HelloNode :: distinct gd.ObjectPtr
+
+// HelloNode typed API — per-class free functions.
+// This pattern mirrors what codegen will produce for Node, Node2D, etc.
+hello_node_object :: proc(self: HelloNode) -> gd.ObjectPtr {
+	return gd.ObjectPtr(self)
+}
+hello_node_unwrap :: proc(instance: gd.ClassInstancePtr) -> HelloNode {
+	return HelloNode((^HelloData)(instance).object)
+}
+
 // ---- Per-instance data ----
 
 HelloData :: struct {
@@ -32,6 +45,8 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 	if instance == nil {return}
 	context = gd.godot_context()
 	if what == 13 {
+		hn := hello_node_unwrap(instance)
+		_ = hn
 		gd.debug_print("Hello from Odin!")
 	}
 }
