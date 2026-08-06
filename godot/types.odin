@@ -92,9 +92,8 @@ is_class :: proc "contextless" (obj: gd.ObjectPtr, class_name: gd.StringNamePtr)
 	return result
 }
 
-// cast_to checks class identity, then reinterprets the pointer — valid per
-// Godot's own docs, since GDExtension object pointers need no adjustment
-// across the Object hierarchy (single inheritance).
+// cast_to checks class identity, then reinterprets the ObjectPtr — GDExtension
+// uses single inheritance so the pointer value is the same across the hierarchy.
 cast_to :: proc "contextless" (
 	obj: gd.ObjectPtr,
 	target_class_name: gd.StringNamePtr,
