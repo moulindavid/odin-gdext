@@ -8,7 +8,7 @@ GDExtensionVariant_Size :: 24
 
 // ---- Variant construction ----
 
-variant_from_float :: proc "contextless" (x: f32) -> (v: [GDExtensionVariant_Size]u8) {
+variant_from_float :: proc "contextless" (x: f64) -> (v: [GDExtensionVariant_Size]u8) {
 	ctor := ffi.get_variant_from_type_constructor(.Float)
 	_x := x
 	ctor(cast(ffi.UninitializedVariantPtr)&v[0], cast(ffi.TypePtr)&_x)
@@ -43,9 +43,9 @@ variant_from_int :: proc "contextless" (x: i64) -> (v: [GDExtensionVariant_Size]
 
 // ---- Variant extraction ----
 
-variant_to_float :: proc "contextless" (v: ^[GDExtensionVariant_Size]u8) -> f32 {
+variant_to_float :: proc "contextless" (v: ^[GDExtensionVariant_Size]u8) -> f64 {
 	ctor := ffi.get_variant_to_type_constructor(.Float)
-	ret: f32
+	ret: f64
 	ctor(cast(ffi.UninitializedTypePtr)&ret, cast(ffi.VariantPtr)&v[0])
 	return ret
 }

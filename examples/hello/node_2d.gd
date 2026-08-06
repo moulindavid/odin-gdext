@@ -1,12 +1,11 @@
 extends Node2D
 
-
 func _ready():
 	if ClassDB.class_exists("HelloNode"):
-		var hello = ClassDB.instantiate("HelloNode")
+		var hello: HelloNode = ClassDB.instantiate("HelloNode")
 		add_child(hello)
 		print("HelloNode created!")
-		var result = hello.add(3.0, 5.0)
-		print("add(3.0, 5.0) = ", result)
-	else:
-		print("HelloNode not found — extension loaded?")
+		var result: float = hello.add(7.0, 6.0)
+		var result2 = hello.call("add", 7.0, 6.0)  # forces variant path
+		print("hello.add(7.0, 6.0) = ", result)
+		print("hello.call(add, 7.0, 6.0) = ", result2)
