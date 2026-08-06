@@ -1,18 +1,14 @@
 // context.odin — Odin runtime shim backed by Godot's memory allocator.
 //
-// This provides an `Allocator` and a `Context` that route allocations
-// through Godot's mem_alloc / mem_realloc / mem_free interface functions,
-// so that Odin dynamic memory (maps, dynamic arrays, temp allocator) uses
-// the same heap as the engine.
-// TODO: might need changes
-
-package gdextension
+// Routes Odin dynamic allocations through Godot's mem_alloc / mem_realloc /
+// mem_free, so the engine and Odin code share the same heap.
+package godot_core
 
 import "base:runtime"
 import "core:c"
 import "core:mem"
 
-godot_allocator_proc :: proc(
+_allocator_proc :: proc(
 	allocator_data: rawptr,
 	mode: mem.Allocator_Mode,
 	size, alignment: int,
@@ -66,25 +62,26 @@ godot_allocator_proc :: proc(
 	return nil, nil
 }
 
-godot_allocator :: #force_inline proc "contextless" () -> (a: runtime.Allocator) {
-	return mem.Allocator{procedure = godot_allocator_proc}
+_allocator :: #force_inline proc "contextless" () -> (a: runtime.Allocator) {
+	return mem.Allocator{procedure = _allocator_proc}
 }
 
 @(private)
-default_godot_allocator := godot_allocator()
+_default_allocator := _allocator()
 
 @(private)
-temp_arena := runtime.Arena {
-	backing_allocator = default_godot_allocator,
+_temp_arena := runtime.Arena {
+	backing_allocator = _default_allocator,
 }
 
 @(private)
-default_temp_godot_allocator := runtime.Allocator{runtime.arena_allocator_proc, &temp_arena}
+_default_temp_allocator := runtime.Allocator{runtime.arena_allocator_proc, &_temp_arena}
 
-// Return a Godot-backed Odin context. Call this at the top of every Godot
-// callback (virtual calls, method calls, init/deinit, etc.).
+// godot_context returns a Godot-backed Odin context.
+// Call at the top of every Godot callback (virtual calls, method calls,
+// init/deinit, etc.).
 godot_context :: #force_inline proc "contextless" () -> (c: runtime.Context) {
-	c.allocator = default_godot_allocator
-	c.temp_allocator = default_temp_godot_allocator
+	c.allocator = _default_allocator
+	c.temp_allocator = _default_temp_allocator
 	return
 }

@@ -16,14 +16,14 @@ else
 endif
 
 INTERFACE_JSON := thirdparty/gdextension_interface.json
-INTERFACE_OUT  := godot-ffi/interface_defs.odin godot-ffi/interface.odin
+INTERFACE_OUT  := core/interface_defs.odin core/interface.odin
 CODEGEN        := bin/godot-codegen
 EXTENSION_API  := thirdparty/extension_api.json
 
 # Build the codegen tool itself.
-$(CODEGEN): $(wildcard godot-codegen/*.odin)
+$(CODEGEN): $(wildcard generator/*.odin generator/**/*.odin)
 	@mkdir -p bin
-	$(ODIN) build godot-codegen -out:$(CODEGEN) -o:speed
+	$(ODIN) build generator -out:$(CODEGEN) -o:speed
 
 # Generate the FFI interface files.
 $(INTERFACE_OUT): $(INTERFACE_JSON) $(CODEGEN)
@@ -45,9 +45,9 @@ $(EXTENSION_API):
 
 extension-api: $(EXTENSION_API)
 
-# Type-check the godot-ffi package.
+# Type-check the core package.
 check:
-	$(ODIN) check godot-ffi -no-entry-point $(ODIN_FLAGS_COMMON)
+	$(ODIN) check core -no-entry-point $(ODIN_FLAGS_COMMON)
 
 # Build the hello-world extension shared library.
 hello: interface
@@ -64,6 +64,6 @@ test-hello: hello
 
 clean:
 	rm -rf examples/hello/bin/
-	rm -f godot-ffi/interface_defs.odin godot-ffi/interface.odin
+	rm -f core/interface_defs.odin core/interface.odin
 	rm -f thirdparty/extension_api.json
 	rm -f bin/godot-codegen

@@ -39,5 +39,6 @@ make extension-api
 This file is ~7 MB and is git-ignored. It does not change between minor
 patch releases, but should be re-dumped when moving to a new Godot minor.
 
-We consume it in `godot-codegen` to generate:
-- `godot/utilities.odin` — typed wrappers for @GlobalScope utility functions
+We consume it in `generator` to produce:
+- `core/` — C-ABI types and interface function stubs
+- `bindings/` — typed wrappers for @GlobalScope utility functions

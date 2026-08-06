@@ -2,7 +2,7 @@ package hello
 
 import "core:fmt"
 import gt "godot:godot"
-import gd "godot:godot-ffi"
+import gd "godot:core"
 
 // ---- Typed handle ----
 
@@ -26,7 +26,7 @@ HelloData :: struct {
 // ---- Class lifecycle callbacks ----
 
 create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool) -> gd.ObjectPtr {
-	context = gd.godot_context()
+	context = gt.godot_context()
 	object := gd.construct_object(hello_parent_name)
 	if object == nil {return nil}
 	self_ := new_clone(HelloData{object = object})
@@ -36,14 +36,14 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 }
 
 free_instance :: proc "c" (class_userdata: rawptr, instance: gd.ClassInstancePtr) {
-	context = gd.godot_context()
+	context = gt.godot_context()
 	if instance == nil {return}
 	free(cast(^HelloData)instance)
 }
 
 notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reversed: bool) {
 	if instance == nil {return}
-	context = gd.godot_context()
+	context = gt.godot_context()
 	if what == 13 {
 		hn := hello_node_unwrap(instance)
 		gd.debug_print("Hello from Odin!")
@@ -92,7 +92,7 @@ add_call :: proc "c" (
 	r_return: gd.VariantPtr,
 	r_error: ^gd.CallError,
 ) {
-	context = gd.godot_context()
+	context = gt.godot_context()
 	a := gt.variant_to_float(cast(^[24]u8)p_args[0])
 	b := gt.variant_to_float(cast(^[24]u8)p_args[1])
 	buf: [64]u8
@@ -108,7 +108,7 @@ add_ptrcall :: proc "c" (
 	p_args: [^]rawptr,
 	r_ret: rawptr,
 ) {
-	context = gd.godot_context()
+	context = gt.godot_context()
 	a := (cast(^f64)p_args[0])^
 	b := (cast(^f64)p_args[1])^
 	buf: [64]u8
@@ -205,7 +205,7 @@ hello_instance_binding_callbacks := gd.InstanceBindingCallbacks {
 }
 
 register_classes :: proc() {
-	context = gd.godot_context()
+	context = gt.godot_context()
 	gd.debug_print("[odin-gdext] Registering HelloNode...")
 
 	gd.string_name_new_with_latin1_chars(hello_class_name, cstring("HelloNode"), true)
@@ -328,11 +328,11 @@ hello_library_init :: proc "c" (
 }
 
 initialize_module :: proc "c" (user_data: rawptr, level: gd.InitializationLevel) {
-	context = gd.godot_context()
+	context = gt.godot_context()
 	if level != .Scene {return}
 	register_classes()
 }
 
 deinitialize_module :: proc "c" (user_data: rawptr, level: gd.InitializationLevel) {
-	context = gd.godot_context()
+	context = gt.godot_context()
 }
