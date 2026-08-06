@@ -220,6 +220,39 @@ destroy_builtin :: proc "contextless" (type: VariantType, ptr: TypePtr) {
 }
 
 // ---------------------------------------------------------------------------
+// Lazy-init for builtin methods
+// ---------------------------------------------------------------------------
+
+// _BuiltinMethod holds a resolved builtin method pointer and its StringName
+// storage. Used by generated bindings for one-time lazy resolution.
+_BuiltinMethod :: struct {
+	name_data: [8]u8,
+	method:    PtrBuiltInMethod,
+	init:      bool,
+}
+
+// _ensure_builtin_method resolves a builtin method pointer on first call.
+_ensure_builtin_method :: proc "contextless" (
+	bm: ^_BuiltinMethod,
+	variant_type: VariantType,
+	name: cstring,
+	hash: i64,
+) {
+	if bm.init do return
+	bm.init = true
+	string_name_new_with_latin1_chars(
+		cast(UninitializedStringNamePtr)&bm.name_data,
+		name,
+		true,
+	)
+	bm.method = variant_get_ptr_builtin_method(
+		variant_type,
+		cast(ConstStringNamePtr)&bm.name_data,
+		hash,
+	)
+}
+
+// ---------------------------------------------------------------------------
 // String / StringName
 // ---------------------------------------------------------------------------
 

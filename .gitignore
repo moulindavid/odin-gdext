@@ -10,13 +10,14 @@
 *.lib
 *.pdb
 
-# generated bindings (godot-ffi)
-/godot-ffi/interface_defs.odin
-/godot-ffi/interface.odin
+# generated FFI bindings (core)
+/core/interface_defs.odin
+/core/interface.odin
 
-# future: generated high-level bindings
-/godot/*.gen.odin
-/godot/classes/
+# generated high-level bindings
+/bindings/builtin/
+/bindings/classes/
+/bindings/enums/
 
 # build output
 /bin/
@@ -26,4 +27,5 @@
 # godot
 .godot/
 *.uid
-extension_api.json
+/extension_api.json
+/thirdparty/extension_api.json
