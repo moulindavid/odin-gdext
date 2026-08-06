@@ -1,0 +1,9 @@
+{
+  "$schema": "https://raw.githubusercontent.com/DanielGavin/ols/master/ols.schema.json",
+  "collections": [
+    {
+      "name": "godot",
+      "path": "."
+    }
+  ]
+}
