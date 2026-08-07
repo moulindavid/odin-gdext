@@ -47,7 +47,7 @@ extension-api: $(EXTENSION_API)
 
 # Type-check the core package.
 check:
-	$(ODIN) check core -no-entry-point $(ODIN_FLAGS_COMMON)
+	$(ODIN) check core -no-entry-point -collection:$(COLLECTION)=$(ROOT) -vet -strict-style -default-to-nil-allocator
 
 # Build the hello-world extension shared library.
 hello: interface

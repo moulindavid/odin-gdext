@@ -3,6 +3,7 @@ package hello
 import "core:fmt"
 import gt "godot:godot"
 import gd "godot:core"
+import gbv2 "godot:bindings/builtin"
 
 // ---- Typed handle ----
 
@@ -123,6 +124,7 @@ add_arg_meta := [2]gd.ClassMethodArgumentMetadata{.None, .None}
 add_return_info := gd.PropertyInfo {
 	type = .Float,
 }
+add_method_info: gd.ClassMethodInfo
 
 add_arg_a_name_data: [8]u8
 add_arg_a_name := gd.StringNamePtr(&add_arg_a_name_data[0])
@@ -165,7 +167,7 @@ register_methods :: proc() {
 	add_arg_info[1].hint_string = empty_str
 	add_return_info.class_name = empty_name
 	add_return_info.hint_string = empty_str
-	info := new(gd.ClassMethodInfo)
+	info := &add_method_info
 	info.name = add_method_name
 	info.has_return_value = true
 	info.return_value_info = &add_return_info
@@ -182,7 +184,6 @@ register_methods :: proc() {
 
 	gd.classdb_register_extension_class_method(gd.library, hello_class_name, info)
 	gd.debug_print("[odin-gdext] Method add registered!")
-	free(info)
 }
 
 // ---- Storage for StringNames (8 bytes each) ----
@@ -308,6 +309,16 @@ register_classes :: proc() {
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
 	gt.print(cast(gd.TypePtr)&vs[0])
 	gt.variant_free(&vs)
+
+	// Test: Vector2 built-in
+	vec := gbv2.vector2_new_xy(3.0, 4.0)
+	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
+	len := gbv2.vector2_length(vec)
+	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))
+	n := gbv2.vector2_normalized(vec)
+	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).normalized(): (%v, %v)", n.x, n.y))
+	dot := gbv2.vector2_dot(vec, gbv2.Vector2{1, 0})
+	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).dot(1,0): %v (expect 3)", dot))
 }
 
 // ---- Entry point ----
