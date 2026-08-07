@@ -16,7 +16,8 @@ Or open this directory as a Godot project. The extension registers `HelloNode`,
 then `coucou.gd` creates it and calls:
 
 ```gdscript
-var result := node.add(7.0, 6.0)
+var node: Object = ClassDB.instantiate("HelloNode")
+var result: Variant = node.call("add", 7.0, 6.0)
 ```
 
 Expected output includes:

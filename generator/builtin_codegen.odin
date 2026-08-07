@@ -311,7 +311,7 @@ emit_constructors :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 
 	strings.write_string(b, "// ---- Constructors ----\n\n")
 
-	for ctor, i in c.constructors {
+	for ctor in c.constructors {
 		ct_name := constructor_name(lower, ctor.index, len(ctor.arguments))
 
 		// Build argument list for proc signature

@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  validate:
+    name: Odin + Godot validation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Odin
+        uses: laytan/setup-odin@v2
+        with:
+          release: dev-2026-07
+
+      - name: Install odinfmt
+        run: |
+          curl -fL -o ols.zip https://github.com/DanielGavin/ols/releases/download/dev-2026-06/ols-x86_64-unknown-linux-gnu.zip
+          unzip -q ols.zip odinfmt-x86_64-unknown-linux-gnu
+          sudo install -m 0755 odinfmt-x86_64-unknown-linux-gnu /usr/local/bin/odinfmt
+          odinfmt -h
+
+      - name: Install Godot 4.7
+        run: |
+          curl -fL -o godot.zip https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_linux.x86_64.zip
+          unzip godot.zip
+          chmod +x Godot_v4.7-stable_linux.x86_64
+          sudo mv Godot_v4.7-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+
+      - name: Show Odin version
+        run: odin version
+
+      - name: Validate
+        run: make ci

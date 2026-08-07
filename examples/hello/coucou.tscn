@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://co2o5c12sasvq"]
+[gd_scene format=3]
 
-[ext_resource type="Script" uid="uid://c0arlm4r3k4vi" path="res://coucou.gd" id="1_1c8th"]
+[ext_resource type="Script" path="res://coucou.gd" id="1_1c8th"]
 
 [node name="Coucou" type="Node" unique_id=713535598]
 script = ExtResource("1_1c8th")

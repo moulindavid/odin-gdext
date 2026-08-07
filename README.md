@@ -11,7 +11,8 @@ via the *GDExtension* C API.
 
 ## Requirements
 
-- Odin compiler on `PATH`.
+- Odin compiler on `PATH` (currently validated with `dev-2026-07`).
+- `odinfmt` on `PATH`.
 - Godot **4.7** on `PATH`.
 - Currently targets Godot's **single-precision** build/API only.
 - `make` and a platform toolchain capable of building shared libraries.
@@ -31,15 +32,45 @@ make hello
 
 # Test in Godot headless
 make test-hello
+
+# Run the full local validation baseline used by CI
+make ci
 ```
 
 A single `make hello` runs interface + builtins + build automatically, so it may
 create or refresh generated files under `core/`, `bindings/builtin/`, and
 `bindings/utilities.odin` before building the example extension.
 
-`make check` type-checks the `core` package with `-vet -strict-style`.
-Additional focused checks used during development include checking `bindings`,
-`bindings/builtin`, and `godot` with the same collection/vet/strict flags.
+`make check` type-checks the `core` package with `-vet -strict-style` and
+`-default-to-nil-allocator`. Additional focused checks are available for the
+generator, generated bindings, and public facade.
+
+## Validation and CI
+
+Use `make ci` before opening a pull request or starting a larger roadmap slice.
+It performs a clean validation pass in a fixed order:
+
+1. `make clean`
+2. `make fmt-check`
+3. `make interface`
+4. `make builtins`
+5. `make check`
+6. `make check-generator`
+7. `make check-bindings`
+8. `make check-godot`
+9. `make test-unit`
+10. `make test-hello`
+
+`make test-unit` is the minimal Odin unit-test harness for focused tests that do
+not need to launch Godot. Odin's test runner allocates internally, so that target
+keeps `-vet` and `-strict-style` but intentionally omits
+`-default-to-nil-allocator`. Runtime integration is still covered by
+`make test-hello`, which builds the example extension and runs Godot headless.
+
+The GitHub Actions workflow in `.github/workflows/ci.yml` installs Odin,
+downloads `odinfmt` from the OLS tooling releases, downloads Godot 4.7, and runs
+`make ci`. Generated bindings remain ignored by git; CI regenerates and checks
+them instead of requiring generated output commits.
 
 ## Imports
 
