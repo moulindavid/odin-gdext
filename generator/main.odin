@@ -8,7 +8,7 @@ import "core:os"
 import "core:strings"
 
 // ---------------------------------------------------------------------------
-// JSON model structs — mirror gdextension_interface.json schema
+// JSON model structs -- mirror gdextension_interface.json schema
 // ---------------------------------------------------------------------------
 
 Header :: struct {
@@ -269,7 +269,7 @@ emit_doc :: proc(
 		if len(deprecated.replace_with) > 0 {
 			fmt.sbprintf(
 				b,
-				"%s * @deprecated since %s — use %s\n",
+				"%s * @deprecated since %s -- use %s\n",
 				indent,
 				deprecated.since,
 				deprecated.replace_with,
@@ -454,8 +454,21 @@ gen_globals_and_init :: proc(iface: []HeaderInterfaceFunction) -> string {
 main :: proc() {
 	if len(os.args) < 2 {
 		fmt.eprintln("usage: bindgen <gdextension_interface.json>")
+		fmt.eprintln("       bindgen --builtin <extension_api.json>")
 		os.exit(1)
 	}
+
+	if os.args[1] == "--builtin" {
+		if len(os.args) < 3 {
+			fmt.eprintln("ERROR: --builtin requires <extension_api.json>")
+			os.exit(1)
+		}
+		if !generate_builtin_bindings(os.args[2]) {
+			os.exit(1)
+		}
+		return
+	}
+
 	json_path := os.args[1]
 
 	// ---- read JSON ----

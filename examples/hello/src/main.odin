@@ -1,15 +1,15 @@
 package hello
 
 import "core:fmt"
-import gt "godot:godot"
-import gd "godot:core"
 import gbv2 "godot:bindings/builtin"
+import gd "godot:core"
+import gt "godot:godot"
 
 // ---- Typed handle ----
 
 HelloNode :: distinct gd.ObjectPtr
 
-// HelloNode typed API — per-class free functions.
+// HelloNode typed API -- per-class free functions.
 // This pattern mirrors what codegen will produce for Node, Node2D, etc.
 hello_node_object :: proc(self: HelloNode) -> gd.ObjectPtr {
 	return gd.ObjectPtr(self)
@@ -75,11 +75,6 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 		gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
 		gd.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
 		gd.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
-
-		// var_to_str on a float variant
-		fv := gt.variant_from_float(42.0)
-		gt.var_to_str(cast(gt.VariantBytes)fv)
-		gd.debug_print("var_to_str(42.0): ok")
 	}
 }
 
@@ -311,7 +306,7 @@ register_classes :: proc() {
 	gt.variant_free(&vs)
 
 	// Test: Vector2 built-in
-	vec := gbv2.vector2_new_xy(3.0, 4.0)
+	vec := gbv2.vector2_new3(3.0, 4.0)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
 	len := gbv2.vector2_length(vec)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))
@@ -319,6 +314,11 @@ register_classes :: proc() {
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).normalized(): (%v, %v)", n.x, n.y))
 	dot := gbv2.vector2_dot(vec, gbv2.Vector2{1, 0})
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).dot(1,0): %v (expect 3)", dot))
+
+	// Utility function smoke test
+	gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
+	gd.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
+	gd.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
 }
 
 // ---- Entry point ----

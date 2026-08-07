@@ -1,4 +1,4 @@
-// context.odin — Odin runtime shim backed by Godot's memory allocator.
+// context.odin -- Odin runtime shim backed by Godot's memory allocator.
 //
 // Routes Odin dynamic allocations through Godot's mem_alloc / mem_realloc /
 // mem_free, so the engine and Odin code share the same heap.

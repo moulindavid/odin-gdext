@@ -26,7 +26,7 @@ Then re-check with `make check`.
 
 ## extension_api.json
 
-A machine-readable dump of Godot's full extension API — built-in classes,
+A machine-readable dump of Godot's full extension API -- built-in classes,
 utility functions, global enums, singletons, native structures, and more.
 
 Generated locally from a Godot binary (not vendored from source):
@@ -40,5 +40,5 @@ This file is ~7 MB and is git-ignored. It does not change between minor
 patch releases, but should be re-dumped when moving to a new Godot minor.
 
 We consume it in `generator` to produce:
-- `core/` — C-ABI types and interface function stubs
-- `bindings/` — typed wrappers for @GlobalScope utility functions
+- `core/` -- C-ABI types and interface function stubs
+- `bindings/` -- typed wrappers for @GlobalScope utility functions

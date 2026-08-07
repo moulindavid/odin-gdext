@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# odin-gdext — Odin bindings for Godot 4 GDExtension
+# odin-gdext -- Odin bindings for Godot 4 GDExtension
 # ---------------------------------------------------------------------------
 
 COLLECTION := godot
@@ -18,7 +18,8 @@ endif
 INTERFACE_JSON := thirdparty/gdextension_interface.json
 INTERFACE_OUT  := core/interface_defs.odin core/interface.odin
 CODEGEN        := bin/godot-codegen
-EXTENSION_API  := thirdparty/extension_api.json
+EXTENSION_API  := extension_api.json
+BUILTIN_STAMP  := bindings/builtin/.stamp
 
 # Build the codegen tool itself.
 $(CODEGEN): $(wildcard generator/*.odin generator/**/*.odin)
@@ -30,13 +31,22 @@ $(INTERFACE_OUT): $(INTERFACE_JSON) $(CODEGEN)
 	@echo ">> Generating interface bindings..."
 	$(CODEGEN) $(INTERFACE_JSON)
 
-.PHONY: codegen interface extension-api check hello test-hello clean
+# Generate builtin type + utility function bindings from extension_api.json.
+$(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
+	@echo ">> Generating builtin + utility bindings..."
+	$(CODEGEN) --builtin $(EXTENSION_API)
+	@touch $(BUILTIN_STAMP)
+
+.PHONY: codegen interface builtins extension-api check hello test-hello clean
 
 # Build the codegen tool.
 codegen: $(CODEGEN)
 
 # Generate the FFI interface.
 interface: $(INTERFACE_OUT)
+
+# Generate builtin type + utility bindings.
+builtins: $(BUILTIN_STAMP)
 
 # Dump the full Godot extension API (builtin classes, utility functions, etc.).
 $(EXTENSION_API):
@@ -50,7 +60,7 @@ check:
 	$(ODIN) check core -no-entry-point -collection:$(COLLECTION)=$(ROOT) -vet -strict-style -default-to-nil-allocator
 
 # Build the hello-world extension shared library.
-hello: interface
+hello: interface builtins
 	@mkdir -p examples/hello/bin
 	$(ODIN) build examples/hello/src \
 		$(ODIN_FLAGS_COMMON) \
@@ -65,5 +75,7 @@ test-hello: hello
 clean:
 	rm -rf examples/hello/bin/
 	rm -f core/interface_defs.odin core/interface.odin
-	rm -f thirdparty/extension_api.json
+	rm -f bindings/builtin/*.odin bindings/utilities.odin
+	rm -f bindings/builtin/.stamp
+	rm -f extension_api.json
 	rm -f bin/godot-codegen
