@@ -28,7 +28,9 @@ hello.add(7.0, 6.0) = 13.0
 
 This example is intentionally low-level and manual. It demonstrates the current
 prototype pipeline: generated GDExtension interface bindings, manual class
-registration, a GDScript-callable method, basic Variant conversion, and generated
-math/utility binding smoke checks.
+registration, a GDScript-callable method, basic Variant conversion, generated
+math/utility binding smoke checks, and class unregistration during module
+deinitialization.
 
-If it doesn´t open in godot or test dont run -> we might have some problem
+If it does not open in Godot or the smoke test does not run, the generated
+bindings, extension build, or local Godot setup may need to be refreshed.
