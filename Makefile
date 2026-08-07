@@ -40,7 +40,7 @@ $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 	$(CODEGEN) --builtin $(EXTENSION_API)
 	@touch $(BUILTIN_STAMP)
 
-.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot test-unit hello test-hello ci clean
+.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot test-unit hello prepare-hello-cache test-hello ci clean
 
 # Build the codegen tool.
 codegen: $(CODEGEN)
@@ -104,9 +104,16 @@ hello: interface builtins
 		-build-mode:shared \
 		-out:examples/hello/bin/hello.so
 
+# Prepare the minimal Godot cache needed for runtime GDExtension discovery.
+# Avoid `godot --import` in CI because Godot 4.7 currently crashes after the
+# extension smoke path succeeds during editor-layout loading.
+prepare-hello-cache:
+	@mkdir -p examples/hello/.godot
+	@printf '%s\n' 'res://hello.gdextension' > examples/hello/.godot/extension_list.cfg
+	@touch examples/hello/.godot/.gdignore
+
 # Test in Godot headless.
-test-hello: hello
-	godot --headless --path examples/hello --import
+test-hello: hello prepare-hello-cache
 	godot --headless --path examples/hello --quit
 
 # Full local/CI validation baseline. Keep this ordered and non-parallel so
@@ -125,6 +132,8 @@ ci:
 
 clean:
 	rm -rf examples/hello/bin/
+	rm -rf examples/hello/.godot/
+	rm -f examples/hello/*.uid
 	rm -f core/interface_defs.odin core/interface.odin
 	rm -f bindings/builtin/*.odin bindings/utilities.odin
 	rm -f bindings/builtin/.stamp

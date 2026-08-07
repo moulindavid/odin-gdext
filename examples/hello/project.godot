@@ -11,5 +11,5 @@ config_version=5
 [application]
 
 config/name="Hello Odin GDExt"
-run/main_scene="uid://co2o5c12sasvq"
+run/main_scene="res://coucou.tscn"
 config/features=PackedStringArray("4.7")
