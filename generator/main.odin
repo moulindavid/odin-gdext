@@ -3,7 +3,6 @@ package bindgen
 
 import "core:encoding/json"
 import "core:fmt"
-import "core:math"
 import "core:os"
 import "core:strings"
 

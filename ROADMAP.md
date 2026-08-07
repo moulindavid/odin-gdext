@@ -16,7 +16,7 @@ Completed safety baseline for the current Godot 4.7 prototype:
 - [x] Add clear nil/trap checks for resolved function pointers.
 - [x] Keep examples unregistering classes during deinitialization.
 
-Priority 0 is considered complete enough to unblock Priority 1 work. Continue to
+Priority 0 is considered complete enough to unblock the next work. We need to
 preserve these invariants while adding new bindings.
 
 ## Priority 1 - stabilize core value types - next

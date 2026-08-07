@@ -7,7 +7,9 @@ ROOT      := $(shell pwd)
 ODIN      := odin
 
 BUILDMODE := debug
-ODIN_FLAGS_COMMON := -collection:$(COLLECTION)=$(ROOT) -vet -strict-style -default-to-nil-allocator -show-timings
+ODIN_CHECK_FLAGS := -collection:$(COLLECTION)=$(ROOT) -vet -strict-style -default-to-nil-allocator
+ODIN_TEST_FLAGS  := -collection:$(COLLECTION)=$(ROOT) -vet -strict-style
+ODIN_FLAGS_COMMON := $(ODIN_CHECK_FLAGS) -show-timings
 
 ifeq ($(BUILDMODE),release)
 	ODIN_FLAGS_COMMON += -o:speed -no-bounds-check
@@ -37,7 +39,7 @@ $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 	$(CODEGEN) --builtin $(EXTENSION_API)
 	@touch $(BUILTIN_STAMP)
 
-.PHONY: codegen interface builtins extension-api check hello test-hello clean
+.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot test-unit hello test-hello ci clean
 
 # Build the codegen tool.
 codegen: $(CODEGEN)
@@ -51,13 +53,47 @@ builtins: $(BUILTIN_STAMP)
 # Dump the full Godot extension API (builtin classes, utility functions, etc.).
 $(EXTENSION_API):
 	@echo ">> Dumping extension API..."
-	godot --dump-extension-api $(EXTENSION_API)
+	godot --headless --dump-extension-api $(EXTENSION_API)
 
 extension-api: $(EXTENSION_API)
 
+# Format handwritten Odin sources. Generated files are intentionally omitted.
+fmt:
+	odinfmt -w -path:core/context.odin
+	odinfmt -w -path:core/lib.odin
+	odinfmt -w -path:core/object.odin
+	odinfmt -w -path:core/variant.odin
+	odinfmt -w -path:generator
+	odinfmt -w -path:godot
+	odinfmt -w -path:examples
+	odinfmt -w -path:tests
+
+# Check formatting without mutating the working tree.
+fmt-check:
+	scripts/fmt-check.sh
+
 # Type-check the core package.
-check:
-	$(ODIN) check core -no-entry-point -collection:$(COLLECTION)=$(ROOT) -vet -strict-style -default-to-nil-allocator
+check: interface
+	$(ODIN) check core -no-entry-point $(ODIN_CHECK_FLAGS)
+
+# Type-check the generator.
+check-generator:
+	$(ODIN) check generator $(ODIN_CHECK_FLAGS)
+
+# Type-check generated binding packages.
+check-bindings: interface builtins
+	$(ODIN) check bindings -no-entry-point $(ODIN_CHECK_FLAGS)
+	$(ODIN) check bindings/builtin -no-entry-point $(ODIN_CHECK_FLAGS)
+
+# Type-check the public facade package.
+check-godot: interface builtins
+	$(ODIN) check godot -no-entry-point $(ODIN_CHECK_FLAGS)
+
+# Run focused Odin unit tests that do not require launching Godot.
+# Odin's test runner allocates internally, so this target intentionally omits
+# -default-to-nil-allocator while keeping vet and strict style enabled.
+test-unit: interface
+	$(ODIN) test tests/core $(ODIN_TEST_FLAGS)
 
 # Build the hello-world extension shared library.
 hello: interface builtins
@@ -71,6 +107,20 @@ hello: interface builtins
 test-hello: hello
 	godot --headless --path examples/hello --import
 	godot --headless --path examples/hello --quit
+
+# Full local/CI validation baseline. Keep this ordered and non-parallel so
+# generated files are created before packages that import them are checked.
+ci:
+	$(MAKE) clean
+	$(MAKE) fmt-check
+	$(MAKE) interface
+	$(MAKE) builtins
+	$(MAKE) check
+	$(MAKE) check-generator
+	$(MAKE) check-bindings
+	$(MAKE) check-godot
+	$(MAKE) test-unit
+	$(MAKE) test-hello
 
 clean:
 	rm -rf examples/hello/bin/
