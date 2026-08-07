@@ -1,4 +1,4 @@
-// godot-core/object.odin — Typed object handle system.
+// godot-core/object.odin -- Typed object handle system.
 //
 // Each Godot class is represented as `distinct ObjectPtr`.
 // Per-class API surface is generated as free functions.

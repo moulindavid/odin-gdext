@@ -1,4 +1,4 @@
-// lib.odin — core helpers built on top of the generated GDExtension interface.
+// lib.odin -- core helpers built on top of the generated GDExtension interface.
 //
 // This file is hand-written. It provides:
 //   - convenient aliases for the generated GDExtension* types
@@ -239,11 +239,7 @@ ensure_builtin_method :: proc "contextless" (
 ) {
 	if bm.init do return
 	bm.init = true
-	string_name_new_with_latin1_chars(
-		cast(UninitializedStringNamePtr)&bm.name_data,
-		name,
-		true,
-	)
+	string_name_new_with_latin1_chars(cast(UninitializedStringNamePtr)&bm.name_data, name, true)
 	bm.method = variant_get_ptr_builtin_method(
 		variant_type,
 		cast(ConstStringNamePtr)&bm.name_data,
@@ -258,7 +254,7 @@ ensure_builtin_method :: proc "contextless" (
 // Construct a StringName from a null-terminated Latin-1/UTF-8 C string.
 // `static = true` signals Godot the name lives for the process lifetime, so
 // it can skip ref-counting; use it for string literals only.
-// In Godot 4.7+, StringNames are internally managed — no explicit destroy needed.
+// In Godot 4.7+, StringNames are internally managed -- no explicit destroy needed.
 string_name_new :: proc "contextless" (
 	dest: UninitializedStringNamePtr,
 	str: cstring,

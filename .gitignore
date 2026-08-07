@@ -29,3 +29,4 @@
 *.uid
 /extension_api.json
 /thirdparty/extension_api.json
+/bindings/utilities.odin

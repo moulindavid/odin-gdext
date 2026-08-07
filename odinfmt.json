@@ -1,0 +1,10 @@
+{
+  "tabs": true,
+  "tabs_width": 4,
+  "character_width": 100,
+  "align_fields": true,
+  "spaces_within_brackets": false,
+  "spaces_within_parens": false,
+  "newline_limit": 2,
+  "sort_imports": true
+}
