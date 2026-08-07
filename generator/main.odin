@@ -400,6 +400,14 @@ gen_interface_proc_type :: proc(
 	write_proc_type(b, type_name, f.arguments, f.return_value.type, defined)
 }
 
+interface_function_is_required :: proc(f: HeaderInterfaceFunction) -> bool {
+	if len(f.deprecated.since) > 0 {return false}
+	for line in f.description {
+		if strings.contains(strings.to_lower(line), "optional") {return false}
+	}
+	return true
+}
+
 // ---------------------------------------------------------------------------
 // Interface globals + init()  (interface.odin)
 // ---------------------------------------------------------------------------
@@ -432,6 +440,7 @@ gen_globals_and_init :: proc(iface: []HeaderInterfaceFunction) -> string {
 	strings.write_string(&b, "    p_library: GDExtensionClassLibraryPtr,\n")
 	strings.write_string(&b, "    p_get_proc_address: GDExtensionInterfaceGetProcAddress,\n")
 	strings.write_string(&b, ") {\n")
+	strings.write_string(&b, "    if p_get_proc_address == nil do _trap_nil_godot_function()\n")
 	strings.write_string(&b, "    library = p_library\n")
 
 	for f in iface {
@@ -443,6 +452,9 @@ gen_globals_and_init :: proc(iface: []HeaderInterfaceFunction) -> string {
 			type_name,
 			f.name,
 		)
+		if interface_function_is_required(f) {
+			fmt.sbprintf(&b, "    if %s == nil do _trap_nil_godot_function()\n", f.name)
+		}
 	}
 	strings.write_string(&b, "}\n")
 

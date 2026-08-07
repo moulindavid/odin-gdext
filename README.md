@@ -38,6 +38,8 @@ create or refresh generated files under `core/`, `bindings/builtin/`, and
 `bindings/utilities.odin` before building the example extension.
 
 `make check` type-checks the `core` package with `-vet -strict-style`.
+Additional focused checks used during development include checking `bindings`,
+`bindings/builtin`, and `godot` with the same collection/vet/strict flags.
 
 ## Imports
 
@@ -116,9 +118,10 @@ odin-gdext/
 
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for the detailed priority plan. In short, the next
-steps are safety hardening, stable value-type wrappers, generated class bindings,
-user-friendly registration helpers, and properties/signals/virtual callbacks.
+See [ROADMAP.md](ROADMAP.md) for the detailed priority plan. Priority 0 safety
+hardening is complete for the current prototype. The next steps are stable
+value-type wrappers, generated class bindings, user-friendly registration
+helpers, and properties/signals/virtual callbacks.
 
 ## License
 

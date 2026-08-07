@@ -277,7 +277,7 @@ emit_variant_conversion :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass
 		c.name,
 	)
 	strings.write_string(b, "\tresult: core.Variant\n")
-	fmt.sbprintf(b, "\tctor := core.get_variant_from_type_constructor(.%s)\n", vt_name)
+	fmt.sbprintf(b, "\tctor := core.require_variant_from_type_constructor(.%s)\n", vt_name)
 	strings.write_string(b, "\t_v := v\n")
 	strings.write_string(
 		b,
@@ -293,7 +293,7 @@ emit_variant_conversion :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass
 		lower,
 		c.name,
 	)
-	fmt.sbprintf(b, "\tctor := core.get_variant_to_type_constructor(.%s)\n", vt_name)
+	fmt.sbprintf(b, "\tctor := core.require_variant_to_type_constructor(.%s)\n", vt_name)
 	fmt.sbprintf(b, "\tresult: %s\n", c.name)
 	strings.write_string(
 		b,
@@ -611,7 +611,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, "\t)\n")
 	strings.write_string(
 		&b,
-		"\tfunc := core.variant_get_ptr_utility_function(cast(core.ConstStringNamePtr)&uf.name_data, hash)\n",
+		"\tfunc := core.require_utility_function(cast(core.ConstStringNamePtr)&uf.name_data, hash)\n",
 	)
 	strings.write_string(&b, "\tuf.func = func\n")
 	strings.write_string(&b, "\tuf.init = true\n")

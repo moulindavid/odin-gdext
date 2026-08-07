@@ -4,17 +4,22 @@ This project is an early prototype. The roadmap below tracks the path from the
 current tested bindings toward a practical game-development GDExtension
 workflow for Odin.
 
-## Priority 0 — safety fixes before adding features
+## Priority 0 - safety fixes before adding features — complete
 
-- Keep allocator behavior correct and documented, including resize and temp
+Completed safety baseline for the current Godot 4.7 prototype:
+
+- [x] Keep allocator behavior correct and documented, including resize and temp
   allocator policy.
-- Keep temporary `String`, temporary `Variant`, and Variant-returning call
-  destruction rules correct.
-- Avoid raw struct offset poking in examples and generated code.
-- Add clear nil/trap checks for resolved function pointers.
-- Keep examples unregistering classes during deinitialization.
+- [x] Keep temporary `String`, temporary `Variant`, and Variant-returning call
+  destruction rules correct for the current handwritten/generated helpers.
+- [x] Avoid raw struct offset poking in examples and generated code.
+- [x] Add clear nil/trap checks for resolved function pointers.
+- [x] Keep examples unregistering classes during deinitialization.
 
-## Priority 1 — stabilize core value types
+Priority 0 is considered complete enough to unblock Priority 1 work. Continue to
+preserve these invariants while adding new bindings.
+
+## Priority 1 - stabilize core value types - next
 
 Implement proper wrappers and ownership rules for:
 
@@ -26,7 +31,7 @@ Implement proper wrappers and ownership rules for:
 - `Dictionary`
 - packed arrays
 
-## Priority 2 — generated class bindings
+## Priority 2 - generated class bindings
 
 Generate object/class APIs such as `Object`, `Node`, `Node2D`, `Resource`, method
 binds, inheritance/upcast helpers, safe `cast_to`, enums/constants, and Odin
@@ -44,7 +49,7 @@ _ready :: proc(self: Player) {
 }
 ```
 
-## Priority 3 — user class registration helpers
+## Priority 3 - user class registration helpers
 
 Build a small Odin-friendly helper layer over manual `ClassCreationInfo` and
 `ClassMethodInfo` construction. Simple free
@@ -76,7 +81,7 @@ gt.register_method(
 The first goal is ergonomic wrappers for today's manual registration path; later
 codegen can emit the same descriptors for larger class APIs.
 
-## Priority 4 — properties, signals, notifications, and virtuals
+## Priority 4 - properties, signals, notifications, and virtuals
 
 Add the features needed for day-to-day game development:
 

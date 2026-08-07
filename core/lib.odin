@@ -95,6 +95,8 @@ PtrKeyedSetter :: GDExtensionPtrKeyedSetter
 PtrKeyedGetter :: GDExtensionPtrKeyedGetter
 PtrKeyedChecker :: GDExtensionPtrKeyedChecker
 PtrUtilityFunction :: GDExtensionPtrUtilityFunction
+VariantFromTypeConstructor :: GDExtensionVariantFromTypeConstructorFunc
+TypeFromVariantConstructor :: GDExtensionTypeFromVariantConstructorFunc
 
 // ---------------------------------------------------------------------------
 // Calling through resolved function pointers
@@ -156,6 +158,8 @@ call_method_ptr_no_ret :: proc "contextless" (
 	base: ObjectPtr,
 	args: ..TypePtr,
 ) {
+	if method == nil do _trap_nil_godot_function()
+	if object_method_bind_ptrcall == nil do _trap_nil_godot_function()
 	object_method_bind_ptrcall(method, base, raw_data(args), cast(TypePtr)nil)
 }
 
@@ -166,6 +170,8 @@ call_method_ptr_ret :: proc "contextless" (
 	base: ObjectPtr,
 	args: ..TypePtr,
 ) -> T {
+	if method == nil do _trap_nil_godot_function()
+	if object_method_bind_ptrcall == nil do _trap_nil_godot_function()
 	ret: T
 	object_method_bind_ptrcall(method, base, raw_data(args), cast(TypePtr)&ret)
 	return ret
@@ -197,16 +203,57 @@ call_utility_function_ptr_no_ret :: proc "contextless" (
 // Builtin type construction / destruction
 // ---------------------------------------------------------------------------
 
+require_variant_from_type_constructor :: proc "contextless" (
+	type: VariantType,
+) -> VariantFromTypeConstructor {
+	if get_variant_from_type_constructor == nil do _trap_nil_godot_function()
+	ctor := get_variant_from_type_constructor(type)
+	if ctor == nil do _trap_nil_godot_function()
+	return ctor
+}
+
+require_variant_to_type_constructor :: proc "contextless" (
+	type: VariantType,
+) -> TypeFromVariantConstructor {
+	if get_variant_to_type_constructor == nil do _trap_nil_godot_function()
+	ctor := get_variant_to_type_constructor(type)
+	if ctor == nil do _trap_nil_godot_function()
+	return ctor
+}
+
+require_utility_function :: proc "contextless" (
+	name: ConstStringNamePtr,
+	hash: i64,
+) -> PtrUtilityFunction {
+	if variant_get_ptr_utility_function == nil do _trap_nil_godot_function()
+	func := variant_get_ptr_utility_function(name, hash)
+	if func == nil do _trap_nil_godot_function()
+	return func
+}
+
+require_classdb_method_bind :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	method_name: ConstStringNamePtr,
+	hash: i64,
+) -> MethodBindPtr {
+	if classdb_get_method_bind == nil do _trap_nil_godot_function()
+	method := classdb_get_method_bind(class_name, method_name, hash)
+	if method == nil do _trap_nil_godot_function()
+	return method
+}
+
 // Fetch a builtin type constructor by its index (0-based).
 get_builtin_constructor_by_index :: proc "contextless" (
 	type: VariantType,
 	index: i32,
 ) -> PtrConstructor {
+	if variant_get_ptr_constructor == nil do _trap_nil_godot_function()
 	return variant_get_ptr_constructor(type, index)
 }
 
 // Fetch the destructor for a builtin type. Returns nil if it has none.
 get_builtin_destructor :: proc "contextless" (type: VariantType) -> PtrDestructor {
+	if variant_get_ptr_destructor == nil do _trap_nil_godot_function()
 	return variant_get_ptr_destructor(type)
 }
 
@@ -256,6 +303,8 @@ ensure_builtin_method :: proc "contextless" (
 
 	if bm.init do return
 
+	if string_name_new_with_latin1_chars == nil do _trap_nil_godot_function()
+	if variant_get_ptr_builtin_method == nil do _trap_nil_godot_function()
 	string_name_new_with_latin1_chars(cast(UninitializedStringNamePtr)&bm.name_data, name, true)
 	method := variant_get_ptr_builtin_method(
 		variant_type,

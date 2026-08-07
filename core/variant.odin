@@ -13,7 +13,7 @@ Variant :: distinct [GDExtensionVariant_Size]u8
 // ---- Variant construction ----
 
 variant_from_float :: proc "contextless" (x: f64) -> (v: Variant) {
-	ctor := get_variant_from_type_constructor(.Float)
+	ctor := require_variant_from_type_constructor(.Float)
 	_x := x
 	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
 	return
@@ -22,7 +22,7 @@ variant_from_float :: proc "contextless" (x: f64) -> (v: Variant) {
 variant_from_cstring :: proc "contextless" (s: cstring) -> (v: Variant) {
 	str_data: [8]u8
 	string_new_with_latin1_chars(cast(UninitializedStringPtr)&str_data[0], s)
-	ctor := get_variant_from_type_constructor(.String)
+	ctor := require_variant_from_type_constructor(.String)
 	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&str_data[0])
 	destroy_builtin(.String, cast(TypePtr)&str_data[0])
 	return
@@ -40,14 +40,14 @@ variant_free_temp :: proc "contextless" (v: ^Variant) {
 }
 
 variant_from_bool :: proc "contextless" (x: bool) -> (v: Variant) {
-	ctor := get_variant_from_type_constructor(.Bool)
+	ctor := require_variant_from_type_constructor(.Bool)
 	_x := x
 	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
 	return
 }
 
 variant_from_int :: proc "contextless" (x: i64) -> (v: Variant) {
-	ctor := get_variant_from_type_constructor(.Int)
+	ctor := require_variant_from_type_constructor(.Int)
 	_x := x
 	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
 	return
@@ -56,21 +56,21 @@ variant_from_int :: proc "contextless" (x: i64) -> (v: Variant) {
 // ---- Variant extraction ----
 
 variant_to_float :: proc "contextless" (v: ^Variant) -> f64 {
-	ctor := get_variant_to_type_constructor(.Float)
+	ctor := require_variant_to_type_constructor(.Float)
 	ret: f64
 	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
 	return ret
 }
 
 variant_to_int :: proc "contextless" (v: ^Variant) -> i64 {
-	ctor := get_variant_to_type_constructor(.Int)
+	ctor := require_variant_to_type_constructor(.Int)
 	ret: i64
 	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
 	return ret
 }
 
 variant_to_bool :: proc "contextless" (v: ^Variant) -> bool {
-	ctor := get_variant_to_type_constructor(.Bool)
+	ctor := require_variant_to_type_constructor(.Bool)
 	ret: bool
 	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
 	return ret
@@ -127,7 +127,7 @@ array_size :: proc "contextless" (arr: ^Variant) -> i64 {
 		&err,
 	)
 	dest: i64
-	to_ctor := get_variant_to_type_constructor(.Int)
+	to_ctor := require_variant_to_type_constructor(.Int)
 	to_ctor(cast(UninitializedTypePtr)&dest, cast(VariantPtr)&ret[0])
 	variant_free_temp(&ret)
 	return dest
@@ -148,7 +148,6 @@ print_init :: proc() {
 }
 
 print :: proc "contextless" (args: ..TypePtr) {
-	func := variant_get_ptr_utility_function(print_name, print_hash)
-	if func == nil {return}
+	func := require_utility_function(print_name, print_hash)
 	call_utility_function_ptr_no_ret(func, ..args)
 }

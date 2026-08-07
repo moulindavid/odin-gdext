@@ -38,7 +38,7 @@ is_nil :: proc "contextless" (obj: Object) -> bool {
 // owns the returned Variant and must destroy it with variant_free.
 object_to_variant :: proc "contextless" (obj: ObjectPtr) -> Variant {
 	v: Variant
-	ctor := get_variant_from_type_constructor(.Object)
+	ctor := require_variant_from_type_constructor(.Object)
 	_obj := obj
 	ctor(cast(UninitializedVariantPtr)&v, cast(TypePtr)&_obj)
 	return v
@@ -47,7 +47,7 @@ object_to_variant :: proc "contextless" (obj: ObjectPtr) -> Variant {
 // object_from_variant extracts an ObjectPtr from a Variant without taking
 // ownership of it.
 object_from_variant :: proc "contextless" (v: ^Variant) -> ObjectPtr {
-	ctor := get_variant_to_type_constructor(.Object)
+	ctor := require_variant_to_type_constructor(.Object)
 	result: ObjectPtr
 	ctor(cast(TypePtr)&result, cast(VariantPtr)v)
 	return result
@@ -73,7 +73,7 @@ init_class_casting :: proc() {
 		cstring("Object"),
 		true,
 	)
-	is_class_method_bind = classdb_get_method_bind(
+	is_class_method_bind = require_classdb_method_bind(
 		object_class_name,
 		is_class_method_name,
 		2619796661,
@@ -82,6 +82,8 @@ init_class_casting :: proc() {
 
 // is_class checks whether obj is an instance of (or derives from) class_name.
 is_class :: proc "contextless" (obj: ObjectPtr, class_name: StringNamePtr) -> bool {
+	if is_class_method_bind == nil do _trap_nil_godot_function()
+	if object_method_bind_ptrcall == nil do _trap_nil_godot_function()
 	result: bool
 	args := [1]rawptr{class_name}
 	object_method_bind_ptrcall(is_class_method_bind, obj, &args[0], &result)
