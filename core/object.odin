@@ -40,7 +40,7 @@ object_to_variant :: proc "contextless" (obj: ObjectPtr) -> Variant {
 	v: Variant
 	ctor := require_variant_from_type_constructor(.Object)
 	_obj := obj
-	ctor(cast(UninitializedVariantPtr)&v, cast(TypePtr)&_obj)
+	ctor(uninitialized_variant_ptr(&v), cast(TypePtr)&_obj)
 	return v
 }
 
@@ -49,7 +49,7 @@ object_to_variant :: proc "contextless" (obj: ObjectPtr) -> Variant {
 object_from_variant :: proc "contextless" (v: ^Variant) -> ObjectPtr {
 	ctor := require_variant_to_type_constructor(.Object)
 	result: ObjectPtr
-	ctor(cast(TypePtr)&result, cast(VariantPtr)v)
+	ctor(cast(TypePtr)&result, variant_ptr(v))
 	return result
 }
 

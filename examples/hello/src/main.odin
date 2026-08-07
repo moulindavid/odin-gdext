@@ -97,7 +97,7 @@ add_call :: proc "c" (
 	buf: [64]u8
 	gd.debug_print(fmt.bprintf(buf[:], "add_call a=%v b=%v", a, b))
 	rv := gt.variant_from_float(a + b)
-	gd.variant_new_copy(r_return, cast(gd.ConstVariantPtr)&rv[0])
+	gt.variant_init_copy(r_return, &rv)
 	gt.variant_free(&rv)
 }
 
@@ -275,7 +275,7 @@ register_classes :: proc() {
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
-	gt.print(cast(gd.TypePtr)&vs[0])
+	gt.print(gt.variant_ptr(&vs))
 	gt.variant_free(&vs)
 
 	// Test: Vector2 built-in

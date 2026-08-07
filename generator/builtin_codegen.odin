@@ -281,7 +281,7 @@ emit_variant_conversion :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass
 	strings.write_string(b, "\t_v := v\n")
 	strings.write_string(
 		b,
-		"\tctor(cast(core.UninitializedVariantPtr)&result, cast(core.TypePtr)&_v)\n",
+		"\tctor(core.uninitialized_variant_ptr(&result), cast(core.TypePtr)&_v)\n",
 	)
 	strings.write_string(b, "\treturn result\n")
 	strings.write_string(b, "}\n\n")
@@ -297,7 +297,7 @@ emit_variant_conversion :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass
 	fmt.sbprintf(b, "\tresult: %s\n", c.name)
 	strings.write_string(
 		b,
-		"\tctor(cast(core.UninitializedTypePtr)&result, cast(core.VariantPtr)v)\n",
+		"\tctor(cast(core.UninitializedTypePtr)&result, core.variant_ptr(v))\n",
 	)
 	strings.write_string(b, "\treturn result\n")
 	strings.write_string(b, "}\n\n")

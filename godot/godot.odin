@@ -11,6 +11,7 @@ import gcore "godot:core"
 // --- Core types ---
 Object :: gcore.Object
 RefCounted :: gcore.RefCounted
+VariantStorage :: gcore.VariantStorage
 Variant :: gcore.Variant
 StringRepr :: gcore.StringRepr
 
@@ -24,6 +25,13 @@ object_from_variant :: gcore.object_from_variant
 godot_context :: gcore.godot_context
 
 // --- Variant ---
+variant_ptr :: gcore.variant_ptr
+const_variant_ptr :: gcore.const_variant_ptr
+uninitialized_variant_ptr :: gcore.uninitialized_variant_ptr
+variant_init_nil :: gcore.variant_init_nil
+variant_nil :: gcore.variant_nil
+variant_init_copy :: gcore.variant_init_copy
+variant_copy :: gcore.variant_copy
 variant_from_float :: gcore.variant_from_float
 variant_from_int :: gcore.variant_from_int
 variant_from_bool :: gcore.variant_from_bool
@@ -32,6 +40,7 @@ variant_to_float :: gcore.variant_to_float
 variant_to_int :: gcore.variant_to_int
 variant_to_bool :: gcore.variant_to_bool
 variant_free :: gcore.variant_free
+variant_free_temp :: gcore.variant_free_temp
 array_new :: gcore.array_new
 array_push :: gcore.array_push
 array_size :: gcore.array_size
