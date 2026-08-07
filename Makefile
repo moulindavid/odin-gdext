@@ -36,6 +36,7 @@ $(INTERFACE_OUT): $(INTERFACE_JSON) $(CODEGEN)
 # Generate builtin type + utility function bindings from extension_api.json.
 $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 	@echo ">> Generating builtin + utility bindings..."
+	@mkdir -p bindings/builtin
 	$(CODEGEN) --builtin $(EXTENSION_API)
 	@touch $(BUILTIN_STAMP)
 

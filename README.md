@@ -67,9 +67,10 @@ keeps `-vet` and `-strict-style` but intentionally omits
 `-default-to-nil-allocator`. Runtime integration is still covered by
 `make test-hello`, which builds the example extension and runs Godot headless.
 
-The GitHub Actions workflow in `.github/workflows/ci.yml` installs Odin, downloads
-Godot 4.7, and runs `make ci`. Generated bindings remain ignored by git; CI
-regenerates and checks them instead of requiring generated output commits.
+The GitHub Actions workflow in `.github/workflows/ci.yml` installs Odin,
+downloads `odinfmt` from the OLS tooling releases, downloads Godot 4.7, and runs
+`make ci`. Generated bindings remain ignored by git; CI regenerates and checks
+them instead of requiring generated output commits.
 
 ## Imports
 
