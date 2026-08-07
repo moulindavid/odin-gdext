@@ -6,35 +6,47 @@ package godot_core
 
 GDExtensionVariant_Size :: 24
 
+// Variant is initialized Godot Variant storage. Every proc returning a Variant
+// transfers ownership to the caller; destroy it with variant_free when finished.
+Variant :: distinct [GDExtensionVariant_Size]u8
+
 // ---- Variant construction ----
 
-variant_from_float :: proc "contextless" (x: f64) -> (v: [GDExtensionVariant_Size]u8) {
+variant_from_float :: proc "contextless" (x: f64) -> (v: Variant) {
 	ctor := get_variant_from_type_constructor(.Float)
 	_x := x
 	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
 	return
 }
 
-variant_from_cstring :: proc "contextless" (s: cstring) -> (v: [GDExtensionVariant_Size]u8) {
+variant_from_cstring :: proc "contextless" (s: cstring) -> (v: Variant) {
 	str_data: [8]u8
 	string_new_with_latin1_chars(cast(UninitializedStringPtr)&str_data[0], s)
 	ctor := get_variant_from_type_constructor(.String)
 	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&str_data[0])
+	destroy_builtin(.String, cast(TypePtr)&str_data[0])
 	return
 }
 
-variant_free :: proc "contextless" (v: ^[GDExtensionVariant_Size]u8) {
-	variant_destroy(cast(VariantPtr)&v[0])
+variant_free :: proc "contextless" (v: ^Variant) {
+	variant_destroy(cast(VariantPtr)v)
 }
 
-variant_from_bool :: proc "contextless" (x: bool) -> (v: [GDExtensionVariant_Size]u8) {
+// Variant-returning calls initialize their return storage even for nil/void
+// results. Destroy every initialized temporary Variant after extracting data from
+// it. Generated wrappers should follow this same ownership rule.
+variant_free_temp :: proc "contextless" (v: ^Variant) {
+	variant_destroy(cast(VariantPtr)v)
+}
+
+variant_from_bool :: proc "contextless" (x: bool) -> (v: Variant) {
 	ctor := get_variant_from_type_constructor(.Bool)
 	_x := x
 	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
 	return
 }
 
-variant_from_int :: proc "contextless" (x: i64) -> (v: [GDExtensionVariant_Size]u8) {
+variant_from_int :: proc "contextless" (x: i64) -> (v: Variant) {
 	ctor := get_variant_from_type_constructor(.Int)
 	_x := x
 	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
@@ -43,21 +55,21 @@ variant_from_int :: proc "contextless" (x: i64) -> (v: [GDExtensionVariant_Size]
 
 // ---- Variant extraction ----
 
-variant_to_float :: proc "contextless" (v: ^[GDExtensionVariant_Size]u8) -> f64 {
+variant_to_float :: proc "contextless" (v: ^Variant) -> f64 {
 	ctor := get_variant_to_type_constructor(.Float)
 	ret: f64
 	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
 	return ret
 }
 
-variant_to_int :: proc "contextless" (v: ^[GDExtensionVariant_Size]u8) -> i64 {
+variant_to_int :: proc "contextless" (v: ^Variant) -> i64 {
 	ctor := get_variant_to_type_constructor(.Int)
 	ret: i64
 	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
 	return ret
 }
 
-variant_to_bool :: proc "contextless" (v: ^[GDExtensionVariant_Size]u8) -> bool {
+variant_to_bool :: proc "contextless" (v: ^Variant) -> bool {
 	ctor := get_variant_to_type_constructor(.Bool)
 	ret: bool
 	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
@@ -66,16 +78,13 @@ variant_to_bool :: proc "contextless" (v: ^[GDExtensionVariant_Size]u8) -> bool 
 
 // ---- Array builtin ----
 
-array_new :: proc "contextless" () -> (v: [GDExtensionVariant_Size]u8) {
+array_new :: proc "contextless" () -> (v: Variant) {
 	err: CallError
 	variant_construct(.Array, cast(UninitializedVariantPtr)&v[0], nil, 0, &err)
 	return
 }
 
-array_push :: proc "contextless" (
-	arr: ^[GDExtensionVariant_Size]u8,
-	value: ^[GDExtensionVariant_Size]u8,
-) {
+array_push :: proc "contextless" (arr: ^Variant, value: ^Variant) {
 	push_name_data: [8]u8
 	string_name_new_with_latin1_chars(
 		cast(UninitializedStringNamePtr)&push_name_data[0],
@@ -85,7 +94,7 @@ array_push :: proc "contextless" (
 	push_name := StringNamePtr(&push_name_data[0])
 
 	err: CallError
-	ret: [GDExtensionVariant_Size]u8
+	ret: Variant
 	args := [1]ConstVariantPtr{cast(ConstVariantPtr)&value[0]}
 	variant_call(
 		cast(VariantPtr)&arr[0],
@@ -95,9 +104,10 @@ array_push :: proc "contextless" (
 		cast(UninitializedVariantPtr)&ret[0],
 		&err,
 	)
+	variant_free_temp(&ret)
 }
 
-array_size :: proc "contextless" (arr: ^[GDExtensionVariant_Size]u8) -> i64 {
+array_size :: proc "contextless" (arr: ^Variant) -> i64 {
 	size_name_data: [8]u8
 	string_name_new_with_latin1_chars(
 		cast(UninitializedStringNamePtr)&size_name_data[0],
@@ -106,12 +116,20 @@ array_size :: proc "contextless" (arr: ^[GDExtensionVariant_Size]u8) -> i64 {
 	)
 	size_name := StringNamePtr(&size_name_data[0])
 
-	ret: [GDExtensionVariant_Size]u8
+	ret: Variant
 	err: CallError
-	variant_call(cast(VariantPtr)&arr[0], size_name, nil, 0, cast(VariantPtr)&ret[0], &err)
+	variant_call(
+		cast(VariantPtr)&arr[0],
+		size_name,
+		nil,
+		0,
+		cast(UninitializedVariantPtr)&ret[0],
+		&err,
+	)
 	dest: i64
 	to_ctor := get_variant_to_type_constructor(.Int)
 	to_ctor(cast(UninitializedTypePtr)&dest, cast(VariantPtr)&ret[0])
+	variant_free_temp(&ret)
 	return dest
 }
 

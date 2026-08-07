@@ -26,6 +26,8 @@ HelloData :: struct {
 
 // ---- Class lifecycle callbacks ----
 
+NOTIFICATION_READY :: 13
+
 create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool) -> gd.ObjectPtr {
 	context = gt.godot_context()
 	object := gd.construct_object(hello_parent_name)
@@ -45,7 +47,7 @@ free_instance :: proc "c" (class_userdata: rawptr, instance: gd.ClassInstancePtr
 notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reversed: bool) {
 	if instance == nil {return}
 	context = gt.godot_context()
-	if what == 13 {
+	if what == NOTIFICATION_READY {
 		hn := hello_node_unwrap(instance)
 		gd.debug_print("Hello from Odin!")
 
@@ -68,8 +70,9 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 		)
 
 		v := gt.object_to_variant(obj)
-		back := gt.object_from_variant(v)
+		back := gt.object_from_variant(&v)
 		gd.debug_print(fmt.bprintf(buf[:], "variant roundtrip: %v (expect true)", back == obj))
+		gt.variant_free(&v)
 
 		// Utility functions
 		gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
@@ -89,8 +92,8 @@ add_call :: proc "c" (
 	r_error: ^gd.CallError,
 ) {
 	context = gt.godot_context()
-	a := gt.variant_to_float(cast(^[24]u8)p_args[0])
-	b := gt.variant_to_float(cast(^[24]u8)p_args[1])
+	a := gt.variant_to_float(cast(^gt.Variant)p_args[0])
+	b := gt.variant_to_float(cast(^gt.Variant)p_args[1])
 	buf: [64]u8
 	gd.debug_print(fmt.bprintf(buf[:], "add_call a=%v b=%v", a, b))
 	rv := gt.variant_from_float(a + b)
@@ -172,10 +175,8 @@ register_methods :: proc() {
 	info.arguments_metadata = &add_arg_meta[0]
 	add_return_info.name = add_method_name
 
-	fn_call: gd.GDExtensionClassMethodCall = add_call
-	fn_ptr: gd.GDExtensionClassMethodPtrCall = add_ptrcall
-	(cast(^rawptr)(cast(uintptr)info + 16))^ = cast(rawptr)fn_call
-	(cast(^rawptr)(cast(uintptr)info + 24))^ = cast(rawptr)fn_ptr
+	info.call_func = add_call
+	info.ptrcall_func = add_ptrcall
 
 	gd.classdb_register_extension_class_method(gd.library, hello_class_name, info)
 	gd.debug_print("[odin-gdext] Method add registered!")
@@ -244,35 +245,7 @@ register_classes :: proc() {
 	)
 	gd.debug_print("[odin-gdext] HelloNode registered!")
 
-	gd.debug_print("[odin-gdext] Checking sizes...")
 	buf: [64]u8
-	gd.debug_print(fmt.bprintf(buf[:], "  MethodInfo: %v", size_of(gd.ClassMethodInfo)))
-	gd.debug_print(fmt.bprintf(buf[:], "  PropertyInfo: %v", size_of(gd.PropertyInfo)))
-	gd.debug_print(
-		fmt.bprintf(buf[:], "  call_func offset: %v", offset_of(gd.ClassMethodInfo, call_func)),
-	)
-	gd.debug_print(
-		fmt.bprintf(
-			buf[:],
-			"  ptrcall_func offset: %v",
-			offset_of(gd.ClassMethodInfo, ptrcall_func),
-		),
-	)
-	gd.debug_print(
-		fmt.bprintf(
-			buf[:],
-			"  GDExtensionClassMethodCall size: %v",
-			size_of(gd.GDExtensionClassMethodCall),
-		),
-	)
-	gd.debug_print(
-		fmt.bprintf(
-			buf[:],
-			"  GDExtensionClassMethodPtrCall size: %v",
-			size_of(gd.GDExtensionClassMethodPtrCall),
-		),
-	)
-	gd.debug_print("[odin-gdext] Sizes printed.")
 
 	register_methods()
 
@@ -346,4 +319,6 @@ initialize_module :: proc "c" (user_data: rawptr, level: gd.InitializationLevel)
 
 deinitialize_module :: proc "c" (user_data: rawptr, level: gd.InitializationLevel) {
 	context = gt.godot_context()
+	if level != .Scene {return}
+	gd.unregister_class(hello_class_name)
 }

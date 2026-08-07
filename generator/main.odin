@@ -293,6 +293,8 @@ gen_alias :: proc(b: ^strings.Builder, t: HeaderType, defined: ^map[string]bool)
 
 gen_handle :: proc(b: ^strings.Builder, t: HeaderType) {
 	emit_doc(b, t.description, t.since, t.deprecated, "")
+	// TODO: migrate handles to distinct rawptr aliases once core/examples have
+	// explicit casts for const/uninitialized pointer roles.
 	fmt.sbprintf(b, "%s :: rawptr\n\n", t.name)
 }
 
