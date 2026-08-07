@@ -3,6 +3,7 @@ package hello
 import "core:fmt"
 import gt "godot:godot"
 import gd "godot:core"
+import gbv2 "godot:bindings/builtin"
 
 // ---- Typed handle ----
 
@@ -308,6 +309,16 @@ register_classes :: proc() {
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
 	gt.print(cast(gd.TypePtr)&vs[0])
 	gt.variant_free(&vs)
+
+	// Test: Vector2 built-in
+	vec := gbv2.vector2_new_xy(3.0, 4.0)
+	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
+	len := gbv2.vector2_length(vec)
+	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))
+	n := gbv2.vector2_normalized(vec)
+	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).normalized(): (%v, %v)", n.x, n.y))
+	dot := gbv2.vector2_dot(vec, gbv2.Vector2{1, 0})
+	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).dot(1,0): %v (expect 3)", dot))
 }
 
 // ---- Entry point ----

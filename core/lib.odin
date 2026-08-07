@@ -184,13 +184,12 @@ call_utility_function_ptr_no_ret :: proc "contextless" (
 // Builtin type construction / destruction
 // ---------------------------------------------------------------------------
 
-// Fetch the constructor for a builtin type with `arg_count` arguments.
-// Returns nil if the type has no such constructor.
-get_builtin_constructor :: proc "contextless" (
+// Fetch a builtin type constructor by its index (0-based).
+get_builtin_constructor_by_index :: proc "contextless" (
 	type: VariantType,
-	arg_count: i32,
+	index: i32,
 ) -> PtrConstructor {
-	return variant_get_ptr_constructor(type, arg_count)
+	return variant_get_ptr_constructor(type, index)
 }
 
 // Fetch the destructor for a builtin type. Returns nil if it has none.
@@ -204,7 +203,7 @@ construct_builtin :: proc "contextless" (
 	dest: UninitializedTypePtr,
 	args: ..TypePtr,
 ) -> bool {
-	constructor := get_builtin_constructor(type, i32(len(args)))
+	constructor := get_builtin_constructor_by_index(type, i32(len(args)))
 	if constructor == nil {
 		return false
 	}
@@ -223,17 +222,17 @@ destroy_builtin :: proc "contextless" (type: VariantType, ptr: TypePtr) {
 // Lazy-init for builtin methods
 // ---------------------------------------------------------------------------
 
-// _BuiltinMethod holds a resolved builtin method pointer and its StringName
+// BuiltinMethod holds a resolved builtin method pointer and its StringName
 // storage. Used by generated bindings for one-time lazy resolution.
-_BuiltinMethod :: struct {
+BuiltinMethod :: struct {
 	name_data: [8]u8,
 	method:    PtrBuiltInMethod,
 	init:      bool,
 }
 
-// _ensure_builtin_method resolves a builtin method pointer on first call.
-_ensure_builtin_method :: proc "contextless" (
-	bm: ^_BuiltinMethod,
+// ensure_builtin_method resolves a builtin method pointer on first call.
+ensure_builtin_method :: proc "contextless" (
+	bm: ^BuiltinMethod,
 	variant_type: VariantType,
 	name: cstring,
 	hash: i64,
