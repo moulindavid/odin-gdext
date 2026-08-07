@@ -1,4 +1,8 @@
-// godot/godot.odin -- Thin re-export facade.
+// godot/godot.odin -- Small convenience facade.
+//
+// This package intentionally re-exports only a tiny handwritten subset today.
+// Import `godot:bindings` and `godot:bindings/builtin` directly for generated
+// utility and builtin APIs.
 package godot
 
 import gbind "godot:bindings"
@@ -7,7 +11,7 @@ import gcore "godot:core"
 // --- Core types ---
 Object :: gcore.Object
 RefCounted :: gcore.RefCounted
-VariantBytes :: gcore.VariantBytes
+Variant :: gcore.Variant
 StringRepr :: gcore.StringRepr
 
 // --- Core functions ---

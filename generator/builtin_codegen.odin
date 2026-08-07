@@ -124,7 +124,7 @@ arg_type_map := map[string]string {
 	"int64"   = "i64",
 	"float"   = "f64",
 	"double"  = "f64",
-	"Variant" = "core.VariantBytes",
+	"Variant" = "core.Variant",
 }
 
 // Entries common to both maps (builtin types, pointer types).
@@ -267,11 +267,16 @@ emit_variant_conversion :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass
 	// to_variant
 	fmt.sbprintf(
 		b,
-		"%s_to_variant :: proc \"contextless\" (v: %s) -> core.VariantBytes {{\n",
+		"// %s_to_variant returns an initialized Variant; call core.variant_free when done.\n",
+		lower,
+	)
+	fmt.sbprintf(
+		b,
+		"%s_to_variant :: proc \"contextless\" (v: %s) -> core.Variant {{\n",
 		lower,
 		c.name,
 	)
-	strings.write_string(b, "\tresult: core.VariantBytes\n")
+	strings.write_string(b, "\tresult: core.Variant\n")
 	fmt.sbprintf(b, "\tctor := core.get_variant_from_type_constructor(.%s)\n", vt_name)
 	strings.write_string(b, "\t_v := v\n")
 	strings.write_string(
@@ -284,16 +289,15 @@ emit_variant_conversion :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass
 	// from_variant
 	fmt.sbprintf(
 		b,
-		"%s_from_variant :: proc \"contextless\" (v: core.VariantBytes) -> %s {{\n",
+		"%s_from_variant :: proc \"contextless\" (v: ^core.Variant) -> %s {{\n",
 		lower,
 		c.name,
 	)
-	strings.write_string(b, "\t_v := v\n")
 	fmt.sbprintf(b, "\tctor := core.get_variant_to_type_constructor(.%s)\n", vt_name)
 	fmt.sbprintf(b, "\tresult: %s\n", c.name)
 	strings.write_string(
 		b,
-		"\tctor(cast(core.UninitializedTypePtr)&result, cast(core.VariantPtr)&_v)\n",
+		"\tctor(cast(core.UninitializedTypePtr)&result, cast(core.VariantPtr)v)\n",
 	)
 	strings.write_string(b, "\treturn result\n")
 	strings.write_string(b, "}\n\n")
@@ -571,7 +575,8 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	)
 	strings.write_string(&b, "// Auto-generated from extension_api.json. DO NOT EDIT.\n\n")
 	strings.write_string(&b, "package godot_bindings\n\n")
-	strings.write_string(&b, "import core \"godot:core\"\n\n")
+	strings.write_string(&b, "import core \"godot:core\"\n")
+	strings.write_string(&b, "import \"core:sync\"\n\n")
 
 	// _UtilFunc struct
 	strings.write_string(
@@ -588,6 +593,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, "\tname_data: [8]u8,\n")
 	strings.write_string(&b, "\tfunc:      core.PtrUtilityFunction,\n")
 	strings.write_string(&b, "\tinit:      bool,\n")
+	strings.write_string(&b, "\tmutex:     sync.Mutex,\n")
 	strings.write_string(&b, "}\n\n")
 
 	strings.write_string(&b, "@(private=\"file\")\n")
@@ -595,8 +601,9 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 		&b,
 		"_ensure_utility :: proc \"contextless\" (uf: ^_UtilFunc, name: cstring, hash: i64) {\n",
 	)
-	strings.write_string(&b, "\tif uf.init do return\n")
-	strings.write_string(&b, "\tuf.init = true\n")
+	strings.write_string(&b, "\tsync.mutex_lock(&uf.mutex)\n")
+	strings.write_string(&b, "\tdefer sync.mutex_unlock(&uf.mutex)\n\n")
+	strings.write_string(&b, "\tif uf.init do return\n\n")
 	strings.write_string(&b, "\tcore.string_name_new_with_latin1_chars(\n")
 	strings.write_string(&b, "\t\tcast(core.UninitializedStringNamePtr)&uf.name_data,\n")
 	strings.write_string(&b, "\t\tname,\n")
@@ -604,8 +611,10 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, "\t)\n")
 	strings.write_string(
 		&b,
-		"\tuf.func = core.variant_get_ptr_utility_function(cast(core.ConstStringNamePtr)&uf.name_data, hash)\n",
+		"\tfunc := core.variant_get_ptr_utility_function(cast(core.ConstStringNamePtr)&uf.name_data, hash)\n",
 	)
+	strings.write_string(&b, "\tuf.func = func\n")
+	strings.write_string(&b, "\tuf.init = true\n")
 	strings.write_string(&b, "}\n\n")
 
 	// Group functions by category for readability

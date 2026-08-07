@@ -13,6 +13,8 @@
 
 package godot_core
 
+import "base:intrinsics"
+import "core:sync"
 
 // ---------------------------------------------------------------------------
 // Type aliases (canonical generated names in interface_defs.odin)
@@ -98,12 +100,18 @@ PtrUtilityFunction :: GDExtensionPtrUtilityFunction
 // Calling through resolved function pointers
 // ---------------------------------------------------------------------------
 
+_trap_nil_godot_function :: proc "contextless" () -> ! {
+	intrinsics.debug_trap()
+	unreachable()
+}
+
 // Invoke a builtin type constructor on uninitialized storage `base`.
 call_builtin_constructor :: proc "contextless" (
 	constructor: PtrConstructor,
 	base: UninitializedTypePtr,
 	args: ..TypePtr,
 ) {
+	if constructor == nil do _trap_nil_godot_function()
 	constructor(base, raw_data(args))
 }
 
@@ -113,6 +121,7 @@ call_builtin_operator_ptr :: proc "contextless" (
 	a, b: TypePtr,
 	$T: typeid,
 ) -> T {
+	if op == nil do _trap_nil_godot_function()
 	ret: T
 	op(a, b, cast(TypePtr)&ret)
 	return ret
@@ -125,6 +134,7 @@ call_builtin_method_ptr_ret :: proc "contextless" (
 	$T: typeid,
 	args: ..TypePtr,
 ) -> T {
+	if method == nil do _trap_nil_godot_function()
 	ret: T
 	method(base, raw_data(args), cast(TypePtr)&ret, i32(len(args)))
 	return ret
@@ -136,6 +146,7 @@ call_builtin_method_ptr_no_ret :: proc "contextless" (
 	base: TypePtr,
 	args: ..TypePtr,
 ) {
+	if method == nil do _trap_nil_godot_function()
 	method(base, raw_data(args), cast(TypePtr)nil, i32(len(args)))
 }
 
@@ -168,6 +179,7 @@ call_utility_function_ptr_ret :: proc "contextless" (
 ) -> (
 	ret: T,
 ) {
+	if func == nil do _trap_nil_godot_function()
 	func(cast(TypePtr)&ret, raw_data(args), i32(len(args)))
 	return
 }
@@ -177,6 +189,7 @@ call_utility_function_ptr_no_ret :: proc "contextless" (
 	func: PtrUtilityFunction,
 	args: ..TypePtr,
 ) {
+	if func == nil do _trap_nil_godot_function()
 	func(cast(TypePtr)nil, raw_data(args), i32(len(args)))
 }
 
@@ -228,6 +241,7 @@ BuiltinMethod :: struct {
 	name_data: [8]u8,
 	method:    PtrBuiltInMethod,
 	init:      bool,
+	mutex:     sync.Mutex,
 }
 
 // ensure_builtin_method resolves a builtin method pointer on first call.
@@ -237,14 +251,20 @@ ensure_builtin_method :: proc "contextless" (
 	name: cstring,
 	hash: i64,
 ) {
+	sync.mutex_lock(&bm.mutex)
+	defer sync.mutex_unlock(&bm.mutex)
+
 	if bm.init do return
-	bm.init = true
+
 	string_name_new_with_latin1_chars(cast(UninitializedStringNamePtr)&bm.name_data, name, true)
-	bm.method = variant_get_ptr_builtin_method(
+	method := variant_get_ptr_builtin_method(
 		variant_type,
 		cast(ConstStringNamePtr)&bm.name_data,
 		hash,
 	)
+	if method == nil do _trap_nil_godot_function()
+	bm.method = method
+	bm.init = true
 }
 
 // ---------------------------------------------------------------------------

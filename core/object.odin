@@ -22,9 +22,6 @@ Object :: ObjectPtr
 // RefCounted is the base type for refcounted Godot objects.
 RefCounted :: distinct ObjectPtr
 
-// VariantBytes is the 24-byte raw Godot Variant storage.
-VariantBytes :: distinct [24]u8
-
 // StringRepr is the 8-byte raw Godot String handle returned by utility
 // functions. Convert to an Odin string via variant layer helpers.
 StringRepr :: distinct [8]u8
@@ -37,21 +34,22 @@ is_nil :: proc "contextless" (obj: Object) -> bool {
 
 // ---- Variant conversion ----
 
-// object_to_variant wraps an ObjectPtr into a Variant.
-object_to_variant :: proc "contextless" (obj: ObjectPtr) -> VariantBytes {
-	v: VariantBytes
+// object_to_variant wraps an ObjectPtr into an initialized Variant. The caller
+// owns the returned Variant and must destroy it with variant_free.
+object_to_variant :: proc "contextless" (obj: ObjectPtr) -> Variant {
+	v: Variant
 	ctor := get_variant_from_type_constructor(.Object)
 	_obj := obj
 	ctor(cast(UninitializedVariantPtr)&v, cast(TypePtr)&_obj)
 	return v
 }
 
-// object_from_variant extracts an ObjectPtr from a Variant.
-object_from_variant :: proc "contextless" (v: VariantBytes) -> ObjectPtr {
-	_v := v
+// object_from_variant extracts an ObjectPtr from a Variant without taking
+// ownership of it.
+object_from_variant :: proc "contextless" (v: ^Variant) -> ObjectPtr {
 	ctor := get_variant_to_type_constructor(.Object)
 	result: ObjectPtr
-	ctor(cast(TypePtr)&result, cast(VariantPtr)&_v)
+	ctor(cast(TypePtr)&result, cast(VariantPtr)v)
 	return result
 }
 
