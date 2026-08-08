@@ -315,6 +315,36 @@ register_classes :: proc() {
 	)
 	gt.variant_free(&vs)
 
+	// Test: owned String wrapper and String Variant extraction
+	gs := gt.string_from_utf8("Owned Godot String")
+	string_text, string_ok, string_needed := gt.string_to_utf8(&gs, utf8_buf[:])
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"string_to_utf8(gs): %v / %v / %v bytes (expect owned string / true)",
+			string_text,
+			string_ok,
+			string_needed,
+		),
+	)
+	gsv := gt.variant_from_string(&gs)
+	gs_back, gs_back_ok := gt.variant_try_string(&gsv)
+	if gs_back_ok {
+		defer gt.string_free(&gs_back)
+		back_text, back_ok, back_needed := gt.string_to_utf8(&gs_back, utf8_buf[:])
+		gd.debug_print(
+			fmt.bprintf(
+				buf[:],
+				"variant_try_string(gsv): %v / %v / %v bytes (expect owned string / true)",
+				back_text,
+				back_ok,
+				back_needed,
+			),
+		)
+	}
+	gt.variant_free(&gsv)
+	gt.string_free(&gs)
+
 	// Test: Vector2 built-in
 	vec := gbv2.vector2_new3(3.0, 4.0)
 	vec_variant := gbv2.vector2_to_variant(vec)

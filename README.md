@@ -111,8 +111,11 @@ Current codegen is intentionally incomplete:
   caller-buffer `variant_try_utf8` String extraction, and generated exact-type
   `{builtin}_try_from_variant` helpers for current memory-compatible builtin types
   are available, but broader complex conversion coverage is still incomplete.
-  Treat current `String`, `StringName`, and `Array` helpers as low-level
-  prototype APIs whose construction/destruction rules may change.
+  `String` has an initial owned-storage wrapper (`string_from_utf8`,
+  `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`),
+  but broader String methods/operators and generated API integration are still pending.
+  Treat current `StringName` and `Array` helpers as low-level prototype APIs whose
+  construction/destruction rules may change.
 
 ## Architecture
 

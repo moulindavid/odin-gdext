@@ -11,11 +11,26 @@ variant_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+string_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.StringStorage), gd.GDExtensionString_Size)
+	testing.expect_value(t, size_of(gd.String), gd.GDExtensionString_Size)
+	testing.expect_value(t, len(gd.StringStorage{}), gd.GDExtensionString_Size)
+}
+
+@(test)
 variant_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	v: gd.Variant
 	_ = gd.variant_ptr(&v)
 	_ = gd.const_variant_ptr(&v)
 	_ = gd.uninitialized_variant_ptr(&v)
+}
+
+@(test)
+string_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	s: gd.String
+	_ = gd.string_ptr(&s)
+	_ = gd.const_string_ptr(&s)
+	_ = gd.uninitialized_string_ptr(&s)
 }
 
 

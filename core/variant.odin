@@ -5,6 +5,88 @@ package godot_core
 
 
 GDExtensionVariant_Size :: 24
+GDExtensionString_Size :: 8
+
+// StringStorage is raw storage large enough for Godot's ABI String handle.
+// Treat it as uninitialized until a string_init_* helper or Godot API has
+// constructed a String in it.
+StringStorage :: [GDExtensionString_Size]u8
+
+// String is initialized Godot String storage. Every proc returning a String
+// transfers ownership to the caller; destroy it with string_free when finished.
+String :: distinct StringStorage
+
+// string_ptr returns a mutable GDExtension pointer to initialized String storage.
+string_ptr :: proc "contextless" (s: ^String) -> StringPtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(StringPtr)s
+}
+
+// const_string_ptr returns a read-only GDExtension pointer to initialized String storage.
+const_string_ptr :: proc "contextless" (s: ^String) -> ConstStringPtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(ConstStringPtr)s
+}
+
+// uninitialized_string_ptr returns a GDExtension pointer to storage that Godot
+// is about to initialize. Do not pass already-owned String storage here unless
+// the called Godot API explicitly overwrites it without leaking.
+uninitialized_string_ptr :: proc "contextless" (s: ^String) -> UninitializedStringPtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(UninitializedStringPtr)s
+}
+
+// string_init_utf8 constructs a Godot String from UTF-8 bytes. The input does
+// not need to be null-terminated and is copied into Godot-owned storage.
+string_init_utf8 :: proc "contextless" (dest: UninitializedStringPtr, value: string) {
+	if string_new_with_utf8_chars_and_len2 == nil do _trap_nil_godot_function()
+	if dest == nil do _trap_nil_godot_function()
+	bytes := transmute([]u8)value
+	if len(bytes) == 0 {
+		written := string_new_with_utf8_chars_and_len2(dest, cstring(""), 0)
+		if written < 0 do _trap_godot_call_error()
+		return
+	}
+	written := string_new_with_utf8_chars_and_len2(
+		dest,
+		cast(cstring)raw_data(bytes),
+		i64(len(bytes)),
+	)
+	if written < 0 do _trap_godot_call_error()
+}
+
+// string_from_utf8 returns an initialized Godot String; call string_free when done.
+string_from_utf8 :: proc "contextless" (value: string) -> (result: String) {
+	string_init_utf8(uninitialized_string_ptr(&result), value)
+	return
+}
+
+// string_utf8_len returns the number of bytes needed to encode s as UTF-8. The
+// result does not include a null terminator.
+string_utf8_len :: proc "contextless" (s: ^String) -> int {
+	if string_to_utf8_chars == nil do _trap_nil_godot_function()
+	return int(string_to_utf8_chars(const_string_ptr(s), nil, 0))
+}
+
+// string_to_utf8 copies UTF-8 bytes into caller-provided storage and returns an
+// Odin string view into that buffer. It does not write or require a terminator.
+string_to_utf8 :: proc "contextless" (
+	s: ^String,
+	buffer: []u8,
+) -> (
+	value: string,
+	ok: bool,
+	needed: int,
+) {
+	byte_count := string_utf8_len(s)
+	if byte_count > len(buffer) do return "", false, byte_count
+	if byte_count > 0 do string_to_utf8_chars(const_string_ptr(s), raw_data(buffer), i64(byte_count))
+	return string(buffer[:byte_count]), true, byte_count
+}
+
+string_free :: proc "contextless" (s: ^String) {
+	destroy_builtin(.String, string_ptr(s))
+}
 
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
 // as uninitialized until one of the variant_init_* helpers or Godot itself has
@@ -83,7 +165,20 @@ variant_from_float :: proc "contextless" (x: f64) -> (v: Variant) {
 	return
 }
 
+variant_from_string :: proc "contextless" (s: ^String) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.String)
+	ctor(uninitialized_variant_ptr(&v), string_ptr(s))
+	return
+}
+
+variant_from_utf8 :: proc "contextless" (s: string) -> (v: Variant) {
+	str := string_from_utf8(s)
+	defer string_free(&str)
+	return variant_from_string(&str)
+}
+
 variant_from_cstring :: proc "contextless" (s: cstring) -> (v: Variant) {
+	if s == nil do _trap_nil_godot_function()
 	str_data: [8]u8
 	string_new_with_latin1_chars(cast(UninitializedStringPtr)&str_data[0], s)
 	ctor := require_variant_from_type_constructor(.String)
@@ -147,15 +242,21 @@ variant_to_string_storage :: proc "contextless" (dest: UninitializedStringPtr, v
 	ctor(dest, variant_ptr(v))
 }
 
+variant_to_string :: proc "contextless" (v: ^Variant) -> (result: String) {
+	variant_to_string_storage(uninitialized_string_ptr(&result), v)
+	return
+}
+
+variant_try_string :: proc "contextless" (v: ^Variant) -> (value: String, ok: bool) {
+	if !variant_is_type(v, .String) do return String{}, false
+	return variant_to_string(v), true
+}
+
 variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {
-	if !variant_is_type(v, .String) do return 0, false
-	if string_to_utf8_chars == nil do _trap_nil_godot_function()
-
-	str_data: [8]u8
-	variant_to_string_storage(cast(UninitializedStringPtr)&str_data[0], v)
-	defer destroy_builtin(.String, cast(TypePtr)&str_data[0])
-
-	return int(string_to_utf8_chars(cast(ConstStringPtr)&str_data[0], nil, 0)), true
+	str, type_ok := variant_try_string(v)
+	if !type_ok do return 0, false
+	defer string_free(&str)
+	return string_utf8_len(&str), true
 }
 
 variant_try_utf8 :: proc "contextless" (
@@ -171,11 +272,9 @@ variant_try_utf8 :: proc "contextless" (
 	if byte_count > len(buffer) do return "", false, byte_count
 
 	if byte_count > 0 {
-		str_data: [8]u8
-		variant_to_string_storage(cast(UninitializedStringPtr)&str_data[0], v)
-		defer destroy_builtin(.String, cast(TypePtr)&str_data[0])
-
-		string_to_utf8_chars(cast(ConstStringPtr)&str_data[0], raw_data(buffer), i64(byte_count))
+		str := variant_to_string(v)
+		defer string_free(&str)
+		string_to_utf8_chars(const_string_ptr(&str), raw_data(buffer), i64(byte_count))
 	}
 	return string(buffer[:byte_count]), true, byte_count
 }

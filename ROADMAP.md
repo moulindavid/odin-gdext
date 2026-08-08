@@ -34,6 +34,8 @@ Implement proper wrappers and ownership rules for:
     - [x] Generated exact-type `{builtin}_try_from_variant` helpers for current memory-compatible builtin types.
     - [ ] Additional complex conversions for StringName, NodePath, RID, Callable, Signal, Array, Dictionary, and packed arrays.
 - [ ] `String`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, UTF-8 construction/extraction, and Variant conversion helpers.
+  - [ ] Broader String methods/operators and generated API integration.
 - [ ] `StringName`
 - [ ] `NodePath`
 - [ ] `Array`

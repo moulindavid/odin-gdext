@@ -13,6 +13,8 @@ Object :: gcore.Object
 RefCounted :: gcore.RefCounted
 VariantStorage :: gcore.VariantStorage
 Variant :: gcore.Variant
+StringStorage :: gcore.StringStorage
+String :: gcore.String
 StringRepr :: gcore.StringRepr
 
 // --- Core functions ---
@@ -24,6 +26,16 @@ object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
 godot_context :: gcore.godot_context
+
+// --- String ---
+string_ptr :: gcore.string_ptr
+const_string_ptr :: gcore.const_string_ptr
+uninitialized_string_ptr :: gcore.uninitialized_string_ptr
+string_init_utf8 :: gcore.string_init_utf8
+string_from_utf8 :: gcore.string_from_utf8
+string_utf8_len :: gcore.string_utf8_len
+string_to_utf8 :: gcore.string_to_utf8
+string_free :: gcore.string_free
 
 // --- Variant ---
 variant_type :: gcore.variant_type
@@ -39,11 +51,15 @@ variant_copy :: gcore.variant_copy
 variant_from_float :: gcore.variant_from_float
 variant_from_int :: gcore.variant_from_int
 variant_from_bool :: gcore.variant_from_bool
+variant_from_string :: gcore.variant_from_string
+variant_from_utf8 :: gcore.variant_from_utf8
 variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
 variant_to_int :: gcore.variant_to_int
 variant_to_bool :: gcore.variant_to_bool
 variant_to_string_storage :: gcore.variant_to_string_storage
+variant_to_string :: gcore.variant_to_string
+variant_try_string :: gcore.variant_try_string
 variant_string_utf8_len :: gcore.variant_string_utf8_len
 variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float
