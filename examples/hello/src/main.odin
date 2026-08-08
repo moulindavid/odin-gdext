@@ -94,10 +94,10 @@ add_call :: proc "c" (
 	context = gt.godot_context()
 	a := gt.variant_to_float(cast(^gt.Variant)p_args[0])
 	b := gt.variant_to_float(cast(^gt.Variant)p_args[1])
-	buf: [64]u8
+	buf: [160]u8
 	gd.debug_print(fmt.bprintf(buf[:], "add_call a=%v b=%v", a, b))
 	rv := gt.variant_from_float(a + b)
-	gd.variant_new_copy(r_return, cast(gd.ConstVariantPtr)&rv[0])
+	gt.variant_init_copy(r_return, &rv)
 	gt.variant_free(&rv)
 }
 
@@ -110,7 +110,7 @@ add_ptrcall :: proc "c" (
 	context = gt.godot_context()
 	a := (cast(^f64)p_args[0])^
 	b := (cast(^f64)p_args[1])^
-	buf: [64]u8
+	buf: [160]u8
 	gd.debug_print(fmt.bprintf(buf[:], "add_ptrcall a=%v b=%v", a, b))
 	(cast(^f64)r_ret)^ = a + b
 }
@@ -245,7 +245,7 @@ register_classes :: proc() {
 	)
 	gd.debug_print("[odin-gdext] HelloNode registered!")
 
-	buf: [64]u8
+	buf: [160]u8
 
 	register_methods()
 
@@ -256,6 +256,25 @@ register_classes :: proc() {
 	gd.debug_print(fmt.bprintf(buf[:], "Float: %v (expect 3.14)", gt.variant_to_float(&vf)))
 	gd.debug_print(fmt.bprintf(buf[:], "Int:   %v (expect -42)", gt.variant_to_int(&vi)))
 	gd.debug_print(fmt.bprintf(buf[:], "Bool:  %v (expect true)", gt.variant_to_bool(&vb)))
+	gd.debug_print(fmt.bprintf(buf[:], "Float type: %v (expect Float)", gt.variant_type(&vf)))
+	vf_try, vf_ok := gt.variant_try_float(&vf)
+	vi_as_float, vi_as_float_ok := gt.variant_try_float(&vi)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "try_float(vf): %v / %v (expect 3.14 / true)", vf_try, vf_ok),
+	)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"try_float(vi): %v / %v (expect 0 / false)",
+			vi_as_float,
+			vi_as_float_ok,
+		),
+	)
+	nil_variant := gt.variant_nil()
+	gd.debug_print(
+		fmt.bprintf(buf[:], "Nil Variant: %v (expect true)", gt.variant_is_nil(&nil_variant)),
+	)
+	gt.variant_free(&nil_variant)
 	gt.variant_free(&vf)
 	gt.variant_free(&vi)
 	gt.variant_free(&vb)
@@ -275,7 +294,18 @@ register_classes :: proc() {
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
-	gt.print(cast(gd.TypePtr)&vs[0])
+	gt.print(gt.variant_ptr(&vs))
+	utf8_buf: [128]u8
+	utf8_text, utf8_ok, utf8_needed := gt.variant_try_utf8(&vs, utf8_buf[:])
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"try_utf8(vs): %v / %v / %v bytes (expect message / true)",
+			utf8_text,
+			utf8_ok,
+			utf8_needed,
+		),
+	)
 	gt.variant_free(&vs)
 
 	// Test: Vector2 built-in

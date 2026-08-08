@@ -94,14 +94,24 @@ Current codegen is intentionally incomplete:
   `Signal`, `Array`, `Dictionary`, and packed arrays are skipped until their
   ownership, lifetime, and ABI rules are implemented properly.
 - Utility generation skips varargs and signatures involving unsupported complex
-  return/argument types, including `String`, `Variant`, `Object`, `RID`, and
-  several packed arrays. Generated utilities are available from
-  `godot:bindings`; only a tiny subset is re-exported by `godot:godot`.
+  return/argument types, including `String`, `Object`, `RID`, `Variant` returns,
+  and several packed arrays. `Variant` arguments are generated as borrowed
+  `^core.Variant` parameters to avoid unsafe owned-storage bit copies. Generated
+  utilities are available from `godot:bindings`; only a tiny subset is
+  re-exported by `godot:godot`.
 - Engine object class wrappers are planned, but not generated yet.
 - Properties, signals, and virtual method overrides are not implemented yet.
-- Ownership rules for value types are still being stabilized. Treat current
-  `Variant`, `String`, `StringName`, and `Array` helpers as low-level prototype
-  APIs whose construction/destruction rules may change.
+- Ownership rules for value types are still being stabilized. `Variant` now has
+  explicit owned-storage helpers (`variant_nil`, `variant_copy`,
+  `variant_init_copy`, pointer adapters, and `variant_free`) plus minimal
+  `CallError` helpers and checked wrappers for `variant_call` /
+  `variant_construct`. Generated wrappers borrow `^core.Variant` parameters and
+  document owned `core.Variant` returns. Runtime type inspection, exact-type
+  `variant_try_bool` / `variant_try_int` / `variant_try_float`, and caller-buffer
+  `variant_try_utf8` String extraction helpers are available, but broader complex
+  conversion coverage is still incomplete.
+  Treat current `String`, `StringName`, and `Array` helpers as low-level
+  prototype APIs whose construction/destruction rules may change.
 
 ## Architecture
 
@@ -116,7 +126,7 @@ odin-gdext/
 └── examples/hello/           ← minimal GDExtension proving the pipeline
 ```
 
-- `core/` -- handwritten runtime: C-ABI types, basic manual Variant helpers,
+- `core/` -- handwritten runtime: C-ABI types, owned Variant storage helpers,
   typed object handle experiments, Godot-backed allocator, class registration
   helpers, `BuiltinMethod` lazy-init pattern.
 - `generator/` -- reads `gdextension_interface.json` and `extension_api.json`.
@@ -138,7 +148,7 @@ odin-gdext/
 
 | Layer | Description | Status |
 |-------|-------------|--------|
-| `core/` | C-ABI types, helpers, basic Variant helpers, typed handle experiments, context | Partial |
+| `core/` | C-ABI types, helpers, owned Variant storage helpers, typed handle experiments, context | Partial |
 | `generator/` | Codegen for FFI, builtin types, utility functions | Partial |
 | `bindings/builtin/` | Math/simple builtin types (Vector2..Projection) with methods | Partial |
 | `bindings/utilities.odin` | Supported @GlobalScope utility functions | Partial |
@@ -149,10 +159,7 @@ odin-gdext/
 
 ## Roadmap
 
-See [ROADMAP.md](ROADMAP.md) for the detailed priority plan. Priority 0 safety
-hardening is complete for the current prototype. The next steps are stable
-value-type wrappers, generated class bindings, user-friendly registration
-helpers, and properties/signals/virtual callbacks.
+See [ROADMAP.md](ROADMAP.md) for the short plan.
 
 ## License
 

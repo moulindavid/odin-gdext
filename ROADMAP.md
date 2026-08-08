@@ -19,17 +19,23 @@ Completed safety baseline for the current Godot 4.7 prototype:
 Priority 0 is considered complete enough to unblock the next work. We need to
 preserve these invariants while adding new bindings.
 
-## Priority 1 - stabilize core value types - next
+## Priority 1 - stabilize core value types - in progress
 
 Implement proper wrappers and ownership rules for:
 
 - `Variant`
-- `String`
-- `StringName`
-- `NodePath`
-- `Array`
-- `Dictionary`
-- packed arrays
+  - [x] Initial owned-storage helpers, nil/copy initialization, checked pointer adapters, and ABI tests.
+  - [x] Minimal `CallError` helpers and checked `variant_call` / `variant_construct` wrappers for handwritten Variant APIs.
+  - [x] Generated APIs borrow `^Variant` parameters instead of bit-copying owned storage, and document owned `Variant` returns.
+  - [x] Runtime type inspection and exact-type `try` conversions for bool, int, and float Variants.
+  - [x] Exact String Variant extraction to caller-provided UTF-8 buffers.
+  - [ ] Richer conversion coverage for object, builtin, and other complex Variant conversions.
+- [ ] `String`
+- [ ] `StringName`
+- [ ] `NodePath`
+- [ ] `Array`
+- [ ] `Dictionary`
+- [ ] packed arrays
 
 ## Priority 2 - generated class bindings
 

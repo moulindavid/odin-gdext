@@ -6,16 +6,80 @@ package godot_core
 
 GDExtensionVariant_Size :: 24
 
+// VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
+// as uninitialized until one of the variant_init_* helpers or Godot itself has
+// constructed a Variant in it.
+VariantStorage :: [GDExtensionVariant_Size]u8
+
 // Variant is initialized Godot Variant storage. Every proc returning a Variant
 // transfers ownership to the caller; destroy it with variant_free when finished.
-Variant :: distinct [GDExtensionVariant_Size]u8
+Variant :: distinct VariantStorage
+
+// variant_ptr returns a mutable GDExtension pointer to initialized Variant
+// storage. Nil pointers trap instead of crossing the GDExtension boundary.
+variant_ptr :: proc "contextless" (v: ^Variant) -> VariantPtr {
+	if v == nil do _trap_nil_godot_function()
+	return cast(VariantPtr)v
+}
+
+// const_variant_ptr returns a read-only GDExtension pointer to initialized
+// Variant storage. Nil pointers trap instead of crossing the GDExtension boundary.
+const_variant_ptr :: proc "contextless" (v: ^Variant) -> ConstVariantPtr {
+	if v == nil do _trap_nil_godot_function()
+	return cast(ConstVariantPtr)v
+}
+
+// uninitialized_variant_ptr returns a GDExtension pointer to storage that Godot
+// is about to initialize. The caller must not pass already-owned Variant storage
+// unless the called Godot API explicitly overwrites it without leaking.
+uninitialized_variant_ptr :: proc "contextless" (v: ^Variant) -> UninitializedVariantPtr {
+	if v == nil do _trap_nil_godot_function()
+	return cast(UninitializedVariantPtr)v
+}
+
+// ---- Variant type inspection ----
+
+variant_type :: proc "contextless" (v: ^Variant) -> VariantType {
+	if variant_get_type == nil do _trap_nil_godot_function()
+	return variant_get_type(const_variant_ptr(v))
+}
+
+variant_is_type :: proc "contextless" (v: ^Variant, type: VariantType) -> bool {
+	return variant_type(v) == type
+}
+
+variant_is_nil :: proc "contextless" (v: ^Variant) -> bool {
+	return variant_is_type(v, .Nil)
+}
 
 // ---- Variant construction ----
+
+variant_init_nil :: proc "contextless" (dest: UninitializedVariantPtr) {
+	if variant_new_nil == nil do _trap_nil_godot_function()
+	if dest == nil do _trap_nil_godot_function()
+	variant_new_nil(dest)
+}
+
+variant_nil :: proc "contextless" () -> (v: Variant) {
+	variant_init_nil(uninitialized_variant_ptr(&v))
+	return
+}
+
+variant_init_copy :: proc "contextless" (dest: UninitializedVariantPtr, src: ^Variant) {
+	if variant_new_copy == nil do _trap_nil_godot_function()
+	if dest == nil do _trap_nil_godot_function()
+	variant_new_copy(dest, const_variant_ptr(src))
+}
+
+variant_copy :: proc "contextless" (src: ^Variant) -> (v: Variant) {
+	variant_init_copy(uninitialized_variant_ptr(&v), src)
+	return
+}
 
 variant_from_float :: proc "contextless" (x: f64) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Float)
 	_x := x
-	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
+	ctor(uninitialized_variant_ptr(&v), cast(TypePtr)&_x)
 	return
 }
 
@@ -23,33 +87,34 @@ variant_from_cstring :: proc "contextless" (s: cstring) -> (v: Variant) {
 	str_data: [8]u8
 	string_new_with_latin1_chars(cast(UninitializedStringPtr)&str_data[0], s)
 	ctor := require_variant_from_type_constructor(.String)
-	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&str_data[0])
+	ctor(uninitialized_variant_ptr(&v), cast(TypePtr)&str_data[0])
 	destroy_builtin(.String, cast(TypePtr)&str_data[0])
 	return
 }
 
 variant_free :: proc "contextless" (v: ^Variant) {
-	variant_destroy(cast(VariantPtr)v)
+	if variant_destroy == nil do _trap_nil_godot_function()
+	variant_destroy(variant_ptr(v))
 }
 
 // Variant-returning calls initialize their return storage even for nil/void
 // results. Destroy every initialized temporary Variant after extracting data from
 // it. Generated wrappers should follow this same ownership rule.
 variant_free_temp :: proc "contextless" (v: ^Variant) {
-	variant_destroy(cast(VariantPtr)v)
+	variant_free(v)
 }
 
 variant_from_bool :: proc "contextless" (x: bool) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Bool)
 	_x := x
-	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
+	ctor(uninitialized_variant_ptr(&v), cast(TypePtr)&_x)
 	return
 }
 
 variant_from_int :: proc "contextless" (x: i64) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Int)
 	_x := x
-	ctor(cast(UninitializedVariantPtr)&v[0], cast(TypePtr)&_x)
+	ctor(uninitialized_variant_ptr(&v), cast(TypePtr)&_x)
 	return
 }
 
@@ -58,29 +123,128 @@ variant_from_int :: proc "contextless" (x: i64) -> (v: Variant) {
 variant_to_float :: proc "contextless" (v: ^Variant) -> f64 {
 	ctor := require_variant_to_type_constructor(.Float)
 	ret: f64
-	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
+	ctor(cast(UninitializedTypePtr)&ret, variant_ptr(v))
 	return ret
 }
 
 variant_to_int :: proc "contextless" (v: ^Variant) -> i64 {
 	ctor := require_variant_to_type_constructor(.Int)
 	ret: i64
-	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
+	ctor(cast(UninitializedTypePtr)&ret, variant_ptr(v))
 	return ret
 }
 
 variant_to_bool :: proc "contextless" (v: ^Variant) -> bool {
 	ctor := require_variant_to_type_constructor(.Bool)
 	ret: bool
-	ctor(cast(UninitializedTypePtr)&ret, cast(VariantPtr)&v[0])
+	ctor(cast(UninitializedTypePtr)&ret, variant_ptr(v))
 	return ret
+}
+
+variant_to_string_storage :: proc "contextless" (dest: UninitializedStringPtr, v: ^Variant) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := require_variant_to_type_constructor(.String)
+	ctor(dest, variant_ptr(v))
+}
+
+variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {
+	if !variant_is_type(v, .String) do return 0, false
+	if string_to_utf8_chars == nil do _trap_nil_godot_function()
+
+	str_data: [8]u8
+	variant_to_string_storage(cast(UninitializedStringPtr)&str_data[0], v)
+	defer destroy_builtin(.String, cast(TypePtr)&str_data[0])
+
+	return int(string_to_utf8_chars(cast(ConstStringPtr)&str_data[0], nil, 0)), true
+}
+
+variant_try_utf8 :: proc "contextless" (
+	v: ^Variant,
+	buffer: []u8,
+) -> (
+	value: string,
+	ok: bool,
+	needed: int,
+) {
+	byte_count, type_ok := variant_string_utf8_len(v)
+	if !type_ok do return "", false, 0
+	if byte_count > len(buffer) do return "", false, byte_count
+
+	if byte_count > 0 {
+		str_data: [8]u8
+		variant_to_string_storage(cast(UninitializedStringPtr)&str_data[0], v)
+		defer destroy_builtin(.String, cast(TypePtr)&str_data[0])
+
+		string_to_utf8_chars(cast(ConstStringPtr)&str_data[0], raw_data(buffer), i64(byte_count))
+	}
+	return string(buffer[:byte_count]), true, byte_count
+}
+
+variant_try_float :: proc "contextless" (v: ^Variant) -> (value: f64, ok: bool) {
+	if !variant_is_type(v, .Float) do return 0, false
+	return variant_to_float(v), true
+}
+
+variant_try_int :: proc "contextless" (v: ^Variant) -> (value: i64, ok: bool) {
+	if !variant_is_type(v, .Int) do return 0, false
+	return variant_to_int(v), true
+}
+
+variant_try_bool :: proc "contextless" (v: ^Variant) -> (value: bool, ok: bool) {
+	if !variant_is_type(v, .Bool) do return false, false
+	return variant_to_bool(v), true
+}
+
+// ---- Variant call errors ----
+
+call_error_ok :: proc "contextless" (err: ^CallError) -> bool {
+	if err == nil do _trap_nil_godot_function()
+	return err.error == .Ok
+}
+
+require_call_ok :: proc "contextless" (err: ^CallError) {
+	if !call_error_ok(err) do _trap_godot_call_error()
+}
+
+variant_construct_checked :: proc "contextless" (
+	type: VariantType,
+	dest: UninitializedVariantPtr,
+	args: [^]ConstVariantPtr,
+	arg_count: i32,
+) -> (
+	err: CallError,
+) {
+	if variant_construct == nil do _trap_nil_godot_function()
+	if dest == nil do _trap_nil_godot_function()
+	if arg_count < 0 do _trap_godot_call_error()
+	if arg_count > 0 && args == nil do _trap_nil_godot_function()
+	variant_construct(type, dest, args, arg_count, &err)
+	return
+}
+
+variant_call_checked :: proc "contextless" (
+	base: ^Variant,
+	method: ConstStringNamePtr,
+	args: [^]ConstVariantPtr,
+	arg_count: i64,
+	ret: UninitializedVariantPtr,
+) -> (
+	err: CallError,
+) {
+	if variant_call == nil do _trap_nil_godot_function()
+	if method == nil do _trap_nil_godot_function()
+	if ret == nil do _trap_nil_godot_function()
+	if arg_count < 0 do _trap_godot_call_error()
+	if arg_count > 0 && args == nil do _trap_nil_godot_function()
+	variant_call(variant_ptr(base), method, args, arg_count, ret, &err)
+	return
 }
 
 // ---- Array builtin ----
 
 array_new :: proc "contextless" () -> (v: Variant) {
-	err: CallError
-	variant_construct(.Array, cast(UninitializedVariantPtr)&v[0], nil, 0, &err)
+	err := variant_construct_checked(.Array, uninitialized_variant_ptr(&v), nil, 0)
+	require_call_ok(&err)
 	return
 }
 
@@ -93,18 +257,11 @@ array_push :: proc "contextless" (arr: ^Variant, value: ^Variant) {
 	)
 	push_name := StringNamePtr(&push_name_data[0])
 
-	err: CallError
 	ret: Variant
-	args := [1]ConstVariantPtr{cast(ConstVariantPtr)&value[0]}
-	variant_call(
-		cast(VariantPtr)&arr[0],
-		push_name,
-		&args[0],
-		1,
-		cast(UninitializedVariantPtr)&ret[0],
-		&err,
-	)
+	args := [1]ConstVariantPtr{const_variant_ptr(value)}
+	err := variant_call_checked(arr, push_name, &args[0], 1, uninitialized_variant_ptr(&ret))
 	variant_free_temp(&ret)
+	require_call_ok(&err)
 }
 
 array_size :: proc "contextless" (arr: ^Variant) -> i64 {
@@ -117,18 +274,14 @@ array_size :: proc "contextless" (arr: ^Variant) -> i64 {
 	size_name := StringNamePtr(&size_name_data[0])
 
 	ret: Variant
-	err: CallError
-	variant_call(
-		cast(VariantPtr)&arr[0],
-		size_name,
-		nil,
-		0,
-		cast(UninitializedVariantPtr)&ret[0],
-		&err,
-	)
+	err := variant_call_checked(arr, size_name, nil, 0, uninitialized_variant_ptr(&ret))
+	if !call_error_ok(&err) {
+		variant_free_temp(&ret)
+		require_call_ok(&err)
+	}
 	dest: i64
 	to_ctor := require_variant_to_type_constructor(.Int)
-	to_ctor(cast(UninitializedTypePtr)&dest, cast(VariantPtr)&ret[0])
+	to_ctor(cast(UninitializedTypePtr)&dest, variant_ptr(&ret))
 	variant_free_temp(&ret)
 	return dest
 }
