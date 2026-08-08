@@ -66,6 +66,10 @@ node_path_init_copy :: gcore.node_path_init_copy
 node_path_copy :: gcore.node_path_copy
 node_path_free :: gcore.node_path_free
 node_path_is_absolute :: gcore.node_path_is_absolute
+node_path_get_name :: gcore.node_path_get_name
+node_path_get_subname :: gcore.node_path_get_subname
+node_path_get_concatenated_names :: gcore.node_path_get_concatenated_names
+node_path_get_concatenated_subnames :: gcore.node_path_get_concatenated_subnames
 node_path_get_name_count :: gcore.node_path_get_name_count
 node_path_get_subname_count :: gcore.node_path_get_subname_count
 node_path_hash :: gcore.node_path_hash

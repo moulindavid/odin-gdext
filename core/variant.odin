@@ -3,8 +3,11 @@
 // https://docs.godotengine.org/fr/4.x/classes/class_variant.html
 package godot_core
 
-//FROM `extension_api.json`
+// NodePath builtin method hashes from Godot 4.7 `extension_api.json`.
+NODE_PATH_IS_ABSOLUTE_HASH :: 3918633141
+NODE_PATH_GET_NAME_HASH :: 2948586938
 NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
+NODE_PATH_GET_CONCATENATED_NAMES_HASH :: 1825232092
 
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
@@ -265,6 +268,10 @@ node_path_free :: proc "contextless" (p: ^NodePath) {
 }
 
 node_path_is_absolute_method: BuiltinMethod
+node_path_get_name_method: BuiltinMethod
+node_path_get_subname_method: BuiltinMethod
+node_path_get_concatenated_names_method: BuiltinMethod
+node_path_get_concatenated_subnames_method: BuiltinMethod
 node_path_get_name_count_method: BuiltinMethod
 node_path_get_subname_count_method: BuiltinMethod
 node_path_hash_method: BuiltinMethod
@@ -274,13 +281,81 @@ node_path_is_absolute :: proc "contextless" (p: ^NodePath) -> bool {
 		&node_path_is_absolute_method,
 		.Node_Path,
 		cstring("is_absolute"),
-		3918633141,
+		NODE_PATH_IS_ABSOLUTE_HASH,
 	)
 	return call_builtin_method_ptr_ret(
 		node_path_is_absolute_method.method,
 		const_node_path_ptr(p),
 		bool,
 	)
+}
+
+// node_path_get_name returns an initialized StringName; call string_name_free when done.
+node_path_get_name :: proc "contextless" (p: ^NodePath, index: i64) -> (result: StringName) {
+	ensure_builtin_method(
+		&node_path_get_name_method,
+		.Node_Path,
+		cstring("get_name"),
+		NODE_PATH_GET_NAME_HASH,
+	)
+	index_arg := index
+	call_builtin_method_ptr_ret_into(
+		node_path_get_name_method.method,
+		const_node_path_ptr(p),
+		uninitialized_string_name_ptr(&result),
+		cast(TypePtr)&index_arg,
+	)
+	return
+}
+
+// node_path_get_subname returns an initialized StringName; call string_name_free when done.
+node_path_get_subname :: proc "contextless" (p: ^NodePath, index: i64) -> (result: StringName) {
+	ensure_builtin_method(
+		&node_path_get_subname_method,
+		.Node_Path,
+		cstring("get_subname"),
+		NODE_PATH_GET_NAME_HASH,
+	)
+	index_arg := index
+	call_builtin_method_ptr_ret_into(
+		node_path_get_subname_method.method,
+		const_node_path_ptr(p),
+		uninitialized_string_name_ptr(&result),
+		cast(TypePtr)&index_arg,
+	)
+	return
+}
+
+// node_path_get_concatenated_names returns an initialized StringName; call string_name_free when done.
+node_path_get_concatenated_names :: proc "contextless" (p: ^NodePath) -> (result: StringName) {
+	ensure_builtin_method(
+		&node_path_get_concatenated_names_method,
+		.Node_Path,
+		cstring("get_concatenated_names"),
+		NODE_PATH_GET_CONCATENATED_NAMES_HASH,
+	)
+	call_builtin_method_ptr_ret_into(
+		node_path_get_concatenated_names_method.method,
+		const_node_path_ptr(p),
+		uninitialized_string_name_ptr(&result),
+	)
+	return
+}
+
+// node_path_get_concatenated_subnames returns an initialized StringName; call string_name_free when done.
+node_path_get_concatenated_subnames :: proc "contextless" (p: ^NodePath) -> (result: StringName) {
+	ensure_builtin_method(
+		&node_path_get_concatenated_subnames_method,
+		.Node_Path,
+		cstring("get_concatenated_subnames"),
+		NODE_PATH_GET_CONCATENATED_NAMES_HASH,
+	)
+	call_builtin_method_ptr_ret_into(
+		node_path_get_concatenated_subnames_method.method,
+		const_node_path_ptr(p),
+		uninitialized_string_name_ptr(&result),
+	)
+	return
 }
 
 node_path_get_name_count :: proc "contextless" (p: ^NodePath) -> i64 {
@@ -312,7 +387,12 @@ node_path_get_subname_count :: proc "contextless" (p: ^NodePath) -> i64 {
 }
 
 node_path_hash :: proc "contextless" (p: ^NodePath) -> i64 {
-	ensure_builtin_method(&node_path_hash_method, .Node_Path, cstring("hash"), 3173160232)
+	ensure_builtin_method(
+		&node_path_hash_method,
+		.Node_Path,
+		cstring("hash"),
+		NODE_PATH_GET_NAME_COUNT_HASH,
+	)
 	return call_builtin_method_ptr_ret(node_path_hash_method.method, const_node_path_ptr(p), i64)
 }
 

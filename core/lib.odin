@@ -147,6 +147,17 @@ call_builtin_method_ptr_ret :: proc "contextless" (
 	return ret
 }
 
+// Invoke a builtin method that writes an initialized return value into caller-provided storage.
+call_builtin_method_ptr_ret_into :: proc "contextless" (
+	method: PtrBuiltInMethod,
+	base: TypePtr,
+	ret: TypePtr,
+	args: ..TypePtr,
+) {
+	if method == nil || ret == nil do _trap_nil_godot_function()
+	method(base, raw_data(args), ret, i32(len(args)))
+}
+
 // Invoke a builtin method that returns nothing.
 call_builtin_method_ptr_no_ret :: proc "contextless" (
 	method: PtrBuiltInMethod,

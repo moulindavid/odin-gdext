@@ -45,6 +45,7 @@ Implement proper wrappers and ownership rules for:
 - [ ] `NodePath`
   - [x] Initial owned-storage wrapper, checked pointer adapters, UTF-8/String construction, copy/free helpers, and Variant conversion helpers.
   - [x] Primitive method wrappers for `is_absolute`, name/subname counts, and hash.
+  - [x] Owned `StringName`-returning helpers for names/subnames and concatenated names/subnames.
 - [ ] `Array`
 - [ ] `Dictionary`
 - [ ] packed arrays

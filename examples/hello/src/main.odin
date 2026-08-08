@@ -377,6 +377,55 @@ register_classes :: proc() {
 			gt.node_path_hash(&np) != 0,
 		),
 	)
+	name := gt.node_path_get_name(&np, 1)
+	name_v := gt.variant_from_string_name(&name)
+	name_back, name_ok := gt.variant_try_string_name(&name_v)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "node_path_get_name -> StringName: %v (expect true)", name_ok),
+	)
+	if name_ok do gt.string_name_free(&name_back)
+	gt.variant_free(&name_v)
+	gt.string_name_free(&name)
+
+	concat_names := gt.node_path_get_concatenated_names(&np)
+	concat_names_v := gt.variant_from_string_name(&concat_names)
+	concat_names_back, concat_names_ok := gt.variant_try_string_name(&concat_names_v)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"node_path_get_concatenated_names -> StringName: %v (expect true)",
+			concat_names_ok,
+		),
+	)
+	if concat_names_ok do gt.string_name_free(&concat_names_back)
+	gt.variant_free(&concat_names_v)
+	gt.string_name_free(&concat_names)
+
+	np_sub := gt.node_path_from_utf8("HelloNode:foo")
+	subname := gt.node_path_get_subname(&np_sub, 0)
+	subname_v := gt.variant_from_string_name(&subname)
+	subname_back, subname_ok := gt.variant_try_string_name(&subname_v)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "node_path_get_subname -> StringName: %v (expect true)", subname_ok),
+	)
+	if subname_ok do gt.string_name_free(&subname_back)
+	gt.variant_free(&subname_v)
+	gt.string_name_free(&subname)
+
+	concat_subnames := gt.node_path_get_concatenated_subnames(&np_sub)
+	concat_subnames_v := gt.variant_from_string_name(&concat_subnames)
+	concat_subnames_back, concat_subnames_ok := gt.variant_try_string_name(&concat_subnames_v)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"node_path_get_concatenated_subnames -> StringName: %v (expect true)",
+			concat_subnames_ok,
+		),
+	)
+	if concat_subnames_ok do gt.string_name_free(&concat_subnames_back)
+	gt.variant_free(&concat_subnames_v)
+	gt.string_name_free(&concat_subnames)
+	gt.node_path_free(&np_sub)
 	if np_back_ok do gt.node_path_free(&np_back)
 	gt.variant_free(&npv)
 	gt.node_path_free(&np)
