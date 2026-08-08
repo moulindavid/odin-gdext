@@ -30,6 +30,9 @@ Implement proper wrappers and ownership rules for:
   - [x] Runtime type inspection and exact-type `try` conversions for bool, int, and float Variants.
   - [x] Exact String Variant extraction to caller-provided UTF-8 buffers.
   - [ ] Richer conversion coverage for object, builtin, and other complex Variant conversions.
+    - [x] Exact Object Variant extraction with `variant_try_object`.
+    - [x] Generated exact-type `{builtin}_try_from_variant` helpers for current memory-compatible builtin types.
+    - [ ] Additional complex conversions for StringName, NodePath, RID, Callable, Signal, Array, Dictionary, and packed arrays.
 - [ ] `String`
 - [ ] `StringName`
 - [ ] `NodePath`

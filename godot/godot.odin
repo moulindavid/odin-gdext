@@ -22,6 +22,7 @@ cast_to :: gcore.cast_to
 init_class_casting :: gcore.init_class_casting
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
+variant_try_object :: gcore.variant_try_object
 godot_context :: gcore.godot_context
 
 // --- Variant ---

@@ -107,9 +107,10 @@ Current codegen is intentionally incomplete:
   `CallError` helpers and checked wrappers for `variant_call` /
   `variant_construct`. Generated wrappers borrow `^core.Variant` parameters and
   document owned `core.Variant` returns. Runtime type inspection, exact-type
-  `variant_try_bool` / `variant_try_int` / `variant_try_float`, and caller-buffer
-  `variant_try_utf8` String extraction helpers are available, but broader complex
-  conversion coverage is still incomplete.
+  `variant_try_bool` / `variant_try_int` / `variant_try_float`, `variant_try_object`,
+  caller-buffer `variant_try_utf8` String extraction, and generated exact-type
+  `{builtin}_try_from_variant` helpers for current memory-compatible builtin types
+  are available, but broader complex conversion coverage is still incomplete.
   Treat current `String`, `StringName`, and `Array` helpers as low-level
   prototype APIs whose construction/destruction rules may change.
 

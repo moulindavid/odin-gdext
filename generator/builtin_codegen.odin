@@ -315,6 +315,22 @@ emit_variant_conversion :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass
 	)
 	strings.write_string(b, "\treturn result\n")
 	strings.write_string(b, "}\n\n")
+
+	// try_from_variant
+	fmt.sbprintf(
+		b,
+		"%s_try_from_variant :: proc \"contextless\" (v: ^core.Variant) -> (value: %s, ok: bool) {{\n",
+		lower,
+		c.name,
+	)
+	fmt.sbprintf(
+		b,
+		"\tif !core.variant_is_type(v, .%s) do return %s{{}}, false\n",
+		vt_name,
+		c.name,
+	)
+	fmt.sbprintf(b, "\treturn %s_from_variant(v), true\n", lower)
+	strings.write_string(b, "}\n\n")
 }
 
 // Emit constructors. Each is selected by index (not arg count).

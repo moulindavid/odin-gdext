@@ -70,8 +70,15 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 		)
 
 		v := gt.object_to_variant(obj)
-		back := gt.object_from_variant(&v)
-		gd.debug_print(fmt.bprintf(buf[:], "variant roundtrip: %v (expect true)", back == obj))
+		back, back_ok := gt.variant_try_object(&v)
+		gd.debug_print(
+			fmt.bprintf(
+				buf[:],
+				"variant object roundtrip: %v / %v (expect true / true)",
+				back == obj,
+				back_ok,
+			),
+		)
 		gt.variant_free(&v)
 
 		// Utility functions
@@ -310,6 +317,18 @@ register_classes :: proc() {
 
 	// Test: Vector2 built-in
 	vec := gbv2.vector2_new3(3.0, 4.0)
+	vec_variant := gbv2.vector2_to_variant(vec)
+	vec_back, vec_back_ok := gbv2.vector2_try_from_variant(&vec_variant)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"Vector2 variant roundtrip: (%v, %v) / %v (expect 3,4 / true)",
+			vec_back.x,
+			vec_back.y,
+			vec_back_ok,
+		),
+	)
+	gt.variant_free(&vec_variant)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
 	len := gbv2.vector2_length(vec)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))

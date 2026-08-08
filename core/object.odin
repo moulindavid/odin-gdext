@@ -45,12 +45,19 @@ object_to_variant :: proc "contextless" (obj: ObjectPtr) -> Variant {
 }
 
 // object_from_variant extracts an ObjectPtr from a Variant without taking
-// ownership of it.
+// ownership of it. Prefer variant_try_object when the Variant type is not known.
 object_from_variant :: proc "contextless" (v: ^Variant) -> ObjectPtr {
 	ctor := require_variant_to_type_constructor(.Object)
 	result: ObjectPtr
-	ctor(cast(TypePtr)&result, variant_ptr(v))
+	ctor(cast(UninitializedTypePtr)&result, variant_ptr(v))
 	return result
+}
+
+// variant_try_object extracts ObjectPtr only from exact Object Variants. A nil
+// Object stored in a Variant still returns ok=true with value=nil.
+variant_try_object :: proc "contextless" (v: ^Variant) -> (value: ObjectPtr, ok: bool) {
+	if !variant_is_type(v, .Object) do return nil, false
+	return object_from_variant(v), true
 }
 
 // ---- Class identity (is_class-based casting) ----
