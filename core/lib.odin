@@ -290,7 +290,7 @@ destroy_builtin :: proc "contextless" (type: VariantType, ptr: TypePtr) {
 // BuiltinMethod holds a resolved builtin method pointer and its StringName
 // storage. Used by generated bindings for one-time lazy resolution.
 BuiltinMethod :: struct {
-	name_data: [8]u8,
+	name_data: StaticStringName,
 	method:    PtrBuiltInMethod,
 	init:      bool,
 	mutex:     sync.Mutex,
@@ -308,12 +308,14 @@ ensure_builtin_method :: proc "contextless" (
 
 	if bm.init do return
 
-	if string_name_new_with_latin1_chars == nil do _trap_nil_godot_function()
 	if variant_get_ptr_builtin_method == nil do _trap_nil_godot_function()
-	string_name_new_with_latin1_chars(cast(UninitializedStringNamePtr)&bm.name_data, name, true)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&bm.name_data),
+		name,
+	)
 	method := variant_get_ptr_builtin_method(
 		variant_type,
-		cast(ConstStringNamePtr)&bm.name_data,
+		const_static_string_name_ptr(&bm.name_data),
 		hash,
 	)
 	if method == nil do _trap_nil_godot_function()

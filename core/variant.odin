@@ -144,6 +144,46 @@ string_name_free :: proc "contextless" (s: ^StringName) {
 	destroy_builtin(.String_Name, string_name_ptr(s))
 }
 
+// StaticStringName is initialized Godot StringName storage using Godot's
+// static-name optimization. The source C string must remain valid for the whole
+// process, and StaticStringName values must never be destroyed.
+StaticStringName :: distinct StringNameStorage
+
+// static_string_name_ptr returns a mutable GDExtension pointer to initialized
+// static StringName storage.
+static_string_name_ptr :: proc "contextless" (s: ^StaticStringName) -> StringNamePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(StringNamePtr)s
+}
+
+// const_static_string_name_ptr returns a read-only GDExtension pointer to
+// initialized static StringName storage.
+const_static_string_name_ptr :: proc "contextless" (s: ^StaticStringName) -> ConstStringNamePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(ConstStringNamePtr)s
+}
+
+// uninitialized_static_string_name_ptr returns a GDExtension pointer to storage
+// that Godot is about to initialize as a static StringName.
+uninitialized_static_string_name_ptr :: proc "contextless" (
+	s: ^StaticStringName,
+) -> UninitializedStringNamePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(UninitializedStringNamePtr)s
+}
+
+// static_string_name_init_latin1_cstring constructs a static StringName from a
+// process-lifetime Latin-1/ASCII C string literal. Never call string_name_free
+// on storage initialized by this helper.
+static_string_name_init_latin1_cstring :: proc "contextless" (
+	dest: UninitializedStringNamePtr,
+	value: cstring,
+) {
+	if string_name_new_with_latin1_chars == nil do _trap_nil_godot_function()
+	if dest == nil || value == nil do _trap_nil_godot_function()
+	string_name_new_with_latin1_chars(dest, value, true)
+}
+
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
 // as uninitialized until one of the variant_init_* helpers or Godot itself has
 // constructed a Variant in it.
@@ -421,13 +461,12 @@ array_new :: proc "contextless" () -> (v: Variant) {
 }
 
 array_push :: proc "contextless" (arr: ^Variant, value: ^Variant) {
-	push_name_data: [8]u8
-	string_name_new_with_latin1_chars(
-		cast(UninitializedStringNamePtr)&push_name_data[0],
+	push_name_data: StaticStringName
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&push_name_data),
 		cstring("push_back"),
-		true,
 	)
-	push_name := StringNamePtr(&push_name_data[0])
+	push_name := const_static_string_name_ptr(&push_name_data)
 
 	ret: Variant
 	args := [1]ConstVariantPtr{const_variant_ptr(value)}
@@ -437,13 +476,12 @@ array_push :: proc "contextless" (arr: ^Variant, value: ^Variant) {
 }
 
 array_size :: proc "contextless" (arr: ^Variant) -> i64 {
-	size_name_data: [8]u8
-	string_name_new_with_latin1_chars(
-		cast(UninitializedStringNamePtr)&size_name_data[0],
+	size_name_data: StaticStringName
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&size_name_data),
 		cstring("size"),
-		true,
 	)
-	size_name := StringNamePtr(&size_name_data[0])
+	size_name := const_static_string_name_ptr(&size_name_data)
 
 	ret: Variant
 	err := variant_call_checked(arr, size_name, nil, 0, uninitialized_variant_ptr(&ret))
@@ -460,19 +498,17 @@ array_size :: proc "contextless" (arr: ^Variant) -> i64 {
 
 // ---- print() utility function ----
 
-print_name_data: [8]u8
-print_name := StringNamePtr(&print_name_data[0])
+print_name_data: StaticStringName
 print_hash: i64 = 2648703342
 
 print_init :: proc() {
-	string_name_new_with_latin1_chars(
-		cast(UninitializedStringNamePtr)&print_name_data[0],
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&print_name_data),
 		cstring("print"),
-		true,
 	)
 }
 
 print :: proc "contextless" (args: ..TypePtr) {
-	func := require_utility_function(print_name, print_hash)
+	func := require_utility_function(const_static_string_name_ptr(&print_name_data), print_hash)
 	call_utility_function_ptr_no_ret(func, ..args)
 }

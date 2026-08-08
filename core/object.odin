@@ -62,27 +62,23 @@ variant_try_object :: proc "contextless" (v: ^Variant) -> (value: ObjectPtr, ok:
 
 // ---- Class identity (is_class-based casting) ----
 
-is_class_method_name_data: [8]u8
-is_class_method_name := StringNamePtr(&is_class_method_name_data[0])
-object_class_name_data: [8]u8
-object_class_name := StringNamePtr(&object_class_name_data[0])
+is_class_method_name_data: StaticStringName
+object_class_name_data: StaticStringName
 is_class_method_bind: MethodBindPtr
 
 // Call once, during module init, before any cast is attempted.
 init_class_casting :: proc() {
-	string_name_new_with_latin1_chars(
-		cast(UninitializedStringNamePtr)&is_class_method_name_data[0],
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&is_class_method_name_data),
 		cstring("is_class"),
-		true,
 	)
-	string_name_new_with_latin1_chars(
-		cast(UninitializedStringNamePtr)&object_class_name_data[0],
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&object_class_name_data),
 		cstring("Object"),
-		true,
 	)
 	is_class_method_bind = require_classdb_method_bind(
-		object_class_name,
-		is_class_method_name,
+		const_static_string_name_ptr(&object_class_name_data),
+		const_static_string_name_ptr(&is_class_method_name_data),
 		2619796661,
 	)
 }

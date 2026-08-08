@@ -17,6 +17,7 @@ StringStorage :: gcore.StringStorage
 String :: gcore.String
 StringNameStorage :: gcore.StringNameStorage
 StringName :: gcore.StringName
+StaticStringName :: gcore.StaticStringName
 StringRepr :: gcore.StringRepr
 
 // --- Core functions ---
@@ -46,6 +47,10 @@ uninitialized_string_name_ptr :: gcore.uninitialized_string_name_ptr
 string_name_init_utf8_cstring :: gcore.string_name_init_utf8_cstring
 string_name_from_utf8_cstring :: gcore.string_name_from_utf8_cstring
 string_name_free :: gcore.string_name_free
+static_string_name_ptr :: gcore.static_string_name_ptr
+const_static_string_name_ptr :: gcore.const_static_string_name_ptr
+uninitialized_static_string_name_ptr :: gcore.uninitialized_static_string_name_ptr
+static_string_name_init_latin1_cstring :: gcore.static_string_name_init_latin1_cstring
 
 // --- Variant ---
 variant_type :: gcore.variant_type

@@ -39,6 +39,8 @@ Implement proper wrappers and ownership rules for:
 - [ ] `StringName`
   - [x] Initial owned-storage wrapper, checked pointer adapters, cstring UTF-8 construction, and Variant conversion helpers.
   - [ ] Static/non-static naming policy integration for generated and handwritten APIs.
+    - [x] `StaticStringName` wrapper for process-lifetime literals, integrated into core lazy builtin-method lookup and handwritten core helpers.
+    - [ ] Replace example/manual registration raw StringName storage with policy helpers.
 - [ ] `NodePath`
 - [ ] `Array`
 - [ ] `Dictionary`
