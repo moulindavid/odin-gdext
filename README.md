@@ -119,8 +119,10 @@ Current codegen is intentionally incomplete:
   a `StaticStringName` wrapper for process-lifetime literals used by core/generated
   builtin-method and utility lookup helpers, plus the hello example's manual
   registration data. Static names must only use process-lifetime strings and must never
-  be destroyed. Treat current
-  `Array` helpers as low-level prototype APIs whose construction/destruction rules may change.
+  be destroyed. `NodePath` has an initial owned wrapper (`node_path_from_utf8`,
+  `node_path_free`, `variant_from_node_path`, and `variant_try_node_path`), but broader
+  methods and generated API integration are still pending. Treat current `Array` helpers
+  as low-level prototype APIs whose construction/destruction rules may change.
 
 ## Architecture
 

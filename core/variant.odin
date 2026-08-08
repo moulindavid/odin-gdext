@@ -7,6 +7,7 @@ package godot_core
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
 GDExtensionStringName_Size :: 8
+GDExtensionNodePath_Size :: 8
 
 // StringStorage is raw storage large enough for Godot's ABI String handle.
 // Treat it as uninitialized until a string_init_* helper or Godot API has
@@ -184,6 +185,83 @@ static_string_name_init_latin1_cstring :: proc "contextless" (
 	string_name_new_with_latin1_chars(dest, value, true)
 }
 
+// NodePathStorage is raw storage large enough for Godot's ABI NodePath handle.
+// Treat it as uninitialized until a node_path_init_* helper or Godot API has
+// constructed a NodePath in it.
+NodePathStorage :: [GDExtensionNodePath_Size]u8
+
+// NodePath is initialized Godot NodePath storage. Every proc returning a
+// NodePath transfers ownership to the caller; destroy it with node_path_free
+// when finished.
+NodePath :: distinct NodePathStorage
+
+// node_path_ptr returns a mutable GDExtension pointer to initialized NodePath storage.
+node_path_ptr :: proc "contextless" (p: ^NodePath) -> TypePtr {
+	if p == nil do _trap_nil_godot_function()
+	return cast(TypePtr)p
+}
+
+// const_node_path_ptr returns a read-only GDExtension pointer to initialized NodePath storage.
+const_node_path_ptr :: proc "contextless" (p: ^NodePath) -> ConstTypePtr {
+	if p == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)p
+}
+
+// uninitialized_node_path_ptr returns a GDExtension pointer to storage that
+// Godot is about to initialize. Do not pass already-owned NodePath storage here
+// unless the called API explicitly overwrites it without leaking.
+uninitialized_node_path_ptr :: proc "contextless" (p: ^NodePath) -> UninitializedTypePtr {
+	if p == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)p
+}
+
+// node_path_init_from_string constructs a NodePath from a Godot String. The
+// input String is borrowed; the caller owns dest and must free it.
+node_path_init_from_string :: proc "contextless" (dest: UninitializedTypePtr, value: ^String) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Node_Path, 2)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_string_ptr(value))
+}
+
+// node_path_from_string returns an initialized NodePath; call node_path_free when done.
+node_path_from_string :: proc "contextless" (value: ^String) -> (result: NodePath) {
+	node_path_init_from_string(uninitialized_node_path_ptr(&result), value)
+	return
+}
+
+// node_path_init_utf8 constructs a NodePath from UTF-8 bytes via a temporary
+// Godot String. The input bytes are copied into Godot-owned storage.
+node_path_init_utf8 :: proc "contextless" (dest: UninitializedTypePtr, value: string) {
+	str := string_from_utf8(value)
+	defer string_free(&str)
+	node_path_init_from_string(dest, &str)
+}
+
+// node_path_from_utf8 returns an initialized NodePath; call node_path_free when done.
+node_path_from_utf8 :: proc "contextless" (value: string) -> (result: NodePath) {
+	node_path_init_utf8(uninitialized_node_path_ptr(&result), value)
+	return
+}
+
+// node_path_init_copy copies an initialized NodePath into uninitialized storage.
+node_path_init_copy :: proc "contextless" (dest: UninitializedTypePtr, value: ^NodePath) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Node_Path, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_node_path_ptr(value))
+}
+
+// node_path_copy returns an initialized copy; call node_path_free when done.
+node_path_copy :: proc "contextless" (value: ^NodePath) -> (result: NodePath) {
+	node_path_init_copy(uninitialized_node_path_ptr(&result), value)
+	return
+}
+
+node_path_free :: proc "contextless" (p: ^NodePath) {
+	destroy_builtin(.Node_Path, node_path_ptr(p))
+}
+
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
 // as uninitialized until one of the variant_init_* helpers or Godot itself has
 // constructed a Variant in it.
@@ -270,6 +348,12 @@ variant_from_string :: proc "contextless" (s: ^String) -> (v: Variant) {
 variant_from_string_name :: proc "contextless" (s: ^StringName) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.String_Name)
 	ctor(uninitialized_variant_ptr(&v), string_name_ptr(s))
+	return
+}
+
+variant_from_node_path :: proc "contextless" (p: ^NodePath) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.Node_Path)
+	ctor(uninitialized_variant_ptr(&v), node_path_ptr(p))
 	return
 }
 
@@ -363,6 +447,17 @@ variant_to_string_name :: proc "contextless" (v: ^Variant) -> (result: StringNam
 variant_try_string_name :: proc "contextless" (v: ^Variant) -> (value: StringName, ok: bool) {
 	if !variant_is_type(v, .String_Name) do return StringName{}, false
 	return variant_to_string_name(v), true
+}
+
+variant_to_node_path :: proc "contextless" (v: ^Variant) -> (result: NodePath) {
+	ctor := require_variant_to_type_constructor(.Node_Path)
+	ctor(uninitialized_node_path_ptr(&result), variant_ptr(v))
+	return
+}
+
+variant_try_node_path :: proc "contextless" (v: ^Variant) -> (value: NodePath, ok: bool) {
+	if !variant_is_type(v, .Node_Path) do return NodePath{}, false
+	return variant_to_node_path(v), true
 }
 
 variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {

@@ -362,6 +362,15 @@ register_classes :: proc() {
 	gt.variant_free(&snv)
 	gt.string_name_free(&sn)
 
+	// Test: owned NodePath wrapper and NodePath Variant extraction
+	np := gt.node_path_from_utf8("../HelloNode")
+	npv := gt.variant_from_node_path(&np)
+	np_back, np_back_ok := gt.variant_try_node_path(&npv)
+	gd.debug_print(fmt.bprintf(buf[:], "variant_try_node_path(npv): %v (expect true)", np_back_ok))
+	if np_back_ok do gt.node_path_free(&np_back)
+	gt.variant_free(&npv)
+	gt.node_path_free(&np)
+
 	// Test: Vector2 built-in
 	vec := gbv2.vector2_new3(3.0, 4.0)
 	vec_variant := gbv2.vector2_to_variant(vec)

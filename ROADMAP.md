@@ -43,6 +43,7 @@ Implement proper wrappers and ownership rules for:
     - [x] Replace example/manual registration raw StringName storage with policy helpers.
     - [x] Generated utility lookup uses `StaticStringName` policy helpers instead of raw storage casts.
 - [ ] `NodePath`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, UTF-8/String construction, copy/free helpers, and Variant conversion helpers.
 - [ ] `Array`
 - [ ] `Dictionary`
 - [ ] packed arrays

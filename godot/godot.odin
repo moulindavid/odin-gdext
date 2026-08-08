@@ -18,6 +18,8 @@ String :: gcore.String
 StringNameStorage :: gcore.StringNameStorage
 StringName :: gcore.StringName
 StaticStringName :: gcore.StaticStringName
+NodePathStorage :: gcore.NodePathStorage
+NodePath :: gcore.NodePath
 StringRepr :: gcore.StringRepr
 
 // --- Core functions ---
@@ -52,6 +54,18 @@ const_static_string_name_ptr :: gcore.const_static_string_name_ptr
 uninitialized_static_string_name_ptr :: gcore.uninitialized_static_string_name_ptr
 static_string_name_init_latin1_cstring :: gcore.static_string_name_init_latin1_cstring
 
+// --- NodePath ---
+node_path_ptr :: gcore.node_path_ptr
+const_node_path_ptr :: gcore.const_node_path_ptr
+uninitialized_node_path_ptr :: gcore.uninitialized_node_path_ptr
+node_path_init_from_string :: gcore.node_path_init_from_string
+node_path_from_string :: gcore.node_path_from_string
+node_path_init_utf8 :: gcore.node_path_init_utf8
+node_path_from_utf8 :: gcore.node_path_from_utf8
+node_path_init_copy :: gcore.node_path_init_copy
+node_path_copy :: gcore.node_path_copy
+node_path_free :: gcore.node_path_free
+
 // --- Variant ---
 variant_type :: gcore.variant_type
 variant_is_type :: gcore.variant_is_type
@@ -68,6 +82,7 @@ variant_from_int :: gcore.variant_from_int
 variant_from_bool :: gcore.variant_from_bool
 variant_from_string :: gcore.variant_from_string
 variant_from_string_name :: gcore.variant_from_string_name
+variant_from_node_path :: gcore.variant_from_node_path
 variant_from_utf8 :: gcore.variant_from_utf8
 variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
@@ -78,6 +93,8 @@ variant_to_string :: gcore.variant_to_string
 variant_try_string :: gcore.variant_try_string
 variant_to_string_name :: gcore.variant_to_string_name
 variant_try_string_name :: gcore.variant_try_string_name
+variant_to_node_path :: gcore.variant_to_node_path
+variant_try_node_path :: gcore.variant_try_node_path
 variant_string_utf8_len :: gcore.variant_string_utf8_len
 variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float
