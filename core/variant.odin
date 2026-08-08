@@ -3,6 +3,8 @@
 // https://docs.godotengine.org/fr/4.x/classes/class_variant.html
 package godot_core
 
+//FROM `extension_api.json`
+NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
 
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
@@ -260,6 +262,58 @@ node_path_copy :: proc "contextless" (value: ^NodePath) -> (result: NodePath) {
 
 node_path_free :: proc "contextless" (p: ^NodePath) {
 	destroy_builtin(.Node_Path, node_path_ptr(p))
+}
+
+node_path_is_absolute_method: BuiltinMethod
+node_path_get_name_count_method: BuiltinMethod
+node_path_get_subname_count_method: BuiltinMethod
+node_path_hash_method: BuiltinMethod
+
+node_path_is_absolute :: proc "contextless" (p: ^NodePath) -> bool {
+	ensure_builtin_method(
+		&node_path_is_absolute_method,
+		.Node_Path,
+		cstring("is_absolute"),
+		3918633141,
+	)
+	return call_builtin_method_ptr_ret(
+		node_path_is_absolute_method.method,
+		const_node_path_ptr(p),
+		bool,
+	)
+}
+
+node_path_get_name_count :: proc "contextless" (p: ^NodePath) -> i64 {
+	ensure_builtin_method(
+		&node_path_get_name_count_method,
+		.Node_Path,
+		cstring("get_name_count"),
+		NODE_PATH_GET_NAME_COUNT_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		node_path_get_name_count_method.method,
+		const_node_path_ptr(p),
+		i64,
+	)
+}
+
+node_path_get_subname_count :: proc "contextless" (p: ^NodePath) -> i64 {
+	ensure_builtin_method(
+		&node_path_get_subname_count_method,
+		.Node_Path,
+		cstring("get_subname_count"),
+		NODE_PATH_GET_NAME_COUNT_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		node_path_get_subname_count_method.method,
+		const_node_path_ptr(p),
+		i64,
+	)
+}
+
+node_path_hash :: proc "contextless" (p: ^NodePath) -> i64 {
+	ensure_builtin_method(&node_path_hash_method, .Node_Path, cstring("hash"), 3173160232)
+	return call_builtin_method_ptr_ret(node_path_hash_method.method, const_node_path_ptr(p), i64)
 }
 
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it

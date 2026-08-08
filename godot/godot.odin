@@ -65,6 +65,10 @@ node_path_from_utf8 :: gcore.node_path_from_utf8
 node_path_init_copy :: gcore.node_path_init_copy
 node_path_copy :: gcore.node_path_copy
 node_path_free :: gcore.node_path_free
+node_path_is_absolute :: gcore.node_path_is_absolute
+node_path_get_name_count :: gcore.node_path_get_name_count
+node_path_get_subname_count :: gcore.node_path_get_subname_count
+node_path_hash :: gcore.node_path_hash
 
 // --- Variant ---
 variant_type :: gcore.variant_type

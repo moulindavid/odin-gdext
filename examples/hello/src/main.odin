@@ -367,6 +367,16 @@ register_classes :: proc() {
 	npv := gt.variant_from_node_path(&np)
 	np_back, np_back_ok := gt.variant_try_node_path(&npv)
 	gd.debug_print(fmt.bprintf(buf[:], "variant_try_node_path(npv): %v (expect true)", np_back_ok))
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"node_path: absolute=%v names=%v subnames=%v hash>0=%v (expect false / 2 / 0 / true)",
+			gt.node_path_is_absolute(&np),
+			gt.node_path_get_name_count(&np),
+			gt.node_path_get_subname_count(&np),
+			gt.node_path_hash(&np) != 0,
+		),
+	)
 	if np_back_ok do gt.node_path_free(&np_back)
 	gt.variant_free(&npv)
 	gt.node_path_free(&np)
