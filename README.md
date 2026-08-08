@@ -117,9 +117,10 @@ Current codegen is intentionally incomplete:
   `StringName` has an initial owned, non-static wrapper (`string_name_from_utf8_cstring`,
   `string_name_free`, `variant_from_string_name`, and `variant_try_string_name`) plus
   a `StaticStringName` wrapper for process-lifetime literals used by core/generated
-  builtin-method lookup helpers. Static names must only use process-lifetime strings and
-  must never be destroyed. Treat current example/manual registration `StringName` usage
-  and `Array` helpers as low-level prototype APIs whose construction/destruction rules may change.
+  builtin-method and utility lookup helpers, plus the hello example's manual
+  registration data. Static names must only use process-lifetime strings and must never
+  be destroyed. Treat current
+  `Array` helpers as low-level prototype APIs whose construction/destruction rules may change.
 
 ## Architecture
 

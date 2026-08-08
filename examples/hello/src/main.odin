@@ -122,8 +122,8 @@ add_ptrcall :: proc "c" (
 	(cast(^f64)r_ret)^ = a + b
 }
 
-add_method_name_data: [8]u8
-add_method_name := gd.StringNamePtr(&add_method_name_data[0])
+add_method_name_data: gd.StaticStringName
+add_method_name := gd.const_static_string_name_ptr(&add_method_name_data)
 add_arg_info := [2]gd.PropertyInfo{{type = .Float}, {type = .Float}}
 add_arg_meta := [2]gd.ClassMethodArgumentMetadata{.None, .None}
 add_return_info := gd.PropertyInfo {
@@ -131,38 +131,34 @@ add_return_info := gd.PropertyInfo {
 }
 add_method_info: gd.ClassMethodInfo
 
-add_arg_a_name_data: [8]u8
-add_arg_a_name := gd.StringNamePtr(&add_arg_a_name_data[0])
-add_arg_b_name_data: [8]u8
-add_arg_b_name := gd.StringNamePtr(&add_arg_b_name_data[0])
+add_arg_a_name_data: gd.StaticStringName
+add_arg_a_name := gd.const_static_string_name_ptr(&add_arg_a_name_data)
+add_arg_b_name_data: gd.StaticStringName
+add_arg_b_name := gd.const_static_string_name_ptr(&add_arg_b_name_data)
 
-empty_name_data: [8]u8
-empty_name := gd.StringNamePtr(&empty_name_data[0])
-empty_str_data: [8]u8
-empty_str := gd.StringPtr(&empty_str_data[0])
+empty_name_data: gd.StaticStringName
+empty_name := gd.const_static_string_name_ptr(&empty_name_data)
+empty_str_data: gd.String
+empty_str := gd.const_string_ptr(&empty_str_data)
 
 register_methods :: proc() {
-	gd.string_name_new_with_latin1_chars(
-		cast(gd.UninitializedStringNamePtr)&add_method_name_data[0],
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&add_method_name_data),
 		cstring("add"),
-		true,
 	)
-	gd.string_name_new_with_latin1_chars(
-		cast(gd.UninitializedStringNamePtr)&add_arg_a_name_data[0],
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&add_arg_a_name_data),
 		cstring("a"),
-		true,
 	)
-	gd.string_name_new_with_latin1_chars(
-		cast(gd.UninitializedStringNamePtr)&add_arg_b_name_data[0],
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&add_arg_b_name_data),
 		cstring("b"),
-		true,
 	)
-	gd.string_name_new_with_latin1_chars(
-		cast(gd.UninitializedStringNamePtr)&empty_name_data[0],
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&empty_name_data),
 		cstring(""),
-		true,
 	)
-	gd.string_new_with_latin1_chars(cast(gd.UninitializedStringPtr)&empty_str_data[0], cstring(""))
+	gd.string_new_with_latin1_chars(gd.uninitialized_string_ptr(&empty_str_data), cstring(""))
 
 	add_arg_info[0].name = add_arg_a_name
 	add_arg_info[0].class_name = empty_name
@@ -189,18 +185,16 @@ register_methods :: proc() {
 	gd.debug_print("[odin-gdext] Method add registered!")
 }
 
-// ---- Storage for StringNames (8 bytes each) ----
+// ---- Static StringName storage ----
 
-// StringNamePtr is const StringName* in C. We store the actual data in byte
-// arrays and pass pointers to those arrays.
-hello_name_data: [8]u8
-parent_name_data: [8]u8
-hello_class_name := gd.StringNamePtr(&hello_name_data[0])
-hello_parent_name := gd.StringNamePtr(&parent_name_data[0])
-node_class_name_data: [8]u8
-node_class_name := gd.StringNamePtr(&node_class_name_data[0])
-node2d_class_name_data: [8]u8
-node2d_class_name := gd.StringNamePtr(&node2d_class_name_data[0])
+hello_name_data: gd.StaticStringName
+parent_name_data: gd.StaticStringName
+hello_class_name := gd.const_static_string_name_ptr(&hello_name_data)
+hello_parent_name := gd.const_static_string_name_ptr(&parent_name_data)
+node_class_name_data: gd.StaticStringName
+node_class_name := gd.const_static_string_name_ptr(&node_class_name_data)
+node2d_class_name_data: gd.StaticStringName
+node2d_class_name := gd.const_static_string_name_ptr(&node2d_class_name_data)
 
 hello_instance_binding_callbacks := gd.InstanceBindingCallbacks {
 	create_callback    = nil,
@@ -212,10 +206,22 @@ register_classes :: proc() {
 	context = gt.godot_context()
 	gd.debug_print("[odin-gdext] Registering HelloNode...")
 
-	gd.string_name_new_with_latin1_chars(hello_class_name, cstring("HelloNode"), true)
-	gd.string_name_new_with_latin1_chars(hello_parent_name, cstring("Node"), true)
-	gd.string_name_new_with_latin1_chars(node_class_name, cstring("Node"), true)
-	gd.string_name_new_with_latin1_chars(node2d_class_name, cstring("Node2D"), true)
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&hello_name_data),
+		cstring("HelloNode"),
+	)
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&parent_name_data),
+		cstring("Node"),
+	)
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&node_class_name_data),
+		cstring("Node"),
+	)
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&node2d_class_name_data),
+		cstring("Node2D"),
+	)
 	gt.init_class_casting()
 
 	class_info := gd.ClassCreationInfo {

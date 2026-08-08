@@ -632,7 +632,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	)
 	strings.write_string(&b, "@(private=\"file\")\n")
 	strings.write_string(&b, "_UtilFunc :: struct {\n")
-	strings.write_string(&b, "\tname_data: [8]u8,\n")
+	strings.write_string(&b, "\tname_data: core.StaticStringName,\n")
 	strings.write_string(&b, "\tfunc:      core.PtrUtilityFunction,\n")
 	strings.write_string(&b, "\tinit:      bool,\n")
 	strings.write_string(&b, "\tmutex:     sync.Mutex,\n")
@@ -646,14 +646,13 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, "\tsync.mutex_lock(&uf.mutex)\n")
 	strings.write_string(&b, "\tdefer sync.mutex_unlock(&uf.mutex)\n\n")
 	strings.write_string(&b, "\tif uf.init do return\n\n")
-	strings.write_string(&b, "\tcore.string_name_new_with_latin1_chars(\n")
-	strings.write_string(&b, "\t\tcast(core.UninitializedStringNamePtr)&uf.name_data,\n")
+	strings.write_string(&b, "\tcore.static_string_name_init_latin1_cstring(\n")
+	strings.write_string(&b, "\t\tcore.uninitialized_static_string_name_ptr(&uf.name_data),\n")
 	strings.write_string(&b, "\t\tname,\n")
-	strings.write_string(&b, "\t\ttrue,\n")
 	strings.write_string(&b, "\t)\n")
 	strings.write_string(
 		&b,
-		"\tfunc := core.require_utility_function(cast(core.ConstStringNamePtr)&uf.name_data, hash)\n",
+		"\tfunc := core.require_utility_function(core.const_static_string_name_ptr(&uf.name_data), hash)\n",
 	)
 	strings.write_string(&b, "\tuf.func = func\n")
 	strings.write_string(&b, "\tuf.init = true\n")
