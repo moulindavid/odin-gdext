@@ -18,6 +18,13 @@ string_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+string_name_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.StringNameStorage), gd.GDExtensionStringName_Size)
+	testing.expect_value(t, size_of(gd.StringName), gd.GDExtensionStringName_Size)
+	testing.expect_value(t, len(gd.StringNameStorage{}), gd.GDExtensionStringName_Size)
+}
+
+@(test)
 variant_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	v: gd.Variant
 	_ = gd.variant_ptr(&v)
@@ -31,6 +38,14 @@ string_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	_ = gd.string_ptr(&s)
 	_ = gd.const_string_ptr(&s)
 	_ = gd.uninitialized_string_ptr(&s)
+}
+
+@(test)
+string_name_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	s: gd.StringName
+	_ = gd.string_name_ptr(&s)
+	_ = gd.const_string_name_ptr(&s)
+	_ = gd.uninitialized_string_name_ptr(&s)
 }
 
 

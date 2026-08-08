@@ -6,6 +6,7 @@ package godot_core
 
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
+GDExtensionStringName_Size :: 8
 
 // StringStorage is raw storage large enough for Godot's ABI String handle.
 // Treat it as uninitialized until a string_init_* helper or Godot API has
@@ -86,6 +87,61 @@ string_to_utf8 :: proc "contextless" (
 
 string_free :: proc "contextless" (s: ^String) {
 	destroy_builtin(.String, string_ptr(s))
+}
+
+// StringNameStorage is raw storage large enough for Godot's ABI StringName handle.
+// Treat it as uninitialized until a string_name_init_* helper or Godot API has
+// constructed a StringName in it.
+StringNameStorage :: [GDExtensionStringName_Size]u8
+
+// StringName is initialized, non-static Godot StringName storage. Every proc
+// returning a StringName transfers ownership to the caller; destroy it with
+// string_name_free when finished. Do not use string_name_free on StringNames
+// constructed with Godot's static StringName optimization.
+StringName :: distinct StringNameStorage
+
+// string_name_ptr returns a mutable GDExtension pointer to initialized StringName storage.
+string_name_ptr :: proc "contextless" (s: ^StringName) -> StringNamePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(StringNamePtr)s
+}
+
+// const_string_name_ptr returns a read-only GDExtension pointer to initialized StringName storage.
+const_string_name_ptr :: proc "contextless" (s: ^StringName) -> ConstStringNamePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(ConstStringNamePtr)s
+}
+
+// uninitialized_string_name_ptr returns a GDExtension pointer to storage that
+// Godot is about to initialize. Do not pass already-owned StringName storage
+// here unless the called API explicitly overwrites it without leaking.
+uninitialized_string_name_ptr :: proc "contextless" (
+	s: ^StringName,
+) -> UninitializedStringNamePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(UninitializedStringNamePtr)s
+}
+
+// string_name_init_utf8_cstring constructs a non-static StringName from a
+// null-terminated UTF-8 C string. The caller owns dest and must free it.
+string_name_init_utf8_cstring :: proc "contextless" (
+	dest: UninitializedStringNamePtr,
+	value: cstring,
+) {
+	if string_name_new_with_utf8_chars == nil do _trap_nil_godot_function()
+	if dest == nil || value == nil do _trap_nil_godot_function()
+	string_name_new_with_utf8_chars(dest, value)
+}
+
+// string_name_from_utf8_cstring returns an initialized non-static StringName;
+// call string_name_free when done.
+string_name_from_utf8_cstring :: proc "contextless" (value: cstring) -> (result: StringName) {
+	string_name_init_utf8_cstring(uninitialized_string_name_ptr(&result), value)
+	return
+}
+
+string_name_free :: proc "contextless" (s: ^StringName) {
+	destroy_builtin(.String_Name, string_name_ptr(s))
 }
 
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
@@ -171,6 +227,12 @@ variant_from_string :: proc "contextless" (s: ^String) -> (v: Variant) {
 	return
 }
 
+variant_from_string_name :: proc "contextless" (s: ^StringName) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.String_Name)
+	ctor(uninitialized_variant_ptr(&v), string_name_ptr(s))
+	return
+}
+
 variant_from_utf8 :: proc "contextless" (s: string) -> (v: Variant) {
 	str := string_from_utf8(s)
 	defer string_free(&str)
@@ -250,6 +312,17 @@ variant_to_string :: proc "contextless" (v: ^Variant) -> (result: String) {
 variant_try_string :: proc "contextless" (v: ^Variant) -> (value: String, ok: bool) {
 	if !variant_is_type(v, .String) do return String{}, false
 	return variant_to_string(v), true
+}
+
+variant_to_string_name :: proc "contextless" (v: ^Variant) -> (result: StringName) {
+	ctor := require_variant_to_type_constructor(.String_Name)
+	ctor(uninitialized_string_name_ptr(&result), variant_ptr(v))
+	return
+}
+
+variant_try_string_name :: proc "contextless" (v: ^Variant) -> (value: StringName, ok: bool) {
+	if !variant_is_type(v, .String_Name) do return StringName{}, false
+	return variant_to_string_name(v), true
 }
 
 variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {

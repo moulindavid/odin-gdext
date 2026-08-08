@@ -15,6 +15,8 @@ VariantStorage :: gcore.VariantStorage
 Variant :: gcore.Variant
 StringStorage :: gcore.StringStorage
 String :: gcore.String
+StringNameStorage :: gcore.StringNameStorage
+StringName :: gcore.StringName
 StringRepr :: gcore.StringRepr
 
 // --- Core functions ---
@@ -37,6 +39,14 @@ string_utf8_len :: gcore.string_utf8_len
 string_to_utf8 :: gcore.string_to_utf8
 string_free :: gcore.string_free
 
+// --- StringName ---
+string_name_ptr :: gcore.string_name_ptr
+const_string_name_ptr :: gcore.const_string_name_ptr
+uninitialized_string_name_ptr :: gcore.uninitialized_string_name_ptr
+string_name_init_utf8_cstring :: gcore.string_name_init_utf8_cstring
+string_name_from_utf8_cstring :: gcore.string_name_from_utf8_cstring
+string_name_free :: gcore.string_name_free
+
 // --- Variant ---
 variant_type :: gcore.variant_type
 variant_is_type :: gcore.variant_is_type
@@ -52,6 +62,7 @@ variant_from_float :: gcore.variant_from_float
 variant_from_int :: gcore.variant_from_int
 variant_from_bool :: gcore.variant_from_bool
 variant_from_string :: gcore.variant_from_string
+variant_from_string_name :: gcore.variant_from_string_name
 variant_from_utf8 :: gcore.variant_from_utf8
 variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
@@ -60,6 +71,8 @@ variant_to_bool :: gcore.variant_to_bool
 variant_to_string_storage :: gcore.variant_to_string_storage
 variant_to_string :: gcore.variant_to_string
 variant_try_string :: gcore.variant_try_string
+variant_to_string_name :: gcore.variant_to_string_name
+variant_try_string_name :: gcore.variant_try_string_name
 variant_string_utf8_len :: gcore.variant_string_utf8_len
 variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float

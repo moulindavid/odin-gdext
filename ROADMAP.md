@@ -37,6 +37,8 @@ Implement proper wrappers and ownership rules for:
   - [x] Initial owned-storage wrapper, checked pointer adapters, UTF-8 construction/extraction, and Variant conversion helpers.
   - [ ] Broader String methods/operators and generated API integration.
 - [ ] `StringName`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, cstring UTF-8 construction, and Variant conversion helpers.
+  - [ ] Static/non-static naming policy integration for generated and handwritten APIs.
 - [ ] `NodePath`
 - [ ] `Array`
 - [ ] `Dictionary`

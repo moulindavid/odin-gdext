@@ -345,6 +345,17 @@ register_classes :: proc() {
 	gt.variant_free(&gsv)
 	gt.string_free(&gs)
 
+	// Test: owned StringName wrapper and StringName Variant extraction
+	sn := gt.string_name_from_utf8_cstring(cstring("HelloNode"))
+	snv := gt.variant_from_string_name(&sn)
+	sn_back, sn_back_ok := gt.variant_try_string_name(&snv)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "variant_try_string_name(snv): %v (expect true)", sn_back_ok),
+	)
+	if sn_back_ok do gt.string_name_free(&sn_back)
+	gt.variant_free(&snv)
+	gt.string_name_free(&sn)
+
 	// Test: Vector2 built-in
 	vec := gbv2.vector2_new3(3.0, 4.0)
 	vec_variant := gbv2.vector2_to_variant(vec)

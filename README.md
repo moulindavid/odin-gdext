@@ -114,8 +114,11 @@ Current codegen is intentionally incomplete:
   `String` has an initial owned-storage wrapper (`string_from_utf8`,
   `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`),
   but broader String methods/operators and generated API integration are still pending.
-  Treat current `StringName` and `Array` helpers as low-level prototype APIs whose
-  construction/destruction rules may change.
+  `StringName` has an initial owned, non-static wrapper (`string_name_from_utf8_cstring`,
+  `string_name_free`, `variant_from_string_name`, and `variant_try_string_name`).
+  Static `StringName` construction is still a low-level/manual policy: only use it for
+  process-lifetime literals and never destroy static names. Treat current `Array` helpers
+  as low-level prototype APIs whose construction/destruction rules may change.
 
 ## Architecture
 

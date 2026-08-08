@@ -325,10 +325,11 @@ ensure_builtin_method :: proc "contextless" (
 // String / StringName
 // ---------------------------------------------------------------------------
 
-// Construct a StringName from a null-terminated Latin-1/UTF-8 C string.
-// `static = true` signals Godot the name lives for the process lifetime, so
-// it can skip ref-counting; use it for string literals only.
-// In Godot 4.7+, StringNames are internally managed -- no explicit destroy needed.
+// Construct a raw StringName from a null-terminated Latin-1 C string.
+// `static = true` signals Godot the name lives for the process lifetime, so it
+// can reuse the literal buffer; use it for string literals only and never destroy
+// that static StringName. For owned, non-static names, prefer the StringName
+// wrapper helpers and call string_name_free when done.
 string_name_new :: proc "contextless" (
 	dest: UninitializedStringNamePtr,
 	str: cstring,
