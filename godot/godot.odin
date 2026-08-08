@@ -25,6 +25,9 @@ object_from_variant :: gcore.object_from_variant
 godot_context :: gcore.godot_context
 
 // --- Variant ---
+variant_type :: gcore.variant_type
+variant_is_type :: gcore.variant_is_type
+variant_is_nil :: gcore.variant_is_nil
 variant_ptr :: gcore.variant_ptr
 const_variant_ptr :: gcore.const_variant_ptr
 uninitialized_variant_ptr :: gcore.uninitialized_variant_ptr
@@ -39,6 +42,12 @@ variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
 variant_to_int :: gcore.variant_to_int
 variant_to_bool :: gcore.variant_to_bool
+variant_to_string_storage :: gcore.variant_to_string_storage
+variant_string_utf8_len :: gcore.variant_string_utf8_len
+variant_try_utf8 :: gcore.variant_try_utf8
+variant_try_float :: gcore.variant_try_float
+variant_try_int :: gcore.variant_try_int
+variant_try_bool :: gcore.variant_try_bool
 variant_free :: gcore.variant_free
 variant_free_temp :: gcore.variant_free_temp
 call_error_ok :: gcore.call_error_ok

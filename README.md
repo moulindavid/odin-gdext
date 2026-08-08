@@ -106,8 +106,10 @@ Current codegen is intentionally incomplete:
   `variant_init_copy`, pointer adapters, and `variant_free`) plus minimal
   `CallError` helpers and checked wrappers for `variant_call` /
   `variant_construct`. Generated wrappers borrow `^core.Variant` parameters and
-  document owned `core.Variant` returns, but broader conversion coverage is still
-  incomplete.
+  document owned `core.Variant` returns. Runtime type inspection, exact-type
+  `variant_try_bool` / `variant_try_int` / `variant_try_float`, and caller-buffer
+  `variant_try_utf8` String extraction helpers are available, but broader complex
+  conversion coverage is still incomplete.
   Treat current `String`, `StringName`, and `Array` helpers as low-level
   prototype APIs whose construction/destruction rules may change.
 

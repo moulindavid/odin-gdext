@@ -37,6 +37,21 @@ uninitialized_variant_ptr :: proc "contextless" (v: ^Variant) -> UninitializedVa
 	return cast(UninitializedVariantPtr)v
 }
 
+// ---- Variant type inspection ----
+
+variant_type :: proc "contextless" (v: ^Variant) -> VariantType {
+	if variant_get_type == nil do _trap_nil_godot_function()
+	return variant_get_type(const_variant_ptr(v))
+}
+
+variant_is_type :: proc "contextless" (v: ^Variant, type: VariantType) -> bool {
+	return variant_type(v) == type
+}
+
+variant_is_nil :: proc "contextless" (v: ^Variant) -> bool {
+	return variant_is_type(v, .Nil)
+}
+
 // ---- Variant construction ----
 
 variant_init_nil :: proc "contextless" (dest: UninitializedVariantPtr) {
@@ -124,6 +139,60 @@ variant_to_bool :: proc "contextless" (v: ^Variant) -> bool {
 	ret: bool
 	ctor(cast(UninitializedTypePtr)&ret, variant_ptr(v))
 	return ret
+}
+
+variant_to_string_storage :: proc "contextless" (dest: UninitializedStringPtr, v: ^Variant) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := require_variant_to_type_constructor(.String)
+	ctor(dest, variant_ptr(v))
+}
+
+variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {
+	if !variant_is_type(v, .String) do return 0, false
+	if string_to_utf8_chars == nil do _trap_nil_godot_function()
+
+	str_data: [8]u8
+	variant_to_string_storage(cast(UninitializedStringPtr)&str_data[0], v)
+	defer destroy_builtin(.String, cast(TypePtr)&str_data[0])
+
+	return int(string_to_utf8_chars(cast(ConstStringPtr)&str_data[0], nil, 0)), true
+}
+
+variant_try_utf8 :: proc "contextless" (
+	v: ^Variant,
+	buffer: []u8,
+) -> (
+	value: string,
+	ok: bool,
+	needed: int,
+) {
+	byte_count, type_ok := variant_string_utf8_len(v)
+	if !type_ok do return "", false, 0
+	if byte_count > len(buffer) do return "", false, byte_count
+
+	if byte_count > 0 {
+		str_data: [8]u8
+		variant_to_string_storage(cast(UninitializedStringPtr)&str_data[0], v)
+		defer destroy_builtin(.String, cast(TypePtr)&str_data[0])
+
+		string_to_utf8_chars(cast(ConstStringPtr)&str_data[0], raw_data(buffer), i64(byte_count))
+	}
+	return string(buffer[:byte_count]), true, byte_count
+}
+
+variant_try_float :: proc "contextless" (v: ^Variant) -> (value: f64, ok: bool) {
+	if !variant_is_type(v, .Float) do return 0, false
+	return variant_to_float(v), true
+}
+
+variant_try_int :: proc "contextless" (v: ^Variant) -> (value: i64, ok: bool) {
+	if !variant_is_type(v, .Int) do return 0, false
+	return variant_to_int(v), true
+}
+
+variant_try_bool :: proc "contextless" (v: ^Variant) -> (value: bool, ok: bool) {
+	if !variant_is_type(v, .Bool) do return false, false
+	return variant_to_bool(v), true
 }
 
 // ---- Variant call errors ----
