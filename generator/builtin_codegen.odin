@@ -164,10 +164,24 @@ resolve_member_type :: proc(godot_name: string) -> string {
 	return godot_name // builtin type with same name
 }
 
-// Resolve a Godot type name to an Odin type for method args/returns (ABI).
-resolve_arg_type :: proc(godot_name: string) -> string {
+// Resolve a Godot type name to an Odin type for method return values (ABI).
+// Variant returns are owned initialized storage; callers must destroy them with
+// core.variant_free when done.
+resolve_return_type :: proc(godot_name: string) -> string {
 	if t, ok := arg_type_map[godot_name]; ok {return t}
 	return godot_name
+}
+
+// Resolve a Godot type name to an Odin type for parameters (ABI). Variant
+// parameters are borrowed to avoid unsafe by-value copies of owned storage.
+resolve_param_type :: proc(godot_name: string) -> string {
+	if godot_name == "Variant" do return "^core.Variant"
+	return resolve_return_type(godot_name)
+}
+
+param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
+	if godot_type == "Variant" do return fmt.aprintf("core.variant_ptr(%s)", arg_name)
+	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
 }
 
 // ---------------------------------------------------------------------------
@@ -317,7 +331,7 @@ emit_constructors :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 		// Build argument list for proc signature
 		args_list := ""
 		for arg, j in ctor.arguments {
-			at := resolve_arg_type(arg.type)
+			at := resolve_param_type(arg.type)
 			if j > 0 {args_list = strings.concatenate({args_list, ", "})}
 			args_list = strings.concatenate({args_list, fmt.aprintf("%s: %s", arg.name, at)})
 		}
@@ -331,8 +345,10 @@ emit_constructors :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 			ctor.index,
 		)
 
-		// Copy args to locals (Odin params aren't addressable)
+		// Copy addressable value args to locals. Variant args are borrowed and
+		// passed as pointers to their existing initialized storage.
 		for arg in ctor.arguments {
+			if arg.type == "Variant" do continue
 			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
 		}
 
@@ -342,7 +358,7 @@ emit_constructors :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 			"\tcore.call_builtin_constructor(ctor, cast(core.UninitializedTypePtr)&result",
 		)
 		for arg in ctor.arguments {
-			fmt.sbprintf(b, ",\n\t\tcast(core.TypePtr)&_%s", arg.name)
+			fmt.sbprintf(b, ",\n\t\t%s", param_ptr_expr(arg.name, arg.type))
 		}
 		strings.write_string(b, ")\n")
 		strings.write_string(b, "\treturn result\n")
@@ -366,13 +382,21 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 
 		// Build proc signature
 		returns_void := m.return_type == "" || m.return_type == "void"
-		ret_type := "" if returns_void else resolve_arg_type(m.return_type)
+		ret_type := "" if returns_void else resolve_return_type(m.return_type)
+		if m.return_type == "Variant" {
+			fmt.sbprintf(
+				b,
+				"// %s_%s returns an initialized Variant; call core.variant_free when done.\n",
+				lower,
+				m.name,
+			)
+		}
 
 		if m.is_static {
 			// Static: no self parameter
 			args_list := ""
 			for arg, j in m.arguments {
-				at := resolve_arg_type(arg.type)
+				at := resolve_param_type(arg.type)
 				if j > 0 {args_list = strings.concatenate({args_list, ", "})}
 				args_list = strings.concatenate({args_list, fmt.aprintf("%s: %s", arg.name, at)})
 			}
@@ -398,7 +422,7 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 			// Instance: self is first parameter
 			fmt.sbprintf(b, "%s_%s :: proc \"contextless\" (self_: %s", lower, m.name, c.name)
 			for arg in m.arguments {
-				at := resolve_arg_type(arg.type)
+				at := resolve_param_type(arg.type)
 				fmt.sbprintf(b, ", %s: %s", arg.name, at)
 			}
 			if returns_void {
@@ -417,11 +441,13 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 			m.hash,
 		)
 
-		// Copy args to locals
+		// Copy addressable value args to locals. Variant args are borrowed and
+		// passed as pointers to their existing initialized storage.
 		if !m.is_static {
 			fmt.sbprintf(b, "\t_self_ := self_\n")
 		}
 		for arg in m.arguments {
+			if arg.type == "Variant" do continue
 			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
 		}
 
@@ -439,7 +465,7 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 				)
 			}
 			for arg in m.arguments {
-				fmt.sbprintf(b, ",\n\t\tcast(core.TypePtr)&_%s", arg.name)
+				fmt.sbprintf(b, ",\n\t\t%s", param_ptr_expr(arg.name, arg.type))
 			}
 			strings.write_string(b, ")\n")
 		} else {
@@ -459,7 +485,7 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 				)
 			}
 			for arg in m.arguments {
-				fmt.sbprintf(b, ",\n\t\tcast(core.TypePtr)&_%s", arg.name)
+				fmt.sbprintf(b, ",\n\t\t%s", param_ptr_expr(arg.name, arg.type))
 			}
 			strings.write_string(b, ")\n")
 		}
@@ -633,7 +659,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 		fmt.sbprintf(&b, "@(private=\"file\")\n%s: _UtilFunc\n\n", var_name)
 
 		returns_void := uf.return_type == "" || uf.return_type == "void"
-		ret_type := "" if returns_void else resolve_arg_type(uf.return_type)
+		ret_type := "" if returns_void else resolve_return_type(uf.return_type)
 
 		// Proc signature
 		if returns_void {
@@ -642,7 +668,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 			fmt.sbprintf(&b, "%s :: proc \"contextless\" (", uf.name)
 		}
 		for a, j in uf.arguments {
-			at := resolve_arg_type(a.type)
+			at := resolve_param_type(a.type)
 			if j > 0 {strings.write_string(&b, ", ")}
 			fmt.sbprintf(&b, "%s: %s", a.name, at)
 		}
@@ -661,6 +687,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 			uf.hash,
 		)
 		for a in uf.arguments {
+			if a.type == "Variant" do continue
 			fmt.sbprintf(&b, "\t_%s := %s\n", a.name, a.name)
 		}
 
@@ -676,7 +703,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 			)
 		}
 		for a in uf.arguments {
-			fmt.sbprintf(&b, ",\n\t\tcast(core.TypePtr)&_%s", a.name)
+			fmt.sbprintf(&b, ",\n\t\t%s", param_ptr_expr(a.name, a.type))
 		}
 		strings.write_string(&b, ")\n")
 		strings.write_string(&b, "}\n\n")

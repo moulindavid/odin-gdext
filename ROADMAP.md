@@ -26,7 +26,8 @@ Implement proper wrappers and ownership rules for:
 - `Variant`
   - [x] Initial owned-storage helpers, nil/copy initialization, checked pointer adapters, and ABI tests.
   - [x] Minimal `CallError` helpers and checked `variant_call` / `variant_construct` wrappers for handwritten Variant APIs.
-  - [ ] Richer conversion coverage and clearer temporary/borrowed ownership patterns for generated APIs.
+  - [x] Generated APIs borrow `^Variant` parameters instead of bit-copying owned storage, and document owned `Variant` returns.
+  - [ ] Richer conversion coverage for primitive and complex Variant conversions.
 - [ ] `String`
 - [ ] `StringName`
 - [ ] `NodePath`

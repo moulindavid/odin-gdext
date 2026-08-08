@@ -94,17 +94,20 @@ Current codegen is intentionally incomplete:
   `Signal`, `Array`, `Dictionary`, and packed arrays are skipped until their
   ownership, lifetime, and ABI rules are implemented properly.
 - Utility generation skips varargs and signatures involving unsupported complex
-  return/argument types, including `String`, `Variant`, `Object`, `RID`, and
-  several packed arrays. Generated utilities are available from
-  `godot:bindings`; only a tiny subset is re-exported by `godot:godot`.
+  return/argument types, including `String`, `Object`, `RID`, `Variant` returns,
+  and several packed arrays. `Variant` arguments are generated as borrowed
+  `^core.Variant` parameters to avoid unsafe owned-storage bit copies. Generated
+  utilities are available from `godot:bindings`; only a tiny subset is
+  re-exported by `godot:godot`.
 - Engine object class wrappers are planned, but not generated yet.
 - Properties, signals, and virtual method overrides are not implemented yet.
 - Ownership rules for value types are still being stabilized. `Variant` now has
   explicit owned-storage helpers (`variant_nil`, `variant_copy`,
   `variant_init_copy`, pointer adapters, and `variant_free`) plus minimal
   `CallError` helpers and checked wrappers for `variant_call` /
-  `variant_construct`, but conversion coverage and higher-level
-  borrowed/temporary patterns are still incomplete.
+  `variant_construct`. Generated wrappers borrow `^core.Variant` parameters and
+  document owned `core.Variant` returns, but broader conversion coverage is still
+  incomplete.
   Treat current `String`, `StringName`, and `Array` helpers as low-level
   prototype APIs whose construction/destruction rules may change.
 
