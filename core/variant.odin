@@ -126,11 +126,56 @@ variant_to_bool :: proc "contextless" (v: ^Variant) -> bool {
 	return ret
 }
 
+// ---- Variant call errors ----
+
+call_error_ok :: proc "contextless" (err: ^CallError) -> bool {
+	if err == nil do _trap_nil_godot_function()
+	return err.error == .Ok
+}
+
+require_call_ok :: proc "contextless" (err: ^CallError) {
+	if !call_error_ok(err) do _trap_godot_call_error()
+}
+
+variant_construct_checked :: proc "contextless" (
+	type: VariantType,
+	dest: UninitializedVariantPtr,
+	args: [^]ConstVariantPtr,
+	arg_count: i32,
+) -> (
+	err: CallError,
+) {
+	if variant_construct == nil do _trap_nil_godot_function()
+	if dest == nil do _trap_nil_godot_function()
+	if arg_count < 0 do _trap_godot_call_error()
+	if arg_count > 0 && args == nil do _trap_nil_godot_function()
+	variant_construct(type, dest, args, arg_count, &err)
+	return
+}
+
+variant_call_checked :: proc "contextless" (
+	base: ^Variant,
+	method: ConstStringNamePtr,
+	args: [^]ConstVariantPtr,
+	arg_count: i64,
+	ret: UninitializedVariantPtr,
+) -> (
+	err: CallError,
+) {
+	if variant_call == nil do _trap_nil_godot_function()
+	if method == nil do _trap_nil_godot_function()
+	if ret == nil do _trap_nil_godot_function()
+	if arg_count < 0 do _trap_godot_call_error()
+	if arg_count > 0 && args == nil do _trap_nil_godot_function()
+	variant_call(variant_ptr(base), method, args, arg_count, ret, &err)
+	return
+}
+
 // ---- Array builtin ----
 
 array_new :: proc "contextless" () -> (v: Variant) {
-	err: CallError
-	variant_construct(.Array, uninitialized_variant_ptr(&v), nil, 0, &err)
+	err := variant_construct_checked(.Array, uninitialized_variant_ptr(&v), nil, 0)
+	require_call_ok(&err)
 	return
 }
 
@@ -143,11 +188,11 @@ array_push :: proc "contextless" (arr: ^Variant, value: ^Variant) {
 	)
 	push_name := StringNamePtr(&push_name_data[0])
 
-	err: CallError
 	ret: Variant
 	args := [1]ConstVariantPtr{const_variant_ptr(value)}
-	variant_call(variant_ptr(arr), push_name, &args[0], 1, uninitialized_variant_ptr(&ret), &err)
+	err := variant_call_checked(arr, push_name, &args[0], 1, uninitialized_variant_ptr(&ret))
 	variant_free_temp(&ret)
+	require_call_ok(&err)
 }
 
 array_size :: proc "contextless" (arr: ^Variant) -> i64 {
@@ -160,8 +205,11 @@ array_size :: proc "contextless" (arr: ^Variant) -> i64 {
 	size_name := StringNamePtr(&size_name_data[0])
 
 	ret: Variant
-	err: CallError
-	variant_call(variant_ptr(arr), size_name, nil, 0, uninitialized_variant_ptr(&ret), &err)
+	err := variant_call_checked(arr, size_name, nil, 0, uninitialized_variant_ptr(&ret))
+	if !call_error_ok(&err) {
+		variant_free_temp(&ret)
+		require_call_ok(&err)
+	}
 	dest: i64
 	to_ctor := require_variant_to_type_constructor(.Int)
 	to_ctor(cast(UninitializedTypePtr)&dest, variant_ptr(&ret))

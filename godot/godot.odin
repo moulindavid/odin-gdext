@@ -41,6 +41,10 @@ variant_to_int :: gcore.variant_to_int
 variant_to_bool :: gcore.variant_to_bool
 variant_free :: gcore.variant_free
 variant_free_temp :: gcore.variant_free_temp
+call_error_ok :: gcore.call_error_ok
+require_call_ok :: gcore.require_call_ok
+variant_construct_checked :: gcore.variant_construct_checked
+variant_call_checked :: gcore.variant_call_checked
 array_new :: gcore.array_new
 array_push :: gcore.array_push
 array_size :: gcore.array_size

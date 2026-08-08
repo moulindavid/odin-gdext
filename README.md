@@ -101,8 +101,10 @@ Current codegen is intentionally incomplete:
 - Properties, signals, and virtual method overrides are not implemented yet.
 - Ownership rules for value types are still being stabilized. `Variant` now has
   explicit owned-storage helpers (`variant_nil`, `variant_copy`,
-  `variant_init_copy`, pointer adapters, and `variant_free`), but conversion
-  coverage and higher-level borrowed/temporary patterns are still incomplete.
+  `variant_init_copy`, pointer adapters, and `variant_free`) plus minimal
+  `CallError` helpers and checked wrappers for `variant_call` /
+  `variant_construct`, but conversion coverage and higher-level
+  borrowed/temporary patterns are still incomplete.
   Treat current `String`, `StringName`, and `Array` helpers as low-level
   prototype APIs whose construction/destruction rules may change.
 

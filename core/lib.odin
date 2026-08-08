@@ -107,6 +107,11 @@ _trap_nil_godot_function :: proc "contextless" () -> ! {
 	unreachable()
 }
 
+_trap_godot_call_error :: proc "contextless" () -> ! {
+	intrinsics.debug_trap()
+	unreachable()
+}
+
 // Invoke a builtin type constructor on uninitialized storage `base`.
 call_builtin_constructor :: proc "contextless" (
 	constructor: PtrConstructor,
