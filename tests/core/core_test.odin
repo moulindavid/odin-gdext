@@ -31,6 +31,11 @@ vector4_matches_generated_storage_layout :: proc(t: ^testing.T) {
 }
 
 @(test)
+color_matches_generated_storage_layout :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.Color), 4 * size_of(f32))
+}
+
+@(test)
 string_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, size_of(gd.StringStorage), gd.GDExtensionString_Size)
 	testing.expect_value(t, size_of(gd.String), gd.GDExtensionString_Size)
@@ -156,6 +161,21 @@ packed_vector4_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) 
 }
 
 @(test)
+packed_color_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedColorArrayStorage),
+		gd.GDExtensionPackedColorArray_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedColorArray), gd.GDExtensionPackedColorArray_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedColorArrayStorage{}),
+		gd.GDExtensionPackedColorArray_Size,
+	)
+}
+
+@(test)
 variant_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	v: gd.Variant
 	_ = gd.variant_ptr(&v)
@@ -270,6 +290,14 @@ packed_vector4_array_pointer_helpers_preserve_storage_address :: proc(t: ^testin
 	_ = gd.packed_vector4_array_ptr(&a)
 	_ = gd.const_packed_vector4_array_ptr(&a)
 	_ = gd.uninitialized_packed_vector4_array_ptr(&a)
+}
+
+@(test)
+packed_color_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedColorArray
+	_ = gd.packed_color_array_ptr(&a)
+	_ = gd.const_packed_color_array_ptr(&a)
+	_ = gd.uninitialized_packed_color_array_ptr(&a)
 }
 
 @(test)

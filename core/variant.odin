@@ -71,6 +71,12 @@ PACKED_VECTOR4_ARRAY_CLEAR_HASH :: 3218959716
 PACKED_VECTOR4_ARRAY_GET_HASH :: 1227817084
 PACKED_VECTOR4_ARRAY_SET_HASH :: 1350366223
 PACKED_VECTOR4_ARRAY_PUSH_BACK_HASH :: 3289167688
+PACKED_COLOR_ARRAY_SIZE_HASH :: 3173160232
+PACKED_COLOR_ARRAY_IS_EMPTY_HASH :: 3918633141
+PACKED_COLOR_ARRAY_CLEAR_HASH :: 3218959716
+PACKED_COLOR_ARRAY_GET_HASH :: 2972831132
+PACKED_COLOR_ARRAY_SET_HASH :: 1444096570
+PACKED_COLOR_ARRAY_PUSH_BACK_HASH :: 1007858200
 
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
@@ -86,6 +92,7 @@ GDExtensionPackedFloat64Array_Size :: 16
 GDExtensionPackedVector2Array_Size :: 16
 GDExtensionPackedVector3Array_Size :: 16
 GDExtensionPackedVector4Array_Size :: 16
+GDExtensionPackedColorArray_Size :: 16
 
 // GodotReal is the ABI type for Godot `float` in the currently supported
 // Godot 4.7 float_64 build. Some builtins, such as PackedFloat32Array, store
@@ -115,6 +122,15 @@ Vector4 :: struct {
 	y: f32,
 	z: f32,
 	w: f32,
+}
+
+// Color is memory-compatible with Godot's Color builtin for the current
+// Godot 4.7 float_64 target. Generated Color APIs alias this storage type.
+Color :: struct {
+	r: f32,
+	g: f32,
+	b: f32,
+	a: f32,
 }
 
 // StringStorage is raw storage large enough for Godot's ABI String handle.
@@ -2170,6 +2186,179 @@ packed_vector4_array_push :: proc "contextless" (a: ^PackedVector4Array, value: 
 	)
 }
 
+
+// PackedColorArrayStorage is raw storage large enough for Godot's ABI
+// PackedColorArray handle. Treat it as uninitialized until a
+// packed_color_array_init_* helper or Godot API has constructed it.
+PackedColorArrayStorage :: [GDExtensionPackedColorArray_Size]u8
+
+// PackedColorArray is initialized Godot PackedColorArray storage. Every proc
+// returning a PackedColorArray transfers ownership to the caller; destroy it
+// with packed_color_array_free when finished.
+PackedColorArray :: distinct PackedColorArrayStorage
+
+// packed_color_array_ptr returns a mutable GDExtension pointer to initialized PackedColorArray storage.
+packed_color_array_ptr :: proc "contextless" (a: ^PackedColorArray) -> TypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(TypePtr)a
+}
+
+// const_packed_color_array_ptr returns a read-only GDExtension pointer to initialized storage.
+const_packed_color_array_ptr :: proc "contextless" (a: ^PackedColorArray) -> ConstTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)a
+}
+
+// uninitialized_packed_color_array_ptr returns a GDExtension pointer to storage
+// that Godot is about to initialize. Do not pass already-owned storage here
+// unless the called API explicitly overwrites it without leaking.
+uninitialized_packed_color_array_ptr :: proc "contextless" (
+	a: ^PackedColorArray,
+) -> UninitializedTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)a
+}
+
+// packed_color_array_init_new constructs an empty PackedColorArray in dest.
+packed_color_array_init_new :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Packed_Color_Array, 0)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest)
+}
+
+// packed_color_array_new returns an initialized empty PackedColorArray; call packed_color_array_free when done.
+packed_color_array_new :: proc "contextless" () -> (result: PackedColorArray) {
+	packed_color_array_init_new(uninitialized_packed_color_array_ptr(&result))
+	return
+}
+
+// packed_color_array_init_copy copies initialized PackedColorArray storage into uninitialized storage.
+packed_color_array_init_copy :: proc "contextless" (
+	dest: UninitializedTypePtr,
+	value: ^PackedColorArray,
+) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Packed_Color_Array, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_packed_color_array_ptr(value))
+}
+
+// packed_color_array_copy returns an initialized copy; call packed_color_array_free when done.
+packed_color_array_copy :: proc "contextless" (
+	value: ^PackedColorArray,
+) -> (
+	result: PackedColorArray,
+) {
+	packed_color_array_init_copy(uninitialized_packed_color_array_ptr(&result), value)
+	return
+}
+
+packed_color_array_free :: proc "contextless" (a: ^PackedColorArray) {
+	destroy_builtin(.Packed_Color_Array, packed_color_array_ptr(a))
+}
+
+packed_color_array_size_method: BuiltinMethod
+packed_color_array_is_empty_method: BuiltinMethod
+packed_color_array_clear_method: BuiltinMethod
+packed_color_array_get_method: BuiltinMethod
+packed_color_array_set_method: BuiltinMethod
+packed_color_array_push_back_method: BuiltinMethod
+
+packed_color_array_size :: proc "contextless" (a: ^PackedColorArray) -> i64 {
+	ensure_builtin_method(
+		&packed_color_array_size_method,
+		.Packed_Color_Array,
+		cstring("size"),
+		PACKED_COLOR_ARRAY_SIZE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		packed_color_array_size_method.method,
+		const_packed_color_array_ptr(a),
+		i64,
+	)
+}
+
+packed_color_array_is_empty :: proc "contextless" (a: ^PackedColorArray) -> bool {
+	ensure_builtin_method(
+		&packed_color_array_is_empty_method,
+		.Packed_Color_Array,
+		cstring("is_empty"),
+		PACKED_COLOR_ARRAY_IS_EMPTY_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		packed_color_array_is_empty_method.method,
+		const_packed_color_array_ptr(a),
+		bool,
+	)
+}
+
+packed_color_array_clear :: proc "contextless" (a: ^PackedColorArray) {
+	ensure_builtin_method(
+		&packed_color_array_clear_method,
+		.Packed_Color_Array,
+		cstring("clear"),
+		PACKED_COLOR_ARRAY_CLEAR_HASH,
+	)
+	call_builtin_method_ptr_no_ret(
+		packed_color_array_clear_method.method,
+		packed_color_array_ptr(a),
+	)
+}
+
+packed_color_array_get :: proc "contextless" (a: ^PackedColorArray, index: i64) -> Color {
+	ensure_builtin_method(
+		&packed_color_array_get_method,
+		.Packed_Color_Array,
+		cstring("get"),
+		PACKED_COLOR_ARRAY_GET_HASH,
+	)
+	index_arg := index
+	return call_builtin_method_ptr_ret(
+		packed_color_array_get_method.method,
+		const_packed_color_array_ptr(a),
+		Color,
+		cast(TypePtr)&index_arg,
+	)
+}
+
+packed_color_array_set :: proc "contextless" (
+	a: ^PackedColorArray,
+	index: i64,
+	value: Color,
+) {
+	ensure_builtin_method(
+		&packed_color_array_set_method,
+		.Packed_Color_Array,
+		cstring("set"),
+		PACKED_COLOR_ARRAY_SET_HASH,
+	)
+	index_arg := index
+	value_arg := value
+	call_builtin_method_ptr_no_ret(
+		packed_color_array_set_method.method,
+		packed_color_array_ptr(a),
+		cast(TypePtr)&index_arg,
+		cast(TypePtr)&value_arg,
+	)
+}
+
+packed_color_array_push :: proc "contextless" (a: ^PackedColorArray, value: Color) {
+	ensure_builtin_method(
+		&packed_color_array_push_back_method,
+		.Packed_Color_Array,
+		cstring("push_back"),
+		PACKED_COLOR_ARRAY_PUSH_BACK_HASH,
+	)
+	value_arg := value
+	_ = call_builtin_method_ptr_ret(
+		packed_color_array_push_back_method.method,
+		packed_color_array_ptr(a),
+		bool,
+		cast(TypePtr)&value_arg,
+	)
+}
+
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
 // as uninitialized until one of the variant_init_* helpers or Godot itself has
 // constructed a Variant in it.
@@ -2322,6 +2511,12 @@ variant_from_packed_vector3_array :: proc "contextless" (a: ^PackedVector3Array)
 variant_from_packed_vector4_array :: proc "contextless" (a: ^PackedVector4Array) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Packed_Vector4_Array)
 	ctor(uninitialized_variant_ptr(&v), packed_vector4_array_ptr(a))
+	return
+}
+
+variant_from_packed_color_array :: proc "contextless" (a: ^PackedColorArray) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.Packed_Color_Array)
+	ctor(uninitialized_variant_ptr(&v), packed_color_array_ptr(a))
 	return
 }
 
@@ -2596,6 +2791,26 @@ variant_try_packed_vector4_array :: proc "contextless" (
 ) {
 	if !variant_is_type(v, .Packed_Vector4_Array) do return PackedVector4Array{}, false
 	return variant_to_packed_vector4_array(v), true
+}
+
+variant_to_packed_color_array :: proc "contextless" (
+	v: ^Variant,
+) -> (
+	result: PackedColorArray,
+) {
+	ctor := require_variant_to_type_constructor(.Packed_Color_Array)
+	ctor(uninitialized_packed_color_array_ptr(&result), variant_ptr(v))
+	return
+}
+
+variant_try_packed_color_array :: proc "contextless" (
+	v: ^Variant,
+) -> (
+	value: PackedColorArray,
+	ok: bool,
+) {
+	if !variant_is_type(v, .Packed_Color_Array) do return PackedColorArray{}, false
+	return variant_to_packed_color_array(v), true
 }
 
 variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {

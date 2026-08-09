@@ -648,6 +648,45 @@ register_classes :: proc() {
 	gt.variant_free(&vectors4_v)
 	gt.packed_vector4_array_free(&vectors4)
 
+
+	// Test: owned PackedColorArray wrapper and Variant extraction
+	colors := gt.packed_color_array_new()
+	gt.packed_color_array_push(&colors, gt.Color{1, 0, 0, 1})
+	gt.packed_color_array_push(&colors, gt.Color{0, 1, 0, 1})
+	colors_size := gt.packed_color_array_size(&colors)
+	colors_first := gt.packed_color_array_get(&colors, 0)
+	gt.packed_color_array_set(&colors, 1, gt.Color{0, 0, 1, 0.5})
+	colors_second_after_set := gt.packed_color_array_get(&colors, 1)
+	colors_v := gt.variant_from_packed_color_array(&colors)
+	colors_back, colors_back_ok := gt.variant_try_packed_color_array(&colors_v)
+	colors_back_size: i64 = 0
+	if colors_back_ok {
+		colors_back_size = gt.packed_color_array_size(&colors_back)
+		gt.packed_color_array_free(&colors_back)
+	}
+	gt.packed_color_array_clear(&colors)
+	colors_empty_after_clear := gt.packed_color_array_is_empty(&colors)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"PackedColorArray: size=%v get0=(%v,%v,%v,%v) set1=(%v,%v,%v,%v) roundtrip=%v/%v clear_empty=%v",
+			colors_size,
+			colors_first.r,
+			colors_first.g,
+			colors_first.b,
+			colors_first.a,
+			colors_second_after_set.r,
+			colors_second_after_set.g,
+			colors_second_after_set.b,
+			colors_second_after_set.a,
+			colors_back_ok,
+			colors_back_size,
+			colors_empty_after_clear,
+		),
+	)
+	gt.variant_free(&colors_v)
+	gt.packed_color_array_free(&colors)
+
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
