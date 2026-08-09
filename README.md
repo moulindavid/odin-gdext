@@ -116,7 +116,9 @@ Current codegen is intentionally incomplete:
   plus safe borrowed-input method wrappers for length, emptiness, hash, compare,
   prefix/suffix, and contains checks. Generated builtin APIs now use borrowed parameters for completed owned core
   values (`^core.String`, `^core.Array`, `^core.PackedStringArray`, etc.) and
-  owned initialized returns with explicit destruction comments.
+  owned initialized returns with explicit destruction comments. Unsupported complex values like `Callable` and `Signal` remain raw/skipped until
+  their object-lifetime, vararg, and registration semantics are designed alongside
+  Priority 3/4 signal and registration helpers.
   `StringName` has an initial owned, non-static wrapper (`string_name_from_utf8_cstring`,
   `string_name_free`, `variant_from_string_name`, and `variant_try_string_name`) plus
   a `StaticStringName` wrapper for process-lifetime literals used by core/generated
