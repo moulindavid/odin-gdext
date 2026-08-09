@@ -949,6 +949,7 @@ class_abi_type_map := map[string]string {
 // - Completed owned value params are borrowed pointers; returns are owned storage.
 // - Variant params are borrowed pointers; Variant returns are owned storage.
 // - Primitive and memory-compatible builtin values are passed by value.
+// - Callable, Signal, varargs, typed arrays, and lifetime-sensitive APIs are deferred.
 resolve_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
 	if godot_name == "" || godot_name == "void" do return "", true
 	if godot_name == "Variant" do return "core.Variant", true
@@ -974,10 +975,28 @@ class_param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
 	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
 }
 
-class_method_supported :: proc(method: ExtensionApiClassMethod) -> bool {
+class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
+	if godot_name == "Callable" || godot_name == "Signal" do return true
+	if strings.has_prefix(godot_name, "typedarray::") do return true
+	if strings.has_prefix(godot_name, "TypedArray") do return true
+	return false
+}
+
+class_method_deferred_until_safety_model :: proc(class_name, method_name: string) -> bool {
+	if class_name == "Control" && method_name == "force_drag" do return true
+	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
+		return true
+	}
+	return false
+}
+
+class_method_supported :: proc(class_name: string, method: ExtensionApiClassMethod) -> bool {
 	if method.is_vararg || method.is_virtual do return false
+	if class_method_deferred_until_safety_model(class_name, method.name) do return false
+	if class_type_deferred_until_safety_model(method.return_value.type) do return false
 	if _, ok := resolve_class_return_type(method.return_value.type); !ok do return false
 	for arg in method.arguments {
+		if class_type_deferred_until_safety_model(arg.type) do return false
 		if _, ok := resolve_class_param_type(arg.type); !ok do return false
 	}
 	return true
@@ -1123,7 +1142,7 @@ emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 		if !class_ok do return false
 		method, method_ok := find_class_method(class, entry.method_name)
 		if !method_ok do return false
-		if !class_method_supported(method) {
+		if !class_method_supported(entry.class_name, method) {
 			fmt.eprintfln(
 				"ERROR: unsupported selected class method %s.%s",
 				entry.class_name,
@@ -1277,6 +1296,11 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 			ancestor = ancestor_class.inherits
 		}
 	}
+
+	strings.write_string(
+		&b,
+		"// Callable, Signal, varargs, typed arrays, and lifetime-sensitive APIs are not generated yet.\n\n",
+	)
 
 	if !emit_class_method_wrappers(&b, root) {return false}
 

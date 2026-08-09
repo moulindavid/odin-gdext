@@ -141,7 +141,7 @@ Implementation order:
      using the documented Godot 4.7 `GodotReal` ABI rule for `float`.
    - [x] `Variant` parameters remain borrowed as `^core.Variant`; Variant
      returns are owned and must be destroyed with `core.variant_free`.
-   - [ ] Skip `Callable`, `Signal`, vararg methods, and unsupported typed-array
+   - [x] Skip `Callable`, `Signal`, vararg methods, and unsupported typed-array
      or object-lifetime-sensitive APIs until their safety model is explicit.
 
 6. Generate safe downcasts and class identity helpers.
