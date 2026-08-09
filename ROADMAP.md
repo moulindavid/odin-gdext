@@ -30,13 +30,13 @@ smoke coverage for common Godot value types.
 Remaining implementation order:
 
 1. Finish shared storage for generated memory-compatible builtin elements.
-   - [ ] Move `Vector3` storage to `core` and make generated `Vector3` alias it.
+   - [x] Move `Vector3` storage to `core` and make generated `Vector3` alias it.
    - [ ] Move `Vector4` storage to `core` and make generated `Vector4` alias it.
    - [ ] Move `Color` storage to `core` and make generated `Color` alias it.
    - [ ] Keep generated builtin methods using the same shared storage types as handwritten core wrappers.
 
 2. Finish the remaining simple packed arrays.
-   - [ ] `PackedVector3Array`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
+   - [x] `PackedVector3Array`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
    - [ ] `PackedVector4Array`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
    - [ ] `PackedColorArray`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
 

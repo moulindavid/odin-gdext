@@ -573,6 +573,42 @@ register_classes :: proc() {
 	gt.variant_free(&vectors2_v)
 	gt.packed_vector2_array_free(&vectors2)
 
+	// Test: owned PackedVector3Array wrapper and Variant extraction
+	vectors3 := gt.packed_vector3_array_new()
+	gt.packed_vector3_array_push(&vectors3, gt.Vector3{1, 2, 3})
+	gt.packed_vector3_array_push(&vectors3, gt.Vector3{-1, -2, -3})
+	vectors3_size := gt.packed_vector3_array_size(&vectors3)
+	vectors3_first := gt.packed_vector3_array_get(&vectors3, 0)
+	gt.packed_vector3_array_set(&vectors3, 1, gt.Vector3{4, 5, 6})
+	vectors3_second_after_set := gt.packed_vector3_array_get(&vectors3, 1)
+	vectors3_v := gt.variant_from_packed_vector3_array(&vectors3)
+	vectors3_back, vectors3_back_ok := gt.variant_try_packed_vector3_array(&vectors3_v)
+	vectors3_back_size: i64 = 0
+	if vectors3_back_ok {
+		vectors3_back_size = gt.packed_vector3_array_size(&vectors3_back)
+		gt.packed_vector3_array_free(&vectors3_back)
+	}
+	gt.packed_vector3_array_clear(&vectors3)
+	vectors3_empty_after_clear := gt.packed_vector3_array_is_empty(&vectors3)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"PackedVector3Array: size=%v get0=(%v,%v,%v) set1=(%v,%v,%v) roundtrip=%v/%v clear_empty=%v",
+			vectors3_size,
+			vectors3_first.x,
+			vectors3_first.y,
+			vectors3_first.z,
+			vectors3_second_after_set.x,
+			vectors3_second_after_set.y,
+			vectors3_second_after_set.z,
+			vectors3_back_ok,
+			vectors3_back_size,
+			vectors3_empty_after_clear,
+		),
+	)
+	gt.variant_free(&vectors3_v)
+	gt.packed_vector3_array_free(&vectors3)
+
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))

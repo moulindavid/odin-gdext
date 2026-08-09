@@ -135,14 +135,14 @@ Current codegen is intentionally incomplete:
   `packed_byte_array_size`, `packed_byte_array_is_empty`, `variant_from_packed_byte_array`,
   and `variant_try_packed_byte_array`). `PackedInt32Array`, `PackedInt64Array`, `PackedFloat32Array`, and
   `PackedFloat64Array` mirror that initial owned-storage/basic-method/Variant-conversion pattern.
-  `PackedVector2Array` adds the same pattern for generated-builtin-compatible `Vector2`
-  storage. Broader methods, typed arrays/dictionaries, the other packed arrays, and
+  `PackedVector2Array` and `PackedVector3Array` add the same pattern for generated-builtin-compatible
+  vector storage. Broader methods, typed arrays/dictionaries, the other packed arrays, and
   generated API integration are still pending.
 - Godot API `float` values use the centralized `GodotReal` alias. It is `f64`
   for the currently supported Godot 4.7 `float_64` target; concrete storage
-  types such as `PackedFloat32Array` still expose `f32` elements. `Vector2` storage is
-  centralized in `godot:core`, and generated `Vector2` APIs alias that storage so
-  packed vector arrays and generated vector methods use the same Odin type.
+  types such as `PackedFloat32Array` still expose `f32` elements. `Vector2` and `Vector3` storage are
+  centralized in `godot:core`, and generated APIs alias that storage so packed
+  vector arrays and generated vector methods use the same Odin types.
 
 ## Architecture
 
