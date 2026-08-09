@@ -321,37 +321,12 @@ register_classes :: proc() {
 	)
 	gt.init_class_bindings()
 
-	class_info := gd.ClassCreationInfo {
-		is_virtual                  = false,
-		is_abstract                 = false,
-		is_exposed                  = true,
-		is_runtime                  = false,
-		icon_path                   = nil,
-		set_func                    = nil,
-		get_func                    = nil,
-		get_property_list_func      = nil,
-		free_property_list_func     = nil,
-		property_can_revert_func    = nil,
-		property_get_revert_func    = nil,
-		validate_property_func      = nil,
-		notification_func           = notification_func,
-		to_string_func              = nil,
-		reference_func              = nil,
-		unreference_func            = nil,
-		create_instance_func        = create_instance,
-		free_instance_func          = free_instance,
-		recreate_instance_func      = nil,
-		get_virtual_func            = nil,
-		get_virtual_call_data_func  = nil,
-		call_virtual_with_data_func = nil,
-		class_userdata              = nil,
-	}
-
-	gd.classdb_register_extension_class6(
-		gd.library,
+	gt.register_class_with_defaults(
 		hello_class_name,
 		hello_parent_name,
-		&class_info,
+		create_instance,
+		free_instance,
+		notification_func,
 	)
 	gd.debug_print("[odin-gdext] HelloNode registered!")
 
@@ -1080,5 +1055,5 @@ initialize_module :: proc "c" (user_data: rawptr, level: gd.InitializationLevel)
 deinitialize_module :: proc "c" (user_data: rawptr, level: gd.InitializationLevel) {
 	context = gt.godot_context()
 	if level != .Scene {return}
-	gd.unregister_class(hello_class_name)
+	gt.unregister_class(hello_class_name)
 }

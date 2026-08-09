@@ -14,6 +14,12 @@ import gcore "godot:core"
 // --- Core types ---
 Object :: gcore.Object
 RefCounted :: gcore.RefCounted
+ObjectPtr :: gcore.ObjectPtr
+ClassInstancePtr :: gcore.ClassInstancePtr
+ConstStringNamePtr :: gcore.ConstStringNamePtr
+ClassCreateInstance :: gcore.ClassCreateInstance
+ClassFreeInstance :: gcore.ClassFreeInstance
+ClassNotification :: gcore.ClassNotification
 VariantStorage :: gcore.VariantStorage
 Variant :: gcore.Variant
 StringStorage :: gcore.StringStorage
@@ -66,6 +72,8 @@ is_nil :: gcore.is_nil
 is_class :: gcore.is_class
 cast_to :: gcore.cast_to
 init_class_casting :: gcore.init_class_casting
+register_class_with_defaults :: gcore.register_class_with_defaults
+unregister_class :: gcore.unregister_class
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object

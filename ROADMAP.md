@@ -185,10 +185,10 @@ requiring direct `ClassCreationInfo`, `ClassMethodInfo`, or instance-binding
 boilerplate in every extension.
 
 1. Add minimal class registration helpers.
-   - [ ] Provide a helper that builds `ClassCreationInfo` with safe defaults.
-   - [ ] Keep create/free/notification callbacks explicit.
-   - [ ] Keep unregistering classes explicit during deinitialization.
-   - [ ] Update hello to use the helper instead of direct
+   - [x] Provide a helper that builds `ClassCreationInfo` with safe defaults.
+   - [x] Keep create/free/notification callbacks explicit.
+   - [x] Keep unregistering classes explicit during deinitialization.
+   - [x] Update hello to use the helper instead of direct
      `classdb_register_extension_class6`.
 
 2. Add static class-name helpers.

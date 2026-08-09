@@ -67,3 +67,37 @@ class_facade_compile_smoke :: proc "contextless" (
 	mode := gt.NodeProcessMode.process_mode_always
 	_ = mode
 }
+
+facade_create_instance :: proc "c" (
+	class_userdata: rawptr,
+	notify_postinitialize: bool,
+) -> gt.ObjectPtr {
+	_ = class_userdata
+	_ = notify_postinitialize
+	return nil
+}
+
+facade_free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr) {
+	_ = class_userdata
+	_ = instance
+}
+
+facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+	_ = instance
+	_ = what
+	_ = reversed
+}
+
+registration_facade_compile_smoke :: proc "contextless" (
+	class_name: gt.ConstStringNamePtr,
+	parent_class_name: gt.ConstStringNamePtr,
+) {
+	gt.register_class_with_defaults(
+		class_name,
+		parent_class_name,
+		facade_create_instance,
+		facade_free_instance,
+		facade_notification,
+	)
+	gt.unregister_class(class_name)
+}

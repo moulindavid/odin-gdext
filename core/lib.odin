@@ -369,6 +369,46 @@ register_class :: proc "contextless" (
 	classdb_register_extension_class6(library, class_name, parent_class_name, info)
 }
 
+// Register an instantiable extension class with safe defaults for unsupported
+// callbacks. The class and parent names must point to process-lifetime
+// StringName storage, and user code remains responsible for explicit
+// unregistration during deinitialization.
+register_class_with_defaults :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	parent_class_name: ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func: ClassFreeInstance,
+	notification_func: ClassNotification,
+	class_userdata: rawptr = nil,
+) {
+	info := ClassCreationInfo {
+		is_virtual                  = false,
+		is_abstract                 = false,
+		is_exposed                  = true,
+		is_runtime                  = false,
+		icon_path                   = nil,
+		set_func                    = nil,
+		get_func                    = nil,
+		get_property_list_func      = nil,
+		free_property_list_func     = nil,
+		property_can_revert_func    = nil,
+		property_get_revert_func    = nil,
+		validate_property_func      = nil,
+		notification_func           = notification_func,
+		to_string_func              = nil,
+		reference_func              = nil,
+		unreference_func            = nil,
+		create_instance_func        = create_instance_func,
+		free_instance_func          = free_instance_func,
+		recreate_instance_func      = nil,
+		get_virtual_func            = nil,
+		get_virtual_call_data_func  = nil,
+		call_virtual_with_data_func = nil,
+		class_userdata              = class_userdata,
+	}
+	register_class(class_name, parent_class_name, &info)
+}
+
 unregister_class :: proc "contextless" (class_name: ConstStringNamePtr) {
 	classdb_unregister_extension_class(library, class_name)
 }
