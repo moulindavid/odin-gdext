@@ -36,13 +36,16 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	node2d := gt.Node2D(object)
 	gt.node2d_set_position(node2d, gt.Vector2{100, 50})
 	position := gt.node2d_get_position(node2d)
-	buf: [128]u8
+	gt.node2d_set_rotation(node2d, 1.25)
+	rotation := gt.node2d_get_rotation(node2d)
+	buf: [160]u8
 	gd.debug_print(
 		fmt.bprintf(
 			buf[:],
-			"generated Node2D position: (%v,%v) (expect 100,50)",
+			"generated Node2D position: (%v,%v) rotation=%.2f (expect 100,50,1.25)",
 			position.x,
 			position.y,
+			rotation,
 		),
 	)
 

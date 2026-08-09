@@ -885,6 +885,8 @@ selected_class_methods := []Selected_Class_Method {
 	{"Node", "get_path_to"},
 	{"Node2D", "set_position"},
 	{"Node2D", "get_position"},
+	{"Node2D", "set_rotation"},
+	{"Node2D", "get_rotation"},
 }
 
 is_selected_class :: proc(name: string) -> bool {

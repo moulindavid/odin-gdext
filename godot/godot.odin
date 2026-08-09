@@ -85,6 +85,8 @@ object_get_class :: gclass.object_get_class
 object_is_class :: gclass.object_is_class
 node2d_set_position :: gclass.node2d_set_position
 node2d_get_position :: gclass.node2d_get_position
+node2d_set_rotation :: gclass.node2d_set_rotation
+node2d_get_rotation :: gclass.node2d_get_rotation
 control_as_canvas_item :: gclass.control_as_canvas_item
 control_as_node :: gclass.control_as_node
 control_as_object :: gclass.control_as_object

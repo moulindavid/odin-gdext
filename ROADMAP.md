@@ -137,7 +137,7 @@ Implementation order:
    - [x] Completed owned value types keep the Priority 1 rule: borrowed
      pointer parameters and owned initialized return values with explicit
      destruction comments.
-   - [ ] Primitive and memory-compatible builtin values are passed by value
+   - [x] Primitive and memory-compatible builtin values are passed by value
      using the documented Godot 4.7 `GodotReal` ABI rule for `float`.
    - [ ] `Variant` parameters remain borrowed as `^core.Variant`; Variant
      returns are owned and must be destroyed with `core.variant_free`.
