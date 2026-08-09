@@ -51,9 +51,9 @@ Remaining implementation order:
    - [x] Add pointer helpers, construction/copy/free rules, Variant conversions, tests, and smoke coverage where practical.
 
 5. Add `PackedStringArray` after the `String` ownership rules are integrated.
-   - [ ] Owned wrapper, pointer helpers, new/copy/free, basic methods, and Variant conversions.
-   - [ ] Ensure element access does not leak or return references to temporary String storage.
-   - [ ] Add tests and hello smoke coverage.
+   - [x] Owned wrapper, pointer helpers, new/copy/free, basic methods, and Variant conversions.
+   - [x] Ensure element access does not leak or return references to temporary String storage.
+   - [x] Add tests and hello smoke coverage.
 
 6. Integrate completed complex value types into generated APIs.
    - [ ] Replace `rawptr` placeholders for value types whose ownership model is complete.

@@ -561,6 +561,59 @@ register_classes :: proc() {
 	gt.variant_free(&floats64_v)
 	gt.packed_float64_array_free(&floats64)
 
+
+	// Test: owned PackedStringArray wrapper and owned String element extraction
+	strings := gt.packed_string_array_new()
+	strings_first_input := gt.string_from_utf8("alpha")
+	strings_second_input := gt.string_from_utf8("beta")
+	strings_replacement := gt.string_from_utf8("gamma")
+	gt.packed_string_array_push(&strings, &strings_first_input)
+	gt.packed_string_array_push(&strings, &strings_second_input)
+	strings_size := gt.packed_string_array_size(&strings)
+	strings_first := gt.packed_string_array_get(&strings, 0)
+	gt.packed_string_array_set(&strings, 1, &strings_replacement)
+	strings_second_after_set := gt.packed_string_array_get(&strings, 1)
+	strings_v := gt.variant_from_packed_string_array(&strings)
+	strings_back, strings_back_ok := gt.variant_try_packed_string_array(&strings_v)
+	strings_back_size: i64 = 0
+	if strings_back_ok {
+		strings_back_size = gt.packed_string_array_size(&strings_back)
+		gt.packed_string_array_free(&strings_back)
+	}
+	strings_first_buf: [64]u8
+	strings_second_buf: [64]u8
+	strings_first_text, strings_first_ok, _ := gt.string_to_utf8(
+		&strings_first,
+		strings_first_buf[:],
+	)
+	strings_second_text, strings_second_ok, _ := gt.string_to_utf8(
+		&strings_second_after_set,
+		strings_second_buf[:],
+	)
+	gt.packed_string_array_clear(&strings)
+	strings_empty_after_clear := gt.packed_string_array_is_empty(&strings)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"PackedStringArray: size=%v get0=%v/%v set1=%v/%v roundtrip=%v/%v clear_empty=%v",
+			strings_size,
+			strings_first_text,
+			strings_first_ok,
+			strings_second_text,
+			strings_second_ok,
+			strings_back_ok,
+			strings_back_size,
+			strings_empty_after_clear,
+		),
+	)
+	gt.variant_free(&strings_v)
+	gt.string_free(&strings_second_after_set)
+	gt.string_free(&strings_first)
+	gt.string_free(&strings_replacement)
+	gt.string_free(&strings_second_input)
+	gt.string_free(&strings_first_input)
+	gt.packed_string_array_free(&strings)
+
 	// Test: owned PackedVector2Array wrapper and Variant extraction
 	vectors2 := gt.packed_vector2_array_new()
 	gt.packed_vector2_array_push(&vectors2, gt.Vector2{3, 4})

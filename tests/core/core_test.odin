@@ -123,6 +123,21 @@ packed_float32_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) 
 }
 
 @(test)
+packed_string_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedStringArrayStorage),
+		gd.GDExtensionPackedStringArray_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedStringArray), gd.GDExtensionPackedStringArray_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedStringArrayStorage{}),
+		gd.GDExtensionPackedStringArray_Size,
+	)
+}
+
+@(test)
 packed_vector2_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(
 		t,
@@ -281,6 +296,14 @@ packed_float64_array_pointer_helpers_preserve_storage_address :: proc(t: ^testin
 	_ = gd.packed_float64_array_ptr(&a)
 	_ = gd.const_packed_float64_array_ptr(&a)
 	_ = gd.uninitialized_packed_float64_array_ptr(&a)
+}
+
+@(test)
+packed_string_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedStringArray
+	_ = gd.packed_string_array_ptr(&a)
+	_ = gd.const_packed_string_array_ptr(&a)
+	_ = gd.uninitialized_packed_string_array_ptr(&a)
 }
 
 @(test)

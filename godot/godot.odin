@@ -36,6 +36,8 @@ PackedFloat32ArrayStorage :: gcore.PackedFloat32ArrayStorage
 PackedFloat32Array :: gcore.PackedFloat32Array
 PackedFloat64ArrayStorage :: gcore.PackedFloat64ArrayStorage
 PackedFloat64Array :: gcore.PackedFloat64Array
+PackedStringArrayStorage :: gcore.PackedStringArrayStorage
+PackedStringArray :: gcore.PackedStringArray
 PackedVector2ArrayStorage :: gcore.PackedVector2ArrayStorage
 PackedVector2Array :: gcore.PackedVector2Array
 PackedVector3ArrayStorage :: gcore.PackedVector3ArrayStorage
@@ -241,6 +243,22 @@ packed_float64_array_get :: gcore.packed_float64_array_get
 packed_float64_array_set :: gcore.packed_float64_array_set
 packed_float64_array_push :: gcore.packed_float64_array_push
 
+// --- PackedStringArray ---
+packed_string_array_ptr :: gcore.packed_string_array_ptr
+const_packed_string_array_ptr :: gcore.const_packed_string_array_ptr
+uninitialized_packed_string_array_ptr :: gcore.uninitialized_packed_string_array_ptr
+packed_string_array_init_new :: gcore.packed_string_array_init_new
+packed_string_array_new :: gcore.packed_string_array_new
+packed_string_array_init_copy :: gcore.packed_string_array_init_copy
+packed_string_array_copy :: gcore.packed_string_array_copy
+packed_string_array_free :: gcore.packed_string_array_free
+packed_string_array_size :: gcore.packed_string_array_size
+packed_string_array_is_empty :: gcore.packed_string_array_is_empty
+packed_string_array_clear :: gcore.packed_string_array_clear
+packed_string_array_get :: gcore.packed_string_array_get
+packed_string_array_set :: gcore.packed_string_array_set
+packed_string_array_push :: gcore.packed_string_array_push
+
 // --- PackedVector2Array ---
 packed_vector2_array_ptr :: gcore.packed_vector2_array_ptr
 const_packed_vector2_array_ptr :: gcore.const_packed_vector2_array_ptr
@@ -330,6 +348,7 @@ variant_from_packed_int32_array :: gcore.variant_from_packed_int32_array
 variant_from_packed_int64_array :: gcore.variant_from_packed_int64_array
 variant_from_packed_float32_array :: gcore.variant_from_packed_float32_array
 variant_from_packed_float64_array :: gcore.variant_from_packed_float64_array
+variant_from_packed_string_array :: gcore.variant_from_packed_string_array
 variant_from_packed_vector2_array :: gcore.variant_from_packed_vector2_array
 variant_from_packed_vector3_array :: gcore.variant_from_packed_vector3_array
 variant_from_packed_vector4_array :: gcore.variant_from_packed_vector4_array
@@ -362,6 +381,8 @@ variant_to_packed_float32_array :: gcore.variant_to_packed_float32_array
 variant_try_packed_float32_array :: gcore.variant_try_packed_float32_array
 variant_to_packed_float64_array :: gcore.variant_to_packed_float64_array
 variant_try_packed_float64_array :: gcore.variant_try_packed_float64_array
+variant_to_packed_string_array :: gcore.variant_to_packed_string_array
+variant_try_packed_string_array :: gcore.variant_try_packed_string_array
 variant_to_packed_vector2_array :: gcore.variant_to_packed_vector2_array
 variant_try_packed_vector2_array :: gcore.variant_try_packed_vector2_array
 variant_to_packed_vector3_array :: gcore.variant_to_packed_vector3_array

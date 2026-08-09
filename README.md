@@ -141,6 +141,8 @@ Current codegen is intentionally incomplete:
   `packed_byte_array_size`, `packed_byte_array_is_empty`, `variant_from_packed_byte_array`,
   and `variant_try_packed_byte_array`). `PackedInt32Array`, `PackedInt64Array`, `PackedFloat32Array`, and
   `PackedFloat64Array` mirror that initial owned-storage/basic-method/Variant-conversion pattern.
+  `PackedStringArray` follows the same array ownership pattern and returns owned
+  `String` elements from `packed_string_array_get` that must be freed.
   `PackedVector2Array`, `PackedVector3Array`, `PackedVector4Array`, and `PackedColorArray` add the same pattern for generated-builtin-compatible
   vector storage. Broader methods, typed arrays/dictionaries, the other packed arrays, and
   generated API integration are still pending.
