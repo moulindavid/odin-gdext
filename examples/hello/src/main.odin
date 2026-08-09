@@ -13,8 +13,10 @@ HelloNode :: distinct gd.ObjectPtr
 hello_node_object :: proc(self: HelloNode) -> gd.ObjectPtr {
 	return gd.ObjectPtr(self)
 }
-hello_node_unwrap :: proc(instance: gd.ClassInstancePtr) -> HelloNode {
-	return HelloNode((^HelloData)(instance).object)
+hello_node_from_instance :: proc(instance: gt.ClassInstancePtr) -> (value: HelloNode, ok: bool) {
+	data, data_ok := gt.class_instance_data(instance, HelloData)
+	if !data_ok do return {}, false
+	return HelloNode(data.object), true
 }
 
 // ---- Per-instance data ----
@@ -118,22 +120,22 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	gt.string_name_free(&meta_name)
 
 	self_ := new_clone(HelloData{object = object})
-	gd.set_instance(object, hello_class_name, self_)
-	gd.set_instance_binding(object, self_, &hello_instance_binding_callbacks)
+	gt.attach_instance(object, hello_class_name, self_, &hello_instance_binding_callbacks)
 	return object
 }
 
 free_instance :: proc "c" (class_userdata: rawptr, instance: gd.ClassInstancePtr) {
 	context = gt.godot_context()
-	if instance == nil {return}
-	free(cast(^HelloData)instance)
+	self_, ok := gt.class_instance_data(instance, HelloData)
+	if !ok do return
+	free(self_)
 }
 
 notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reversed: bool) {
-	if instance == nil {return}
 	context = gt.godot_context()
 	if what == gt.node_notification_ready {
-		hn := hello_node_unwrap(instance)
+		hn, hn_ok := hello_node_from_instance(instance)
+		if !hn_ok do return
 		gd.debug_print("Hello from Odin!")
 
 		obj := hello_node_object(hn)
@@ -293,7 +295,7 @@ node_class_name := gt.class_name_ptr(&node_class_name_data)
 node2d_class_name_data: gt.ClassName
 node2d_class_name := gt.class_name_ptr(&node2d_class_name_data)
 
-hello_instance_binding_callbacks := gd.InstanceBindingCallbacks {
+hello_instance_binding_callbacks := gt.InstanceBindingCallbacks {
 	create_callback    = nil,
 	free_callback      = nil,
 	reference_callback = nil,

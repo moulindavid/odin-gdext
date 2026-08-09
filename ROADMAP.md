@@ -198,10 +198,10 @@ boilerplate in every extension.
    - [x] Avoid returning pointers to temporary StringName storage.
 
 3. Add instance binding helpers.
-   - [ ] Wrap `set_instance` and `set_instance_binding` into a small helper.
-   - [ ] Add checked helpers for retrieving typed Odin instance data from
+   - [x] Wrap `set_instance` and `set_instance_binding` into a small helper.
+   - [x] Add checked helpers for retrieving typed Odin instance data from
      `ClassInstancePtr`.
-   - [ ] Keep allocation and freeing of extension-owned data explicit.
+   - [x] Keep allocation and freeing of extension-owned data explicit.
 
 4. Add method metadata registration helpers.
    - [ ] Provide descriptors for method name, return type, arguments, metadata,

@@ -73,6 +73,16 @@ facade_parent_name_data: gt.ClassName
 facade_class_name := gt.class_name_ptr(&facade_class_name_data)
 facade_parent_name := gt.class_name_ptr(&facade_parent_name_data)
 
+FacadeData :: struct {
+	object: gt.ObjectPtr,
+}
+
+facade_instance_binding_callbacks := gt.InstanceBindingCallbacks {
+	create_callback    = nil,
+	free_callback      = nil,
+	reference_callback = nil,
+}
+
 facade_create_instance :: proc "c" (
 	class_userdata: rawptr,
 	notify_postinitialize: bool,
@@ -104,4 +114,16 @@ registration_facade_compile_smoke :: proc "contextless" () {
 		facade_notification,
 	)
 	gt.unregister_class(facade_class_name)
+}
+
+instance_binding_facade_compile_smoke :: proc "contextless" (
+	object: gt.ObjectPtr,
+	class_name: gt.ConstStringNamePtr,
+	data: ^FacadeData,
+	instance: gt.ClassInstancePtr,
+) {
+	gt.attach_instance(object, class_name, data, &facade_instance_binding_callbacks)
+	checked, checked_ok := gt.class_instance_data(instance, FacadeData)
+	_ = checked
+	_ = checked_ok
 }

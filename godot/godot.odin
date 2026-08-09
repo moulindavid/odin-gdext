@@ -20,6 +20,7 @@ ConstStringNamePtr :: gcore.ConstStringNamePtr
 ClassCreateInstance :: gcore.ClassCreateInstance
 ClassFreeInstance :: gcore.ClassFreeInstance
 ClassNotification :: gcore.ClassNotification
+InstanceBindingCallbacks :: gcore.InstanceBindingCallbacks
 VariantStorage :: gcore.VariantStorage
 Variant :: gcore.Variant
 StringStorage :: gcore.StringStorage
@@ -75,6 +76,8 @@ cast_to :: gcore.cast_to
 init_class_casting :: gcore.init_class_casting
 register_class_with_defaults :: gcore.register_class_with_defaults
 unregister_class :: gcore.unregister_class
+attach_instance :: gcore.attach_instance
+class_instance_data :: gcore.class_instance_data
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object

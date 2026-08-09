@@ -483,6 +483,35 @@ set_instance_binding :: proc "contextless" (
 	object_set_instance_binding(object, library, instance, callbacks)
 }
 
+// attach_instance associates caller-allocated Odin instance data with a Godot
+// object. It does not allocate, retain, or free the instance data; user code
+// remains responsible for freeing it from the class free callback.
+attach_instance :: proc "contextless" (
+	object: ObjectPtr,
+	class_name: ConstStringNamePtr,
+	instance: rawptr,
+	callbacks: ^InstanceBindingCallbacks,
+) {
+	if object == nil || class_name == nil || instance == nil || callbacks == nil {
+		_trap_nil_godot_function()
+	}
+	set_instance(object, class_name, instance)
+	set_instance_binding(object, instance, callbacks)
+}
+
+// class_instance_data returns typed Odin instance data previously attached to a
+// Godot object. A nil ClassInstancePtr is treated as a failed lookup.
+class_instance_data :: proc "contextless" (
+	instance: ClassInstancePtr,
+	$T: typeid,
+) -> (
+	data: ^T,
+	ok: bool,
+) {
+	if instance == nil do return nil, false
+	return cast(^T)instance, true
+}
+
 // Construct a plain Object of the given class.
 construct_object :: proc "contextless" (class_name: ConstStringNamePtr) -> ObjectPtr {
 	return classdb_construct_object3(class_name)

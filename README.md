@@ -104,6 +104,22 @@ otherwise process-lifetime storage for registered class names and parent names.
 Do not create class-name storage as a temporary local value and keep the returned
 pointer after that storage goes out of scope.
 
+Instance data remains extension-owned. Allocate it explicitly in your create
+callback, attach it with `gt.attach_instance`, retrieve it with
+`gt.class_instance_data`, and free it explicitly in your free callback:
+
+```odin
+self := new_clone(PlayerData{object = object})
+gt.attach_instance(object, player_name, self, &player_instance_binding_callbacks)
+
+self, ok := gt.class_instance_data(instance, PlayerData)
+if ok do free(self)
+```
+
+The helper only calls Godot's `set_instance` and `set_instance_binding` for the
+caller-provided pointer. It does not allocate, retain, unref, or free extension
+owned data.
+
 ## API coverage
 
 Current codegen is intentionally incomplete:
