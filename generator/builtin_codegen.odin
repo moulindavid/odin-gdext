@@ -880,6 +880,8 @@ Selected_Class_Method :: struct {
 selected_class_methods := []Selected_Class_Method {
 	{"Object", "get_class"},
 	{"Object", "is_class"},
+	{"Object", "set_meta"},
+	{"Object", "get_meta"},
 	{"Node", "get_parent"},
 	{"Node", "is_ancestor_of"},
 	{"Node", "get_path_to"},

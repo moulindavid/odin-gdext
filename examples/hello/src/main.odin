@@ -65,6 +65,25 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 		),
 	)
 
+	meta_name := gt.string_name_from_utf8_cstring(cstring("odin_meta_value"))
+	meta_value := gt.variant_from_int(1234)
+	gt.object_set_meta(gt.Object(object), &meta_name, &meta_value)
+	meta_default := gt.variant_nil()
+	meta_back := gt.object_get_meta(gt.Object(object), &meta_name, &meta_default)
+	meta_int, meta_ok := gt.variant_try_int(&meta_back)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated Variant mapping: meta=%v/%v (expect 1234/true)",
+			meta_int,
+			meta_ok,
+		),
+	)
+	gt.variant_free(&meta_back)
+	gt.variant_free(&meta_default)
+	gt.variant_free(&meta_value)
+	gt.string_name_free(&meta_name)
+
 	self_ := new_clone(HelloData{object = object})
 	gd.set_instance(object, hello_class_name, self_)
 	gd.set_instance_binding(object, self_, &hello_instance_binding_callbacks)

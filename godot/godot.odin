@@ -83,6 +83,8 @@ node2d_as_node :: gclass.node2d_as_node
 node2d_as_object :: gclass.node2d_as_object
 object_get_class :: gclass.object_get_class
 object_is_class :: gclass.object_is_class
+object_set_meta :: gclass.object_set_meta
+object_get_meta :: gclass.object_get_meta
 node2d_set_position :: gclass.node2d_set_position
 node2d_get_position :: gclass.node2d_get_position
 node2d_set_rotation :: gclass.node2d_set_rotation
