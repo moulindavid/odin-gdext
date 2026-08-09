@@ -112,14 +112,14 @@ Implementation order:
    - [x] Document that generated class handles do not own or free Godot objects.
 
 3. Generate class binding initialization.
-   - [ ] Generate process-lifetime `StaticStringName` storage for class and
+   - [x] Generate process-lifetime `StaticStringName` storage for class and
      method names.
-   - [ ] Generate `MethodBindPtr` caches resolved with
+   - [x] Generate `MethodBindPtr` caches resolved with
      `core.require_classdb_method_bind`.
-   - [ ] Generate one explicit `init_class_bindings` entry point and call it
+   - [x] Generate one explicit `init_class_bindings` entry point and call it
      from the extension initialization path before generated class methods are
      used.
-   - [ ] Preserve Priority 0 nil/trap checks for unresolved function pointers
+   - [x] Preserve Priority 0 nil/trap checks for unresolved function pointers
      and method binds.
 
 4. Generate a first safe method-wrapper slice.

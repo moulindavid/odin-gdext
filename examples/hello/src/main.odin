@@ -222,7 +222,7 @@ register_classes :: proc() {
 		gd.uninitialized_static_string_name_ptr(&node2d_class_name_data),
 		cstring("Node2D"),
 	)
-	gt.init_class_casting()
+	gt.init_class_bindings()
 
 	class_info := gd.ClassCreationInfo {
 		is_virtual                  = false,

@@ -872,6 +872,18 @@ selected_class_names := []string {
 	"Control",
 }
 
+Selected_Class_Method :: struct {
+	class_name:  string,
+	method_name: string,
+}
+
+selected_class_methods := []Selected_Class_Method {
+	{"Object", "get_class"},
+	{"Object", "is_class"},
+	{"Node2D", "set_position"},
+	{"Node2D", "get_position"},
+}
+
 is_selected_class :: proc(name: string) -> bool {
 	for selected in selected_class_names {
 		if selected == name do return true
@@ -886,13 +898,28 @@ find_class :: proc(root: ^ExtensionApiRoot, name: string) -> (class: ExtensionAp
 	return {}, false
 }
 
+find_class_method :: proc(
+	class: ExtensionApiClass,
+	name: string,
+) -> (
+	method: ExtensionApiClassMethod,
+	ok: bool,
+) {
+	for m in class.methods {
+		if m.name == name do return m, true
+	}
+	return {}, false
+}
+
 class_type_expr :: proc(class_name: string) -> string {
 	if class_name == "Object" do return "core.Object"
+	if class_name == "RefCounted" do return "core.RefCounted"
 	return fmt.aprintf("distinct core.ObjectPtr")
 }
 
 class_handle_expr :: proc(class_name: string) -> string {
 	if class_name == "Object" do return "core.Object"
+	if class_name == "RefCounted" do return "core.RefCounted"
 	return class_name
 }
 
@@ -930,6 +957,104 @@ emit_class_upcast :: proc(b: ^strings.Builder, class: ExtensionApiClass, ancesto
 	strings.write_string(b, "}\n\n")
 }
 
+emit_class_binding_storage :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
+	strings.write_string(b, "// ---- Binding initialization ----\n\n")
+	strings.write_string(b, "class_bindings_initialized: bool\n\n")
+
+	for name in selected_class_names {
+		prefix := class_proc_prefix(name)
+		fmt.sbprintf(b, "%s_class_name_data: core.StaticStringName\n", prefix)
+	}
+	strings.write_string(b, "\n")
+
+	for entry in selected_class_methods {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok {
+			fmt.eprintfln("ERROR: class %q missing from extension_api.json", entry.class_name)
+			return false
+		}
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok {
+			fmt.eprintfln(
+				"ERROR: method %q.%q missing from extension_api.json",
+				entry.class_name,
+				entry.method_name,
+			)
+			return false
+		}
+
+		class_prefix := class_proc_prefix(entry.class_name)
+		method_prefix := class_proc_prefix(entry.method_name)
+		fmt.sbprintf(
+			b,
+			"%s_%s_method_name_data: core.StaticStringName\n",
+			class_prefix,
+			method_prefix,
+		)
+		fmt.sbprintf(
+			b,
+			"%s_%s_method_bind: core.MethodBindPtr // hash %d\n\n",
+			class_prefix,
+			method_prefix,
+			method.hash,
+		)
+	}
+	return true
+}
+
+emit_init_static_string_name :: proc(b: ^strings.Builder, storage_name, literal: string) {
+	fmt.sbprintf(
+		b,
+		"\tcore.static_string_name_init_latin1_cstring(\n" +
+		"\t\tcore.uninitialized_static_string_name_ptr(&%s),\n" +
+		"\t\tcstring(\"%s\"),\n" +
+		"\t)\n",
+		storage_name,
+		literal,
+	)
+}
+
+emit_class_binding_init :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
+	strings.write_string(b, "init_class_bindings :: proc \"contextless\" () {\n")
+	strings.write_string(b, "\tif class_bindings_initialized do return\n\n")
+	strings.write_string(b, "\tcore.init_class_casting()\n\n")
+
+	for name in selected_class_names {
+		prefix := class_proc_prefix(name)
+		emit_init_static_string_name(b, fmt.aprintf("%s_class_name_data", prefix), name)
+	}
+	strings.write_string(b, "\n")
+
+	for entry in selected_class_methods {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok do return false
+
+		class_prefix := class_proc_prefix(entry.class_name)
+		method_prefix := class_proc_prefix(entry.method_name)
+		method_name_storage := fmt.aprintf("%s_%s_method_name_data", class_prefix, method_prefix)
+		emit_init_static_string_name(b, method_name_storage, entry.method_name)
+		fmt.sbprintf(
+			b,
+			"\t%s_%s_method_bind = core.require_classdb_method_bind(\n" +
+			"\t\tcore.const_static_string_name_ptr(&%s_class_name_data),\n" +
+			"\t\tcore.const_static_string_name_ptr(&%s),\n" +
+			"\t\t%d,\n" +
+			"\t)\n",
+			class_prefix,
+			method_prefix,
+			class_prefix,
+			method_name_storage,
+			method.hash,
+		)
+	}
+
+	strings.write_string(b, "\n\tclass_bindings_initialized = true\n")
+	strings.write_string(b, "}\n\n")
+	return true
+}
+
 generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	path := "bindings/classes/classes.odin"
 
@@ -951,6 +1076,9 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 		&b,
 		"// They do not own, retain, unref, or free the underlying object.\n\n",
 	)
+
+	if !emit_class_binding_storage(&b, root) {return false}
+	if !emit_class_binding_init(&b, root) {return false}
 
 	selected := make(map[string]ExtensionApiClass, len(selected_class_names))
 	defer delete(selected)

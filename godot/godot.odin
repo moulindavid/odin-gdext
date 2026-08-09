@@ -6,6 +6,7 @@
 package godot
 
 import gbind "godot:bindings"
+import gclass "godot:bindings/classes"
 import gcore "godot:core"
 
 // --- Core types ---
@@ -52,6 +53,11 @@ Vector2 :: gcore.Vector2
 Vector3 :: gcore.Vector3
 Vector4 :: gcore.Vector4
 Color :: gcore.Color
+Resource :: gclass.Resource
+Node :: gclass.Node
+CanvasItem :: gclass.CanvasItem
+Node2D :: gclass.Node2D
+Control :: gclass.Control
 
 // --- Core functions ---
 is_nil :: gcore.is_nil
@@ -62,6 +68,19 @@ object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
 godot_context :: gcore.godot_context
+init_class_bindings :: gclass.init_class_bindings
+ref_counted_as_object :: gclass.ref_counted_as_object
+resource_as_ref_counted :: gclass.resource_as_ref_counted
+resource_as_object :: gclass.resource_as_object
+node_as_object :: gclass.node_as_object
+canvas_item_as_node :: gclass.canvas_item_as_node
+canvas_item_as_object :: gclass.canvas_item_as_object
+node2d_as_canvas_item :: gclass.node2d_as_canvas_item
+node2d_as_node :: gclass.node2d_as_node
+node2d_as_object :: gclass.node2d_as_object
+control_as_canvas_item :: gclass.control_as_canvas_item
+control_as_node :: gclass.control_as_node
+control_as_object :: gclass.control_as_object
 
 // --- String ---
 string_ptr :: gcore.string_ptr
