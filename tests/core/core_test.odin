@@ -181,6 +181,14 @@ packed_float32_array_pointer_helpers_preserve_storage_address :: proc(t: ^testin
 }
 
 @(test)
+packed_float64_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedFloat64Array
+	_ = gd.packed_float64_array_ptr(&a)
+	_ = gd.const_packed_float64_array_ptr(&a)
+	_ = gd.uninitialized_packed_float64_array_ptr(&a)
+}
+
+@(test)
 call_error_ok_reports_only_success :: proc(t: ^testing.T) {
 	ok := gd.CallError {
 		error = .Ok,

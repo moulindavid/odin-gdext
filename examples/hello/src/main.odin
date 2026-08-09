@@ -507,6 +507,38 @@ register_classes :: proc() {
 	gt.variant_free(&floats32_v)
 	gt.packed_float32_array_free(&floats32)
 
+	// Test: owned PackedFloat64Array wrapper and Variant extraction
+	floats64 := gt.packed_float64_array_new()
+	gt.packed_float64_array_push(&floats64, 1.5)
+	gt.packed_float64_array_push(&floats64, -2.25)
+	floats64_size := gt.packed_float64_array_size(&floats64)
+	floats64_first := gt.packed_float64_array_get(&floats64, 0)
+	gt.packed_float64_array_set(&floats64, 1, 3.75)
+	floats64_second_after_set := gt.packed_float64_array_get(&floats64, 1)
+	floats64_v := gt.variant_from_packed_float64_array(&floats64)
+	floats64_back, floats64_back_ok := gt.variant_try_packed_float64_array(&floats64_v)
+	floats64_back_size: i64 = 0
+	if floats64_back_ok {
+		floats64_back_size = gt.packed_float64_array_size(&floats64_back)
+		gt.packed_float64_array_free(&floats64_back)
+	}
+	gt.packed_float64_array_clear(&floats64)
+	floats64_empty_after_clear := gt.packed_float64_array_is_empty(&floats64)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"PackedFloat64Array: size=%v get0=%v set1=%v roundtrip=%v/%v clear_empty=%v",
+			floats64_size,
+			floats64_first,
+			floats64_second_after_set,
+			floats64_back_ok,
+			floats64_back_size,
+			floats64_empty_after_clear,
+		),
+	)
+	gt.variant_free(&floats64_v)
+	gt.packed_float64_array_free(&floats64)
+
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
