@@ -282,16 +282,16 @@ register_methods :: proc() {
 	gd.debug_print("[odin-gdext] Method add registered!")
 }
 
-// ---- Static StringName storage ----
+// ---- Process-lifetime class name storage ----
 
-hello_name_data: gd.StaticStringName
-parent_name_data: gd.StaticStringName
-hello_class_name := gd.const_static_string_name_ptr(&hello_name_data)
-hello_parent_name := gd.const_static_string_name_ptr(&parent_name_data)
-node_class_name_data: gd.StaticStringName
-node_class_name := gd.const_static_string_name_ptr(&node_class_name_data)
-node2d_class_name_data: gd.StaticStringName
-node2d_class_name := gd.const_static_string_name_ptr(&node2d_class_name_data)
+hello_name_data: gt.ClassName
+parent_name_data: gt.ClassName
+hello_class_name := gt.class_name_ptr(&hello_name_data)
+hello_parent_name := gt.class_name_ptr(&parent_name_data)
+node_class_name_data: gt.ClassName
+node_class_name := gt.class_name_ptr(&node_class_name_data)
+node2d_class_name_data: gt.ClassName
+node2d_class_name := gt.class_name_ptr(&node2d_class_name_data)
 
 hello_instance_binding_callbacks := gd.InstanceBindingCallbacks {
 	create_callback    = nil,
@@ -303,22 +303,10 @@ register_classes :: proc() {
 	context = gt.godot_context()
 	gd.debug_print("[odin-gdext] Registering HelloNode...")
 
-	gd.static_string_name_init_latin1_cstring(
-		gd.uninitialized_static_string_name_ptr(&hello_name_data),
-		cstring("HelloNode"),
-	)
-	gd.static_string_name_init_latin1_cstring(
-		gd.uninitialized_static_string_name_ptr(&parent_name_data),
-		cstring("Node2D"),
-	)
-	gd.static_string_name_init_latin1_cstring(
-		gd.uninitialized_static_string_name_ptr(&node_class_name_data),
-		cstring("Node"),
-	)
-	gd.static_string_name_init_latin1_cstring(
-		gd.uninitialized_static_string_name_ptr(&node2d_class_name_data),
-		cstring("Node2D"),
-	)
+	gt.class_name_init_latin1_cstring(&hello_name_data, cstring("HelloNode"))
+	gt.class_name_init_latin1_cstring(&parent_name_data, cstring("Node2D"))
+	gt.class_name_init_latin1_cstring(&node_class_name_data, cstring("Node"))
+	gt.class_name_init_latin1_cstring(&node2d_class_name_data, cstring("Node2D"))
 	gt.init_class_bindings()
 
 	gt.register_class_with_defaults(

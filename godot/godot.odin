@@ -27,6 +27,7 @@ String :: gcore.String
 StringNameStorage :: gcore.StringNameStorage
 StringName :: gcore.StringName
 StaticStringName :: gcore.StaticStringName
+ClassName :: gcore.ClassName
 NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
 RIDStorage :: gcore.RIDStorage
@@ -216,6 +217,8 @@ static_string_name_ptr :: gcore.static_string_name_ptr
 const_static_string_name_ptr :: gcore.const_static_string_name_ptr
 uninitialized_static_string_name_ptr :: gcore.uninitialized_static_string_name_ptr
 static_string_name_init_latin1_cstring :: gcore.static_string_name_init_latin1_cstring
+class_name_ptr :: gcore.class_name_ptr
+class_name_init_latin1_cstring :: gcore.class_name_init_latin1_cstring
 
 // --- NodePath ---
 node_path_ptr :: gcore.node_path_ptr

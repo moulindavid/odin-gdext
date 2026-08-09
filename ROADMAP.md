@@ -192,10 +192,10 @@ boilerplate in every extension.
      `classdb_register_extension_class6`.
 
 2. Add static class-name helpers.
-   - [ ] Make process-lifetime `StaticStringName` class and parent names easier
+   - [x] Make process-lifetime `StaticStringName` class and parent names easier
      to initialize.
-   - [ ] Document that the backing storage must outlive the registered class.
-   - [ ] Avoid returning pointers to temporary StringName storage.
+   - [x] Document that the backing storage must outlive the registered class.
+   - [x] Avoid returning pointers to temporary StringName storage.
 
 3. Add instance binding helpers.
    - [ ] Wrap `set_instance` and `set_instance_binding` into a small helper.

@@ -68,6 +68,11 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = mode
 }
 
+facade_class_name_data: gt.ClassName
+facade_parent_name_data: gt.ClassName
+facade_class_name := gt.class_name_ptr(&facade_class_name_data)
+facade_parent_name := gt.class_name_ptr(&facade_parent_name_data)
+
 facade_create_instance :: proc "c" (
 	class_userdata: rawptr,
 	notify_postinitialize: bool,
@@ -88,16 +93,15 @@ facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, rever
 	_ = reversed
 }
 
-registration_facade_compile_smoke :: proc "contextless" (
-	class_name: gt.ConstStringNamePtr,
-	parent_class_name: gt.ConstStringNamePtr,
-) {
+registration_facade_compile_smoke :: proc "contextless" () {
+	gt.class_name_init_latin1_cstring(&facade_class_name_data, cstring("FacadeSmoke"))
+	gt.class_name_init_latin1_cstring(&facade_parent_name_data, cstring("Node2D"))
 	gt.register_class_with_defaults(
-		class_name,
-		parent_class_name,
+		facade_class_name,
+		facade_parent_name,
 		facade_create_instance,
 		facade_free_instance,
 		facade_notification,
 	)
-	gt.unregister_class(class_name)
+	gt.unregister_class(facade_class_name)
 }

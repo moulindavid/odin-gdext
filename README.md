@@ -85,6 +85,25 @@ import bind "godot:bindings"         // generated @GlobalScope utilities
 import builtin "godot:bindings/builtin" // generated builtin-type bindings
 ```
 
+## User class registration notes
+
+For class and parent names,use `ClassName` storage through the public facade:
+
+```odin
+player_name_data: gt.ClassName
+player_parent_name_data: gt.ClassName
+player_name := gt.class_name_ptr(&player_name_data)
+player_parent_name := gt.class_name_ptr(&player_parent_name_data)
+
+gt.class_name_init_latin1_cstring(&player_name_data, cstring("Player"))
+gt.class_name_init_latin1_cstring(&player_parent_name_data, cstring("Node2D"))
+```
+
+The backing `ClassName` storage must outlive the registered class. Use global or
+otherwise process-lifetime storage for registered class names and parent names.
+Do not create class-name storage as a temporary local value and keep the returned
+pointer after that storage goes out of scope.
+
 ## API coverage
 
 Current codegen is intentionally incomplete:

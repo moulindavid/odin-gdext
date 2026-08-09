@@ -357,6 +357,30 @@ string_new :: proc "contextless" (dest: UninitializedStringPtr, str: cstring) {
 }
 
 // ---------------------------------------------------------------------------
+// Class names
+// ---------------------------------------------------------------------------
+
+// ClassName is process-lifetime StaticStringName storage for class and parent
+// names used by registration. Keep the backing storage global or otherwise
+// alive until the class is unregistered. Do not allocate it as a temporary.
+ClassName :: distinct StaticStringName
+
+// class_name_ptr returns a stable pointer into caller-owned ClassName storage.
+// The pointer is only as long-lived as the storage passed here.
+class_name_ptr :: proc "contextless" (name: ^ClassName) -> ConstStringNamePtr {
+	if name == nil do _trap_nil_godot_function()
+	return const_static_string_name_ptr(cast(^StaticStringName)name)
+}
+
+class_name_init_latin1_cstring :: proc "contextless" (name: ^ClassName, value: cstring) {
+	if name == nil do _trap_nil_godot_function()
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(cast(^StaticStringName)name),
+		value,
+	)
+}
+
+// ---------------------------------------------------------------------------
 // Class registration
 // ---------------------------------------------------------------------------
 
