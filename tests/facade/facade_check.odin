@@ -127,3 +127,81 @@ instance_binding_facade_compile_smoke :: proc "contextless" (
 	_ = checked
 	_ = checked_ok
 }
+
+facade_method_name_data: gt.StaticStringName
+facade_method_arg_name_data: gt.StaticStringName
+facade_method_empty_name_data: gt.StaticStringName
+facade_method_empty_string_data: gt.String
+facade_method_name := gt.const_static_string_name_ptr(&facade_method_name_data)
+facade_method_arg_name := gt.const_static_string_name_ptr(&facade_method_arg_name_data)
+facade_method_empty_name := gt.const_static_string_name_ptr(&facade_method_empty_name_data)
+facade_method_empty_string := gt.const_string_ptr(&facade_method_empty_string_data)
+facade_method_args: [1]gt.PropertyInfo
+facade_method_arg_meta := [1]gt.ClassMethodArgumentMetadata{.None}
+facade_method_return: gt.PropertyInfo
+facade_method_info: gt.ClassMethodInfo
+
+facade_method_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: gt.ClassInstancePtr,
+	p_args: [^]gt.ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: gt.VariantPtr,
+	r_error: ^gt.CallError,
+) {
+	_ = method_userdata
+	_ = p_instance
+	_ = p_args
+	_ = p_argument_count
+	_ = r_return
+	_ = r_error
+}
+
+facade_method_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: rawptr,
+	p_args: [^]rawptr,
+	r_ret: rawptr,
+) {
+	_ = method_userdata
+	_ = p_instance
+	_ = p_args
+	_ = r_ret
+}
+
+method_registration_facade_compile_smoke :: proc "contextless" (
+	class_name: gt.ConstStringNamePtr,
+) {
+	gt.init_method_property_info(
+		&facade_method_args[0],
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = facade_method_arg_name,
+			class_name = facade_method_empty_name,
+			hint_string = facade_method_empty_string,
+		},
+	)
+	gt.init_method_property_info(
+		&facade_method_return,
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = facade_method_name,
+			class_name = facade_method_empty_name,
+			hint_string = facade_method_empty_string,
+		},
+	)
+	gt.register_class_method_with_descriptor(
+		class_name,
+		&facade_method_info,
+		gt.ClassMethodDescriptor {
+			name = facade_method_name,
+			call_func = facade_method_call,
+			ptrcall_func = facade_method_ptrcall,
+			return_value_info = &facade_method_return,
+			return_value_metadata = .None,
+			argument_count = 1,
+			arguments_info = &facade_method_args[0],
+			arguments_metadata = &facade_method_arg_meta[0],
+		},
+	)
+}

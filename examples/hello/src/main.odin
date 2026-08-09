@@ -221,66 +221,84 @@ add_ptrcall :: proc "c" (
 	(cast(^gt.GodotReal)r_ret)^ = a + b
 }
 
-add_method_name_data: gd.StaticStringName
-add_method_name := gd.const_static_string_name_ptr(&add_method_name_data)
-add_arg_info := [2]gd.PropertyInfo{{type = .Float}, {type = .Float}}
-add_arg_meta := [2]gd.ClassMethodArgumentMetadata{.None, .None}
-add_return_info := gd.PropertyInfo {
-	type = .Float,
-}
-add_method_info: gd.ClassMethodInfo
+add_method_name_data: gt.StaticStringName
+add_method_name := gt.const_static_string_name_ptr(&add_method_name_data)
+add_arg_info: [2]gt.PropertyInfo
+add_arg_meta := [2]gt.ClassMethodArgumentMetadata{.None, .None}
+add_return_info: gt.PropertyInfo
+add_method_info: gt.ClassMethodInfo
 
-add_arg_a_name_data: gd.StaticStringName
-add_arg_a_name := gd.const_static_string_name_ptr(&add_arg_a_name_data)
-add_arg_b_name_data: gd.StaticStringName
-add_arg_b_name := gd.const_static_string_name_ptr(&add_arg_b_name_data)
+add_arg_a_name_data: gt.StaticStringName
+add_arg_a_name := gt.const_static_string_name_ptr(&add_arg_a_name_data)
+add_arg_b_name_data: gt.StaticStringName
+add_arg_b_name := gt.const_static_string_name_ptr(&add_arg_b_name_data)
 
-empty_name_data: gd.StaticStringName
-empty_name := gd.const_static_string_name_ptr(&empty_name_data)
-empty_str_data: gd.String
-empty_str := gd.const_string_ptr(&empty_str_data)
+empty_name_data: gt.StaticStringName
+empty_name := gt.const_static_string_name_ptr(&empty_name_data)
+empty_str_data: gt.String
+empty_str := gt.const_string_ptr(&empty_str_data)
 
 register_methods :: proc() {
-	gd.static_string_name_init_latin1_cstring(
-		gd.uninitialized_static_string_name_ptr(&add_method_name_data),
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&add_method_name_data),
 		cstring("add"),
 	)
-	gd.static_string_name_init_latin1_cstring(
-		gd.uninitialized_static_string_name_ptr(&add_arg_a_name_data),
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&add_arg_a_name_data),
 		cstring("a"),
 	)
-	gd.static_string_name_init_latin1_cstring(
-		gd.uninitialized_static_string_name_ptr(&add_arg_b_name_data),
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&add_arg_b_name_data),
 		cstring("b"),
 	)
-	gd.static_string_name_init_latin1_cstring(
-		gd.uninitialized_static_string_name_ptr(&empty_name_data),
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&empty_name_data),
 		cstring(""),
 	)
-	gd.string_new_with_latin1_chars(gd.uninitialized_string_ptr(&empty_str_data), cstring(""))
+	gd.string_new_with_latin1_chars(gt.uninitialized_string_ptr(&empty_str_data), cstring(""))
 
-	add_arg_info[0].name = add_arg_a_name
-	add_arg_info[0].class_name = empty_name
-	add_arg_info[0].hint_string = empty_str
-	add_arg_info[1].name = add_arg_b_name
-	add_arg_info[1].class_name = empty_name
-	add_arg_info[1].hint_string = empty_str
-	add_return_info.class_name = empty_name
-	add_return_info.hint_string = empty_str
-	info := &add_method_info
-	info.name = add_method_name
-	info.has_return_value = true
-	info.return_value_info = &add_return_info
-	info.return_value_metadata = .None
-	info.argument_count = 2
-	info.arguments_info = &add_arg_info[0]
-	info.arguments_metadata = &add_arg_meta[0]
-	add_return_info.name = add_method_name
+	gt.init_method_property_info(
+		&add_arg_info[0],
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = add_arg_a_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.init_method_property_info(
+		&add_arg_info[1],
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = add_arg_b_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.init_method_property_info(
+		&add_return_info,
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = add_method_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
 
-	info.call_func = add_call
-	info.ptrcall_func = add_ptrcall
-
-	gd.classdb_register_extension_class_method(gd.library, hello_class_name, info)
+	gt.register_class_method_with_descriptor(
+		hello_class_name,
+		&add_method_info,
+		gt.ClassMethodDescriptor {
+			name = add_method_name,
+			call_func = add_call,
+			ptrcall_func = add_ptrcall,
+			return_value_info = &add_return_info,
+			return_value_metadata = .None,
+			argument_count = 2,
+			arguments_info = &add_arg_info[0],
+			arguments_metadata = &add_arg_meta[0],
+		},
+	)
 	gd.debug_print("[odin-gdext] Method add registered!")
 }
 

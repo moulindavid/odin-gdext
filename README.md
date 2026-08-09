@@ -120,6 +120,34 @@ The helper only calls Godot's `set_instance` and `set_instance_binding` for the
 caller-provided pointer. It does not allocate, retain, unref, or free extension
 owned data.
 
+Method registration helpers use explicit descriptors over caller-owned stable
+metadata storage. The call and ptrcall callbacks stay visible, so Variant
+construction/destruction and ptrcall ABI casts remain under user control:
+
+```odin
+gt.init_method_property_info(&arg_info[0], gt.MethodPropertyDescriptor{
+	type = .Float,
+	name = arg_name,
+	class_name = empty_name,
+	hint_string = empty_string,
+})
+
+gt.register_class_method_with_descriptor(class_name, &method_info, gt.ClassMethodDescriptor{
+	name = method_name,
+	call_func = add_call,
+	ptrcall_func = add_ptrcall,
+	return_value_info = &return_info,
+	argument_count = 1,
+	arguments_info = &arg_info[0],
+	arguments_metadata = &arg_meta[0],
+})
+```
+
+The helper fills `PropertyInfo` and `ClassMethodInfo`; it does not copy or own
+metadata arrays, generate adapters, or change Variant/ptrcall ownership rules.
+Keep method names, argument names, hint strings, `PropertyInfo`, metadata arrays,
+and `ClassMethodInfo` storage alive for the registration call.
+
 ## API coverage
 
 Current codegen is intentionally incomplete:

@@ -437,6 +437,88 @@ unregister_class :: proc "contextless" (class_name: ConstStringNamePtr) {
 	classdb_unregister_extension_class(library, class_name)
 }
 
+MethodPropertyDescriptor :: struct {
+	type:        VariantType,
+	name:        StringNamePtr,
+	class_name:  StringNamePtr,
+	hint_string: StringPtr,
+	hint:        u32,
+	usage:       u32,
+}
+
+ClassMethodDescriptor :: struct {
+	name:                  StringNamePtr,
+	method_userdata:       rawptr,
+	call_func:             ClassMethodCall,
+	ptrcall_func:          ClassMethodPtrCall,
+	method_flags:          u32,
+	return_value_info:     ^PropertyInfo,
+	return_value_metadata: ClassMethodArgumentMetadata,
+	argument_count:        u32,
+	arguments_info:        ^PropertyInfo,
+	arguments_metadata:    ^ClassMethodArgumentMetadata,
+}
+
+// init_method_property_info fills caller-owned PropertyInfo storage. Name,
+// class_name, and hint_string must point to storage that remains valid while
+// Godot reads the method metadata. Use process-lifetime StringName storage for
+// names and stable String storage for hint text.
+init_method_property_info :: proc "contextless" (
+	info: ^PropertyInfo,
+	desc: MethodPropertyDescriptor,
+) {
+	if info == nil || desc.name == nil || desc.class_name == nil || desc.hint_string == nil {
+		_trap_nil_godot_function()
+	}
+	info.type = desc.type
+	info.name = desc.name
+	info.class_name = desc.class_name
+	info.hint = desc.hint
+	info.hint_string = desc.hint_string
+	info.usage = desc.usage
+}
+
+// init_class_method_info fills caller-owned ClassMethodInfo storage from stable
+// caller-owned metadata. This helper does not generate adapters and does not
+// alter Variant or ptrcall ABI rules; call_func and ptrcall_func remain explicit.
+init_class_method_info :: proc "contextless" (
+	info: ^ClassMethodInfo,
+	desc: ClassMethodDescriptor,
+) {
+	if info == nil || desc.name == nil || desc.call_func == nil || desc.ptrcall_func == nil {
+		_trap_nil_godot_function()
+	}
+	if desc.return_value_info != nil && desc.return_value_info.name == nil {
+		_trap_nil_godot_function()
+	}
+	if desc.argument_count > 0 && (desc.arguments_info == nil || desc.arguments_metadata == nil) {
+		_trap_nil_godot_function()
+	}
+	info.name = desc.name
+	info.method_userdata = desc.method_userdata
+	info.call_func = desc.call_func
+	info.ptrcall_func = desc.ptrcall_func
+	info.method_flags = desc.method_flags
+	info.has_return_value = desc.return_value_info != nil
+	info.return_value_info = desc.return_value_info
+	info.return_value_metadata = desc.return_value_metadata
+	info.argument_count = desc.argument_count
+	info.arguments_info = desc.arguments_info
+	info.arguments_metadata = desc.arguments_metadata
+	info.default_argument_count = 0
+	info.default_arguments = nil
+}
+
+register_class_method_with_descriptor :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	info: ^ClassMethodInfo,
+	desc: ClassMethodDescriptor,
+) {
+	if class_name == nil do _trap_nil_godot_function()
+	init_class_method_info(info, desc)
+	register_class_method(class_name, info)
+}
+
 // Register a method on an extension class.
 register_class_method :: proc "contextless" (
 	class_name: ConstStringNamePtr,

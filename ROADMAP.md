@@ -204,11 +204,11 @@ boilerplate in every extension.
    - [x] Keep allocation and freeing of extension-owned data explicit.
 
 4. Add method metadata registration helpers.
-   - [ ] Provide descriptors for method name, return type, arguments, metadata,
+   - [x] Provide descriptors for method name, return type, arguments, metadata,
      call callback, and ptrcall callback.
-   - [ ] Build `ClassMethodInfo` and `PropertyInfo` safely from stable storage.
-   - [ ] Update hello's `add` method registration to use the helper.
-   - [ ] Preserve explicit Variant destruction and ptrcall ABI rules.
+   - [x] Build `ClassMethodInfo` and `PropertyInfo` safely from stable storage.
+   - [x] Update hello's `add` method registration to use the helper.
+   - [x] Preserve explicit Variant destruction and ptrcall ABI rules.
 
 5. Add typed method adapter helpers for simple signatures.
    - [ ] Start with fixed arity primitive signatures such as
