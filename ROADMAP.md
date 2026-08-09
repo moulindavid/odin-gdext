@@ -159,10 +159,10 @@ Implementation order:
      and type names.
 
 8. Integrate generated classes into the public facade.
-   - [ ] Re-export selected class handle types and free-function wrappers from
+   - [x] Re-export selected class handle types and free-function wrappers from
      `godot/godot.odin`.
-   - [ ] Keep examples importing only `godot:godot` for normal usage.
-   - [ ] Add checks/tests proving generated class APIs compile without importing
+   - [x] Keep examples importing only `godot:godot` for normal usage.
+   - [x] Add checks/tests proving generated class APIs compile without importing
      internal generated packages directly.
 
 9. Expand class coverage incrementally.

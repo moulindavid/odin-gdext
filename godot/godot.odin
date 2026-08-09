@@ -1,11 +1,13 @@
-// godot/godot.odin -- Small convenience facade.
+// godot/godot.odin -- Public convenience facade.
 //
-// This package intentionally re-exports only a tiny handwritten subset today.
-// Import `godot:bindings` and `godot:bindings/builtin` directly for generated
-// utility and builtin APIs.
+// Prefer this package for normal extension code. It re-exports the stable core
+// value helpers plus the selected generated builtin, utility, and class APIs.
+// Manual class registration still uses some low-level core declarations until
+// the Priority 3 registration helpers exist.
 package godot
 
 import gbind "godot:bindings"
+import gbind_builtin "godot:bindings/builtin"
 import gclass "godot:bindings/classes"
 import gcore "godot:core"
 
@@ -496,6 +498,16 @@ variant_construct_checked :: gcore.variant_construct_checked
 variant_call_checked :: gcore.variant_call_checked
 print :: gcore.print
 print_init :: gcore.print_init
+
+// --- Generated builtin helpers used by the public facade smoke path ---
+color_to_html :: gbind_builtin.color_to_html
+color_html :: gbind_builtin.color_html
+vector2_new3 :: gbind_builtin.vector2_new3
+vector2_to_variant :: gbind_builtin.vector2_to_variant
+vector2_try_from_variant :: gbind_builtin.vector2_try_from_variant
+vector2_length :: gbind_builtin.vector2_length
+vector2_normalized :: gbind_builtin.vector2_normalized
+vector2_dot :: gbind_builtin.vector2_dot
 
 // --- Utility functions ---
 sin :: gbind.sin

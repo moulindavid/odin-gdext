@@ -1,7 +1,6 @@
 package hello
 
 import "core:fmt"
-import gbv2 "godot:bindings/builtin"
 import gd "godot:core"
 import gt "godot:godot"
 
@@ -906,12 +905,12 @@ register_classes :: proc() {
 			gt.string_nocasecmp_to(&gs, &gs_case) == 0,
 		),
 	)
-	generated_html := gbv2.color_to_html(gt.Color{0.25, 0.5, 0.75, 1}, true)
+	generated_html := gt.color_to_html(gt.Color{0.25, 0.5, 0.75, 1}, true)
 	generated_html_text, generated_html_ok, generated_html_needed := gt.string_to_utf8(
 		&generated_html,
 		utf8_buf[:],
 	)
-	generated_color := gbv2.color_html(&generated_html)
+	generated_color := gt.color_html(&generated_html)
 	gd.debug_print(
 		fmt.bprintf(
 			buf[:],
@@ -1013,9 +1012,9 @@ register_classes :: proc() {
 	gt.node_path_free(&np)
 
 	// Test: Vector2 built-in
-	vec := gbv2.vector2_new3(3.0, 4.0)
-	vec_variant := gbv2.vector2_to_variant(vec)
-	vec_back, vec_back_ok := gbv2.vector2_try_from_variant(&vec_variant)
+	vec := gt.vector2_new3(3.0, 4.0)
+	vec_variant := gt.vector2_to_variant(vec)
+	vec_back, vec_back_ok := gt.vector2_try_from_variant(&vec_variant)
 	gd.debug_print(
 		fmt.bprintf(
 			buf[:],
@@ -1027,11 +1026,11 @@ register_classes :: proc() {
 	)
 	gt.variant_free(&vec_variant)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
-	len := gbv2.vector2_length(vec)
+	len := gt.vector2_length(vec)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))
-	n := gbv2.vector2_normalized(vec)
+	n := gt.vector2_normalized(vec)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).normalized(): (%v, %v)", n.x, n.y))
-	dot := gbv2.vector2_dot(vec, gbv2.Vector2{1, 0})
+	dot := gt.vector2_dot(vec, gt.Vector2{1, 0})
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).dot(1,0): %v (expect 3)", dot))
 
 	// Utility function smoke test

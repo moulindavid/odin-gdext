@@ -42,7 +42,7 @@ $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 	@touch $(BUILTIN_STAMP)
 	@touch $(CLASSES_STAMP)
 
-.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot test-unit hello prepare-hello-cache test-hello ci clean
+.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot check-facade test-unit hello prepare-hello-cache test-hello ci clean
 
 # Build the codegen tool.
 codegen: $(CODEGEN)
@@ -93,6 +93,10 @@ check-bindings: interface builtins
 check-godot: interface builtins
 	$(ODIN) check godot -no-entry-point $(ODIN_CHECK_FLAGS)
 
+# Type-check public facade usage without importing internal generated packages.
+check-facade: interface builtins
+	$(ODIN) check tests/facade -no-entry-point $(ODIN_CHECK_FLAGS)
+
 # Run focused Odin unit tests that do not require launching Godot.
 # Odin's test runner allocates internally, so this target intentionally omits
 # -default-to-nil-allocator while keeping vet and strict style enabled.
@@ -130,6 +134,7 @@ ci:
 	$(MAKE) check-generator
 	$(MAKE) check-bindings
 	$(MAKE) check-godot
+	$(MAKE) check-facade
 	$(MAKE) test-unit
 	$(MAKE) test-hello
 
