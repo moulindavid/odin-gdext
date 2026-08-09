@@ -519,6 +519,126 @@ register_class_method_with_descriptor :: proc "contextless" (
 	register_class_method(class_name, info)
 }
 
+ClassMethodGodotReal2ToGodotReal :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	a: GodotReal,
+	b: GodotReal,
+) -> (
+	value: GodotReal,
+	ok: bool,
+)
+
+ClassMethodGodotReal2ToGodotRealAdapter :: struct {
+	method: ClassMethodGodotReal2ToGodotReal,
+}
+
+_set_call_error :: proc "contextless" (
+	err: ^CallError,
+	error: CallErrorType,
+	argument: i32 = 0,
+	expected: i32 = 0,
+) {
+	if err == nil do return
+	err.error = error
+	err.argument = argument
+	err.expected = expected
+}
+
+// class_method_godot_real2_to_godot_real_call adapts a fixed-arity
+// GodotReal, GodotReal -> GodotReal method to the Variant call ABI. Store a
+// process-lifetime ClassMethodGodotReal2ToGodotRealAdapter in method_userdata.
+class_method_godot_real2_to_godot_real_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil || r_return == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 2 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 2)
+		return
+	}
+	if p_argument_count > 2 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 2)
+		return
+	}
+	if p_args == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Float)
+		return
+	}
+
+	adapter := cast(^ClassMethodGodotReal2ToGodotRealAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	if p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Float)
+		return
+	}
+	a, a_ok := variant_try_float(cast(^Variant)p_args[0])
+	if !a_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Float)
+		return
+	}
+	if p_args[1] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 1, cast(i32)VariantType.Float)
+		return
+	}
+	b, b_ok := variant_try_float(cast(^Variant)p_args[1])
+	if !b_ok {
+		_set_call_error(r_error, .Invalid_Argument, 1, cast(i32)VariantType.Float)
+		return
+	}
+
+	value, ok := adapter.method(p_instance, a, b)
+	if !ok {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+
+	rv := variant_from_float(value)
+	variant_init_copy(r_return, &rv)
+	variant_free(&rv)
+	_set_call_error(r_error, .Ok)
+}
+
+// class_method_godot_real2_to_godot_real_ptrcall adapts the same method to the
+// validated ptrcall ABI. Godot validates argument count and type metadata before
+// this path, so it reads the two GodotReal arguments directly.
+class_method_godot_real2_to_godot_real_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	if method_userdata == nil || p_instance == nil || p_args == nil || r_ret == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodGodotReal2ToGodotRealAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	a := (cast(^GodotReal)p_args[0])^
+	b := (cast(^GodotReal)p_args[1])^
+	value, ok := adapter.method(p_instance, a, b)
+	if !ok do _trap_godot_call_error()
+	(cast(^GodotReal)r_ret)^ = value
+}
+
 // Register a method on an extension class.
 register_class_method :: proc "contextless" (
 	class_name: ConstStringNamePtr,

@@ -211,10 +211,10 @@ boilerplate in every extension.
    - [x] Preserve explicit Variant destruction and ptrcall ABI rules.
 
 5. Add typed method adapter helpers for simple signatures.
-   - [ ] Start with fixed arity primitive signatures such as
+   - [x] Start with fixed arity primitive signatures such as
      `GodotReal, GodotReal -> GodotReal`.
-   - [ ] Generate or provide explicit adapters for both call and ptrcall paths.
-   - [ ] Defer varargs, default arguments, `Callable`, `Signal`, and complex
+   - [x] Generate or provide explicit adapters for both call and ptrcall paths.
+   - [x] Defer varargs, default arguments, `Callable`, `Signal`, and complex
      object-lifetime-sensitive signatures.
 
 6. Add notification dispatch helpers.

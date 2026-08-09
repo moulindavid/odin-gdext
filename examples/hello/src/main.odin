@@ -13,7 +13,12 @@ HelloNode :: distinct gd.ObjectPtr
 hello_node_object :: proc(self: HelloNode) -> gd.ObjectPtr {
 	return gd.ObjectPtr(self)
 }
-hello_node_from_instance :: proc(instance: gt.ClassInstancePtr) -> (value: HelloNode, ok: bool) {
+hello_node_from_instance :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: HelloNode,
+	ok: bool,
+) {
 	data, data_ok := gt.class_instance_data(instance, HelloData)
 	if !data_ok do return {}, false
 	return HelloNode(data.object), true
@@ -189,36 +194,26 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 
 // ---- Method: add(a, b) -> a + b ----
 
-add_call :: proc "c" (
-	method_userdata: rawptr,
-	p_instance: gd.ClassInstancePtr,
-	p_args: [^]gd.ConstVariantPtr,
-	p_argument_count: i64,
-	r_return: gd.VariantPtr,
-	r_error: ^gd.CallError,
-) {
-	context = gt.godot_context()
-	a := gt.variant_to_float(cast(^gt.Variant)p_args[0])
-	b := gt.variant_to_float(cast(^gt.Variant)p_args[1])
-	buf: [160]u8
-	gd.debug_print(fmt.bprintf(buf[:], "add_call a=%v b=%v", a, b))
-	rv := gt.variant_from_float(a + b)
-	gt.variant_init_copy(r_return, &rv)
-	gt.variant_free(&rv)
+add :: proc "contextless" (self: HelloNode, a: gt.GodotReal, b: gt.GodotReal) -> gt.GodotReal {
+	_ = self
+	return a + b
 }
 
-add_ptrcall :: proc "c" (
-	method_userdata: rawptr,
-	p_instance: rawptr,
-	p_args: [^]rawptr,
-	r_ret: rawptr,
+add_adapter_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	a: gt.GodotReal,
+	b: gt.GodotReal,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
 ) {
-	context = gt.godot_context()
-	a := (cast(^gt.GodotReal)p_args[0])^
-	b := (cast(^gt.GodotReal)p_args[1])^
-	buf: [160]u8
-	gd.debug_print(fmt.bprintf(buf[:], "add_ptrcall a=%v b=%v", a, b))
-	(cast(^gt.GodotReal)r_ret)^ = a + b
+	self, self_ok := hello_node_from_instance(instance)
+	if !self_ok do return 0, false
+	return add(self, a, b), true
+}
+
+add_method_adapter := gt.ClassMethodGodotReal2ToGodotRealAdapter {
+	method = add_adapter_method,
 }
 
 add_method_name_data: gt.StaticStringName
@@ -290,8 +285,9 @@ register_methods :: proc() {
 		&add_method_info,
 		gt.ClassMethodDescriptor {
 			name = add_method_name,
-			call_func = add_call,
-			ptrcall_func = add_ptrcall,
+			method_userdata = &add_method_adapter,
+			call_func = gt.class_method_godot_real2_to_godot_real_call,
+			ptrcall_func = gt.class_method_godot_real2_to_godot_real_ptrcall,
 			return_value_info = &add_return_info,
 			return_value_metadata = .None,
 			argument_count = 2,

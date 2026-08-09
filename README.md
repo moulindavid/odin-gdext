@@ -4,10 +4,10 @@
 via the *GDExtension* C API.
 
 > **Status:** early prototype. Current smoke-tested scope: Godot 4.7
-> single-precision C ABI generation, manual class registration, manual lifecycle
-> callbacks, manual method registration, basic Variant helpers, typed object
-> handle experiments, generated math builtin bindings, and partial utility
-> function bindings.
+> single-precision C ABI generation, manual lifecycle callbacks, registration
+> helpers for user classes and simple methods, basic Variant helpers, typed
+> object handle experiments, generated math builtin bindings, and partial
+> utility function bindings.
 
 ## Requirements
 
@@ -87,7 +87,7 @@ import builtin "godot:bindings/builtin" // generated builtin-type bindings
 
 ## User class registration notes
 
-For class and parent names,use `ClassName` storage through the public facade:
+For class and parent names, use `ClassName` storage through the public facade:
 
 ```odin
 player_name_data: gt.ClassName
@@ -121,8 +121,11 @@ caller-provided pointer. It does not allocate, retain, unref, or free extension
 owned data.
 
 Method registration helpers use explicit descriptors over caller-owned stable
-metadata storage. The call and ptrcall callbacks stay visible, so Variant
-construction/destruction and ptrcall ABI casts remain under user control:
+metadata storage. For advanced signatures, call and ptrcall callbacks can stay
+fully explicit so Variant construction/destruction and ptrcall ABI casts remain
+under user control. For the first simple case, `GodotReal, GodotReal ->
+GodotReal`, the facade also exposes typed callbacks backed by stable adapter
+userdata:
 
 ```odin
 gt.init_method_property_info(&arg_info[0], gt.MethodPropertyDescriptor{
@@ -132,21 +135,28 @@ gt.init_method_property_info(&arg_info[0], gt.MethodPropertyDescriptor{
 	hint_string = empty_string,
 })
 
+// Global or otherwise process-lifetime storage.
+real2_adapter: gt.ClassMethodGodotReal2ToGodotRealAdapter
+real2_adapter.method = add_adapter_method
+
 gt.register_class_method_with_descriptor(class_name, &method_info, gt.ClassMethodDescriptor{
 	name = method_name,
-	call_func = add_call,
-	ptrcall_func = add_ptrcall,
+	method_userdata = &real2_adapter,
+	call_func = gt.class_method_godot_real2_to_godot_real_call,
+	ptrcall_func = gt.class_method_godot_real2_to_godot_real_ptrcall,
 	return_value_info = &return_info,
-	argument_count = 1,
+	argument_count = 2,
 	arguments_info = &arg_info[0],
 	arguments_metadata = &arg_meta[0],
 })
 ```
 
 The helper fills `PropertyInfo` and `ClassMethodInfo`; it does not copy or own
-metadata arrays, generate adapters, or change Variant/ptrcall ownership rules.
-Keep method names, argument names, hint strings, `PropertyInfo`, metadata arrays,
-and `ClassMethodInfo` storage alive for the registration call.
+metadata arrays and does not change Variant/ptrcall ownership rules. Keep method
+names, argument names, hint strings, `PropertyInfo`, metadata arrays,
+`ClassMethodInfo`, and adapter userdata storage alive for the registration call.
+Varargs, default arguments, `Callable`, `Signal`, and object-lifetime-sensitive
+method adapters are intentionally deferred until their safety model is explicit.
 
 ## API coverage
 

@@ -33,6 +33,8 @@ PropertyInfo :: gcore.PropertyInfo
 ClassMethodInfo :: gcore.ClassMethodInfo
 MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
+ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
+ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
 InstanceBindingCallbacks :: gcore.InstanceBindingCallbacks
 VariantType :: gcore.VariantType
 VariantStorage :: gcore.VariantStorage
@@ -95,6 +97,9 @@ class_instance_data :: gcore.class_instance_data
 init_method_property_info :: gcore.init_method_property_info
 init_class_method_info :: gcore.init_class_method_info
 register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
+class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
+class_method_godot_real2_to_godot_real_ptrcall ::
+	gcore.class_method_godot_real2_to_godot_real_ptrcall
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
