@@ -48,8 +48,10 @@ Implement proper wrappers and ownership rules for:
   - [x] Owned `StringName`-returning helpers for names/subnames and concatenated names/subnames.
 - [ ] `Array`
   - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `push`, `size`, and Variant conversion helpers.
+  - [x] Additional safe methods for `get`, `set`, `clear`, `erase`, `has`, and `is_empty`.
 - [ ] `Dictionary`
   - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `set`, `has`, `size`, `is_empty`, and Variant conversion helpers.
+  - [x] Additional safe methods for `get`, `get_or_default`, `clear`, and `erase`.
 - [ ] packed arrays
 
 ## Priority 2 - generated class bindings

@@ -89,6 +89,12 @@ array_copy :: gcore.array_copy
 array_free :: gcore.array_free
 array_push :: gcore.array_push
 array_size :: gcore.array_size
+array_is_empty :: gcore.array_is_empty
+array_clear :: gcore.array_clear
+array_get :: gcore.array_get
+array_set :: gcore.array_set
+array_erase :: gcore.array_erase
+array_has :: gcore.array_has
 
 // --- Dictionary ---
 dictionary_ptr :: gcore.dictionary_ptr
@@ -103,6 +109,10 @@ dictionary_set :: gcore.dictionary_set
 dictionary_has :: gcore.dictionary_has
 dictionary_size :: gcore.dictionary_size
 dictionary_is_empty :: gcore.dictionary_is_empty
+dictionary_clear :: gcore.dictionary_clear
+dictionary_erase :: gcore.dictionary_erase
+dictionary_get_or_default :: gcore.dictionary_get_or_default
+dictionary_get :: gcore.dictionary_get
 
 // --- Variant ---
 variant_type :: gcore.variant_type

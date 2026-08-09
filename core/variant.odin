@@ -9,11 +9,20 @@ NODE_PATH_GET_NAME_HASH :: 2948586938
 NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
 NODE_PATH_GET_CONCATENATED_NAMES_HASH :: 1825232092
 ARRAY_SIZE_HASH :: 3173160232
+ARRAY_IS_EMPTY_HASH :: 3918633141
+ARRAY_CLEAR_HASH :: 3218959716
+ARRAY_GET_HASH :: 708700221
+ARRAY_SET_HASH :: 3798478031
 ARRAY_PUSH_BACK_HASH :: 3316032543
+ARRAY_ERASE_HASH :: 3316032543
+ARRAY_HAS_HASH :: 3680194679
 DICTIONARY_SIZE_HASH :: 3173160232
 DICTIONARY_IS_EMPTY_HASH :: 3918633141
+DICTIONARY_CLEAR_HASH :: 3218959716
 DICTIONARY_SET_HASH :: 2175348267
 DICTIONARY_HAS_HASH :: 3680194679
+DICTIONARY_ERASE_HASH :: 1776646889
+DICTIONARY_GET_HASH :: 2205440559
 
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
@@ -467,6 +476,12 @@ array_free :: proc "contextless" (a: ^Array) {
 
 array_push_back_method: BuiltinMethod
 array_size_method: BuiltinMethod
+array_is_empty_method: BuiltinMethod
+array_clear_method: BuiltinMethod
+array_get_method: BuiltinMethod
+array_set_method: BuiltinMethod
+array_erase_method: BuiltinMethod
+array_has_method: BuiltinMethod
 
 array_push :: proc "contextless" (arr: ^Array, value: ^Variant) {
 	ensure_builtin_method(
@@ -485,6 +500,55 @@ array_push :: proc "contextless" (arr: ^Array, value: ^Variant) {
 array_size :: proc "contextless" (arr: ^Array) -> i64 {
 	ensure_builtin_method(&array_size_method, .Array, cstring("size"), ARRAY_SIZE_HASH)
 	return call_builtin_method_ptr_ret(array_size_method.method, const_array_ptr(arr), i64)
+}
+
+array_is_empty :: proc "contextless" (arr: ^Array) -> bool {
+	ensure_builtin_method(&array_is_empty_method, .Array, cstring("is_empty"), ARRAY_IS_EMPTY_HASH)
+	return call_builtin_method_ptr_ret(array_is_empty_method.method, const_array_ptr(arr), bool)
+}
+
+array_clear :: proc "contextless" (arr: ^Array) {
+	ensure_builtin_method(&array_clear_method, .Array, cstring("clear"), ARRAY_CLEAR_HASH)
+	call_builtin_method_ptr_no_ret(array_clear_method.method, array_ptr(arr))
+}
+
+// array_get returns an initialized Variant; call variant_free when done.
+array_get :: proc "contextless" (arr: ^Array, index: i64) -> (result: Variant) {
+	ensure_builtin_method(&array_get_method, .Array, cstring("get"), ARRAY_GET_HASH)
+	index_arg := index
+	call_builtin_method_ptr_ret_into(
+		array_get_method.method,
+		const_array_ptr(arr),
+		uninitialized_variant_ptr(&result),
+		cast(TypePtr)&index_arg,
+	)
+	return
+}
+
+array_set :: proc "contextless" (arr: ^Array, index: i64, value: ^Variant) {
+	ensure_builtin_method(&array_set_method, .Array, cstring("set"), ARRAY_SET_HASH)
+	index_arg := index
+	call_builtin_method_ptr_no_ret(
+		array_set_method.method,
+		array_ptr(arr),
+		cast(TypePtr)&index_arg,
+		variant_ptr(value),
+	)
+}
+
+array_erase :: proc "contextless" (arr: ^Array, value: ^Variant) {
+	ensure_builtin_method(&array_erase_method, .Array, cstring("erase"), ARRAY_ERASE_HASH)
+	call_builtin_method_ptr_no_ret(array_erase_method.method, array_ptr(arr), variant_ptr(value))
+}
+
+array_has :: proc "contextless" (arr: ^Array, value: ^Variant) -> bool {
+	ensure_builtin_method(&array_has_method, .Array, cstring("has"), ARRAY_HAS_HASH)
+	return call_builtin_method_ptr_ret(
+		array_has_method.method,
+		const_array_ptr(arr),
+		bool,
+		variant_ptr(value),
+	)
 }
 
 // DictionaryStorage is raw storage large enough for Godot's ABI Dictionary
@@ -553,6 +617,9 @@ dictionary_set_method: BuiltinMethod
 dictionary_has_method: BuiltinMethod
 dictionary_size_method: BuiltinMethod
 dictionary_is_empty_method: BuiltinMethod
+dictionary_clear_method: BuiltinMethod
+dictionary_erase_method: BuiltinMethod
+dictionary_get_method: BuiltinMethod
 
 dictionary_set :: proc "contextless" (dict: ^Dictionary, key, value: ^Variant) -> bool {
 	ensure_builtin_method(&dictionary_set_method, .Dictionary, cstring("set"), DICTIONARY_SET_HASH)
@@ -601,6 +668,57 @@ dictionary_is_empty :: proc "contextless" (dict: ^Dictionary) -> bool {
 		const_dictionary_ptr(dict),
 		bool,
 	)
+}
+
+dictionary_clear :: proc "contextless" (dict: ^Dictionary) {
+	ensure_builtin_method(
+		&dictionary_clear_method,
+		.Dictionary,
+		cstring("clear"),
+		DICTIONARY_CLEAR_HASH,
+	)
+	call_builtin_method_ptr_no_ret(dictionary_clear_method.method, dictionary_ptr(dict))
+}
+
+dictionary_erase :: proc "contextless" (dict: ^Dictionary, key: ^Variant) -> bool {
+	ensure_builtin_method(
+		&dictionary_erase_method,
+		.Dictionary,
+		cstring("erase"),
+		DICTIONARY_ERASE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		dictionary_erase_method.method,
+		dictionary_ptr(dict),
+		bool,
+		variant_ptr(key),
+	)
+}
+
+// dictionary_get_or_default returns an initialized Variant; call variant_free when done.
+dictionary_get_or_default :: proc "contextless" (
+	dict: ^Dictionary,
+	key, default_value: ^Variant,
+) -> (
+	result: Variant,
+) {
+	ensure_builtin_method(&dictionary_get_method, .Dictionary, cstring("get"), DICTIONARY_GET_HASH)
+	call_builtin_method_ptr_ret_into(
+		dictionary_get_method.method,
+		const_dictionary_ptr(dict),
+		uninitialized_variant_ptr(&result),
+		variant_ptr(key),
+		variant_ptr(default_value),
+	)
+	return
+}
+
+// dictionary_get returns an initialized Variant or Nil when the key is absent;
+// call variant_free when done.
+dictionary_get :: proc "contextless" (dict: ^Dictionary, key: ^Variant) -> (result: Variant) {
+	default_value := variant_nil()
+	defer variant_free(&default_value)
+	return dictionary_get_or_default(dict, key, &default_value)
 }
 
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it

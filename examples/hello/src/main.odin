@@ -299,7 +299,34 @@ register_classes :: proc() {
 	gt.array_push(&arr, &v1)
 	gt.array_push(&arr, &v2)
 	size := gt.array_size(&arr)
-	gd.debug_print(fmt.bprintf(buf[:], "Array size: %v (expect 2)", size))
+	arr_first := gt.array_get(&arr, 0)
+	arr_first_value, arr_first_ok := gt.variant_try_float(&arr_first)
+	arr_has_v1_before_erase := gt.array_has(&arr, &v1)
+	gt.array_erase(&arr, &v1)
+	arr_size_after_erase := gt.array_size(&arr)
+	gt.array_set(&arr, 0, &v1)
+	arr_first_after_set := gt.array_get(&arr, 0)
+	arr_first_after_set_value, arr_first_after_set_ok := gt.variant_try_float(&arr_first_after_set)
+	gt.array_clear(&arr)
+	arr_empty_after_clear := gt.array_is_empty(&arr)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"Array: size=%v get0=%v/%v has10=%v erase_size=%v set0=%v/%v clear_empty=%v",
+			size,
+			arr_first_value,
+			arr_first_ok,
+			arr_has_v1_before_erase,
+			arr_size_after_erase,
+			arr_first_after_set_value,
+			arr_first_after_set_ok,
+			arr_empty_after_clear,
+		),
+	)
+	gt.variant_free(&arr_first_after_set)
+	gt.variant_free(&arr_first)
+	gt.array_push(&arr, &v1)
+	gt.array_push(&arr, &v2)
 	arr_v := gt.variant_from_array(&arr)
 	arr_back, arr_back_ok := gt.variant_try_array(&arr_v)
 	gd.debug_print(fmt.bprintf(buf[:], "variant_try_array(arr_v): %v (expect true)", arr_back_ok))
@@ -317,16 +344,30 @@ register_classes :: proc() {
 	dict_has_key := gt.dictionary_has(&dict, &dict_key)
 	dict_size := gt.dictionary_size(&dict)
 	dict_empty := gt.dictionary_is_empty(&dict)
+	dict_got := gt.dictionary_get(&dict, &dict_key)
+	dict_got_value, dict_got_ok := gt.variant_try_int(&dict_got)
+	dict_erased := gt.dictionary_erase(&dict, &dict_key)
+	dict_size_after_erase := gt.dictionary_size(&dict)
+	_ = gt.dictionary_set(&dict, &dict_key, &dict_value)
+	gt.dictionary_clear(&dict)
+	dict_empty_after_clear := gt.dictionary_is_empty(&dict)
+	_ = gt.dictionary_set(&dict, &dict_key, &dict_value)
 	gd.debug_print(
 		fmt.bprintf(
 			buf[:],
-			"Dictionary: set=%v has=%v size=%v empty=%v (expect true / true / 1 / false)",
+			"Dictionary: set=%v has=%v size=%v empty=%v get=%v/%v erase=%v erase_size=%v clear_empty=%v",
 			dict_set_ok,
 			dict_has_key,
 			dict_size,
 			dict_empty,
+			dict_got_value,
+			dict_got_ok,
+			dict_erased,
+			dict_size_after_erase,
+			dict_empty_after_clear,
 		),
 	)
+	gt.variant_free(&dict_got)
 	dict_v := gt.variant_from_dictionary(&dict)
 	dict_back, dict_back_ok := gt.variant_try_dictionary(&dict_v)
 	gd.debug_print(
