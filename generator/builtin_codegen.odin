@@ -131,7 +131,6 @@ arg_type_map := map[string]string {
 common_type_entries := []struct {
 	godot, odin: string,
 } {
-	{"String", "rawptr"},
 	{"StringName", "rawptr"},
 	{"NodePath", "rawptr"},
 	{"RID", "rawptr"},
@@ -165,22 +164,25 @@ resolve_member_type :: proc(godot_name: string) -> string {
 }
 
 // Resolve a Godot type name to an Odin type for method return values (ABI).
-// Variant returns are owned initialized storage; callers must destroy them with
-// core.variant_free when done.
+// Variant and String returns are owned initialized storage; callers must destroy
+// them with core.variant_free or core.string_free when done.
 resolve_return_type :: proc(godot_name: string) -> string {
+	if godot_name == "String" do return "core.String"
 	if t, ok := arg_type_map[godot_name]; ok {return t}
 	return godot_name
 }
 
-// Resolve a Godot type name to an Odin type for parameters (ABI). Variant
-// parameters are borrowed to avoid unsafe by-value copies of owned storage.
+// Resolve a Godot type name to an Odin type for parameters (ABI). Variant and
+// String parameters are borrowed to avoid unsafe by-value copies of owned storage.
 resolve_param_type :: proc(godot_name: string) -> string {
 	if godot_name == "Variant" do return "^core.Variant"
+	if godot_name == "String" do return "^core.String"
 	return resolve_return_type(godot_name)
 }
 
 param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
 	if godot_type == "Variant" do return fmt.aprintf("core.variant_ptr(%s)", arg_name)
+	if godot_type == "String" do return fmt.aprintf("core.const_string_ptr(%s)", arg_name)
 	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
 }
 
@@ -368,7 +370,7 @@ emit_constructors :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 		// Copy addressable value args to locals. Variant args are borrowed and
 		// passed as pointers to their existing initialized storage.
 		for arg in ctor.arguments {
-			if arg.type == "Variant" do continue
+			if arg.type == "Variant" || arg.type == "String" do continue
 			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
 		}
 
@@ -407,6 +409,13 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 			fmt.sbprintf(
 				b,
 				"// %s_%s returns an initialized Variant; call core.variant_free when done.\n",
+				lower,
+				m.name,
+			)
+		} else if m.return_type == "String" {
+			fmt.sbprintf(
+				b,
+				"// %s_%s returns an initialized String; call core.string_free when done.\n",
 				lower,
 				m.name,
 			)
@@ -467,7 +476,7 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 			fmt.sbprintf(b, "\t_self_ := self_\n")
 		}
 		for arg in m.arguments {
-			if arg.type == "Variant" do continue
+			if arg.type == "Variant" || arg.type == "String" do continue
 			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
 		}
 

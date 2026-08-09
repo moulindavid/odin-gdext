@@ -748,6 +748,26 @@ register_classes :: proc() {
 			gt.string_nocasecmp_to(&gs, &gs_case) == 0,
 		),
 	)
+	generated_html := gbv2.color_to_html(gt.Color{0.25, 0.5, 0.75, 1}, true)
+	generated_html_text, generated_html_ok, generated_html_needed := gt.string_to_utf8(
+		&generated_html,
+		utf8_buf[:],
+	)
+	generated_color := gbv2.color_html(&generated_html)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated String return: %v / %v / %v bytes -> color=(%v,%v,%v,%v)",
+			generated_html_text,
+			generated_html_ok,
+			generated_html_needed,
+			generated_color.r,
+			generated_color.g,
+			generated_color.b,
+			generated_color.a,
+		),
+	)
+	gt.string_free(&generated_html)
 	gt.variant_free(&gsv)
 	gt.string_free(&gs_case)
 	gt.string_free(&gs_needle)

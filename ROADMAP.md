@@ -42,8 +42,8 @@ Remaining implementation order:
 
 3. Stabilize `String` enough for generated APIs.
    - [x] Add a small safe method/operator set needed by generated APIs, such as length/is-empty/compare/hash if present in Godot metadata.
-   - [ ] Define generated API rules for `String` parameters and returns: borrowed input storage, owned initialized return storage, and explicit destruction.
-   - [ ] Add tests/examples proving String-returning generated or handwritten calls are destroyed correctly.
+   - [x] Define generated API rules for `String` parameters and returns: borrowed input storage, owned initialized return storage, and explicit destruction.
+   - [x] Add tests/examples proving String-returning generated or handwritten calls are destroyed correctly.
 
 4. Add `RID` as the next standalone complex value type.
    - [ ] Query Godot metadata and destructor/constructor semantics before implementation.
