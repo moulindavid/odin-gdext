@@ -145,11 +145,11 @@ Implementation order:
      or object-lifetime-sensitive APIs until their safety model is explicit.
 
 6. Generate safe downcasts and class identity helpers.
-   - [ ] Generate wrappers around `core.cast_to` for selected classes, using
+   - [x] Generate wrappers around `core.cast_to` for selected classes, using
      Godot `is_class` checks before reinterpretation.
-   - [ ] Return `(value, ok)` for checked downcasts and treat nil objects as
+   - [x] Return `(value, ok)` for checked downcasts and treat nil objects as
      failed casts.
-   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 7. Generate class constants and enums.
    - [ ] Emit Odin-safe names for class enums and constants.

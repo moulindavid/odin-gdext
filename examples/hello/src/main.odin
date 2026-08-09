@@ -38,7 +38,7 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	position := gt.node2d_get_position(node2d)
 	gt.node2d_set_rotation(node2d, 1.25)
 	rotation := gt.node2d_get_rotation(node2d)
-	buf: [160]u8
+	buf: [256]u8
 	gd.debug_print(
 		fmt.bprintf(
 			buf[:],
@@ -62,6 +62,26 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 			gt.is_nil(gt.Object(parent)),
 			self_is_ancestor,
 			path_to_self_hash,
+		),
+	)
+
+	cast_node2d, cast_node2d_ok := gt.object_try_as_node2d(gt.Object(object))
+	cast_node, cast_node_ok := gt.object_try_as_node(gt.Object(object))
+	nil_object: gt.Object
+	nil_node2d, nil_node2d_ok := gt.object_try_as_node2d(nil_object)
+	downcast_identity_ok :=
+		gt.node2d_as_object(cast_node2d) == object &&
+		gt.node_as_object(cast_node) == object &&
+		gt.node2d_as_object(nil_node2d) == nil
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated downcasts: is_node2d=%v object->Node2D=%v object->Node=%v nil->Node2D=%v identity=%v (expect true,true,true,false,true)",
+			gt.object_is_node2d(gt.Object(object)),
+			cast_node2d_ok,
+			cast_node_ok,
+			nil_node2d_ok,
+			downcast_identity_ok,
 		),
 	)
 

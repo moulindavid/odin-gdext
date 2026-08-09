@@ -1002,6 +1002,22 @@ class_method_supported :: proc(class_name: string, method: ExtensionApiClassMeth
 	return true
 }
 
+
+class_inherits_from :: proc(
+	root: ^ExtensionApiRoot,
+	class: ExtensionApiClass,
+	ancestor_name: string,
+) -> bool {
+	ancestor := class.inherits
+	for len(ancestor) > 0 {
+		if ancestor == ancestor_name do return true
+		ancestor_class, ok := find_class(root, ancestor)
+		if !ok do break
+		ancestor = ancestor_class.inherits
+	}
+	return false
+}
+
 class_proc_prefix :: proc(class_name: string) -> string {
 	b := strings.builder_make(context.temp_allocator)
 	for r, i in class_name {
@@ -1018,6 +1034,79 @@ class_proc_prefix :: proc(class_name: string) -> string {
 		}
 	}
 	return strings.to_string(b)
+}
+
+
+emit_class_downcast :: proc(
+	b: ^strings.Builder,
+	source_name: string,
+	source_type: string,
+	target_name: string,
+	target_type: string,
+) {
+	source_lower := class_proc_prefix(source_name)
+	target_lower := class_proc_prefix(target_name)
+	fmt.sbprintf(
+		b,
+		"%s_is_%s :: proc \"contextless\" (self: %s) -> bool {{\n",
+		source_lower,
+		target_lower,
+		source_type,
+	)
+	strings.write_string(b, "\tif core.ObjectPtr(self) == nil {return false}\n")
+	fmt.sbprintf(
+		b,
+		"\treturn core.is_class(core.ObjectPtr(self), core.static_string_name_ptr(&%s_class_name_data))\n",
+		target_lower,
+	)
+	strings.write_string(b, "}\n\n")
+
+	fmt.sbprintf(
+		b,
+		"%s_try_as_%s :: proc \"contextless\" (self: %s) -> (value: %s, ok: bool) {{\n",
+		source_lower,
+		target_lower,
+		source_type,
+		target_type,
+	)
+	fmt.sbprintf(
+		b,
+		"\treturn core.cast_to(core.ObjectPtr(self), core.static_string_name_ptr(&%s_class_name_data), %s)\n",
+		target_lower,
+		target_type,
+	)
+	strings.write_string(b, "}\n\n")
+}
+
+emit_class_downcasts :: proc(
+	b: ^strings.Builder,
+	root: ^ExtensionApiRoot,
+	selected: map[string]ExtensionApiClass,
+) {
+	strings.write_string(b, "// ---- Checked downcasts and class identity helpers ----\n\n")
+	strings.write_string(
+		b,
+		"// These helpers keep downcasts checked through Object.is_class/core.cast_to.\n",
+	)
+	strings.write_string(b, "// Nil objects always return ok=false for try_as helpers.\n\n")
+
+	for source_name in selected_class_names {
+		source_type := class_handle_expr(source_name)
+
+		for target_name in selected_class_names {
+			if source_name == target_name do continue
+			target_class := selected[target_name]
+			if !class_inherits_from(root, target_class, source_name) do continue
+
+			emit_class_downcast(
+				b,
+				source_name,
+				source_type,
+				target_name,
+				class_handle_expr(target_name),
+			)
+		}
+	}
 }
 
 emit_class_upcast :: proc(b: ^strings.Builder, class: ExtensionApiClass, ancestor: string) {
@@ -1296,6 +1385,8 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 			ancestor = ancestor_class.inherits
 		}
 	}
+
+	emit_class_downcasts(&b, root, selected)
 
 	strings.write_string(
 		&b,

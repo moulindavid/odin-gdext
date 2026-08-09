@@ -92,6 +92,30 @@ node2d_get_rotation :: gclass.node2d_get_rotation
 control_as_canvas_item :: gclass.control_as_canvas_item
 control_as_node :: gclass.control_as_node
 control_as_object :: gclass.control_as_object
+object_is_ref_counted :: gclass.object_is_ref_counted
+object_try_as_ref_counted :: gclass.object_try_as_ref_counted
+object_is_resource :: gclass.object_is_resource
+object_try_as_resource :: gclass.object_try_as_resource
+object_is_node :: gclass.object_is_node
+object_try_as_node :: gclass.object_try_as_node
+object_is_canvas_item :: gclass.object_is_canvas_item
+object_try_as_canvas_item :: gclass.object_try_as_canvas_item
+object_is_node2d :: gclass.object_is_node2d
+object_try_as_node2d :: gclass.object_try_as_node2d
+object_is_control :: gclass.object_is_control
+object_try_as_control :: gclass.object_try_as_control
+ref_counted_is_resource :: gclass.ref_counted_is_resource
+ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
+node_is_canvas_item :: gclass.node_is_canvas_item
+node_try_as_canvas_item :: gclass.node_try_as_canvas_item
+node_is_node2d :: gclass.node_is_node2d
+node_try_as_node2d :: gclass.node_try_as_node2d
+node_is_control :: gclass.node_is_control
+node_try_as_control :: gclass.node_try_as_control
+canvas_item_is_node2d :: gclass.canvas_item_is_node2d
+canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
+canvas_item_is_control :: gclass.canvas_item_is_control
+canvas_item_try_as_control :: gclass.canvas_item_try_as_control
 
 // --- String ---
 string_ptr :: gcore.string_ptr
