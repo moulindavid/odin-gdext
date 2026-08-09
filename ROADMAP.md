@@ -21,45 +21,55 @@ preserve these invariants while adding new bindings.
 
 ## Priority 1 - stabilize core value types - in progress
 
-Implement proper wrappers and ownership rules for:
+Finish the low-level value-type foundation before generating broad class APIs.
+The goal is not to match `godot-rust/gdext` feature-for-feature yet, but to
+have the same kind of safe core: explicit owned storage, pointer helpers,
+Variant conversions, destructor rules, generated API integration, and runtime
+smoke coverage for common Godot value types.
 
-- `Variant`
-  - [x] Initial owned-storage helpers, nil/copy initialization, checked pointer adapters, and ABI tests.
-  - [x] Minimal `CallError` helpers and checked `variant_call` / `variant_construct` wrappers for handwritten Variant APIs.
-  - [x] Generated APIs borrow `^Variant` parameters instead of bit-copying owned storage, and document owned `Variant` returns.
-  - [x] Runtime type inspection and exact-type `try` conversions for bool, int, and float Variants.
-  - [x] Centralized Godot `float` ABI as `GodotReal` for the current Godot 4.7 `float_64` target.
-  - [x] Exact String Variant extraction to caller-provided UTF-8 buffers.
-  - [ ] Richer conversion coverage for object, builtin, and other complex Variant conversions.
-    - [x] Exact Object Variant extraction with `variant_try_object`.
-    - [x] Generated exact-type `{builtin}_try_from_variant` helpers for current memory-compatible builtin types.
-    - [ ] Additional complex conversions for StringName, NodePath, RID, Callable, Signal, Array, Dictionary, and packed arrays.
-- [ ] `String`
-  - [x] Initial owned-storage wrapper, checked pointer adapters, UTF-8 construction/extraction, and Variant conversion helpers.
-  - [ ] Broader String methods/operators and generated API integration.
-- [ ] `StringName`
-  - [x] Initial owned-storage wrapper, checked pointer adapters, cstring UTF-8 construction, and Variant conversion helpers.
-  - [x] Static/non-static naming policy integration for generated and handwritten APIs.
-    - [x] `StaticStringName` wrapper for process-lifetime literals, integrated into core lazy builtin-method lookup and handwritten core helpers.
-    - [x] Replace example/manual registration raw StringName storage with policy helpers.
-    - [x] Generated utility lookup uses `StaticStringName` policy helpers instead of raw storage casts.
-- [ ] `NodePath`
-  - [x] Initial owned-storage wrapper, checked pointer adapters, UTF-8/String construction, copy/free helpers, and Variant conversion helpers.
-  - [x] Primitive method wrappers for `is_absolute`, name/subname counts, and hash.
-  - [x] Owned `StringName`-returning helpers for names/subnames and concatenated names/subnames.
-- [ ] `Array`
-  - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `push`, `size`, and Variant conversion helpers.
-  - [x] Additional safe methods for `get`, `set`, `clear`, `erase`, `has`, and `is_empty`.
-- [ ] `Dictionary`
-  - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `set`, `has`, `size`, `is_empty`, and Variant conversion helpers.
-  - [x] Additional safe methods for `get`, `get_or_default`, `clear`, and `erase`.
-- [ ] packed arrays
-  - [x] Initial owned `PackedByteArray` wrapper, checked pointer adapters, new/copy/free helpers, basic byte methods, and Variant conversion helpers.
-  - [x] Initial owned `PackedInt32Array` wrapper, checked pointer adapters, new/copy/free helpers, basic int32 methods, and Variant conversion helpers.
-  - [x] Initial owned `PackedInt64Array` wrapper, checked pointer adapters, new/copy/free helpers, basic int64 methods, and Variant conversion helpers.
-  - [x] Initial owned `PackedFloat32Array` wrapper, checked pointer adapters, new/copy/free helpers, basic float32 methods, and Variant conversion helpers.
-  - [x] Initial owned `PackedFloat64Array` wrapper, checked pointer adapters, new/copy/free helpers, basic float64 methods, and Variant conversion helpers.
-  - [x] Shared core `Vector2` storage plus initial owned `PackedVector2Array` wrapper, checked pointer adapters, basic Vector2 methods, and Variant conversion helpers.
+Remaining implementation order:
+
+1. Finish shared storage for generated memory-compatible builtin elements.
+   - [ ] Move `Vector3` storage to `core` and make generated `Vector3` alias it.
+   - [ ] Move `Vector4` storage to `core` and make generated `Vector4` alias it.
+   - [ ] Move `Color` storage to `core` and make generated `Color` alias it.
+   - [ ] Keep generated builtin methods using the same shared storage types as handwritten core wrappers.
+
+2. Finish the remaining simple packed arrays.
+   - [ ] `PackedVector3Array`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
+   - [ ] `PackedVector4Array`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
+   - [ ] `PackedColorArray`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
+
+3. Stabilize `String` enough for generated APIs.
+   - [ ] Add a small safe method/operator set needed by generated APIs, such as length/is-empty/compare/hash if present in Godot metadata.
+   - [ ] Define generated API rules for `String` parameters and returns: borrowed input storage, owned initialized return storage, and explicit destruction.
+   - [ ] Add tests/examples proving String-returning generated or handwritten calls are destroyed correctly.
+
+4. Add `RID` as the next standalone complex value type.
+   - [ ] Query Godot metadata and destructor/constructor semantics before implementation.
+   - [ ] Add owned storage or lightweight wrapper according to Godot's ABI semantics.
+   - [ ] Add pointer helpers, construction/copy/free rules, Variant conversions, tests, and smoke coverage where practical.
+
+5. Add `PackedStringArray` after the `String` ownership rules are integrated.
+   - [ ] Owned wrapper, pointer helpers, new/copy/free, basic methods, and Variant conversions.
+   - [ ] Ensure element access does not leak or return references to temporary String storage.
+   - [ ] Add tests and hello smoke coverage.
+
+6. Integrate completed complex value types into generated APIs.
+   - [ ] Replace `rawptr` placeholders for value types whose ownership model is complete.
+   - [ ] Keep `Variant` parameters borrowed as `^core.Variant`; never generate by-value owned Variant bit-copies.
+   - [ ] Emit ownership comments for generated methods returning initialized owned Godot storage.
+   - [ ] Keep generated output deterministic and fix generator/templates rather than generated files.
+
+7. Decide the Priority 1 boundary for `Callable` and `Signal`.
+   - [ ] Investigate constructors, destructors, call/connect behavior, and object lifetime implications.
+   - [ ] If they are self-contained enough, add minimal owned wrappers and Variant conversions.
+   - [ ] If they pull strongly into registration, signals, or virtual dispatch, document the boundary and defer the ergonomic parts to Priority 3/4.
+
+Priority 1 can be considered complete when common value types used by generated
+APIs have explicit ownership rules, CI and hello smoke tests cover the important
+destruction paths, and any remaining raw/unsafe surfaces are intentional and
+documented. :shrug: 
 
 ## Priority 2 - generated class bindings
 
