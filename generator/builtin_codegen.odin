@@ -253,6 +253,10 @@ emit_struct :: proc(
 	real_members: map[string][]ExtensionApiMemberOffsetEntry,
 ) {
 	strings.write_string(b, "// ---- Struct (memory-compatible with Godot) ----\n\n")
+	if c.name == "Vector2" {
+		strings.write_string(b, "Vector2 :: core.Vector2\n\n")
+		return
+	}
 	fmt.sbprintf(b, "%s :: struct {{\n", c.name)
 
 	if entries, ok := real_members[c.name]; ok {

@@ -539,6 +539,40 @@ register_classes :: proc() {
 	gt.variant_free(&floats64_v)
 	gt.packed_float64_array_free(&floats64)
 
+	// Test: owned PackedVector2Array wrapper and Variant extraction
+	vectors2 := gt.packed_vector2_array_new()
+	gt.packed_vector2_array_push(&vectors2, gt.Vector2{3, 4})
+	gt.packed_vector2_array_push(&vectors2, gt.Vector2{-1, 2})
+	vectors2_size := gt.packed_vector2_array_size(&vectors2)
+	vectors2_first := gt.packed_vector2_array_get(&vectors2, 0)
+	gt.packed_vector2_array_set(&vectors2, 1, gt.Vector2{6, 8})
+	vectors2_second_after_set := gt.packed_vector2_array_get(&vectors2, 1)
+	vectors2_v := gt.variant_from_packed_vector2_array(&vectors2)
+	vectors2_back, vectors2_back_ok := gt.variant_try_packed_vector2_array(&vectors2_v)
+	vectors2_back_size: i64 = 0
+	if vectors2_back_ok {
+		vectors2_back_size = gt.packed_vector2_array_size(&vectors2_back)
+		gt.packed_vector2_array_free(&vectors2_back)
+	}
+	gt.packed_vector2_array_clear(&vectors2)
+	vectors2_empty_after_clear := gt.packed_vector2_array_is_empty(&vectors2)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"PackedVector2Array: size=%v get0=(%v,%v) set1=(%v,%v) roundtrip=%v/%v clear_empty=%v",
+			vectors2_size,
+			vectors2_first.x,
+			vectors2_first.y,
+			vectors2_second_after_set.x,
+			vectors2_second_after_set.y,
+			vectors2_back_ok,
+			vectors2_back_size,
+			vectors2_empty_after_clear,
+		),
+	)
+	gt.variant_free(&vectors2_v)
+	gt.packed_vector2_array_free(&vectors2)
+
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))

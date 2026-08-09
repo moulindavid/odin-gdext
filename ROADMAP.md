@@ -59,6 +59,7 @@ Implement proper wrappers and ownership rules for:
   - [x] Initial owned `PackedInt64Array` wrapper, checked pointer adapters, new/copy/free helpers, basic int64 methods, and Variant conversion helpers.
   - [x] Initial owned `PackedFloat32Array` wrapper, checked pointer adapters, new/copy/free helpers, basic float32 methods, and Variant conversion helpers.
   - [x] Initial owned `PackedFloat64Array` wrapper, checked pointer adapters, new/copy/free helpers, basic float64 methods, and Variant conversion helpers.
+  - [x] Shared core `Vector2` storage plus initial owned `PackedVector2Array` wrapper, checked pointer adapters, basic Vector2 methods, and Variant conversion helpers.
 
 ## Priority 2 - generated class bindings
 

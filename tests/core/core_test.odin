@@ -16,6 +16,11 @@ godot_real_matches_current_float64_abi :: proc(t: ^testing.T) {
 }
 
 @(test)
+vector2_matches_generated_storage_layout :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.Vector2), 2 * size_of(f32))
+}
+
+@(test)
 string_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, size_of(gd.StringStorage), gd.GDExtensionString_Size)
 	testing.expect_value(t, size_of(gd.String), gd.GDExtensionString_Size)
@@ -92,6 +97,21 @@ packed_float32_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) 
 		t,
 		len(gd.PackedFloat32ArrayStorage{}),
 		gd.GDExtensionPackedFloat32Array_Size,
+	)
+}
+
+@(test)
+packed_vector2_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedVector2ArrayStorage),
+		gd.GDExtensionPackedVector2Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedVector2Array), gd.GDExtensionPackedVector2Array_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedVector2ArrayStorage{}),
+		gd.GDExtensionPackedVector2Array_Size,
 	)
 }
 
@@ -186,6 +206,14 @@ packed_float64_array_pointer_helpers_preserve_storage_address :: proc(t: ^testin
 	_ = gd.packed_float64_array_ptr(&a)
 	_ = gd.const_packed_float64_array_ptr(&a)
 	_ = gd.uninitialized_packed_float64_array_ptr(&a)
+}
+
+@(test)
+packed_vector2_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedVector2Array
+	_ = gd.packed_vector2_array_ptr(&a)
+	_ = gd.const_packed_vector2_array_ptr(&a)
+	_ = gd.uninitialized_packed_vector2_array_ptr(&a)
 }
 
 @(test)
