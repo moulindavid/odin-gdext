@@ -1030,13 +1030,33 @@ selected_class_methods := []Selected_Class_Method {
 	{"Object", "is_class"},
 	{"Object", "set_meta"},
 	{"Object", "get_meta"},
+	{"RefCounted", "get_reference_count"},
+	{"Resource", "get_path"},
+	{"Resource", "get_rid"},
+	{"Resource", "set_local_to_scene"},
+	{"Resource", "is_local_to_scene"},
 	{"Node", "get_parent"},
 	{"Node", "is_ancestor_of"},
 	{"Node", "get_path_to"},
+	{"CanvasItem", "set_visible"},
+	{"CanvasItem", "is_visible"},
+	{"CanvasItem", "show"},
+	{"CanvasItem", "hide"},
+	{"CanvasItem", "queue_redraw"},
+	{"CanvasItem", "get_canvas"},
 	{"Node2D", "set_position"},
 	{"Node2D", "get_position"},
 	{"Node2D", "set_rotation"},
 	{"Node2D", "get_rotation"},
+	{"Control", "set_custom_minimum_size"},
+	{"Control", "get_custom_minimum_size"},
+	{"Control", "set_focus_mode"},
+	{"Control", "get_focus_mode"},
+	{"Control", "has_focus"},
+	{"Control", "grab_focus"},
+	{"Control", "release_focus"},
+	{"Control", "set_mouse_filter"},
+	{"Control", "get_mouse_filter"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
@@ -1078,6 +1098,16 @@ class_handle_expr :: proc(class_name: string) -> string {
 	return class_name
 }
 
+
+class_enum_type_from_godot :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if !strings.has_prefix(godot_name, "enum::") do return "", false
+	rest := strings.trim_prefix(godot_name, "enum::")
+	parts := strings.split(rest, ".", context.temp_allocator)
+	if len(parts) != 2 do return "", false
+	if !is_selected_class(parts[0]) do return "", false
+	return class_enum_type_name(parts[0], parts[1]), true
+}
+
 class_abi_type_map := map[string]string {
 	"Nil"     = "rawptr",
 	"bool"    = "bool",
@@ -1100,6 +1130,7 @@ class_abi_type_map := map[string]string {
 // - Callable, Signal, varargs, typed arrays, and lifetime-sensitive APIs are deferred.
 resolve_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
 	if godot_name == "" || godot_name == "void" do return "", true
+	if enum_type, enum_ok := class_enum_type_from_godot(godot_name); enum_ok do return enum_type, true
 	if godot_name == "Variant" do return "core.Variant", true
 	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok do return entry.odin, true
 	if is_selected_class(godot_name) do return class_handle_expr(godot_name), true
@@ -1127,11 +1158,17 @@ class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
 	if godot_name == "Callable" || godot_name == "Signal" do return true
 	if strings.has_prefix(godot_name, "typedarray::") do return true
 	if strings.has_prefix(godot_name, "TypedArray") do return true
+	if strings.has_prefix(godot_name, "bitfield::") do return true
 	return false
 }
 
 class_method_deferred_until_safety_model :: proc(class_name, method_name: string) -> bool {
 	if class_name == "Control" && method_name == "force_drag" do return true
+	if class_name == "Resource" && method_name == "duplicate" do return true
+	if class_name == "RefCounted" &&
+	   (method_name == "init_ref" || method_name == "reference" || method_name == "unreference") {
+		return true
+	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
 		return true
 	}

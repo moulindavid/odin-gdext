@@ -83,6 +83,21 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 		),
 	)
 
+	canvas_item := gt.node2d_as_canvas_item(node2d)
+	gt.canvas_item_hide(canvas_item)
+	hidden := gt.canvas_item_is_visible(canvas_item)
+	gt.canvas_item_show(canvas_item)
+	shown := gt.canvas_item_is_visible(canvas_item)
+	gt.canvas_item_queue_redraw(canvas_item)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated CanvasItem mapping: hidden=%v shown=%v (expect false,true)",
+			hidden,
+			shown,
+		),
+	)
+
 	meta_name := gt.string_name_from_utf8_cstring(cstring("odin_meta_value"))
 	meta_value := gt.variant_from_int(1234)
 	gt.object_set_meta(gt.Object(object), &meta_name, &meta_value)

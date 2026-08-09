@@ -166,11 +166,11 @@ Implementation order:
      internal generated packages directly.
 
 9. Expand class coverage incrementally.
-   - [ ] After `Object`/`Node`/`Node2D` works, add `CanvasItem`, `Control`,
+   - [x] After `Object`/`Node`/`Node2D` works, add `CanvasItem`, `Control`,
      `Resource`, `RefCounted`, and other common scene/resource classes.
-   - [ ] Avoid generating the full 1000+ class API until skip rules, type
+   - [x] Avoid generating the full 1000+ class API until skip rules, type
      mapping, inheritance helpers, and smoke coverage are stable.
-   - [ ] Prefer fixing generator logic over patching generated files manually.
+   - [x] Prefer fixing generator logic over patching generated files manually.
 
 Priority 2 is complete when a small but useful generated class API can be used
 from the hello extension, class wrappers preserve object lifetime safety, and CI
