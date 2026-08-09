@@ -379,6 +379,38 @@ register_classes :: proc() {
 	gt.variant_free(&dict_value)
 	gt.dictionary_free(&dict)
 
+	// Test: owned PackedByteArray wrapper and Variant extraction
+	bytes := gt.packed_byte_array_new()
+	gt.packed_byte_array_push(&bytes, 7)
+	gt.packed_byte_array_push(&bytes, 42)
+	bytes_size := gt.packed_byte_array_size(&bytes)
+	bytes_first := gt.packed_byte_array_get(&bytes, 0)
+	gt.packed_byte_array_set(&bytes, 1, 99)
+	bytes_second_after_set := gt.packed_byte_array_get(&bytes, 1)
+	bytes_v := gt.variant_from_packed_byte_array(&bytes)
+	bytes_back, bytes_back_ok := gt.variant_try_packed_byte_array(&bytes_v)
+	bytes_back_size: i64 = 0
+	if bytes_back_ok {
+		bytes_back_size = gt.packed_byte_array_size(&bytes_back)
+		gt.packed_byte_array_free(&bytes_back)
+	}
+	gt.packed_byte_array_clear(&bytes)
+	bytes_empty_after_clear := gt.packed_byte_array_is_empty(&bytes)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"PackedByteArray: size=%v get0=%v set1=%v roundtrip=%v/%v clear_empty=%v",
+			bytes_size,
+			bytes_first,
+			bytes_second_after_set,
+			bytes_back_ok,
+			bytes_back_size,
+			bytes_empty_after_clear,
+		),
+	)
+	gt.variant_free(&bytes_v)
+	gt.packed_byte_array_free(&bytes)
+
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))

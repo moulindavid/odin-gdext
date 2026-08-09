@@ -129,8 +129,12 @@ Current codegen is intentionally incomplete:
   owned-storage pattern plus `dictionary_set`, `dictionary_get`, `dictionary_get_or_default`,
   `dictionary_has`, `dictionary_erase`, `dictionary_clear`, `dictionary_size`,
   `dictionary_is_empty`, `variant_from_dictionary`, and `variant_try_dictionary`.
-  Broader methods, typed arrays/dictionaries, packed arrays, and generated API integration
-  are still pending.
+  `PackedByteArray` has an initial owned-storage wrapper (`packed_byte_array_new`,
+  `packed_byte_array_copy`, `packed_byte_array_free`, `packed_byte_array_push`,
+  `packed_byte_array_get`, `packed_byte_array_set`, `packed_byte_array_clear`,
+  `packed_byte_array_size`, `packed_byte_array_is_empty`, `variant_from_packed_byte_array`,
+  and `variant_try_packed_byte_array`). Broader methods, typed arrays/dictionaries,
+  the other packed arrays, and generated API integration are still pending.
 
 ## Architecture
 

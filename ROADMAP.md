@@ -53,6 +53,7 @@ Implement proper wrappers and ownership rules for:
   - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `set`, `has`, `size`, `is_empty`, and Variant conversion helpers.
   - [x] Additional safe methods for `get`, `get_or_default`, `clear`, and `erase`.
 - [ ] packed arrays
+  - [x] Initial owned `PackedByteArray` wrapper, checked pointer adapters, new/copy/free helpers, basic byte methods, and Variant conversion helpers.
 
 ## Priority 2 - generated class bindings
 

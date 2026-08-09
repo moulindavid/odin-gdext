@@ -24,6 +24,8 @@ ArrayStorage :: gcore.ArrayStorage
 Array :: gcore.Array
 DictionaryStorage :: gcore.DictionaryStorage
 Dictionary :: gcore.Dictionary
+PackedByteArrayStorage :: gcore.PackedByteArrayStorage
+PackedByteArray :: gcore.PackedByteArray
 StringRepr :: gcore.StringRepr
 
 // --- Core functions ---
@@ -114,6 +116,22 @@ dictionary_erase :: gcore.dictionary_erase
 dictionary_get_or_default :: gcore.dictionary_get_or_default
 dictionary_get :: gcore.dictionary_get
 
+// --- PackedByteArray ---
+packed_byte_array_ptr :: gcore.packed_byte_array_ptr
+const_packed_byte_array_ptr :: gcore.const_packed_byte_array_ptr
+uninitialized_packed_byte_array_ptr :: gcore.uninitialized_packed_byte_array_ptr
+packed_byte_array_init_new :: gcore.packed_byte_array_init_new
+packed_byte_array_new :: gcore.packed_byte_array_new
+packed_byte_array_init_copy :: gcore.packed_byte_array_init_copy
+packed_byte_array_copy :: gcore.packed_byte_array_copy
+packed_byte_array_free :: gcore.packed_byte_array_free
+packed_byte_array_size :: gcore.packed_byte_array_size
+packed_byte_array_is_empty :: gcore.packed_byte_array_is_empty
+packed_byte_array_clear :: gcore.packed_byte_array_clear
+packed_byte_array_get :: gcore.packed_byte_array_get
+packed_byte_array_set :: gcore.packed_byte_array_set
+packed_byte_array_push :: gcore.packed_byte_array_push
+
 // --- Variant ---
 variant_type :: gcore.variant_type
 variant_is_type :: gcore.variant_is_type
@@ -133,6 +151,7 @@ variant_from_string_name :: gcore.variant_from_string_name
 variant_from_node_path :: gcore.variant_from_node_path
 variant_from_array :: gcore.variant_from_array
 variant_from_dictionary :: gcore.variant_from_dictionary
+variant_from_packed_byte_array :: gcore.variant_from_packed_byte_array
 variant_from_utf8 :: gcore.variant_from_utf8
 variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
@@ -149,6 +168,8 @@ variant_to_array :: gcore.variant_to_array
 variant_try_array :: gcore.variant_try_array
 variant_to_dictionary :: gcore.variant_to_dictionary
 variant_try_dictionary :: gcore.variant_try_dictionary
+variant_to_packed_byte_array :: gcore.variant_to_packed_byte_array
+variant_try_packed_byte_array :: gcore.variant_try_packed_byte_array
 variant_string_utf8_len :: gcore.variant_string_utf8_len
 variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float
