@@ -95,21 +95,21 @@ _ready :: proc(self: Player) {
 Implementation order:
 
 1. Parse class metadata from `extension_api.json`.
-   - [ ] Add generator structs for `classes`, `singletons`, class methods,
+   - [x] Add generator structs for `classes`, `singletons`, class methods,
      constants, enums, inheritance, return values, arguments, hashes, and flags
      needed for class generation.
-   - [ ] Inspect representative metadata for `Object`, `Node`, `Node2D`,
+   - [x] Inspect representative metadata for `Object`, `Node`, `Node2D`,
      `CanvasItem`, `Resource`, and `RefCounted` before emitting broad output.
    - [ ] Keep generation deterministic and report or skip unsupported method
      shapes explicitly.
 
 2. Generate minimal class handle files.
-   - [ ] Add a generated class package such as `bindings/classes`.
-   - [ ] Generate borrowed object handle types using the existing model:
+   - [x] Add a generated class package such as `bindings/classes`.
+   - [x] Generate borrowed object handle types using the existing model:
      `Object` as `core.Object`, other classes as `distinct core.ObjectPtr`.
-   - [ ] Generate explicit upcast helpers such as `node2d_as_node`,
+   - [x] Generate explicit upcast helpers such as `node2d_as_node`,
      `node2d_as_canvas_item`, and `node2d_as_object`.
-   - [ ] Document that generated class handles do not own or free Godot objects.
+   - [x] Document that generated class handles do not own or free Godot objects.
 
 3. Generate class binding initialization.
    - [ ] Generate process-lifetime `StaticStringName` storage for class and

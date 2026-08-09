@@ -12,6 +12,8 @@ import "core:strings"
 
 ExtensionApiRoot :: struct {
 	builtin_classes:              []ExtensionApiBuiltinClass `json:"builtin_classes"`,
+	classes:                      []ExtensionApiClass `json:"classes"`,
+	singletons:                   []ExtensionApiSingleton `json:"singletons"`,
 	utility_functions:            []ExtensionApiUtilityFunction `json:"utility_functions"`,
 	builtin_class_member_offsets: []ExtensionApiMemberOffsets `json:"builtin_class_member_offsets"`,
 }
@@ -68,6 +70,39 @@ ExtensionApiConstant :: struct {
 	name:  string `json:"name"`,
 	type:  string `json:"type"`,
 	value: string `json:"value"`,
+}
+
+ExtensionApiClass :: struct {
+	name:      string `json:"name"`,
+	inherits:  string `json:"inherits,omitempty"`,
+	methods:   []ExtensionApiClassMethod `json:"methods,omitempty"`,
+	enums:     []ExtensionApiEnum `json:"enums,omitempty"`,
+	constants: []ExtensionApiClassConstant `json:"constants,omitempty"`,
+}
+
+ExtensionApiClassMethod :: struct {
+	name:         string `json:"name"`,
+	return_value: ExtensionApiClassReturnValue `json:"return_value,omitempty"`,
+	is_static:    bool `json:"is_static,omitempty"`,
+	is_vararg:    bool `json:"is_vararg,omitempty"`,
+	is_virtual:   bool `json:"is_virtual,omitempty"`,
+	hash:         i64 `json:"hash"`,
+	arguments:    []ExtensionApiMethodArg `json:"arguments,omitempty"`,
+}
+
+ExtensionApiClassReturnValue :: struct {
+	type: string `json:"type,omitempty"`,
+}
+
+ExtensionApiClassConstant :: struct {
+	name:  string `json:"name"`,
+	type:  string `json:"type,omitempty"`,
+	value: json.Value `json:"value"`,
+}
+
+ExtensionApiSingleton :: struct {
+	name: string `json:"name"`,
+	type: string `json:"type"`,
 }
 
 ExtensionApiUtilityFunction :: struct {
@@ -822,6 +857,151 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	return true
 }
 
+
+// ---------------------------------------------------------------------------
+// Class handle codegen
+// ---------------------------------------------------------------------------
+
+selected_class_names := []string {
+	"Object",
+	"RefCounted",
+	"Resource",
+	"Node",
+	"CanvasItem",
+	"Node2D",
+	"Control",
+}
+
+is_selected_class :: proc(name: string) -> bool {
+	for selected in selected_class_names {
+		if selected == name do return true
+	}
+	return false
+}
+
+find_class :: proc(root: ^ExtensionApiRoot, name: string) -> (class: ExtensionApiClass, ok: bool) {
+	for c in root.classes {
+		if c.name == name do return c, true
+	}
+	return {}, false
+}
+
+class_type_expr :: proc(class_name: string) -> string {
+	if class_name == "Object" do return "core.Object"
+	return fmt.aprintf("distinct core.ObjectPtr")
+}
+
+class_handle_expr :: proc(class_name: string) -> string {
+	if class_name == "Object" do return "core.Object"
+	return class_name
+}
+
+class_proc_prefix :: proc(class_name: string) -> string {
+	b := strings.builder_make(context.temp_allocator)
+	for r, i in class_name {
+		if r >= 'A' && r <= 'Z' {
+			if i > 0 {
+				prev := class_name[i - 1]
+				if prev >= 'a' && prev <= 'z' {
+					strings.write_byte(&b, '_')
+				}
+			}
+			strings.write_rune(&b, r + 32)
+		} else {
+			strings.write_rune(&b, r)
+		}
+	}
+	return strings.to_string(b)
+}
+
+emit_class_upcast :: proc(b: ^strings.Builder, class: ExtensionApiClass, ancestor: string) {
+	lower := class_proc_prefix(class.name)
+	ancestor_lower := class_proc_prefix(ancestor)
+	ancestor_type := class_handle_expr(ancestor)
+	fmt.sbprintf(
+		b,
+		"%s_as_%s :: proc \"contextless\" (self: %s) -> %s {{\n",
+		lower,
+		ancestor_lower,
+		class.name,
+		ancestor_type,
+	)
+	fmt.sbprintf(b, "\treturn %s(self)\n", ancestor_type)
+	strings.write_string(b, "}\n\n")
+}
+
+generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
+	path := "bindings/classes/classes.odin"
+
+	b := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&b)
+
+	strings.write_string(
+		&b,
+		"// bindings/classes/classes.odin -- selected Godot class handle bindings.\n",
+	)
+	strings.write_string(&b, "// Auto-generated from extension_api.json. DO NOT EDIT.\n\n")
+	strings.write_string(&b, "package godot_bindings_classes\n\n")
+	strings.write_string(&b, "import core \"godot:core\"\n\n")
+	strings.write_string(
+		&b,
+		"// Generated class handles are borrowed views over Godot-owned objects.\n",
+	)
+	strings.write_string(
+		&b,
+		"// They do not own, retain, unref, or free the underlying object.\n\n",
+	)
+
+	selected := make(map[string]ExtensionApiClass, len(selected_class_names))
+	defer delete(selected)
+	for name in selected_class_names {
+		class, ok := find_class(root, name)
+		if !ok {
+			fmt.eprintfln("ERROR: class %q missing from extension_api.json", name)
+			return false
+		}
+		selected[name] = class
+	}
+
+	for name in selected_class_names {
+		class := selected[name]
+		fmt.sbprintf(
+			&b,
+			"// %s inherits %s.\n",
+			class.name,
+			class.inherits if len(class.inherits) > 0 else "<none>",
+		)
+		fmt.sbprintf(&b, "%s :: %s\n\n", class.name, class_type_expr(class.name))
+	}
+
+	for name in selected_class_names {
+		class := selected[name]
+		if class.name == "Object" do continue
+
+		strings.write_string(&b, "// ---- ")
+		strings.write_string(&b, class.name)
+		strings.write_string(&b, " upcasts ----\n\n")
+
+		ancestor := class.inherits
+		for len(ancestor) > 0 {
+			if is_selected_class(ancestor) {
+				emit_class_upcast(&b, class, ancestor)
+			}
+			ancestor_class, ok := find_class(root, ancestor)
+			if !ok do break
+			ancestor = ancestor_class.inherits
+		}
+	}
+
+	err := os.write_entire_file(path, transmute([]byte)strings.to_string(b))
+	if err != nil {
+		fmt.eprintfln("ERROR: %v", err)
+		return false
+	}
+	fmt.printfln("  %s  (%d class handles)", path, len(selected_class_names))
+	return true
+}
+
 // ---------------------------------------------------------------------------
 // Entry point -- called from main.odin for `--builtin` flag.
 // ---------------------------------------------------------------------------
@@ -856,6 +1036,7 @@ generate_builtin_bindings :: proc(json_path: string) -> bool {
 	}
 
 	if !generate_utility_bindings(&root) {return false}
+	if !generate_class_bindings(&root) {return false}
 
 	return true
 }

@@ -22,6 +22,7 @@ INTERFACE_OUT  := core/interface_defs.odin core/interface.odin
 CODEGEN        := bin/godot-codegen
 EXTENSION_API  := extension_api.json
 BUILTIN_STAMP  := bindings/builtin/.stamp
+CLASSES_STAMP  := bindings/classes/.stamp
 
 # Build the codegen tool itself.
 $(CODEGEN): $(wildcard generator/*.odin generator/**/*.odin)
@@ -36,9 +37,10 @@ $(INTERFACE_OUT): $(INTERFACE_JSON) $(CODEGEN)
 # Generate builtin type + utility function bindings from extension_api.json.
 $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 	@echo ">> Generating builtin + utility bindings..."
-	@mkdir -p bindings/builtin
+	@mkdir -p bindings/builtin bindings/classes
 	$(CODEGEN) --builtin $(EXTENSION_API)
 	@touch $(BUILTIN_STAMP)
+	@touch $(CLASSES_STAMP)
 
 .PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot test-unit hello prepare-hello-cache test-hello ci clean
 
@@ -85,6 +87,7 @@ check-generator:
 check-bindings: interface builtins
 	$(ODIN) check bindings -no-entry-point $(ODIN_CHECK_FLAGS)
 	$(ODIN) check bindings/builtin -no-entry-point $(ODIN_CHECK_FLAGS)
+	$(ODIN) check bindings/classes -no-entry-point $(ODIN_CHECK_FLAGS)
 
 # Type-check the public facade package.
 check-godot: interface builtins
@@ -136,6 +139,7 @@ clean:
 	rm -f examples/hello/*.uid
 	rm -f core/interface_defs.odin core/interface.odin
 	rm -f bindings/builtin/*.odin bindings/utilities.odin
-	rm -f bindings/builtin/.stamp
+	rm -f bindings/classes/*.odin
+	rm -f bindings/builtin/.stamp bindings/classes/.stamp
 	rm -f extension_api.json
 	rm -f bin/godot-codegen
