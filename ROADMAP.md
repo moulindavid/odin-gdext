@@ -56,10 +56,10 @@ Remaining implementation order:
    - [x] Add tests and hello smoke coverage.
 
 6. Integrate completed complex value types into generated APIs.
-   - [ ] Replace `rawptr` placeholders for value types whose ownership model is complete.
-   - [ ] Keep `Variant` parameters borrowed as `^core.Variant`; never generate by-value owned Variant bit-copies.
-   - [ ] Emit ownership comments for generated methods returning initialized owned Godot storage.
-   - [ ] Keep generated output deterministic and fix generator/templates rather than generated files.
+   - [x] Replace `rawptr` placeholders for value types whose ownership model is complete.
+   - [x] Keep `Variant` parameters borrowed as `^core.Variant`; never generate by-value owned Variant bit-copies.
+   - [x] Emit ownership comments for generated methods returning initialized owned Godot storage.
+   - [x] Keep generated output deterministic and fix generator/templates rather than generated files.
 
 7. Decide the Priority 1 boundary for `Callable` and `Signal`.
    - [ ] Investigate constructors, destructors, call/connect behavior, and object lifetime implications.

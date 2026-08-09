@@ -114,9 +114,9 @@ Current codegen is intentionally incomplete:
   `String` has an initial owned-storage wrapper (`string_from_utf8`,
   `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`)
   plus safe borrowed-input method wrappers for length, emptiness, hash, compare,
-  prefix/suffix, and contains checks. Generated builtin APIs now use borrowed
-  `^core.String` parameters and owned `core.String` returns with explicit
-  `core.string_free` destruction comments.
+  prefix/suffix, and contains checks. Generated builtin APIs now use borrowed parameters for completed owned core
+  values (`^core.String`, `^core.Array`, `^core.PackedStringArray`, etc.) and
+  owned initialized returns with explicit destruction comments.
   `StringName` has an initial owned, non-static wrapper (`string_name_from_utf8_cstring`,
   `string_name_free`, `variant_from_string_name`, and `variant_try_string_name`) plus
   a `StaticStringName` wrapper for process-lifetime literals used by core/generated
