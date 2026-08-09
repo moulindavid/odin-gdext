@@ -100,7 +100,7 @@ Implementation order:
      needed for class generation.
    - [x] Inspect representative metadata for `Object`, `Node`, `Node2D`,
      `CanvasItem`, `Resource`, and `RefCounted` before emitting broad output.
-   - [ ] Keep generation deterministic and report or skip unsupported method
+   - [x] Keep generation deterministic and report or skip unsupported method
      shapes explicitly.
 
 2. Generate minimal class handle files.
