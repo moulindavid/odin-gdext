@@ -132,9 +132,9 @@ Implementation order:
      extension.
 
 5. Define class method type-mapping rules.
-   - [ ] Object/class parameters and returns are borrowed handles by value; no
+   - [x] Object/class parameters and returns are borrowed handles by value; no
      generated wrapper takes ownership of a Godot object.
-   - [ ] Completed owned value types keep the Priority 1 rule: borrowed
+   - [x] Completed owned value types keep the Priority 1 rule: borrowed
      pointer parameters and owned initialized return values with explicit
      destruction comments.
    - [ ] Primitive and memory-compatible builtin values are passed by value

@@ -46,6 +46,22 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 		),
 	)
 
+	node := gt.node2d_as_node(node2d)
+	parent := gt.node_get_parent(node)
+	self_is_ancestor := gt.node_is_ancestor_of(node, node)
+	path_to_self := gt.node_get_path_to(node, node, false)
+	path_to_self_hash := gt.node_path_hash(&path_to_self)
+	gt.node_path_free(&path_to_self)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated Node mapping: parent_nil=%v self_ancestor=%v path_hash=%v (expect true,false,owned)",
+			gt.is_nil(gt.Object(parent)),
+			self_is_ancestor,
+			path_to_self_hash,
+		),
+	)
+
 	self_ := new_clone(HelloData{object = object})
 	gd.set_instance(object, hello_class_name, self_)
 	gd.set_instance_binding(object, self_, &hello_instance_binding_callbacks)

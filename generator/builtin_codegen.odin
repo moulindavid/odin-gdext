@@ -880,6 +880,9 @@ Selected_Class_Method :: struct {
 selected_class_methods := []Selected_Class_Method {
 	{"Object", "get_class"},
 	{"Object", "is_class"},
+	{"Node", "get_parent"},
+	{"Node", "is_ancestor_of"},
+	{"Node", "get_path_to"},
 	{"Node2D", "set_position"},
 	{"Node2D", "get_position"},
 }
@@ -937,6 +940,11 @@ class_abi_type_map := map[string]string {
 	"Color"   = "core.Color",
 }
 
+// Class method mapping rules:
+// - Godot Object/class params and returns are borrowed handles by value.
+// - Completed owned value params are borrowed pointers; returns are owned storage.
+// - Variant params are borrowed pointers; Variant returns are owned storage.
+// - Primitive and memory-compatible builtin values are passed by value.
 resolve_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
 	if godot_name == "" || godot_name == "void" do return "", true
 	if godot_name == "Variant" do return "core.Variant", true
@@ -1147,6 +1155,13 @@ emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 					entry_value.godot,
 					entry_value.free,
 				)
+			} else if is_selected_class(method.return_value.type) {
+				fmt.sbprintf(
+					b,
+					"// %s returns a borrowed %s handle; do not free or unref it.\n",
+					proc_name,
+					method.return_value.type,
+				)
 			}
 		}
 
@@ -1209,9 +1224,10 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 		&b,
 		"// Generated class handles are borrowed views over Godot-owned objects.\n",
 	)
+	strings.write_string(&b, "// They do not own, retain, unref, or free the underlying object.\n")
 	strings.write_string(
 		&b,
-		"// They do not own, retain, unref, or free the underlying object.\n\n",
+		"// Class method object parameters and returns are borrowed handles by value.\n\n",
 	)
 
 	if !emit_class_binding_storage(&b, root) {return false}

@@ -73,6 +73,9 @@ ref_counted_as_object :: gclass.ref_counted_as_object
 resource_as_ref_counted :: gclass.resource_as_ref_counted
 resource_as_object :: gclass.resource_as_object
 node_as_object :: gclass.node_as_object
+node_get_parent :: gclass.node_get_parent
+node_is_ancestor_of :: gclass.node_is_ancestor_of
+node_get_path_to :: gclass.node_get_path_to
 canvas_item_as_node :: gclass.canvas_item_as_node
 canvas_item_as_object :: gclass.canvas_item_as_object
 node2d_as_canvas_item :: gclass.node2d_as_canvas_item
