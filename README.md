@@ -112,8 +112,9 @@ Current codegen is intentionally incomplete:
   `{builtin}_try_from_variant` helpers for current memory-compatible builtin types
   are available, but broader complex conversion coverage is still incomplete.
   `String` has an initial owned-storage wrapper (`string_from_utf8`,
-  `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`),
-  but broader String methods/operators and generated API integration are still pending.
+  `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`)
+  plus safe borrowed-input method wrappers for length, emptiness, hash, compare,
+  prefix/suffix, and contains checks. Generated API integration is still pending.
   `StringName` has an initial owned, non-static wrapper (`string_name_from_utf8_cstring`,
   `string_name_free`, `variant_from_string_name`, and `variant_try_string_name`) plus
   a `StaticStringName` wrapper for process-lifetime literals used by core/generated

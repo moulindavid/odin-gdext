@@ -706,6 +706,10 @@ register_classes :: proc() {
 
 	// Test: owned String wrapper and String Variant extraction
 	gs := gt.string_from_utf8("Owned Godot String")
+	gs_prefix := gt.string_from_utf8("Owned")
+	gs_suffix := gt.string_from_utf8("String")
+	gs_needle := gt.string_from_utf8("Godot")
+	gs_case := gt.string_from_utf8("owned godot string")
 	string_text, string_ok, string_needed := gt.string_to_utf8(&gs, utf8_buf[:])
 	gd.debug_print(
 		fmt.bprintf(
@@ -731,7 +735,24 @@ register_classes :: proc() {
 			),
 		)
 	}
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"string methods: len=%v empty=%v hash>0=%v begins=%v ends=%v contains=%v nocase=%v",
+			gt.string_length(&gs),
+			gt.string_is_empty(&gs),
+			gt.string_hash(&gs) != 0,
+			gt.string_begins_with(&gs, &gs_prefix),
+			gt.string_ends_with(&gs, &gs_suffix),
+			gt.string_contains(&gs, &gs_needle),
+			gt.string_nocasecmp_to(&gs, &gs_case) == 0,
+		),
+	)
 	gt.variant_free(&gsv)
+	gt.string_free(&gs_case)
+	gt.string_free(&gs_needle)
+	gt.string_free(&gs_suffix)
+	gt.string_free(&gs_prefix)
 	gt.string_free(&gs)
 
 	// Test: owned StringName wrapper and StringName Variant extraction

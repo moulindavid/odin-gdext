@@ -68,6 +68,16 @@ string_from_utf8 :: gcore.string_from_utf8
 string_utf8_len :: gcore.string_utf8_len
 string_to_utf8 :: gcore.string_to_utf8
 string_free :: gcore.string_free
+string_length :: gcore.string_length
+string_is_empty :: gcore.string_is_empty
+string_hash :: gcore.string_hash
+string_casecmp_to :: gcore.string_casecmp_to
+string_nocasecmp_to :: gcore.string_nocasecmp_to
+string_naturalcasecmp_to :: gcore.string_naturalcasecmp_to
+string_naturalnocasecmp_to :: gcore.string_naturalnocasecmp_to
+string_begins_with :: gcore.string_begins_with
+string_ends_with :: gcore.string_ends_with
+string_contains :: gcore.string_contains
 
 // --- StringName ---
 string_name_ptr :: gcore.string_name_ptr

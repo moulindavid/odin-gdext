@@ -3,7 +3,12 @@
 // https://docs.godotengine.org/fr/4.x/classes/class_variant.html
 package godot_core
 
-// NodePath builtin method hashes from Godot 4.7 `extension_api.json`.
+// Builtin method hashes from Godot 4.7 `extension_api.json`.
+STRING_LENGTH_HASH :: 3173160232
+STRING_IS_EMPTY_HASH :: 3918633141
+STRING_HASH_HASH :: 3173160232
+STRING_COMPARE_HASH :: 2920860731
+STRING_MATCH_HASH :: 2566493496
 NODE_PATH_IS_ABSOLUTE_HASH :: 3918633141
 NODE_PATH_GET_NAME_HASH :: 2948586938
 NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
@@ -212,6 +217,143 @@ string_to_utf8 :: proc "contextless" (
 
 string_free :: proc "contextless" (s: ^String) {
 	destroy_builtin(.String, string_ptr(s))
+}
+
+
+string_length_method: BuiltinMethod
+string_is_empty_method: BuiltinMethod
+string_hash_method: BuiltinMethod
+string_casecmp_to_method: BuiltinMethod
+string_nocasecmp_to_method: BuiltinMethod
+string_naturalcasecmp_to_method: BuiltinMethod
+string_naturalnocasecmp_to_method: BuiltinMethod
+string_begins_with_method: BuiltinMethod
+string_ends_with_method: BuiltinMethod
+string_contains_method: BuiltinMethod
+
+string_length :: proc "contextless" (s: ^String) -> i64 {
+	ensure_builtin_method(&string_length_method, .String, cstring("length"), STRING_LENGTH_HASH)
+	return call_builtin_method_ptr_ret(string_length_method.method, const_string_ptr(s), i64)
+}
+
+string_is_empty :: proc "contextless" (s: ^String) -> bool {
+	ensure_builtin_method(
+		&string_is_empty_method,
+		.String,
+		cstring("is_empty"),
+		STRING_IS_EMPTY_HASH,
+	)
+	return call_builtin_method_ptr_ret(string_is_empty_method.method, const_string_ptr(s), bool)
+}
+
+string_hash :: proc "contextless" (s: ^String) -> i64 {
+	ensure_builtin_method(&string_hash_method, .String, cstring("hash"), STRING_HASH_HASH)
+	return call_builtin_method_ptr_ret(string_hash_method.method, const_string_ptr(s), i64)
+}
+
+string_casecmp_to :: proc "contextless" (s, other: ^String) -> i64 {
+	ensure_builtin_method(
+		&string_casecmp_to_method,
+		.String,
+		cstring("casecmp_to"),
+		STRING_COMPARE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		string_casecmp_to_method.method,
+		const_string_ptr(s),
+		i64,
+		const_string_ptr(other),
+	)
+}
+
+string_nocasecmp_to :: proc "contextless" (s, other: ^String) -> i64 {
+	ensure_builtin_method(
+		&string_nocasecmp_to_method,
+		.String,
+		cstring("nocasecmp_to"),
+		STRING_COMPARE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		string_nocasecmp_to_method.method,
+		const_string_ptr(s),
+		i64,
+		const_string_ptr(other),
+	)
+}
+
+string_naturalcasecmp_to :: proc "contextless" (s, other: ^String) -> i64 {
+	ensure_builtin_method(
+		&string_naturalcasecmp_to_method,
+		.String,
+		cstring("naturalcasecmp_to"),
+		STRING_COMPARE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		string_naturalcasecmp_to_method.method,
+		const_string_ptr(s),
+		i64,
+		const_string_ptr(other),
+	)
+}
+
+string_naturalnocasecmp_to :: proc "contextless" (s, other: ^String) -> i64 {
+	ensure_builtin_method(
+		&string_naturalnocasecmp_to_method,
+		.String,
+		cstring("naturalnocasecmp_to"),
+		STRING_COMPARE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		string_naturalnocasecmp_to_method.method,
+		const_string_ptr(s),
+		i64,
+		const_string_ptr(other),
+	)
+}
+
+string_begins_with :: proc "contextless" (s, text: ^String) -> bool {
+	ensure_builtin_method(
+		&string_begins_with_method,
+		.String,
+		cstring("begins_with"),
+		STRING_MATCH_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		string_begins_with_method.method,
+		const_string_ptr(s),
+		bool,
+		const_string_ptr(text),
+	)
+}
+
+string_ends_with :: proc "contextless" (s, text: ^String) -> bool {
+	ensure_builtin_method(
+		&string_ends_with_method,
+		.String,
+		cstring("ends_with"),
+		STRING_MATCH_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		string_ends_with_method.method,
+		const_string_ptr(s),
+		bool,
+		const_string_ptr(text),
+	)
+}
+
+string_contains :: proc "contextless" (s, what: ^String) -> bool {
+	ensure_builtin_method(
+		&string_contains_method,
+		.String,
+		cstring("contains"),
+		STRING_MATCH_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		string_contains_method.method,
+		const_string_ptr(s),
+		bool,
+		const_string_ptr(what),
+	)
 }
 
 // StringNameStorage is raw storage large enough for Godot's ABI StringName handle.
