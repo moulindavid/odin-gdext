@@ -11,6 +11,31 @@ variant_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+godot_real_matches_current_float64_abi :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.GodotReal), size_of(f64))
+}
+
+@(test)
+vector2_matches_generated_storage_layout :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.Vector2), 2 * size_of(f32))
+}
+
+@(test)
+vector3_matches_generated_storage_layout :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.Vector3), 3 * size_of(f32))
+}
+
+@(test)
+vector4_matches_generated_storage_layout :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.Vector4), 4 * size_of(f32))
+}
+
+@(test)
+color_matches_generated_storage_layout :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.Color), 4 * size_of(f32))
+}
+
+@(test)
 string_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, size_of(gd.StringStorage), gd.GDExtensionString_Size)
 	testing.expect_value(t, size_of(gd.String), gd.GDExtensionString_Size)
@@ -33,6 +58,13 @@ node_path_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+rid_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.RIDStorage), gd.GDExtensionRID_Size)
+	testing.expect_value(t, size_of(gd.RID), gd.GDExtensionRID_Size)
+	testing.expect_value(t, len(gd.RIDStorage{}), gd.GDExtensionRID_Size)
+}
+
+@(test)
 array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, size_of(gd.ArrayStorage), gd.GDExtensionArray_Size)
 	testing.expect_value(t, size_of(gd.Array), gd.GDExtensionArray_Size)
@@ -44,6 +76,121 @@ dictionary_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, size_of(gd.DictionaryStorage), gd.GDExtensionDictionary_Size)
 	testing.expect_value(t, size_of(gd.Dictionary), gd.GDExtensionDictionary_Size)
 	testing.expect_value(t, len(gd.DictionaryStorage{}), gd.GDExtensionDictionary_Size)
+}
+
+@(test)
+packed_byte_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.PackedByteArrayStorage), gd.GDExtensionPackedByteArray_Size)
+	testing.expect_value(t, size_of(gd.PackedByteArray), gd.GDExtensionPackedByteArray_Size)
+	testing.expect_value(t, len(gd.PackedByteArrayStorage{}), gd.GDExtensionPackedByteArray_Size)
+}
+
+@(test)
+packed_int32_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedInt32ArrayStorage),
+		gd.GDExtensionPackedInt32Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedInt32Array), gd.GDExtensionPackedInt32Array_Size)
+	testing.expect_value(t, len(gd.PackedInt32ArrayStorage{}), gd.GDExtensionPackedInt32Array_Size)
+}
+
+@(test)
+packed_int64_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedInt64ArrayStorage),
+		gd.GDExtensionPackedInt64Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedInt64Array), gd.GDExtensionPackedInt64Array_Size)
+	testing.expect_value(t, len(gd.PackedInt64ArrayStorage{}), gd.GDExtensionPackedInt64Array_Size)
+}
+
+@(test)
+packed_float32_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedFloat32ArrayStorage),
+		gd.GDExtensionPackedFloat32Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedFloat32Array), gd.GDExtensionPackedFloat32Array_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedFloat32ArrayStorage{}),
+		gd.GDExtensionPackedFloat32Array_Size,
+	)
+}
+
+@(test)
+packed_string_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedStringArrayStorage),
+		gd.GDExtensionPackedStringArray_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedStringArray), gd.GDExtensionPackedStringArray_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedStringArrayStorage{}),
+		gd.GDExtensionPackedStringArray_Size,
+	)
+}
+
+@(test)
+packed_vector2_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedVector2ArrayStorage),
+		gd.GDExtensionPackedVector2Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedVector2Array), gd.GDExtensionPackedVector2Array_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedVector2ArrayStorage{}),
+		gd.GDExtensionPackedVector2Array_Size,
+	)
+}
+
+@(test)
+packed_vector3_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedVector3ArrayStorage),
+		gd.GDExtensionPackedVector3Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedVector3Array), gd.GDExtensionPackedVector3Array_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedVector3ArrayStorage{}),
+		gd.GDExtensionPackedVector3Array_Size,
+	)
+}
+
+@(test)
+packed_vector4_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedVector4ArrayStorage),
+		gd.GDExtensionPackedVector4Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedVector4Array), gd.GDExtensionPackedVector4Array_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedVector4ArrayStorage{}),
+		gd.GDExtensionPackedVector4Array_Size,
+	)
+}
+
+@(test)
+packed_color_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedColorArrayStorage),
+		gd.GDExtensionPackedColorArray_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedColorArray), gd.GDExtensionPackedColorArray_Size)
+	testing.expect_value(t, len(gd.PackedColorArrayStorage{}), gd.GDExtensionPackedColorArray_Size)
 }
 
 @(test)
@@ -84,6 +231,14 @@ node_path_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 }
 
 @(test)
+rid_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	r: gd.RID
+	_ = gd.rid_ptr(&r)
+	_ = gd.const_rid_ptr(&r)
+	_ = gd.uninitialized_rid_ptr(&r)
+}
+
+@(test)
 array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	a: gd.Array
 	_ = gd.array_ptr(&a)
@@ -97,6 +252,86 @@ dictionary_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	_ = gd.dictionary_ptr(&d)
 	_ = gd.const_dictionary_ptr(&d)
 	_ = gd.uninitialized_dictionary_ptr(&d)
+}
+
+@(test)
+packed_byte_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedByteArray
+	_ = gd.packed_byte_array_ptr(&a)
+	_ = gd.const_packed_byte_array_ptr(&a)
+	_ = gd.uninitialized_packed_byte_array_ptr(&a)
+}
+
+@(test)
+packed_int32_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedInt32Array
+	_ = gd.packed_int32_array_ptr(&a)
+	_ = gd.const_packed_int32_array_ptr(&a)
+	_ = gd.uninitialized_packed_int32_array_ptr(&a)
+}
+
+@(test)
+packed_int64_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedInt64Array
+	_ = gd.packed_int64_array_ptr(&a)
+	_ = gd.const_packed_int64_array_ptr(&a)
+	_ = gd.uninitialized_packed_int64_array_ptr(&a)
+}
+
+@(test)
+packed_float32_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedFloat32Array
+	_ = gd.packed_float32_array_ptr(&a)
+	_ = gd.const_packed_float32_array_ptr(&a)
+	_ = gd.uninitialized_packed_float32_array_ptr(&a)
+}
+
+@(test)
+packed_float64_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedFloat64Array
+	_ = gd.packed_float64_array_ptr(&a)
+	_ = gd.const_packed_float64_array_ptr(&a)
+	_ = gd.uninitialized_packed_float64_array_ptr(&a)
+}
+
+@(test)
+packed_string_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedStringArray
+	_ = gd.packed_string_array_ptr(&a)
+	_ = gd.const_packed_string_array_ptr(&a)
+	_ = gd.uninitialized_packed_string_array_ptr(&a)
+}
+
+@(test)
+packed_vector2_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedVector2Array
+	_ = gd.packed_vector2_array_ptr(&a)
+	_ = gd.const_packed_vector2_array_ptr(&a)
+	_ = gd.uninitialized_packed_vector2_array_ptr(&a)
+}
+
+@(test)
+packed_vector3_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedVector3Array
+	_ = gd.packed_vector3_array_ptr(&a)
+	_ = gd.const_packed_vector3_array_ptr(&a)
+	_ = gd.uninitialized_packed_vector3_array_ptr(&a)
+}
+
+@(test)
+packed_vector4_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedVector4Array
+	_ = gd.packed_vector4_array_ptr(&a)
+	_ = gd.const_packed_vector4_array_ptr(&a)
+	_ = gd.uninitialized_packed_vector4_array_ptr(&a)
+}
+
+@(test)
+packed_color_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedColorArray
+	_ = gd.packed_color_array_ptr(&a)
+	_ = gd.const_packed_color_array_ptr(&a)
+	_ = gd.uninitialized_packed_color_array_ptr(&a)
 }
 
 @(test)

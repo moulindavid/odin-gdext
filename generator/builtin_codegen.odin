@@ -102,7 +102,7 @@ ExtensionApiMemberOffsetEntry :: struct {
 // Type mapping: Godot name → Odin name
 //
 // Two separate maps because GDExtension uses different sizes for members
-// (native storage, f32) vs method args/returns (ABI, f64).
+// (native storage, f32) vs method args/returns (Godot `float` ABI, core.GodotReal).
 // ---------------------------------------------------------------------------
 
 member_type_map := map[string]string {
@@ -122,7 +122,7 @@ arg_type_map := map[string]string {
 	"int"     = "i64",
 	"int32"   = "i32",
 	"int64"   = "i64",
-	"float"   = "f64",
+	"float"   = "core.GodotReal",
 	"double"  = "f64",
 	"Variant" = "core.Variant",
 }
@@ -130,32 +130,97 @@ arg_type_map := map[string]string {
 // Entries common to both maps (builtin types, pointer types).
 common_type_entries := []struct {
 	godot, odin: string,
-} {
-	{"String", "rawptr"},
-	{"StringName", "rawptr"},
-	{"NodePath", "rawptr"},
-	{"RID", "rawptr"},
-	{"Callable", "rawptr"},
-	{"Signal", "rawptr"},
-	{"Dictionary", "rawptr"},
-	{"Array", "rawptr"},
-	{"PackedByteArray", "rawptr"},
-	{"PackedInt32Array", "rawptr"},
-	{"PackedInt64Array", "rawptr"},
-	{"PackedFloat32Array", "rawptr"},
-	{"PackedFloat64Array", "rawptr"},
-	{"PackedStringArray", "rawptr"},
-	{"PackedVector2Array", "rawptr"},
-	{"PackedVector3Array", "rawptr"},
-	{"PackedColorArray", "rawptr"},
-	{"PackedVector4Array", "rawptr"},
-}
+}{{"Callable", "rawptr"}, {"Signal", "rawptr"}}
 
 init_type_maps :: proc() {
 	for e in common_type_entries {
 		member_type_map[e.godot] = e.odin
 		arg_type_map[e.godot] = e.odin
 	}
+}
+
+
+Core_Value_Entry :: struct {
+	godot: string,
+	odin:  string,
+	ptr:   string,
+	free:  string,
+}
+
+completed_core_value_entries := []Core_Value_Entry {
+	{"String", "core.String", "core.const_string_ptr", "core.string_free"},
+	{"StringName", "core.StringName", "core.const_string_name_ptr", "core.string_name_free"},
+	{"NodePath", "core.NodePath", "core.const_node_path_ptr", "core.node_path_free"},
+	{"RID", "core.RID", "core.const_rid_ptr", "core.rid_free"},
+	{"Array", "core.Array", "core.const_array_ptr", "core.array_free"},
+	{"Dictionary", "core.Dictionary", "core.const_dictionary_ptr", "core.dictionary_free"},
+	{
+		"PackedByteArray",
+		"core.PackedByteArray",
+		"core.const_packed_byte_array_ptr",
+		"core.packed_byte_array_free",
+	},
+	{
+		"PackedInt32Array",
+		"core.PackedInt32Array",
+		"core.const_packed_int32_array_ptr",
+		"core.packed_int32_array_free",
+	},
+	{
+		"PackedInt64Array",
+		"core.PackedInt64Array",
+		"core.const_packed_int64_array_ptr",
+		"core.packed_int64_array_free",
+	},
+	{
+		"PackedFloat32Array",
+		"core.PackedFloat32Array",
+		"core.const_packed_float32_array_ptr",
+		"core.packed_float32_array_free",
+	},
+	{
+		"PackedFloat64Array",
+		"core.PackedFloat64Array",
+		"core.const_packed_float64_array_ptr",
+		"core.packed_float64_array_free",
+	},
+	{
+		"PackedStringArray",
+		"core.PackedStringArray",
+		"core.const_packed_string_array_ptr",
+		"core.packed_string_array_free",
+	},
+	{
+		"PackedVector2Array",
+		"core.PackedVector2Array",
+		"core.const_packed_vector2_array_ptr",
+		"core.packed_vector2_array_free",
+	},
+	{
+		"PackedVector3Array",
+		"core.PackedVector3Array",
+		"core.const_packed_vector3_array_ptr",
+		"core.packed_vector3_array_free",
+	},
+	{
+		"PackedVector4Array",
+		"core.PackedVector4Array",
+		"core.const_packed_vector4_array_ptr",
+		"core.packed_vector4_array_free",
+	},
+	{
+		"PackedColorArray",
+		"core.PackedColorArray",
+		"core.const_packed_color_array_ptr",
+		"core.packed_color_array_free",
+	},
+}
+
+completed_core_value_entry :: proc(godot_name: string) -> (entry: Core_Value_Entry, ok: bool) {
+	for e in completed_core_value_entries {
+		if e.godot == godot_name do return e, true
+	}
+	return {}, false
 }
 
 // Resolve a Godot type name to an Odin type for struct members (native storage).
@@ -165,22 +230,30 @@ resolve_member_type :: proc(godot_name: string) -> string {
 }
 
 // Resolve a Godot type name to an Odin type for method return values (ABI).
-// Variant returns are owned initialized storage; callers must destroy them with
-// core.variant_free when done.
+// Variant and String returns are owned initialized storage; callers must destroy
+// them with core.variant_free or core.string_free when done.
 resolve_return_type :: proc(godot_name: string) -> string {
+	if entry, ok := completed_core_value_entry(godot_name); ok {return entry.odin}
 	if t, ok := arg_type_map[godot_name]; ok {return t}
 	return godot_name
 }
 
-// Resolve a Godot type name to an Odin type for parameters (ABI). Variant
-// parameters are borrowed to avoid unsafe by-value copies of owned storage.
+// Resolve a Godot type name to an Odin type for parameters (ABI). Variant and
+// completed core value parameters are borrowed to avoid unsafe by-value copies
+// of owned storage.
 resolve_param_type :: proc(godot_name: string) -> string {
 	if godot_name == "Variant" do return "^core.Variant"
+	if entry, ok := completed_core_value_entry(godot_name); ok {
+		return fmt.aprintf("^%s", entry.odin)
+	}
 	return resolve_return_type(godot_name)
 }
 
 param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
 	if godot_type == "Variant" do return fmt.aprintf("core.variant_ptr(%s)", arg_name)
+	if entry, ok := completed_core_value_entry(godot_type); ok {
+		return fmt.aprintf("%s(%s)", entry.ptr, arg_name)
+	}
 	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
 }
 
@@ -253,6 +326,10 @@ emit_struct :: proc(
 	real_members: map[string][]ExtensionApiMemberOffsetEntry,
 ) {
 	strings.write_string(b, "// ---- Struct (memory-compatible with Godot) ----\n\n")
+	if c.name == "Vector2" || c.name == "Vector3" || c.name == "Vector4" || c.name == "Color" {
+		fmt.sbprintf(b, "%s :: core.%s\n\n", c.name, c.name)
+		return
+	}
 	fmt.sbprintf(b, "%s :: struct {{\n", c.name)
 
 	if entries, ok := real_members[c.name]; ok {
@@ -365,6 +442,7 @@ emit_constructors :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 		// passed as pointers to their existing initialized storage.
 		for arg in ctor.arguments {
 			if arg.type == "Variant" do continue
+			if _, ok := completed_core_value_entry(arg.type); ok do continue
 			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
 		}
 
@@ -405,6 +483,15 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 				"// %s_%s returns an initialized Variant; call core.variant_free when done.\n",
 				lower,
 				m.name,
+			)
+		} else if entry, ok := completed_core_value_entry(m.return_type); ok {
+			fmt.sbprintf(
+				b,
+				"// %s_%s returns initialized %s storage; call %s when done.\n",
+				lower,
+				m.name,
+				entry.godot,
+				entry.free,
 			)
 		}
 
@@ -464,6 +551,7 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 		}
 		for arg in m.arguments {
 			if arg.type == "Variant" do continue
+			if _, ok := completed_core_value_entry(arg.type); ok do continue
 			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
 		}
 

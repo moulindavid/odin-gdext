@@ -112,8 +112,13 @@ Current codegen is intentionally incomplete:
   `{builtin}_try_from_variant` helpers for current memory-compatible builtin types
   are available, but broader complex conversion coverage is still incomplete.
   `String` has an initial owned-storage wrapper (`string_from_utf8`,
-  `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`),
-  but broader String methods/operators and generated API integration are still pending.
+  `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`)
+  plus safe borrowed-input method wrappers for length, emptiness, hash, compare,
+  prefix/suffix, and contains checks. Generated builtin APIs now use borrowed parameters for completed owned core
+  values (`^core.String`, `^core.Array`, `^core.PackedStringArray`, etc.) and
+  owned initialized returns with explicit destruction comments. Unsupported complex values like `Callable` and `Signal` remain raw/skipped until
+  their object-lifetime, vararg, and registration semantics are designed alongside
+  Priority 3/4 signal and registration helpers.
   `StringName` has an initial owned, non-static wrapper (`string_name_from_utf8_cstring`,
   `string_name_free`, `variant_from_string_name`, and `variant_try_string_name`) plus
   a `StaticStringName` wrapper for process-lifetime literals used by core/generated
@@ -122,13 +127,32 @@ Current codegen is intentionally incomplete:
   be destroyed. `NodePath` has an initial owned wrapper (`node_path_from_utf8`,
   `node_path_free`, `variant_from_node_path`, and `variant_try_node_path`) plus primitive
   method wrappers and owned `StringName`-returning helpers for names/subnames. Generated
-  API integration is still pending. `Array` has an initial owned-storage wrapper
-  (`array_new`, `array_copy`, `array_free`, `array_push`, `array_size`,
+  API integration is still pending. `RID` has a lightweight 8-byte wrapper (`rid_new`,
+  `rid_copy`, `rid_free`, `rid_is_valid`, `rid_get_id`, `variant_from_rid`, and
+  `variant_try_rid`); destroying the wrapper does not free the underlying server resource.
+  `Array` has an initial owned-storage wrapper
+  (`array_new`, `array_copy`, `array_free`, `array_push`, `array_size`, `array_get`,
+  `array_set`, `array_clear`, `array_erase`, `array_has`, `array_is_empty`,
   `variant_from_array`, and `variant_try_array`). `Dictionary` has the same initial
-  owned-storage pattern plus `dictionary_set`, `dictionary_has`, `dictionary_size`,
+  owned-storage pattern plus `dictionary_set`, `dictionary_get`, `dictionary_get_or_default`,
+  `dictionary_has`, `dictionary_erase`, `dictionary_clear`, `dictionary_size`,
   `dictionary_is_empty`, `variant_from_dictionary`, and `variant_try_dictionary`.
-  Broader methods, typed arrays/dictionaries, packed arrays, and generated API integration
-  are still pending.
+  `PackedByteArray` has an initial owned-storage wrapper (`packed_byte_array_new`,
+  `packed_byte_array_copy`, `packed_byte_array_free`, `packed_byte_array_push`,
+  `packed_byte_array_get`, `packed_byte_array_set`, `packed_byte_array_clear`,
+  `packed_byte_array_size`, `packed_byte_array_is_empty`, `variant_from_packed_byte_array`,
+  and `variant_try_packed_byte_array`). `PackedInt32Array`, `PackedInt64Array`, `PackedFloat32Array`, and
+  `PackedFloat64Array` mirror that initial owned-storage/basic-method/Variant-conversion pattern.
+  `PackedStringArray` follows the same array ownership pattern and returns owned
+  `String` elements from `packed_string_array_get` that must be freed.
+  `PackedVector2Array`, `PackedVector3Array`, `PackedVector4Array`, and `PackedColorArray` add the same pattern for generated-builtin-compatible
+  vector storage. Broader methods, typed arrays/dictionaries, the other packed arrays, and
+  generated API integration are still pending.
+- Godot API `float` values use the centralized `GodotReal` alias. It is `f64`
+  for the currently supported Godot 4.7 `float_64` target; concrete storage
+  types such as `PackedFloat32Array` still expose `f32` elements. `Vector2` and `Vector3` storage are
+  centralized in `godot:core`, and generated APIs alias that storage so packed
+  vector arrays and generated vector methods use the same Odin types.
 
 ## Architecture
 
@@ -153,7 +177,7 @@ odin-gdext/
 - `bindings/builtin/` -- code-generated for simple/math builtin types: struct
   layout from real member offsets, `to_variant`/`from_variant`, constructors,
   instance/static methods, enums. Complex/value-owning builtins such as `String`,
-  `StringName`, `NodePath`, `RID`, `Callable`, `Signal`, `Array`, `Dictionary`,
+  `StringName`, `NodePath`, `Callable`, `Signal`, `Array`, `Dictionary`,
   and packed arrays are not complete yet.
 - `bindings/utilities.odin` -- code-generated non-vararg @GlobalScope utility
   functions whose return and argument types are currently supported. Utilities

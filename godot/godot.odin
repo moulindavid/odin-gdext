@@ -20,11 +20,38 @@ StringName :: gcore.StringName
 StaticStringName :: gcore.StaticStringName
 NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
+RIDStorage :: gcore.RIDStorage
+RID :: gcore.RID
 ArrayStorage :: gcore.ArrayStorage
 Array :: gcore.Array
 DictionaryStorage :: gcore.DictionaryStorage
 Dictionary :: gcore.Dictionary
+PackedByteArrayStorage :: gcore.PackedByteArrayStorage
+PackedByteArray :: gcore.PackedByteArray
+PackedInt32ArrayStorage :: gcore.PackedInt32ArrayStorage
+PackedInt32Array :: gcore.PackedInt32Array
+PackedInt64ArrayStorage :: gcore.PackedInt64ArrayStorage
+PackedInt64Array :: gcore.PackedInt64Array
+PackedFloat32ArrayStorage :: gcore.PackedFloat32ArrayStorage
+PackedFloat32Array :: gcore.PackedFloat32Array
+PackedFloat64ArrayStorage :: gcore.PackedFloat64ArrayStorage
+PackedFloat64Array :: gcore.PackedFloat64Array
+PackedStringArrayStorage :: gcore.PackedStringArrayStorage
+PackedStringArray :: gcore.PackedStringArray
+PackedVector2ArrayStorage :: gcore.PackedVector2ArrayStorage
+PackedVector2Array :: gcore.PackedVector2Array
+PackedVector3ArrayStorage :: gcore.PackedVector3ArrayStorage
+PackedVector3Array :: gcore.PackedVector3Array
+PackedVector4ArrayStorage :: gcore.PackedVector4ArrayStorage
+PackedVector4Array :: gcore.PackedVector4Array
+PackedColorArrayStorage :: gcore.PackedColorArrayStorage
+PackedColorArray :: gcore.PackedColorArray
 StringRepr :: gcore.StringRepr
+GodotReal :: gcore.GodotReal
+Vector2 :: gcore.Vector2
+Vector3 :: gcore.Vector3
+Vector4 :: gcore.Vector4
+Color :: gcore.Color
 
 // --- Core functions ---
 is_nil :: gcore.is_nil
@@ -45,6 +72,16 @@ string_from_utf8 :: gcore.string_from_utf8
 string_utf8_len :: gcore.string_utf8_len
 string_to_utf8 :: gcore.string_to_utf8
 string_free :: gcore.string_free
+string_length :: gcore.string_length
+string_is_empty :: gcore.string_is_empty
+string_hash :: gcore.string_hash
+string_casecmp_to :: gcore.string_casecmp_to
+string_nocasecmp_to :: gcore.string_nocasecmp_to
+string_naturalcasecmp_to :: gcore.string_naturalcasecmp_to
+string_naturalnocasecmp_to :: gcore.string_naturalnocasecmp_to
+string_begins_with :: gcore.string_begins_with
+string_ends_with :: gcore.string_ends_with
+string_contains :: gcore.string_contains
 
 // --- StringName ---
 string_name_ptr :: gcore.string_name_ptr
@@ -78,6 +115,18 @@ node_path_get_name_count :: gcore.node_path_get_name_count
 node_path_get_subname_count :: gcore.node_path_get_subname_count
 node_path_hash :: gcore.node_path_hash
 
+// --- RID ---
+rid_ptr :: gcore.rid_ptr
+const_rid_ptr :: gcore.const_rid_ptr
+uninitialized_rid_ptr :: gcore.uninitialized_rid_ptr
+rid_init_new :: gcore.rid_init_new
+rid_new :: gcore.rid_new
+rid_init_copy :: gcore.rid_init_copy
+rid_copy :: gcore.rid_copy
+rid_free :: gcore.rid_free
+rid_is_valid :: gcore.rid_is_valid
+rid_get_id :: gcore.rid_get_id
+
 // --- Array ---
 array_ptr :: gcore.array_ptr
 const_array_ptr :: gcore.const_array_ptr
@@ -89,6 +138,12 @@ array_copy :: gcore.array_copy
 array_free :: gcore.array_free
 array_push :: gcore.array_push
 array_size :: gcore.array_size
+array_is_empty :: gcore.array_is_empty
+array_clear :: gcore.array_clear
+array_get :: gcore.array_get
+array_set :: gcore.array_set
+array_erase :: gcore.array_erase
+array_has :: gcore.array_has
 
 // --- Dictionary ---
 dictionary_ptr :: gcore.dictionary_ptr
@@ -103,6 +158,170 @@ dictionary_set :: gcore.dictionary_set
 dictionary_has :: gcore.dictionary_has
 dictionary_size :: gcore.dictionary_size
 dictionary_is_empty :: gcore.dictionary_is_empty
+dictionary_clear :: gcore.dictionary_clear
+dictionary_erase :: gcore.dictionary_erase
+dictionary_get_or_default :: gcore.dictionary_get_or_default
+dictionary_get :: gcore.dictionary_get
+
+// --- PackedByteArray ---
+packed_byte_array_ptr :: gcore.packed_byte_array_ptr
+const_packed_byte_array_ptr :: gcore.const_packed_byte_array_ptr
+uninitialized_packed_byte_array_ptr :: gcore.uninitialized_packed_byte_array_ptr
+packed_byte_array_init_new :: gcore.packed_byte_array_init_new
+packed_byte_array_new :: gcore.packed_byte_array_new
+packed_byte_array_init_copy :: gcore.packed_byte_array_init_copy
+packed_byte_array_copy :: gcore.packed_byte_array_copy
+packed_byte_array_free :: gcore.packed_byte_array_free
+packed_byte_array_size :: gcore.packed_byte_array_size
+packed_byte_array_is_empty :: gcore.packed_byte_array_is_empty
+packed_byte_array_clear :: gcore.packed_byte_array_clear
+packed_byte_array_get :: gcore.packed_byte_array_get
+packed_byte_array_set :: gcore.packed_byte_array_set
+packed_byte_array_push :: gcore.packed_byte_array_push
+
+// --- PackedInt32Array ---
+packed_int32_array_ptr :: gcore.packed_int32_array_ptr
+const_packed_int32_array_ptr :: gcore.const_packed_int32_array_ptr
+uninitialized_packed_int32_array_ptr :: gcore.uninitialized_packed_int32_array_ptr
+packed_int32_array_init_new :: gcore.packed_int32_array_init_new
+packed_int32_array_new :: gcore.packed_int32_array_new
+packed_int32_array_init_copy :: gcore.packed_int32_array_init_copy
+packed_int32_array_copy :: gcore.packed_int32_array_copy
+packed_int32_array_free :: gcore.packed_int32_array_free
+packed_int32_array_size :: gcore.packed_int32_array_size
+packed_int32_array_is_empty :: gcore.packed_int32_array_is_empty
+packed_int32_array_clear :: gcore.packed_int32_array_clear
+packed_int32_array_get :: gcore.packed_int32_array_get
+packed_int32_array_set :: gcore.packed_int32_array_set
+packed_int32_array_push :: gcore.packed_int32_array_push
+
+// --- PackedInt64Array ---
+packed_int64_array_ptr :: gcore.packed_int64_array_ptr
+const_packed_int64_array_ptr :: gcore.const_packed_int64_array_ptr
+uninitialized_packed_int64_array_ptr :: gcore.uninitialized_packed_int64_array_ptr
+packed_int64_array_init_new :: gcore.packed_int64_array_init_new
+packed_int64_array_new :: gcore.packed_int64_array_new
+packed_int64_array_init_copy :: gcore.packed_int64_array_init_copy
+packed_int64_array_copy :: gcore.packed_int64_array_copy
+packed_int64_array_free :: gcore.packed_int64_array_free
+packed_int64_array_size :: gcore.packed_int64_array_size
+packed_int64_array_is_empty :: gcore.packed_int64_array_is_empty
+packed_int64_array_clear :: gcore.packed_int64_array_clear
+packed_int64_array_get :: gcore.packed_int64_array_get
+packed_int64_array_set :: gcore.packed_int64_array_set
+packed_int64_array_push :: gcore.packed_int64_array_push
+
+// --- PackedFloat32Array ---
+packed_float32_array_ptr :: gcore.packed_float32_array_ptr
+const_packed_float32_array_ptr :: gcore.const_packed_float32_array_ptr
+uninitialized_packed_float32_array_ptr :: gcore.uninitialized_packed_float32_array_ptr
+packed_float32_array_init_new :: gcore.packed_float32_array_init_new
+packed_float32_array_new :: gcore.packed_float32_array_new
+packed_float32_array_init_copy :: gcore.packed_float32_array_init_copy
+packed_float32_array_copy :: gcore.packed_float32_array_copy
+packed_float32_array_free :: gcore.packed_float32_array_free
+packed_float32_array_size :: gcore.packed_float32_array_size
+packed_float32_array_is_empty :: gcore.packed_float32_array_is_empty
+packed_float32_array_clear :: gcore.packed_float32_array_clear
+packed_float32_array_get :: gcore.packed_float32_array_get
+packed_float32_array_set :: gcore.packed_float32_array_set
+packed_float32_array_push :: gcore.packed_float32_array_push
+
+// --- PackedFloat64Array ---
+packed_float64_array_ptr :: gcore.packed_float64_array_ptr
+const_packed_float64_array_ptr :: gcore.const_packed_float64_array_ptr
+uninitialized_packed_float64_array_ptr :: gcore.uninitialized_packed_float64_array_ptr
+packed_float64_array_init_new :: gcore.packed_float64_array_init_new
+packed_float64_array_new :: gcore.packed_float64_array_new
+packed_float64_array_init_copy :: gcore.packed_float64_array_init_copy
+packed_float64_array_copy :: gcore.packed_float64_array_copy
+packed_float64_array_free :: gcore.packed_float64_array_free
+packed_float64_array_size :: gcore.packed_float64_array_size
+packed_float64_array_is_empty :: gcore.packed_float64_array_is_empty
+packed_float64_array_clear :: gcore.packed_float64_array_clear
+packed_float64_array_get :: gcore.packed_float64_array_get
+packed_float64_array_set :: gcore.packed_float64_array_set
+packed_float64_array_push :: gcore.packed_float64_array_push
+
+// --- PackedStringArray ---
+packed_string_array_ptr :: gcore.packed_string_array_ptr
+const_packed_string_array_ptr :: gcore.const_packed_string_array_ptr
+uninitialized_packed_string_array_ptr :: gcore.uninitialized_packed_string_array_ptr
+packed_string_array_init_new :: gcore.packed_string_array_init_new
+packed_string_array_new :: gcore.packed_string_array_new
+packed_string_array_init_copy :: gcore.packed_string_array_init_copy
+packed_string_array_copy :: gcore.packed_string_array_copy
+packed_string_array_free :: gcore.packed_string_array_free
+packed_string_array_size :: gcore.packed_string_array_size
+packed_string_array_is_empty :: gcore.packed_string_array_is_empty
+packed_string_array_clear :: gcore.packed_string_array_clear
+packed_string_array_get :: gcore.packed_string_array_get
+packed_string_array_set :: gcore.packed_string_array_set
+packed_string_array_push :: gcore.packed_string_array_push
+
+// --- PackedVector2Array ---
+packed_vector2_array_ptr :: gcore.packed_vector2_array_ptr
+const_packed_vector2_array_ptr :: gcore.const_packed_vector2_array_ptr
+uninitialized_packed_vector2_array_ptr :: gcore.uninitialized_packed_vector2_array_ptr
+packed_vector2_array_init_new :: gcore.packed_vector2_array_init_new
+packed_vector2_array_new :: gcore.packed_vector2_array_new
+packed_vector2_array_init_copy :: gcore.packed_vector2_array_init_copy
+packed_vector2_array_copy :: gcore.packed_vector2_array_copy
+packed_vector2_array_free :: gcore.packed_vector2_array_free
+packed_vector2_array_size :: gcore.packed_vector2_array_size
+packed_vector2_array_is_empty :: gcore.packed_vector2_array_is_empty
+packed_vector2_array_clear :: gcore.packed_vector2_array_clear
+packed_vector2_array_get :: gcore.packed_vector2_array_get
+packed_vector2_array_set :: gcore.packed_vector2_array_set
+packed_vector2_array_push :: gcore.packed_vector2_array_push
+
+// --- PackedVector3Array ---
+packed_vector3_array_ptr :: gcore.packed_vector3_array_ptr
+const_packed_vector3_array_ptr :: gcore.const_packed_vector3_array_ptr
+uninitialized_packed_vector3_array_ptr :: gcore.uninitialized_packed_vector3_array_ptr
+packed_vector3_array_init_new :: gcore.packed_vector3_array_init_new
+packed_vector3_array_new :: gcore.packed_vector3_array_new
+packed_vector3_array_init_copy :: gcore.packed_vector3_array_init_copy
+packed_vector3_array_copy :: gcore.packed_vector3_array_copy
+packed_vector3_array_free :: gcore.packed_vector3_array_free
+packed_vector3_array_size :: gcore.packed_vector3_array_size
+packed_vector3_array_is_empty :: gcore.packed_vector3_array_is_empty
+packed_vector3_array_clear :: gcore.packed_vector3_array_clear
+packed_vector3_array_get :: gcore.packed_vector3_array_get
+packed_vector3_array_set :: gcore.packed_vector3_array_set
+packed_vector3_array_push :: gcore.packed_vector3_array_push
+
+// --- PackedVector4Array ---
+packed_vector4_array_ptr :: gcore.packed_vector4_array_ptr
+const_packed_vector4_array_ptr :: gcore.const_packed_vector4_array_ptr
+uninitialized_packed_vector4_array_ptr :: gcore.uninitialized_packed_vector4_array_ptr
+packed_vector4_array_init_new :: gcore.packed_vector4_array_init_new
+packed_vector4_array_new :: gcore.packed_vector4_array_new
+packed_vector4_array_init_copy :: gcore.packed_vector4_array_init_copy
+packed_vector4_array_copy :: gcore.packed_vector4_array_copy
+packed_vector4_array_free :: gcore.packed_vector4_array_free
+packed_vector4_array_size :: gcore.packed_vector4_array_size
+packed_vector4_array_is_empty :: gcore.packed_vector4_array_is_empty
+packed_vector4_array_clear :: gcore.packed_vector4_array_clear
+packed_vector4_array_get :: gcore.packed_vector4_array_get
+packed_vector4_array_set :: gcore.packed_vector4_array_set
+packed_vector4_array_push :: gcore.packed_vector4_array_push
+
+// --- PackedColorArray ---
+packed_color_array_ptr :: gcore.packed_color_array_ptr
+const_packed_color_array_ptr :: gcore.const_packed_color_array_ptr
+uninitialized_packed_color_array_ptr :: gcore.uninitialized_packed_color_array_ptr
+packed_color_array_init_new :: gcore.packed_color_array_init_new
+packed_color_array_new :: gcore.packed_color_array_new
+packed_color_array_init_copy :: gcore.packed_color_array_init_copy
+packed_color_array_copy :: gcore.packed_color_array_copy
+packed_color_array_free :: gcore.packed_color_array_free
+packed_color_array_size :: gcore.packed_color_array_size
+packed_color_array_is_empty :: gcore.packed_color_array_is_empty
+packed_color_array_clear :: gcore.packed_color_array_clear
+packed_color_array_get :: gcore.packed_color_array_get
+packed_color_array_set :: gcore.packed_color_array_set
+packed_color_array_push :: gcore.packed_color_array_push
 
 // --- Variant ---
 variant_type :: gcore.variant_type
@@ -121,8 +340,19 @@ variant_from_bool :: gcore.variant_from_bool
 variant_from_string :: gcore.variant_from_string
 variant_from_string_name :: gcore.variant_from_string_name
 variant_from_node_path :: gcore.variant_from_node_path
+variant_from_rid :: gcore.variant_from_rid
 variant_from_array :: gcore.variant_from_array
 variant_from_dictionary :: gcore.variant_from_dictionary
+variant_from_packed_byte_array :: gcore.variant_from_packed_byte_array
+variant_from_packed_int32_array :: gcore.variant_from_packed_int32_array
+variant_from_packed_int64_array :: gcore.variant_from_packed_int64_array
+variant_from_packed_float32_array :: gcore.variant_from_packed_float32_array
+variant_from_packed_float64_array :: gcore.variant_from_packed_float64_array
+variant_from_packed_string_array :: gcore.variant_from_packed_string_array
+variant_from_packed_vector2_array :: gcore.variant_from_packed_vector2_array
+variant_from_packed_vector3_array :: gcore.variant_from_packed_vector3_array
+variant_from_packed_vector4_array :: gcore.variant_from_packed_vector4_array
+variant_from_packed_color_array :: gcore.variant_from_packed_color_array
 variant_from_utf8 :: gcore.variant_from_utf8
 variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
@@ -135,10 +365,32 @@ variant_to_string_name :: gcore.variant_to_string_name
 variant_try_string_name :: gcore.variant_try_string_name
 variant_to_node_path :: gcore.variant_to_node_path
 variant_try_node_path :: gcore.variant_try_node_path
+variant_to_rid :: gcore.variant_to_rid
+variant_try_rid :: gcore.variant_try_rid
 variant_to_array :: gcore.variant_to_array
 variant_try_array :: gcore.variant_try_array
 variant_to_dictionary :: gcore.variant_to_dictionary
 variant_try_dictionary :: gcore.variant_try_dictionary
+variant_to_packed_byte_array :: gcore.variant_to_packed_byte_array
+variant_try_packed_byte_array :: gcore.variant_try_packed_byte_array
+variant_to_packed_int32_array :: gcore.variant_to_packed_int32_array
+variant_try_packed_int32_array :: gcore.variant_try_packed_int32_array
+variant_to_packed_int64_array :: gcore.variant_to_packed_int64_array
+variant_try_packed_int64_array :: gcore.variant_try_packed_int64_array
+variant_to_packed_float32_array :: gcore.variant_to_packed_float32_array
+variant_try_packed_float32_array :: gcore.variant_try_packed_float32_array
+variant_to_packed_float64_array :: gcore.variant_to_packed_float64_array
+variant_try_packed_float64_array :: gcore.variant_try_packed_float64_array
+variant_to_packed_string_array :: gcore.variant_to_packed_string_array
+variant_try_packed_string_array :: gcore.variant_try_packed_string_array
+variant_to_packed_vector2_array :: gcore.variant_to_packed_vector2_array
+variant_try_packed_vector2_array :: gcore.variant_try_packed_vector2_array
+variant_to_packed_vector3_array :: gcore.variant_to_packed_vector3_array
+variant_try_packed_vector3_array :: gcore.variant_try_packed_vector3_array
+variant_to_packed_vector4_array :: gcore.variant_to_packed_vector4_array
+variant_try_packed_vector4_array :: gcore.variant_try_packed_vector4_array
+variant_to_packed_color_array :: gcore.variant_to_packed_color_array
+variant_try_packed_color_array :: gcore.variant_try_packed_color_array
 variant_string_utf8_len :: gcore.variant_string_utf8_len
 variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float
