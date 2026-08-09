@@ -55,6 +55,8 @@ Implement proper wrappers and ownership rules for:
 - [ ] packed arrays
   - [x] Initial owned `PackedByteArray` wrapper, checked pointer adapters, new/copy/free helpers, basic byte methods, and Variant conversion helpers.
   - [x] Initial owned `PackedInt32Array` wrapper, checked pointer adapters, new/copy/free helpers, basic int32 methods, and Variant conversion helpers.
+  - [x] Initial owned `PackedInt64Array` wrapper, checked pointer adapters, new/copy/free helpers, basic int64 methods, and Variant conversion helpers.
+  - [x] Initial owned `PackedFloat32Array` wrapper, checked pointer adapters, new/copy/free helpers, basic float32 methods, and Variant conversion helpers.
 
 ## Priority 2 - generated class bindings
 

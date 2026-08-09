@@ -65,6 +65,32 @@ packed_int32_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+packed_int64_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedInt64ArrayStorage),
+		gd.GDExtensionPackedInt64Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedInt64Array), gd.GDExtensionPackedInt64Array_Size)
+	testing.expect_value(t, len(gd.PackedInt64ArrayStorage{}), gd.GDExtensionPackedInt64Array_Size)
+}
+
+@(test)
+packed_float32_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedFloat32ArrayStorage),
+		gd.GDExtensionPackedFloat32Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedFloat32Array), gd.GDExtensionPackedFloat32Array_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedFloat32ArrayStorage{}),
+		gd.GDExtensionPackedFloat32Array_Size,
+	)
+}
+
+@(test)
 variant_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	v: gd.Variant
 	_ = gd.variant_ptr(&v)
@@ -131,6 +157,22 @@ packed_int32_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.
 	_ = gd.packed_int32_array_ptr(&a)
 	_ = gd.const_packed_int32_array_ptr(&a)
 	_ = gd.uninitialized_packed_int32_array_ptr(&a)
+}
+
+@(test)
+packed_int64_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedInt64Array
+	_ = gd.packed_int64_array_ptr(&a)
+	_ = gd.const_packed_int64_array_ptr(&a)
+	_ = gd.uninitialized_packed_int64_array_ptr(&a)
+}
+
+@(test)
+packed_float32_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedFloat32Array
+	_ = gd.packed_float32_array_ptr(&a)
+	_ = gd.const_packed_float32_array_ptr(&a)
+	_ = gd.uninitialized_packed_float32_array_ptr(&a)
 }
 
 @(test)

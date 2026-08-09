@@ -35,6 +35,18 @@ PACKED_INT32_ARRAY_CLEAR_HASH :: 3218959716
 PACKED_INT32_ARRAY_GET_HASH :: 4103005248
 PACKED_INT32_ARRAY_SET_HASH :: 3638975848
 PACKED_INT32_ARRAY_PUSH_BACK_HASH :: 694024632
+PACKED_INT64_ARRAY_SIZE_HASH :: 3173160232
+PACKED_INT64_ARRAY_IS_EMPTY_HASH :: 3918633141
+PACKED_INT64_ARRAY_CLEAR_HASH :: 3218959716
+PACKED_INT64_ARRAY_GET_HASH :: 4103005248
+PACKED_INT64_ARRAY_SET_HASH :: 3638975848
+PACKED_INT64_ARRAY_PUSH_BACK_HASH :: 694024632
+PACKED_FLOAT32_ARRAY_SIZE_HASH :: 3173160232
+PACKED_FLOAT32_ARRAY_IS_EMPTY_HASH :: 3918633141
+PACKED_FLOAT32_ARRAY_CLEAR_HASH :: 3218959716
+PACKED_FLOAT32_ARRAY_GET_HASH :: 1401583798
+PACKED_FLOAT32_ARRAY_SET_HASH :: 1113000516
+PACKED_FLOAT32_ARRAY_PUSH_BACK_HASH :: 4094791666
 
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
@@ -44,6 +56,8 @@ GDExtensionArray_Size :: 8
 GDExtensionDictionary_Size :: 8
 GDExtensionPackedByteArray_Size :: 16
 GDExtensionPackedInt32Array_Size :: 16
+GDExtensionPackedInt64Array_Size :: 16
+GDExtensionPackedFloat32Array_Size :: 16
 
 // StringStorage is raw storage large enough for Godot's ABI String handle.
 // Treat it as uninitialized until a string_init_* helper or Godot API has
@@ -1071,6 +1085,344 @@ packed_int32_array_push :: proc "contextless" (a: ^PackedInt32Array, value: i32)
 	)
 }
 
+
+// PackedInt64ArrayStorage is raw storage large enough for Godot's ABI
+// PackedInt64Array handle. Treat it as uninitialized until a
+// packed_int64_array_init_* helper or Godot API has constructed it.
+PackedInt64ArrayStorage :: [GDExtensionPackedInt64Array_Size]u8
+
+// PackedInt64Array is initialized Godot PackedInt64Array storage. Every proc returning a PackedInt64Array
+// transfers ownership to the caller; destroy it with packed_int64_array_free when finished.
+PackedInt64Array :: distinct PackedInt64ArrayStorage
+
+// packed_int64_array_ptr returns a mutable GDExtension pointer to initialized PackedInt64Array storage.
+packed_int64_array_ptr :: proc "contextless" (a: ^PackedInt64Array) -> TypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(TypePtr)a
+}
+
+// const_packed_int64_array_ptr returns a read-only GDExtension pointer to initialized storage.
+const_packed_int64_array_ptr :: proc "contextless" (a: ^PackedInt64Array) -> ConstTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)a
+}
+
+// uninitialized_packed_int64_array_ptr returns a GDExtension pointer to storage that Godot
+// is about to initialize. Do not pass already-owned storage here unless the
+// called API explicitly overwrites it without leaking.
+uninitialized_packed_int64_array_ptr :: proc "contextless" (
+	a: ^PackedInt64Array,
+) -> UninitializedTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)a
+}
+
+// packed_int64_array_init_new constructs an empty PackedInt64Array in dest.
+packed_int64_array_init_new :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Packed_Int64_Array, 0)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest)
+}
+
+// packed_int64_array_new returns an initialized empty PackedInt64Array; call packed_int64_array_free when done.
+packed_int64_array_new :: proc "contextless" () -> (result: PackedInt64Array) {
+	packed_int64_array_init_new(uninitialized_packed_int64_array_ptr(&result))
+	return
+}
+
+// packed_int64_array_init_copy copies initialized PackedInt64Array storage into uninitialized storage.
+packed_int64_array_init_copy :: proc "contextless" (
+	dest: UninitializedTypePtr,
+	value: ^PackedInt64Array,
+) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Packed_Int64_Array, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_packed_int64_array_ptr(value))
+}
+
+// packed_int64_array_copy returns an initialized copy; call packed_int64_array_free when done.
+packed_int64_array_copy :: proc "contextless" (
+	value: ^PackedInt64Array,
+) -> (
+	result: PackedInt64Array,
+) {
+	packed_int64_array_init_copy(uninitialized_packed_int64_array_ptr(&result), value)
+	return
+}
+
+packed_int64_array_free :: proc "contextless" (a: ^PackedInt64Array) {
+	destroy_builtin(.Packed_Int64_Array, packed_int64_array_ptr(a))
+}
+
+packed_int64_array_size_method: BuiltinMethod
+packed_int64_array_is_empty_method: BuiltinMethod
+packed_int64_array_clear_method: BuiltinMethod
+packed_int64_array_get_method: BuiltinMethod
+packed_int64_array_set_method: BuiltinMethod
+packed_int64_array_push_back_method: BuiltinMethod
+
+packed_int64_array_size :: proc "contextless" (a: ^PackedInt64Array) -> i64 {
+	ensure_builtin_method(
+		&packed_int64_array_size_method,
+		.Packed_Int64_Array,
+		cstring("size"),
+		PACKED_INT64_ARRAY_SIZE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		packed_int64_array_size_method.method,
+		const_packed_int64_array_ptr(a),
+		i64,
+	)
+}
+
+packed_int64_array_is_empty :: proc "contextless" (a: ^PackedInt64Array) -> bool {
+	ensure_builtin_method(
+		&packed_int64_array_is_empty_method,
+		.Packed_Int64_Array,
+		cstring("is_empty"),
+		PACKED_INT64_ARRAY_IS_EMPTY_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		packed_int64_array_is_empty_method.method,
+		const_packed_int64_array_ptr(a),
+		bool,
+	)
+}
+
+packed_int64_array_clear :: proc "contextless" (a: ^PackedInt64Array) {
+	ensure_builtin_method(
+		&packed_int64_array_clear_method,
+		.Packed_Int64_Array,
+		cstring("clear"),
+		PACKED_INT64_ARRAY_CLEAR_HASH,
+	)
+	call_builtin_method_ptr_no_ret(
+		packed_int64_array_clear_method.method,
+		packed_int64_array_ptr(a),
+	)
+}
+
+packed_int64_array_get :: proc "contextless" (a: ^PackedInt64Array, index: i64) -> i64 {
+	ensure_builtin_method(
+		&packed_int64_array_get_method,
+		.Packed_Int64_Array,
+		cstring("get"),
+		PACKED_INT64_ARRAY_GET_HASH,
+	)
+	index_arg := index
+	value := call_builtin_method_ptr_ret(
+		packed_int64_array_get_method.method,
+		const_packed_int64_array_ptr(a),
+		i64,
+		cast(TypePtr)&index_arg,
+	)
+	return i64(value)
+}
+
+packed_int64_array_set :: proc "contextless" (a: ^PackedInt64Array, index: i64, value: i64) {
+	ensure_builtin_method(
+		&packed_int64_array_set_method,
+		.Packed_Int64_Array,
+		cstring("set"),
+		PACKED_INT64_ARRAY_SET_HASH,
+	)
+	index_arg := index
+	value_arg := value
+	call_builtin_method_ptr_no_ret(
+		packed_int64_array_set_method.method,
+		packed_int64_array_ptr(a),
+		cast(TypePtr)&index_arg,
+		cast(TypePtr)&value_arg,
+	)
+}
+
+packed_int64_array_push :: proc "contextless" (a: ^PackedInt64Array, value: i64) {
+	ensure_builtin_method(
+		&packed_int64_array_push_back_method,
+		.Packed_Int64_Array,
+		cstring("push_back"),
+		PACKED_INT64_ARRAY_PUSH_BACK_HASH,
+	)
+	value_arg := value
+	_ = call_builtin_method_ptr_ret(
+		packed_int64_array_push_back_method.method,
+		packed_int64_array_ptr(a),
+		bool,
+		cast(TypePtr)&value_arg,
+	)
+}
+
+
+// PackedFloat32ArrayStorage is raw storage large enough for Godot's ABI
+// PackedFloat32Array handle. Treat it as uninitialized until a
+// packed_float32_array_init_* helper or Godot API has constructed it.
+PackedFloat32ArrayStorage :: [GDExtensionPackedFloat32Array_Size]u8
+
+// PackedFloat32Array is initialized Godot PackedFloat32Array storage. Every proc returning a PackedFloat32Array
+// transfers ownership to the caller; destroy it with packed_float32_array_free when finished.
+PackedFloat32Array :: distinct PackedFloat32ArrayStorage
+
+// packed_float32_array_ptr returns a mutable GDExtension pointer to initialized PackedFloat32Array storage.
+packed_float32_array_ptr :: proc "contextless" (a: ^PackedFloat32Array) -> TypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(TypePtr)a
+}
+
+// const_packed_float32_array_ptr returns a read-only GDExtension pointer to initialized storage.
+const_packed_float32_array_ptr :: proc "contextless" (a: ^PackedFloat32Array) -> ConstTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)a
+}
+
+// uninitialized_packed_float32_array_ptr returns a GDExtension pointer to storage that Godot
+// is about to initialize. Do not pass already-owned storage here unless the
+// called API explicitly overwrites it without leaking.
+uninitialized_packed_float32_array_ptr :: proc "contextless" (
+	a: ^PackedFloat32Array,
+) -> UninitializedTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)a
+}
+
+// packed_float32_array_init_new constructs an empty PackedFloat32Array in dest.
+packed_float32_array_init_new :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Packed_Float32_Array, 0)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest)
+}
+
+// packed_float32_array_new returns an initialized empty PackedFloat32Array; call packed_float32_array_free when done.
+packed_float32_array_new :: proc "contextless" () -> (result: PackedFloat32Array) {
+	packed_float32_array_init_new(uninitialized_packed_float32_array_ptr(&result))
+	return
+}
+
+// packed_float32_array_init_copy copies initialized PackedFloat32Array storage into uninitialized storage.
+packed_float32_array_init_copy :: proc "contextless" (
+	dest: UninitializedTypePtr,
+	value: ^PackedFloat32Array,
+) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Packed_Float32_Array, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_packed_float32_array_ptr(value))
+}
+
+// packed_float32_array_copy returns an initialized copy; call packed_float32_array_free when done.
+packed_float32_array_copy :: proc "contextless" (
+	value: ^PackedFloat32Array,
+) -> (
+	result: PackedFloat32Array,
+) {
+	packed_float32_array_init_copy(uninitialized_packed_float32_array_ptr(&result), value)
+	return
+}
+
+packed_float32_array_free :: proc "contextless" (a: ^PackedFloat32Array) {
+	destroy_builtin(.Packed_Float32_Array, packed_float32_array_ptr(a))
+}
+
+packed_float32_array_size_method: BuiltinMethod
+packed_float32_array_is_empty_method: BuiltinMethod
+packed_float32_array_clear_method: BuiltinMethod
+packed_float32_array_get_method: BuiltinMethod
+packed_float32_array_set_method: BuiltinMethod
+packed_float32_array_push_back_method: BuiltinMethod
+
+packed_float32_array_size :: proc "contextless" (a: ^PackedFloat32Array) -> i64 {
+	ensure_builtin_method(
+		&packed_float32_array_size_method,
+		.Packed_Float32_Array,
+		cstring("size"),
+		PACKED_FLOAT32_ARRAY_SIZE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		packed_float32_array_size_method.method,
+		const_packed_float32_array_ptr(a),
+		i64,
+	)
+}
+
+packed_float32_array_is_empty :: proc "contextless" (a: ^PackedFloat32Array) -> bool {
+	ensure_builtin_method(
+		&packed_float32_array_is_empty_method,
+		.Packed_Float32_Array,
+		cstring("is_empty"),
+		PACKED_FLOAT32_ARRAY_IS_EMPTY_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		packed_float32_array_is_empty_method.method,
+		const_packed_float32_array_ptr(a),
+		bool,
+	)
+}
+
+packed_float32_array_clear :: proc "contextless" (a: ^PackedFloat32Array) {
+	ensure_builtin_method(
+		&packed_float32_array_clear_method,
+		.Packed_Float32_Array,
+		cstring("clear"),
+		PACKED_FLOAT32_ARRAY_CLEAR_HASH,
+	)
+	call_builtin_method_ptr_no_ret(
+		packed_float32_array_clear_method.method,
+		packed_float32_array_ptr(a),
+	)
+}
+
+packed_float32_array_get :: proc "contextless" (a: ^PackedFloat32Array, index: i64) -> f32 {
+	ensure_builtin_method(
+		&packed_float32_array_get_method,
+		.Packed_Float32_Array,
+		cstring("get"),
+		PACKED_FLOAT32_ARRAY_GET_HASH,
+	)
+	index_arg := index
+	value := call_builtin_method_ptr_ret(
+		packed_float32_array_get_method.method,
+		const_packed_float32_array_ptr(a),
+		f64,
+		cast(TypePtr)&index_arg,
+	)
+	return f32(value)
+}
+
+packed_float32_array_set :: proc "contextless" (a: ^PackedFloat32Array, index: i64, value: f32) {
+	ensure_builtin_method(
+		&packed_float32_array_set_method,
+		.Packed_Float32_Array,
+		cstring("set"),
+		PACKED_FLOAT32_ARRAY_SET_HASH,
+	)
+	index_arg := index
+	value_arg := f64(value)
+	call_builtin_method_ptr_no_ret(
+		packed_float32_array_set_method.method,
+		packed_float32_array_ptr(a),
+		cast(TypePtr)&index_arg,
+		cast(TypePtr)&value_arg,
+	)
+}
+
+packed_float32_array_push :: proc "contextless" (a: ^PackedFloat32Array, value: f32) {
+	ensure_builtin_method(
+		&packed_float32_array_push_back_method,
+		.Packed_Float32_Array,
+		cstring("push_back"),
+		PACKED_FLOAT32_ARRAY_PUSH_BACK_HASH,
+	)
+	value_arg := f64(value)
+	_ = call_builtin_method_ptr_ret(
+		packed_float32_array_push_back_method.method,
+		packed_float32_array_ptr(a),
+		bool,
+		cast(TypePtr)&value_arg,
+	)
+}
+
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
 // as uninitialized until one of the variant_init_* helpers or Godot itself has
 // constructed a Variant in it.
@@ -1187,6 +1539,18 @@ variant_from_packed_byte_array :: proc "contextless" (a: ^PackedByteArray) -> (v
 variant_from_packed_int32_array :: proc "contextless" (a: ^PackedInt32Array) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Packed_Int32_Array)
 	ctor(uninitialized_variant_ptr(&v), packed_int32_array_ptr(a))
+	return
+}
+
+variant_from_packed_int64_array :: proc "contextless" (a: ^PackedInt64Array) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.Packed_Int64_Array)
+	ctor(uninitialized_variant_ptr(&v), packed_int64_array_ptr(a))
+	return
+}
+
+variant_from_packed_float32_array :: proc "contextless" (a: ^PackedFloat32Array) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.Packed_Float32_Array)
+	ctor(uninitialized_variant_ptr(&v), packed_float32_array_ptr(a))
 	return
 }
 
@@ -1345,6 +1709,42 @@ variant_try_packed_int32_array :: proc "contextless" (
 ) {
 	if !variant_is_type(v, .Packed_Int32_Array) do return PackedInt32Array{}, false
 	return variant_to_packed_int32_array(v), true
+}
+
+variant_to_packed_int64_array :: proc "contextless" (v: ^Variant) -> (result: PackedInt64Array) {
+	ctor := require_variant_to_type_constructor(.Packed_Int64_Array)
+	ctor(uninitialized_packed_int64_array_ptr(&result), variant_ptr(v))
+	return
+}
+
+variant_try_packed_int64_array :: proc "contextless" (
+	v: ^Variant,
+) -> (
+	value: PackedInt64Array,
+	ok: bool,
+) {
+	if !variant_is_type(v, .Packed_Int64_Array) do return PackedInt64Array{}, false
+	return variant_to_packed_int64_array(v), true
+}
+
+variant_to_packed_float32_array :: proc "contextless" (
+	v: ^Variant,
+) -> (
+	result: PackedFloat32Array,
+) {
+	ctor := require_variant_to_type_constructor(.Packed_Float32_Array)
+	ctor(uninitialized_packed_float32_array_ptr(&result), variant_ptr(v))
+	return
+}
+
+variant_try_packed_float32_array :: proc "contextless" (
+	v: ^Variant,
+) -> (
+	value: PackedFloat32Array,
+	ok: bool,
+) {
+	if !variant_is_type(v, .Packed_Float32_Array) do return PackedFloat32Array{}, false
+	return variant_to_packed_float32_array(v), true
 }
 
 variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {
