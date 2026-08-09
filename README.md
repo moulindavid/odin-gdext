@@ -133,8 +133,10 @@ Current codegen is intentionally incomplete:
   `packed_byte_array_copy`, `packed_byte_array_free`, `packed_byte_array_push`,
   `packed_byte_array_get`, `packed_byte_array_set`, `packed_byte_array_clear`,
   `packed_byte_array_size`, `packed_byte_array_is_empty`, `variant_from_packed_byte_array`,
-  and `variant_try_packed_byte_array`). Broader methods, typed arrays/dictionaries,
-  the other packed arrays, and generated API integration are still pending.
+  and `variant_try_packed_byte_array`). `PackedInt32Array` mirrors that initial
+  owned-storage/basic-method/Variant-conversion pattern. Broader methods, typed
+  arrays/dictionaries, the other packed arrays, and generated API integration are
+  still pending.
 
 ## Architecture
 

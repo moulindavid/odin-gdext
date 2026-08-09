@@ -411,6 +411,38 @@ register_classes :: proc() {
 	gt.variant_free(&bytes_v)
 	gt.packed_byte_array_free(&bytes)
 
+	// Test: owned PackedInt32Array wrapper and Variant extraction
+	ints := gt.packed_int32_array_new()
+	gt.packed_int32_array_push(&ints, -10)
+	gt.packed_int32_array_push(&ints, 2048)
+	ints_size := gt.packed_int32_array_size(&ints)
+	ints_first := gt.packed_int32_array_get(&ints, 0)
+	gt.packed_int32_array_set(&ints, 1, -4096)
+	ints_second_after_set := gt.packed_int32_array_get(&ints, 1)
+	ints_v := gt.variant_from_packed_int32_array(&ints)
+	ints_back, ints_back_ok := gt.variant_try_packed_int32_array(&ints_v)
+	ints_back_size: i64 = 0
+	if ints_back_ok {
+		ints_back_size = gt.packed_int32_array_size(&ints_back)
+		gt.packed_int32_array_free(&ints_back)
+	}
+	gt.packed_int32_array_clear(&ints)
+	ints_empty_after_clear := gt.packed_int32_array_is_empty(&ints)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"PackedInt32Array: size=%v get0=%v set1=%v roundtrip=%v/%v clear_empty=%v",
+			ints_size,
+			ints_first,
+			ints_second_after_set,
+			ints_back_ok,
+			ints_back_size,
+			ints_empty_after_clear,
+		),
+	)
+	gt.variant_free(&ints_v)
+	gt.packed_int32_array_free(&ints)
+
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
