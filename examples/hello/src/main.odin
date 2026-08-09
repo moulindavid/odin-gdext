@@ -292,6 +292,28 @@ register_classes :: proc() {
 	gt.variant_free(&vi)
 	gt.variant_free(&vb)
 
+
+	// Test: lightweight RID wrapper and Variant extraction. Destroying this wrapper
+	// only destroys the RID value storage, not any Godot server-side resource.
+	rid := gt.rid_new()
+	rid_copy := gt.rid_copy(&rid)
+	rid_v := gt.variant_from_rid(&rid)
+	rid_back, rid_back_ok := gt.variant_try_rid(&rid_v)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"RID: valid=%v id=%v copy_id=%v roundtrip=%v (expect false / 0 / 0 / true)",
+			gt.rid_is_valid(&rid),
+			gt.rid_get_id(&rid),
+			gt.rid_get_id(&rid_copy),
+			rid_back_ok,
+		),
+	)
+	if rid_back_ok do gt.rid_free(&rid_back)
+	gt.variant_free(&rid_v)
+	gt.rid_free(&rid_copy)
+	gt.rid_free(&rid)
+
 	// Test: owned Array wrapper and Array Variant extraction
 	arr := gt.array_new()
 	v1 := gt.variant_from_float(10.0)

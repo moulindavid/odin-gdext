@@ -46,9 +46,9 @@ Remaining implementation order:
    - [x] Add tests/examples proving String-returning generated or handwritten calls are destroyed correctly.
 
 4. Add `RID` as the next standalone complex value type.
-   - [ ] Query Godot metadata and destructor/constructor semantics before implementation.
-   - [ ] Add owned storage or lightweight wrapper according to Godot's ABI semantics.
-   - [ ] Add pointer helpers, construction/copy/free rules, Variant conversions, tests, and smoke coverage where practical.
+   - [x] Query Godot metadata and destructor/constructor semantics before implementation.
+   - [x] Add owned storage or lightweight wrapper according to Godot's ABI semantics.
+   - [x] Add pointer helpers, construction/copy/free rules, Variant conversions, tests, and smoke coverage where practical.
 
 5. Add `PackedStringArray` after the `String` ownership rules are integrated.
    - [ ] Owned wrapper, pointer helpers, new/copy/free, basic methods, and Variant conversions.

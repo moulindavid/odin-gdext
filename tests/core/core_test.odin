@@ -58,6 +58,13 @@ node_path_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+rid_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.RIDStorage), gd.GDExtensionRID_Size)
+	testing.expect_value(t, size_of(gd.RID), gd.GDExtensionRID_Size)
+	testing.expect_value(t, len(gd.RIDStorage{}), gd.GDExtensionRID_Size)
+}
+
+@(test)
 array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, size_of(gd.ArrayStorage), gd.GDExtensionArray_Size)
 	testing.expect_value(t, size_of(gd.Array), gd.GDExtensionArray_Size)
@@ -210,6 +217,14 @@ node_path_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	_ = gd.node_path_ptr(&p)
 	_ = gd.const_node_path_ptr(&p)
 	_ = gd.uninitialized_node_path_ptr(&p)
+}
+
+@(test)
+rid_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	r: gd.RID
+	_ = gd.rid_ptr(&r)
+	_ = gd.const_rid_ptr(&r)
+	_ = gd.uninitialized_rid_ptr(&r)
 }
 
 @(test)

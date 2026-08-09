@@ -9,6 +9,8 @@ STRING_IS_EMPTY_HASH :: 3918633141
 STRING_HASH_HASH :: 3173160232
 STRING_COMPARE_HASH :: 2920860731
 STRING_MATCH_HASH :: 2566493496
+RID_IS_VALID_HASH :: 3918633141
+RID_GET_ID_HASH :: 3173160232
 NODE_PATH_IS_ABSOLUTE_HASH :: 3918633141
 NODE_PATH_GET_NAME_HASH :: 2948586938
 NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
@@ -87,6 +89,7 @@ GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
 GDExtensionStringName_Size :: 8
 GDExtensionNodePath_Size :: 8
+GDExtensionRID_Size :: 8
 GDExtensionArray_Size :: 8
 GDExtensionDictionary_Size :: 8
 GDExtensionPackedByteArray_Size :: 16
@@ -655,6 +658,81 @@ node_path_hash :: proc "contextless" (p: ^NodePath) -> i64 {
 		NODE_PATH_GET_NAME_COUNT_HASH,
 	)
 	return call_builtin_method_ptr_ret(node_path_hash_method.method, const_node_path_ptr(p), i64)
+}
+
+
+// RIDStorage is raw storage large enough for Godot's ABI RID handle. Treat it
+// as uninitialized until a rid_init_* helper or Godot API has constructed it.
+RIDStorage :: [GDExtensionRID_Size]u8
+
+// RID is initialized Godot RID storage. A RID identifies a Godot server-side
+// resource, but this wrapper does not own or free that resource; rid_free only
+// destroys the RID value storage.
+RID :: distinct RIDStorage
+
+// rid_ptr returns a mutable GDExtension pointer to initialized RID storage.
+rid_ptr :: proc "contextless" (r: ^RID) -> TypePtr {
+	if r == nil do _trap_nil_godot_function()
+	return cast(TypePtr)r
+}
+
+// const_rid_ptr returns a read-only GDExtension pointer to initialized RID storage.
+const_rid_ptr :: proc "contextless" (r: ^RID) -> ConstTypePtr {
+	if r == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)r
+}
+
+// uninitialized_rid_ptr returns a GDExtension pointer to storage that Godot is
+// about to initialize. Do not pass already-owned RID storage here unless the
+// called API explicitly overwrites it without leaking.
+uninitialized_rid_ptr :: proc "contextless" (r: ^RID) -> UninitializedTypePtr {
+	if r == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)r
+}
+
+// rid_init_new constructs an invalid/default RID in dest.
+rid_init_new :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Rid, 0)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest)
+}
+
+// rid_new returns an initialized invalid/default RID; call rid_free when done.
+rid_new :: proc "contextless" () -> (result: RID) {
+	rid_init_new(uninitialized_rid_ptr(&result))
+	return
+}
+
+// rid_init_copy copies initialized RID storage into uninitialized storage.
+rid_init_copy :: proc "contextless" (dest: UninitializedTypePtr, value: ^RID) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Rid, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_rid_ptr(value))
+}
+
+// rid_copy returns an initialized copy; call rid_free when done.
+rid_copy :: proc "contextless" (value: ^RID) -> (result: RID) {
+	rid_init_copy(uninitialized_rid_ptr(&result), value)
+	return
+}
+
+rid_free :: proc "contextless" (r: ^RID) {
+	destroy_builtin(.Rid, rid_ptr(r))
+}
+
+rid_is_valid_method: BuiltinMethod
+rid_get_id_method: BuiltinMethod
+
+rid_is_valid :: proc "contextless" (r: ^RID) -> bool {
+	ensure_builtin_method(&rid_is_valid_method, .Rid, cstring("is_valid"), RID_IS_VALID_HASH)
+	return call_builtin_method_ptr_ret(rid_is_valid_method.method, const_rid_ptr(r), bool)
+}
+
+rid_get_id :: proc "contextless" (r: ^RID) -> i64 {
+	ensure_builtin_method(&rid_get_id_method, .Rid, cstring("get_id"), RID_GET_ID_HASH)
+	return call_builtin_method_ptr_ret(rid_get_id_method.method, const_rid_ptr(r), i64)
 }
 
 // ArrayStorage is raw storage large enough for Godot's ABI Array handle. Treat
@@ -2596,6 +2674,12 @@ variant_from_node_path :: proc "contextless" (p: ^NodePath) -> (v: Variant) {
 	return
 }
 
+variant_from_rid :: proc "contextless" (r: ^RID) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.Rid)
+	ctor(uninitialized_variant_ptr(&v), rid_ptr(r))
+	return
+}
+
 variant_from_array :: proc "contextless" (a: ^Array) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Array)
 	ctor(uninitialized_variant_ptr(&v), array_ptr(a))
@@ -2763,6 +2847,17 @@ variant_to_node_path :: proc "contextless" (v: ^Variant) -> (result: NodePath) {
 variant_try_node_path :: proc "contextless" (v: ^Variant) -> (value: NodePath, ok: bool) {
 	if !variant_is_type(v, .Node_Path) do return NodePath{}, false
 	return variant_to_node_path(v), true
+}
+
+variant_to_rid :: proc "contextless" (v: ^Variant) -> (result: RID) {
+	ctor := require_variant_to_type_constructor(.Rid)
+	ctor(uninitialized_rid_ptr(&result), variant_ptr(v))
+	return
+}
+
+variant_try_rid :: proc "contextless" (v: ^Variant) -> (value: RID, ok: bool) {
+	if !variant_is_type(v, .Rid) do return RID{}, false
+	return variant_to_rid(v), true
 }
 
 variant_to_array :: proc "contextless" (v: ^Variant) -> (result: Array) {

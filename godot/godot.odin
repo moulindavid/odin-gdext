@@ -20,6 +20,8 @@ StringName :: gcore.StringName
 StaticStringName :: gcore.StaticStringName
 NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
+RIDStorage :: gcore.RIDStorage
+RID :: gcore.RID
 ArrayStorage :: gcore.ArrayStorage
 Array :: gcore.Array
 DictionaryStorage :: gcore.DictionaryStorage
@@ -110,6 +112,18 @@ node_path_get_concatenated_subnames :: gcore.node_path_get_concatenated_subnames
 node_path_get_name_count :: gcore.node_path_get_name_count
 node_path_get_subname_count :: gcore.node_path_get_subname_count
 node_path_hash :: gcore.node_path_hash
+
+// --- RID ---
+rid_ptr :: gcore.rid_ptr
+const_rid_ptr :: gcore.const_rid_ptr
+uninitialized_rid_ptr :: gcore.uninitialized_rid_ptr
+rid_init_new :: gcore.rid_init_new
+rid_new :: gcore.rid_new
+rid_init_copy :: gcore.rid_init_copy
+rid_copy :: gcore.rid_copy
+rid_free :: gcore.rid_free
+rid_is_valid :: gcore.rid_is_valid
+rid_get_id :: gcore.rid_get_id
 
 // --- Array ---
 array_ptr :: gcore.array_ptr
@@ -308,6 +322,7 @@ variant_from_bool :: gcore.variant_from_bool
 variant_from_string :: gcore.variant_from_string
 variant_from_string_name :: gcore.variant_from_string_name
 variant_from_node_path :: gcore.variant_from_node_path
+variant_from_rid :: gcore.variant_from_rid
 variant_from_array :: gcore.variant_from_array
 variant_from_dictionary :: gcore.variant_from_dictionary
 variant_from_packed_byte_array :: gcore.variant_from_packed_byte_array
@@ -331,6 +346,8 @@ variant_to_string_name :: gcore.variant_to_string_name
 variant_try_string_name :: gcore.variant_try_string_name
 variant_to_node_path :: gcore.variant_to_node_path
 variant_try_node_path :: gcore.variant_try_node_path
+variant_to_rid :: gcore.variant_to_rid
+variant_try_rid :: gcore.variant_try_rid
 variant_to_array :: gcore.variant_to_array
 variant_try_array :: gcore.variant_try_array
 variant_to_dictionary :: gcore.variant_to_dictionary

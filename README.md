@@ -125,7 +125,10 @@ Current codegen is intentionally incomplete:
   be destroyed. `NodePath` has an initial owned wrapper (`node_path_from_utf8`,
   `node_path_free`, `variant_from_node_path`, and `variant_try_node_path`) plus primitive
   method wrappers and owned `StringName`-returning helpers for names/subnames. Generated
-  API integration is still pending. `Array` has an initial owned-storage wrapper
+  API integration is still pending. `RID` has a lightweight 8-byte wrapper (`rid_new`,
+  `rid_copy`, `rid_free`, `rid_is_valid`, `rid_get_id`, `variant_from_rid`, and
+  `variant_try_rid`); destroying the wrapper does not free the underlying server resource.
+  `Array` has an initial owned-storage wrapper
   (`array_new`, `array_copy`, `array_free`, `array_push`, `array_size`, `array_get`,
   `array_set`, `array_clear`, `array_erase`, `array_has`, `array_is_empty`,
   `variant_from_array`, and `variant_try_array`). `Dictionary` has the same initial
@@ -170,7 +173,7 @@ odin-gdext/
 - `bindings/builtin/` -- code-generated for simple/math builtin types: struct
   layout from real member offsets, `to_variant`/`from_variant`, constructors,
   instance/static methods, enums. Complex/value-owning builtins such as `String`,
-  `StringName`, `NodePath`, `RID`, `Callable`, `Signal`, `Array`, `Dictionary`,
+  `StringName`, `NodePath`, `Callable`, `Signal`, `Array`, `Dictionary`,
   and packed arrays are not complete yet.
 - `bindings/utilities.odin` -- code-generated non-vararg @GlobalScope utility
   functions whose return and argument types are currently supported. Utilities
