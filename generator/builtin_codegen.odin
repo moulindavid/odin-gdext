@@ -292,6 +292,154 @@ param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
 	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
 }
 
+
+odin_identifier_reserved := map[string]bool {
+	"auto_cast"   = true,
+	"bit_field"   = true,
+	"bit_set"     = true,
+	"break"       = true,
+	"case"        = true,
+	"cast"        = true,
+	"context"     = true,
+	"continue"    = true,
+	"defer"       = true,
+	"distinct"    = true,
+	"do"          = true,
+	"dynamic"     = true,
+	"else"        = true,
+	"enum"        = true,
+	"fallthrough" = true,
+	"for"         = true,
+	"foreign"     = true,
+	"if"          = true,
+	"import"      = true,
+	"in"          = true,
+	"map"         = true,
+	"matrix"      = true,
+	"not_in"      = true,
+	"or_else"     = true,
+	"or_return"   = true,
+	"package"     = true,
+	"proc"        = true,
+	"return"      = true,
+	"struct"      = true,
+	"switch"      = true,
+	"transmute"   = true,
+	"typeid"      = true,
+	"union"       = true,
+	"using"       = true,
+	"when"        = true,
+	"where"       = true,
+}
+
+is_ident_alpha :: proc(ch: u8) -> bool {
+	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_'
+}
+
+is_ident_digit :: proc(ch: u8) -> bool {
+	return ch >= '0' && ch <= '9'
+}
+
+is_ident_upper :: proc(ch: u8) -> bool {
+	return ch >= 'A' && ch <= 'Z'
+}
+
+is_ident_lower :: proc(ch: u8) -> bool {
+	return ch >= 'a' && ch <= 'z'
+}
+
+to_lower_ascii :: proc(ch: u8) -> u8 {
+	if is_ident_upper(ch) do return ch + 32
+	return ch
+}
+
+to_upper_ascii :: proc(ch: u8) -> u8 {
+	if is_ident_lower(ch) do return ch - 32
+	return ch
+}
+
+odin_safe_snake_identifier :: proc(name: string) -> string {
+	b := strings.builder_make(context.temp_allocator)
+	previous_underscore := false
+	previous_was_lower_or_digit := false
+
+	for ch in transmute([]u8)name {
+		if is_ident_alpha(ch) || is_ident_digit(ch) {
+			if is_ident_upper(ch) && previous_was_lower_or_digit && !previous_underscore {
+				strings.write_byte(&b, '_')
+			}
+			strings.write_byte(&b, to_lower_ascii(ch))
+			previous_underscore = false
+			previous_was_lower_or_digit = is_ident_lower(ch) || is_ident_digit(ch)
+		} else if !previous_underscore {
+			strings.write_byte(&b, '_')
+			previous_underscore = true
+			previous_was_lower_or_digit = false
+		}
+	}
+
+	result := strings.to_string(b)
+	for len(result) > 0 && result[len(result) - 1] == '_' {
+		result = result[:len(result) - 1]
+	}
+	if len(result) == 0 {
+		result = "_"
+	}
+	if is_ident_digit(result[0]) {
+		result = fmt.aprintf("_%s", result)
+	}
+	if odin_identifier_reserved[result] {
+		result = fmt.aprintf("%s_", result)
+	}
+	return result
+}
+
+odin_safe_pascal_identifier :: proc(name: string) -> string {
+	snake := odin_safe_snake_identifier(name)
+	b := strings.builder_make(context.temp_allocator)
+	capitalize_next := true
+	for ch in transmute([]u8)snake {
+		if ch == '_' {
+			capitalize_next = true
+			continue
+		}
+		out := ch
+		if capitalize_next {
+			out = to_upper_ascii(ch)
+			capitalize_next = false
+		}
+		strings.write_byte(&b, out)
+	}
+	result := strings.to_string(b)
+	if len(result) == 0 {
+		result = "_"
+	}
+	if is_ident_digit(result[0]) {
+		result = fmt.aprintf("_%s", result)
+	}
+	return result
+}
+
+class_enum_type_name :: proc(class_name, enum_name: string) -> string {
+	return fmt.aprintf(
+		"%s%s",
+		odin_safe_pascal_identifier(class_name),
+		odin_safe_pascal_identifier(enum_name),
+	)
+}
+
+class_constant_name :: proc(class_name, constant_name: string) -> string {
+	return fmt.aprintf(
+		"%s_%s",
+		odin_safe_snake_identifier(class_name),
+		odin_safe_snake_identifier(constant_name),
+	)
+}
+
+class_enum_value_name :: proc(value_name: string) -> string {
+	return odin_safe_snake_identifier(value_name)
+}
+
 // ---------------------------------------------------------------------------
 // Variant type enum name: JSON uses names like "AABB", "Transform2D" but
 // GDExtensionVariantType uses .Aabb, .Transform2d.
@@ -1037,6 +1185,54 @@ class_proc_prefix :: proc(class_name: string) -> string {
 }
 
 
+emit_class_constants_and_enums :: proc(
+	b: ^strings.Builder,
+	selected: map[string]ExtensionApiClass,
+) {
+	strings.write_string(b, "// ---- Class enums and constants ----\n\n")
+	strings.write_string(
+		b,
+		"// Constants are prefixed with the class name to avoid package-level collisions.\n",
+	)
+	strings.write_string(b, "// Enum values are scoped to their generated enum type.\n\n")
+
+	for class_name in selected_class_names {
+		class := selected[class_name]
+		if len(class.enums) == 0 && len(class.constants) == 0 do continue
+
+		fmt.sbprintf(b, "// %s\n\n", class.name)
+		for enum_ in class.enums {
+			enum_type := class_enum_type_name(class.name, enum_.name)
+			fmt.sbprintf(b, "%s :: enum i64 {{\n", enum_type)
+			used_values := make(map[string]bool, len(enum_.values))
+			for value in enum_.values {
+				value_name := class_enum_value_name(value.name)
+				if used_values[value_name] {
+					value_name = fmt.aprintf("%s_%d", value_name, value.value)
+				}
+				used_values[value_name] = true
+				fmt.sbprintf(b, "\t%s = %d,\n", value_name, value.value)
+			}
+			delete(used_values)
+			strings.write_string(b, "}\n\n")
+		}
+
+		used_constants := make(map[string]bool, len(class.constants))
+		for constant in class.constants {
+			constant_name := class_constant_name(class.name, constant.name)
+			if used_constants[constant_name] {
+				constant_name = fmt.aprintf("%s_%d", constant_name, constant.value)
+			}
+			used_constants[constant_name] = true
+			fmt.sbprintf(b, "%s :: %d\n", constant_name, constant.value)
+		}
+		delete(used_constants)
+		if len(class.constants) > 0 {
+			strings.write_string(b, "\n")
+		}
+	}
+}
+
 emit_class_downcast :: proc(
 	b: ^strings.Builder,
 	source_name: string,
@@ -1387,6 +1583,7 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	}
 
 	emit_class_downcasts(&b, root, selected)
+	emit_class_constants_and_enums(&b, selected)
 
 	strings.write_string(
 		&b,

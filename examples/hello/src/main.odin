@@ -26,7 +26,6 @@ HelloData :: struct {
 
 // ---- Class lifecycle callbacks ----
 
-NOTIFICATION_READY :: 13
 
 create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool) -> gd.ObjectPtr {
 	context = gt.godot_context()
@@ -119,7 +118,7 @@ free_instance :: proc "c" (class_userdata: rawptr, instance: gd.ClassInstancePtr
 notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reversed: bool) {
 	if instance == nil {return}
 	context = gt.godot_context()
-	if what == NOTIFICATION_READY {
+	if what == gt.node_notification_ready {
 		hn := hello_node_unwrap(instance)
 		gd.debug_print("Hello from Odin!")
 

@@ -152,10 +152,10 @@ Implementation order:
    - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 7. Generate class constants and enums.
-   - [ ] Emit Odin-safe names for class enums and constants.
-   - [ ] Include important notification and mode constants, especially for
+   - [x] Emit Odin-safe names for class enums and constants.
+   - [x] Include important notification and mode constants, especially for
      `Object`, `Node`, and common scene classes.
-   - [ ] Keep output deterministic and avoid collisions with generated method
+   - [x] Keep output deterministic and avoid collisions with generated method
      and type names.
 
 8. Integrate generated classes into the public facade.

@@ -117,6 +117,44 @@ canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
 canvas_item_try_as_control :: gclass.canvas_item_try_as_control
 
+// --- Class enums and constants ---
+ObjectConnectFlags :: gclass.ObjectConnectFlags
+ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
+NodeProcessMode :: gclass.NodeProcessMode
+NodeProcessThreadGroup :: gclass.NodeProcessThreadGroup
+NodeProcessThreadMessages :: gclass.NodeProcessThreadMessages
+NodePhysicsInterpolationMode :: gclass.NodePhysicsInterpolationMode
+NodeDuplicateFlags :: gclass.NodeDuplicateFlags
+NodeInternalMode :: gclass.NodeInternalMode
+NodeAutoTranslateMode :: gclass.NodeAutoTranslateMode
+CanvasItemTextureFilter :: gclass.CanvasItemTextureFilter
+CanvasItemTextureRepeat :: gclass.CanvasItemTextureRepeat
+CanvasItemClipChildrenMode :: gclass.CanvasItemClipChildrenMode
+CanvasItemOversamplingWithScale :: gclass.CanvasItemOversamplingWithScale
+ControlFocusMode :: gclass.ControlFocusMode
+ControlFocusBehaviorRecursive :: gclass.ControlFocusBehaviorRecursive
+ControlMouseBehaviorRecursive :: gclass.ControlMouseBehaviorRecursive
+ControlCursorShape :: gclass.ControlCursorShape
+ControlLayoutPreset :: gclass.ControlLayoutPreset
+ControlLayoutPresetMode :: gclass.ControlLayoutPresetMode
+ControlSizeFlags :: gclass.ControlSizeFlags
+ControlMouseFilter :: gclass.ControlMouseFilter
+object_notification_postinitialize :: gclass.object_notification_postinitialize
+object_notification_predelete :: gclass.object_notification_predelete
+object_notification_extension_reloaded :: gclass.object_notification_extension_reloaded
+node_notification_enter_tree :: gclass.node_notification_enter_tree
+node_notification_exit_tree :: gclass.node_notification_exit_tree
+node_notification_ready :: gclass.node_notification_ready
+node_notification_process :: gclass.node_notification_process
+node_notification_physics_process :: gclass.node_notification_physics_process
+canvas_item_notification_draw :: gclass.canvas_item_notification_draw
+canvas_item_notification_transform_changed :: gclass.canvas_item_notification_transform_changed
+canvas_item_notification_visibility_changed :: gclass.canvas_item_notification_visibility_changed
+control_notification_resized :: gclass.control_notification_resized
+control_notification_focus_enter :: gclass.control_notification_focus_enter
+control_notification_focus_exit :: gclass.control_notification_focus_exit
+control_notification_theme_changed :: gclass.control_notification_theme_changed
+
 // --- String ---
 string_ptr :: gcore.string_ptr
 const_string_ptr :: gcore.const_string_ptr
