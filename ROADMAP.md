@@ -19,7 +19,7 @@ Completed safety baseline for the current Godot 4.7 prototype:
 Priority 0 is considered complete enough to unblock the next work. We need to
 preserve these invariants while adding new bindings.
 
-## Priority 1 - stabilize core value types - in progress
+## Priority 1 - stabilize core value types — complete
 
 Finish the low-level value-type foundation before generating broad class APIs.
 The goal is not to match `godot-rust/gdext` feature-for-feature yet, but to
@@ -66,10 +66,10 @@ Remaining implementation order:
    - [x] If they are self-contained enough, add minimal owned wrappers and Variant conversions. Decision: not self-contained enough for Priority 1 because useful `Callable`/`Signal` APIs depend on Object lifetime, varargs, call/connect behavior, and registration semantics.
    - [x] If they pull strongly into registration, signals, or virtual dispatch, document the boundary and defer the ergonomic parts to Priority 3/4.
 
-Priority 1 can be considered complete when common value types used by generated
-APIs have explicit ownership rules, CI and hello smoke tests cover the important
-destruction paths, and any remaining raw/unsafe surfaces are intentional and
-documented. `Callable` and `Signal` remain intentionally deferred to Priority
+Priority 1 is considered complete for the current Godot 4.7 prototype: common
+value types used by generated APIs have explicit ownership rules, CI and hello
+smoke tests cover the important destruction paths, and remaining raw/unsafe
+surfaces are intentional and documented. `Callable` and `Signal` remain intentionally deferred to Priority
 3/4 because their safe API depends on object lifetime, registration, varargs,
 and signal connection semantics rather than standalone value storage alone. 
 

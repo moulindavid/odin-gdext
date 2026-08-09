@@ -190,11 +190,7 @@ packed_color_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 		gd.GDExtensionPackedColorArray_Size,
 	)
 	testing.expect_value(t, size_of(gd.PackedColorArray), gd.GDExtensionPackedColorArray_Size)
-	testing.expect_value(
-		t,
-		len(gd.PackedColorArrayStorage{}),
-		gd.GDExtensionPackedColorArray_Size,
-	)
+	testing.expect_value(t, len(gd.PackedColorArrayStorage{}), gd.GDExtensionPackedColorArray_Size)
 }
 
 @(test)

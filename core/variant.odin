@@ -352,12 +352,7 @@ string_ends_with :: proc "contextless" (s, text: ^String) -> bool {
 }
 
 string_contains :: proc "contextless" (s, what: ^String) -> bool {
-	ensure_builtin_method(
-		&string_contains_method,
-		.String,
-		cstring("contains"),
-		STRING_MATCH_HASH,
-	)
+	ensure_builtin_method(&string_contains_method, .String, cstring("contains"), STRING_MATCH_HASH)
 	return call_builtin_method_ptr_ret(
 		string_contains_method.method,
 		const_string_ptr(s),
@@ -1895,7 +1890,6 @@ packed_float64_array_push :: proc "contextless" (a: ^PackedFloat64Array, value: 
 }
 
 
-
 // PackedStringArrayStorage is raw storage large enough for Godot's ABI
 // PackedStringArray handle. Treat it as uninitialized until a
 // packed_string_array_init_* helper or Godot API has constructed it.
@@ -2016,7 +2010,12 @@ packed_string_array_clear :: proc "contextless" (a: ^PackedStringArray) {
 }
 
 // packed_string_array_get returns an initialized String; call string_free when done.
-packed_string_array_get :: proc "contextless" (a: ^PackedStringArray, index: i64) -> (result: String) {
+packed_string_array_get :: proc "contextless" (
+	a: ^PackedStringArray,
+	index: i64,
+) -> (
+	result: String,
+) {
 	ensure_builtin_method(
 		&packed_string_array_get_method,
 		.Packed_String_Array,
@@ -2718,11 +2717,7 @@ packed_color_array_get :: proc "contextless" (a: ^PackedColorArray, index: i64) 
 	)
 }
 
-packed_color_array_set :: proc "contextless" (
-	a: ^PackedColorArray,
-	index: i64,
-	value: Color,
-) {
+packed_color_array_set :: proc "contextless" (a: ^PackedColorArray, index: i64, value: Color) {
 	ensure_builtin_method(
 		&packed_color_array_set_method,
 		.Packed_Color_Array,
@@ -3152,11 +3147,7 @@ variant_try_packed_float64_array :: proc "contextless" (
 	return variant_to_packed_float64_array(v), true
 }
 
-variant_to_packed_string_array :: proc "contextless" (
-	v: ^Variant,
-) -> (
-	result: PackedStringArray,
-) {
+variant_to_packed_string_array :: proc "contextless" (v: ^Variant) -> (result: PackedStringArray) {
 	ctor := require_variant_to_type_constructor(.Packed_String_Array)
 	ctor(uninitialized_packed_string_array_ptr(&result), variant_ptr(v))
 	return
@@ -3232,11 +3223,7 @@ variant_try_packed_vector4_array :: proc "contextless" (
 	return variant_to_packed_vector4_array(v), true
 }
 
-variant_to_packed_color_array :: proc "contextless" (
-	v: ^Variant,
-) -> (
-	result: PackedColorArray,
-) {
+variant_to_packed_color_array :: proc "contextless" (v: ^Variant) -> (result: PackedColorArray) {
 	ctor := require_variant_to_type_constructor(.Packed_Color_Array)
 	ctor(uninitialized_packed_color_array_ptr(&result), variant_ptr(v))
 	return
