@@ -59,6 +59,11 @@ GDExtensionPackedInt32Array_Size :: 16
 GDExtensionPackedInt64Array_Size :: 16
 GDExtensionPackedFloat32Array_Size :: 16
 
+// GodotReal is the ABI type for Godot `float` in the currently supported
+// Godot 4.7 float_64 build. Some builtins, such as PackedFloat32Array, store
+// f32 elements but still pass `float` method arguments/results as this ABI type.
+GodotReal :: f64
+
 // StringStorage is raw storage large enough for Godot's ABI String handle.
 // Treat it as uninitialized until a string_init_* helper or Godot API has
 // constructed a String in it.
@@ -1384,7 +1389,7 @@ packed_float32_array_get :: proc "contextless" (a: ^PackedFloat32Array, index: i
 	value := call_builtin_method_ptr_ret(
 		packed_float32_array_get_method.method,
 		const_packed_float32_array_ptr(a),
-		f64,
+		GodotReal,
 		cast(TypePtr)&index_arg,
 	)
 	return f32(value)
@@ -1398,7 +1403,7 @@ packed_float32_array_set :: proc "contextless" (a: ^PackedFloat32Array, index: i
 		PACKED_FLOAT32_ARRAY_SET_HASH,
 	)
 	index_arg := index
-	value_arg := f64(value)
+	value_arg := GodotReal(value)
 	call_builtin_method_ptr_no_ret(
 		packed_float32_array_set_method.method,
 		packed_float32_array_ptr(a),
@@ -1414,7 +1419,7 @@ packed_float32_array_push :: proc "contextless" (a: ^PackedFloat32Array, value: 
 		cstring("push_back"),
 		PACKED_FLOAT32_ARRAY_PUSH_BACK_HASH,
 	)
-	value_arg := f64(value)
+	value_arg := GodotReal(value)
 	_ = call_builtin_method_ptr_ret(
 		packed_float32_array_push_back_method.method,
 		packed_float32_array_ptr(a),
@@ -1493,7 +1498,7 @@ variant_copy :: proc "contextless" (src: ^Variant) -> (v: Variant) {
 	return
 }
 
-variant_from_float :: proc "contextless" (x: f64) -> (v: Variant) {
+variant_from_float :: proc "contextless" (x: GodotReal) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Float)
 	_x := x
 	ctor(uninitialized_variant_ptr(&v), cast(TypePtr)&_x)
@@ -1598,9 +1603,9 @@ variant_from_int :: proc "contextless" (x: i64) -> (v: Variant) {
 
 // ---- Variant extraction ----
 
-variant_to_float :: proc "contextless" (v: ^Variant) -> f64 {
+variant_to_float :: proc "contextless" (v: ^Variant) -> GodotReal {
 	ctor := require_variant_to_type_constructor(.Float)
-	ret: f64
+	ret: GodotReal
 	ctor(cast(UninitializedTypePtr)&ret, variant_ptr(v))
 	return ret
 }
@@ -1774,7 +1779,7 @@ variant_try_utf8 :: proc "contextless" (
 	return string(buffer[:byte_count]), true, byte_count
 }
 
-variant_try_float :: proc "contextless" (v: ^Variant) -> (value: f64, ok: bool) {
+variant_try_float :: proc "contextless" (v: ^Variant) -> (value: GodotReal, ok: bool) {
 	if !variant_is_type(v, .Float) do return 0, false
 	return variant_to_float(v), true
 }

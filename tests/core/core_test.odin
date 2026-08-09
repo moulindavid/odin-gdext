@@ -11,6 +11,11 @@ variant_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+godot_real_matches_current_float64_abi :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.GodotReal), size_of(f64))
+}
+
+@(test)
 string_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, size_of(gd.StringStorage), gd.GDExtensionString_Size)
 	testing.expect_value(t, size_of(gd.String), gd.GDExtensionString_Size)

@@ -28,6 +28,7 @@ Implement proper wrappers and ownership rules for:
   - [x] Minimal `CallError` helpers and checked `variant_call` / `variant_construct` wrappers for handwritten Variant APIs.
   - [x] Generated APIs borrow `^Variant` parameters instead of bit-copying owned storage, and document owned `Variant` returns.
   - [x] Runtime type inspection and exact-type `try` conversions for bool, int, and float Variants.
+  - [x] Centralized Godot `float` ABI as `GodotReal` for the current Godot 4.7 `float_64` target.
   - [x] Exact String Variant extraction to caller-provided UTF-8 buffers.
   - [ ] Richer conversion coverage for object, builtin, and other complex Variant conversions.
     - [x] Exact Object Variant extraction with `variant_try_object`.
@@ -100,8 +101,8 @@ gt.register_method(
 	HelloNode,
 	"add",
 	add,
-	params = {gt.param("a", f64), gt.param("b", f64)},
-	ret = f64,
+	params = {gt.param("a", gt.GodotReal), gt.param("b", gt.GodotReal)},
+	ret = gt.GodotReal,
 )
 ```
 

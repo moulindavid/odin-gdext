@@ -102,7 +102,7 @@ ExtensionApiMemberOffsetEntry :: struct {
 // Type mapping: Godot name → Odin name
 //
 // Two separate maps because GDExtension uses different sizes for members
-// (native storage, f32) vs method args/returns (ABI, f64).
+// (native storage, f32) vs method args/returns (Godot `float` ABI, core.GodotReal).
 // ---------------------------------------------------------------------------
 
 member_type_map := map[string]string {
@@ -122,7 +122,7 @@ arg_type_map := map[string]string {
 	"int"     = "i64",
 	"int32"   = "i32",
 	"int64"   = "i64",
-	"float"   = "f64",
+	"float"   = "core.GodotReal",
 	"double"  = "f64",
 	"Variant" = "core.Variant",
 }

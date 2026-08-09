@@ -115,11 +115,11 @@ add_ptrcall :: proc "c" (
 	r_ret: rawptr,
 ) {
 	context = gt.godot_context()
-	a := (cast(^f64)p_args[0])^
-	b := (cast(^f64)p_args[1])^
+	a := (cast(^gt.GodotReal)p_args[0])^
+	b := (cast(^gt.GodotReal)p_args[1])^
 	buf: [160]u8
 	gd.debug_print(fmt.bprintf(buf[:], "add_ptrcall a=%v b=%v", a, b))
-	(cast(^f64)r_ret)^ = a + b
+	(cast(^gt.GodotReal)r_ret)^ = a + b
 }
 
 add_method_name_data: gd.StaticStringName

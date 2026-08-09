@@ -33,6 +33,7 @@ PackedInt64Array :: gcore.PackedInt64Array
 PackedFloat32ArrayStorage :: gcore.PackedFloat32ArrayStorage
 PackedFloat32Array :: gcore.PackedFloat32Array
 StringRepr :: gcore.StringRepr
+GodotReal :: gcore.GodotReal
 
 // --- Core functions ---
 is_nil :: gcore.is_nil

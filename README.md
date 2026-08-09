@@ -137,6 +137,9 @@ Current codegen is intentionally incomplete:
   that initial owned-storage/basic-method/Variant-conversion pattern. Broader
   methods, typed arrays/dictionaries, the other packed arrays, and generated API
   integration are still pending.
+- Godot API `float` values use the centralized `GodotReal` alias. It is `f64`
+  for the currently supported Godot 4.7 `float_64` target; concrete storage
+  types such as `PackedFloat32Array` still expose `f32` elements.
 
 ## Architecture
 
