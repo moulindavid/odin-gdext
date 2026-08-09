@@ -124,8 +124,11 @@ Current codegen is intentionally incomplete:
   method wrappers and owned `StringName`-returning helpers for names/subnames. Generated
   API integration is still pending. `Array` has an initial owned-storage wrapper
   (`array_new`, `array_copy`, `array_free`, `array_push`, `array_size`,
-  `variant_from_array`, and `variant_try_array`), but broader methods, typed arrays,
-  and generated API integration are still pending.
+  `variant_from_array`, and `variant_try_array`). `Dictionary` has the same initial
+  owned-storage pattern plus `dictionary_set`, `dictionary_has`, `dictionary_size`,
+  `dictionary_is_empty`, `variant_from_dictionary`, and `variant_try_dictionary`.
+  Broader methods, typed arrays/dictionaries, packed arrays, and generated API integration
+  are still pending.
 
 ## Architecture
 

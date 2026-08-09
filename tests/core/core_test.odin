@@ -40,6 +40,13 @@ array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+dictionary_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.DictionaryStorage), gd.GDExtensionDictionary_Size)
+	testing.expect_value(t, size_of(gd.Dictionary), gd.GDExtensionDictionary_Size)
+	testing.expect_value(t, len(gd.DictionaryStorage{}), gd.GDExtensionDictionary_Size)
+}
+
+@(test)
 variant_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	v: gd.Variant
 	_ = gd.variant_ptr(&v)
@@ -82,6 +89,14 @@ array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	_ = gd.array_ptr(&a)
 	_ = gd.const_array_ptr(&a)
 	_ = gd.uninitialized_array_ptr(&a)
+}
+
+@(test)
+dictionary_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	d: gd.Dictionary
+	_ = gd.dictionary_ptr(&d)
+	_ = gd.const_dictionary_ptr(&d)
+	_ = gd.uninitialized_dictionary_ptr(&d)
 }
 
 @(test)

@@ -309,6 +309,35 @@ register_classes :: proc() {
 	gt.variant_free(&v2)
 	gt.array_free(&arr)
 
+	// Test: owned Dictionary wrapper and Dictionary Variant extraction
+	dict := gt.dictionary_new()
+	dict_key := gt.variant_from_cstring(cstring("answer"))
+	dict_value := gt.variant_from_int(42)
+	dict_set_ok := gt.dictionary_set(&dict, &dict_key, &dict_value)
+	dict_has_key := gt.dictionary_has(&dict, &dict_key)
+	dict_size := gt.dictionary_size(&dict)
+	dict_empty := gt.dictionary_is_empty(&dict)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"Dictionary: set=%v has=%v size=%v empty=%v (expect true / true / 1 / false)",
+			dict_set_ok,
+			dict_has_key,
+			dict_size,
+			dict_empty,
+		),
+	)
+	dict_v := gt.variant_from_dictionary(&dict)
+	dict_back, dict_back_ok := gt.variant_try_dictionary(&dict_v)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "variant_try_dictionary(dict_v): %v (expect true)", dict_back_ok),
+	)
+	if dict_back_ok do gt.dictionary_free(&dict_back)
+	gt.variant_free(&dict_v)
+	gt.variant_free(&dict_key)
+	gt.variant_free(&dict_value)
+	gt.dictionary_free(&dict)
+
 	// Test: print utility function
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))

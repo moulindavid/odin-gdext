@@ -49,6 +49,7 @@ Implement proper wrappers and ownership rules for:
 - [ ] `Array`
   - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `push`, `size`, and Variant conversion helpers.
 - [ ] `Dictionary`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `set`, `has`, `size`, `is_empty`, and Variant conversion helpers.
 - [ ] packed arrays
 
 ## Priority 2 - generated class bindings

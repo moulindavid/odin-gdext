@@ -22,6 +22,8 @@ NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
 ArrayStorage :: gcore.ArrayStorage
 Array :: gcore.Array
+DictionaryStorage :: gcore.DictionaryStorage
+Dictionary :: gcore.Dictionary
 StringRepr :: gcore.StringRepr
 
 // --- Core functions ---
@@ -88,6 +90,20 @@ array_free :: gcore.array_free
 array_push :: gcore.array_push
 array_size :: gcore.array_size
 
+// --- Dictionary ---
+dictionary_ptr :: gcore.dictionary_ptr
+const_dictionary_ptr :: gcore.const_dictionary_ptr
+uninitialized_dictionary_ptr :: gcore.uninitialized_dictionary_ptr
+dictionary_init_new :: gcore.dictionary_init_new
+dictionary_new :: gcore.dictionary_new
+dictionary_init_copy :: gcore.dictionary_init_copy
+dictionary_copy :: gcore.dictionary_copy
+dictionary_free :: gcore.dictionary_free
+dictionary_set :: gcore.dictionary_set
+dictionary_has :: gcore.dictionary_has
+dictionary_size :: gcore.dictionary_size
+dictionary_is_empty :: gcore.dictionary_is_empty
+
 // --- Variant ---
 variant_type :: gcore.variant_type
 variant_is_type :: gcore.variant_is_type
@@ -106,6 +122,7 @@ variant_from_string :: gcore.variant_from_string
 variant_from_string_name :: gcore.variant_from_string_name
 variant_from_node_path :: gcore.variant_from_node_path
 variant_from_array :: gcore.variant_from_array
+variant_from_dictionary :: gcore.variant_from_dictionary
 variant_from_utf8 :: gcore.variant_from_utf8
 variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
@@ -120,6 +137,8 @@ variant_to_node_path :: gcore.variant_to_node_path
 variant_try_node_path :: gcore.variant_try_node_path
 variant_to_array :: gcore.variant_to_array
 variant_try_array :: gcore.variant_try_array
+variant_to_dictionary :: gcore.variant_to_dictionary
+variant_try_dictionary :: gcore.variant_try_dictionary
 variant_string_utf8_len :: gcore.variant_string_utf8_len
 variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float

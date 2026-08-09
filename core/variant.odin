@@ -10,12 +10,17 @@ NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
 NODE_PATH_GET_CONCATENATED_NAMES_HASH :: 1825232092
 ARRAY_SIZE_HASH :: 3173160232
 ARRAY_PUSH_BACK_HASH :: 3316032543
+DICTIONARY_SIZE_HASH :: 3173160232
+DICTIONARY_IS_EMPTY_HASH :: 3918633141
+DICTIONARY_SET_HASH :: 2175348267
+DICTIONARY_HAS_HASH :: 3680194679
 
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
 GDExtensionStringName_Size :: 8
 GDExtensionNodePath_Size :: 8
 GDExtensionArray_Size :: 8
+GDExtensionDictionary_Size :: 8
 
 // StringStorage is raw storage large enough for Godot's ABI String handle.
 // Treat it as uninitialized until a string_init_* helper or Godot API has
@@ -482,6 +487,122 @@ array_size :: proc "contextless" (arr: ^Array) -> i64 {
 	return call_builtin_method_ptr_ret(array_size_method.method, const_array_ptr(arr), i64)
 }
 
+// DictionaryStorage is raw storage large enough for Godot's ABI Dictionary
+// handle. Treat it as uninitialized until a dictionary_init_* helper or Godot
+// API has constructed a Dictionary in it.
+DictionaryStorage :: [GDExtensionDictionary_Size]u8
+
+// Dictionary is initialized Godot Dictionary storage. Every proc returning a
+// Dictionary transfers ownership to the caller; destroy it with dictionary_free
+// when finished.
+Dictionary :: distinct DictionaryStorage
+
+// dictionary_ptr returns a mutable GDExtension pointer to initialized Dictionary storage.
+dictionary_ptr :: proc "contextless" (d: ^Dictionary) -> TypePtr {
+	if d == nil do _trap_nil_godot_function()
+	return cast(TypePtr)d
+}
+
+// const_dictionary_ptr returns a read-only GDExtension pointer to initialized Dictionary storage.
+const_dictionary_ptr :: proc "contextless" (d: ^Dictionary) -> ConstTypePtr {
+	if d == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)d
+}
+
+// uninitialized_dictionary_ptr returns a GDExtension pointer to storage that
+// Godot is about to initialize. Do not pass already-owned Dictionary storage
+// here unless the called API explicitly overwrites it without leaking.
+uninitialized_dictionary_ptr :: proc "contextless" (d: ^Dictionary) -> UninitializedTypePtr {
+	if d == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)d
+}
+
+// dictionary_init_new constructs an empty Dictionary in dest.
+dictionary_init_new :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Dictionary, 0)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest)
+}
+
+// dictionary_new returns an initialized empty Dictionary; call dictionary_free when done.
+dictionary_new :: proc "contextless" () -> (result: Dictionary) {
+	dictionary_init_new(uninitialized_dictionary_ptr(&result))
+	return
+}
+
+// dictionary_init_copy copies an initialized Dictionary into uninitialized storage.
+dictionary_init_copy :: proc "contextless" (dest: UninitializedTypePtr, value: ^Dictionary) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Dictionary, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_dictionary_ptr(value))
+}
+
+// dictionary_copy returns an initialized copy; call dictionary_free when done.
+dictionary_copy :: proc "contextless" (value: ^Dictionary) -> (result: Dictionary) {
+	dictionary_init_copy(uninitialized_dictionary_ptr(&result), value)
+	return
+}
+
+dictionary_free :: proc "contextless" (d: ^Dictionary) {
+	destroy_builtin(.Dictionary, dictionary_ptr(d))
+}
+
+dictionary_set_method: BuiltinMethod
+dictionary_has_method: BuiltinMethod
+dictionary_size_method: BuiltinMethod
+dictionary_is_empty_method: BuiltinMethod
+
+dictionary_set :: proc "contextless" (dict: ^Dictionary, key, value: ^Variant) -> bool {
+	ensure_builtin_method(&dictionary_set_method, .Dictionary, cstring("set"), DICTIONARY_SET_HASH)
+	return call_builtin_method_ptr_ret(
+		dictionary_set_method.method,
+		dictionary_ptr(dict),
+		bool,
+		variant_ptr(key),
+		variant_ptr(value),
+	)
+}
+
+dictionary_has :: proc "contextless" (dict: ^Dictionary, key: ^Variant) -> bool {
+	ensure_builtin_method(&dictionary_has_method, .Dictionary, cstring("has"), DICTIONARY_HAS_HASH)
+	return call_builtin_method_ptr_ret(
+		dictionary_has_method.method,
+		const_dictionary_ptr(dict),
+		bool,
+		variant_ptr(key),
+	)
+}
+
+dictionary_size :: proc "contextless" (dict: ^Dictionary) -> i64 {
+	ensure_builtin_method(
+		&dictionary_size_method,
+		.Dictionary,
+		cstring("size"),
+		DICTIONARY_SIZE_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		dictionary_size_method.method,
+		const_dictionary_ptr(dict),
+		i64,
+	)
+}
+
+dictionary_is_empty :: proc "contextless" (dict: ^Dictionary) -> bool {
+	ensure_builtin_method(
+		&dictionary_is_empty_method,
+		.Dictionary,
+		cstring("is_empty"),
+		DICTIONARY_IS_EMPTY_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		dictionary_is_empty_method.method,
+		const_dictionary_ptr(dict),
+		bool,
+	)
+}
+
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
 // as uninitialized until one of the variant_init_* helpers or Godot itself has
 // constructed a Variant in it.
@@ -580,6 +701,12 @@ variant_from_node_path :: proc "contextless" (p: ^NodePath) -> (v: Variant) {
 variant_from_array :: proc "contextless" (a: ^Array) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Array)
 	ctor(uninitialized_variant_ptr(&v), array_ptr(a))
+	return
+}
+
+variant_from_dictionary :: proc "contextless" (d: ^Dictionary) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.Dictionary)
+	ctor(uninitialized_variant_ptr(&v), dictionary_ptr(d))
 	return
 }
 
@@ -695,6 +822,17 @@ variant_to_array :: proc "contextless" (v: ^Variant) -> (result: Array) {
 variant_try_array :: proc "contextless" (v: ^Variant) -> (value: Array, ok: bool) {
 	if !variant_is_type(v, .Array) do return Array{}, false
 	return variant_to_array(v), true
+}
+
+variant_to_dictionary :: proc "contextless" (v: ^Variant) -> (result: Dictionary) {
+	ctor := require_variant_to_type_constructor(.Dictionary)
+	ctor(uninitialized_dictionary_ptr(&result), variant_ptr(v))
+	return
+}
+
+variant_try_dictionary :: proc "contextless" (v: ^Variant) -> (value: Dictionary, ok: bool) {
+	if !variant_is_type(v, .Dictionary) do return Dictionary{}, false
+	return variant_to_dictionary(v), true
 }
 
 variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {
