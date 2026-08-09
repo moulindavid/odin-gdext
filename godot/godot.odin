@@ -20,6 +20,8 @@ StringName :: gcore.StringName
 StaticStringName :: gcore.StaticStringName
 NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
+ArrayStorage :: gcore.ArrayStorage
+Array :: gcore.Array
 StringRepr :: gcore.StringRepr
 
 // --- Core functions ---
@@ -74,6 +76,18 @@ node_path_get_name_count :: gcore.node_path_get_name_count
 node_path_get_subname_count :: gcore.node_path_get_subname_count
 node_path_hash :: gcore.node_path_hash
 
+// --- Array ---
+array_ptr :: gcore.array_ptr
+const_array_ptr :: gcore.const_array_ptr
+uninitialized_array_ptr :: gcore.uninitialized_array_ptr
+array_init_new :: gcore.array_init_new
+array_new :: gcore.array_new
+array_init_copy :: gcore.array_init_copy
+array_copy :: gcore.array_copy
+array_free :: gcore.array_free
+array_push :: gcore.array_push
+array_size :: gcore.array_size
+
 // --- Variant ---
 variant_type :: gcore.variant_type
 variant_is_type :: gcore.variant_is_type
@@ -91,6 +105,7 @@ variant_from_bool :: gcore.variant_from_bool
 variant_from_string :: gcore.variant_from_string
 variant_from_string_name :: gcore.variant_from_string_name
 variant_from_node_path :: gcore.variant_from_node_path
+variant_from_array :: gcore.variant_from_array
 variant_from_utf8 :: gcore.variant_from_utf8
 variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
@@ -103,6 +118,8 @@ variant_to_string_name :: gcore.variant_to_string_name
 variant_try_string_name :: gcore.variant_try_string_name
 variant_to_node_path :: gcore.variant_to_node_path
 variant_try_node_path :: gcore.variant_try_node_path
+variant_to_array :: gcore.variant_to_array
+variant_try_array :: gcore.variant_try_array
 variant_string_utf8_len :: gcore.variant_string_utf8_len
 variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float
@@ -114,9 +131,6 @@ call_error_ok :: gcore.call_error_ok
 require_call_ok :: gcore.require_call_ok
 variant_construct_checked :: gcore.variant_construct_checked
 variant_call_checked :: gcore.variant_call_checked
-array_new :: gcore.array_new
-array_push :: gcore.array_push
-array_size :: gcore.array_size
 print :: gcore.print
 print_init :: gcore.print_init
 

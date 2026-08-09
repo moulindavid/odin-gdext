@@ -292,7 +292,7 @@ register_classes :: proc() {
 	gt.variant_free(&vi)
 	gt.variant_free(&vb)
 
-	// Test: Array variant
+	// Test: owned Array wrapper and Array Variant extraction
 	arr := gt.array_new()
 	v1 := gt.variant_from_float(10.0)
 	v2 := gt.variant_from_float(20.0)
@@ -300,9 +300,14 @@ register_classes :: proc() {
 	gt.array_push(&arr, &v2)
 	size := gt.array_size(&arr)
 	gd.debug_print(fmt.bprintf(buf[:], "Array size: %v (expect 2)", size))
+	arr_v := gt.variant_from_array(&arr)
+	arr_back, arr_back_ok := gt.variant_try_array(&arr_v)
+	gd.debug_print(fmt.bprintf(buf[:], "variant_try_array(arr_v): %v (expect true)", arr_back_ok))
+	if arr_back_ok do gt.array_free(&arr_back)
+	gt.variant_free(&arr_v)
 	gt.variant_free(&v1)
 	gt.variant_free(&v2)
-	gt.variant_free(&arr)
+	gt.array_free(&arr)
 
 	// Test: print utility function
 	gt.print_init()

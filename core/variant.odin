@@ -8,11 +8,14 @@ NODE_PATH_IS_ABSOLUTE_HASH :: 3918633141
 NODE_PATH_GET_NAME_HASH :: 2948586938
 NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
 NODE_PATH_GET_CONCATENATED_NAMES_HASH :: 1825232092
+ARRAY_SIZE_HASH :: 3173160232
+ARRAY_PUSH_BACK_HASH :: 3316032543
 
 GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
 GDExtensionStringName_Size :: 8
 GDExtensionNodePath_Size :: 8
+GDExtensionArray_Size :: 8
 
 // StringStorage is raw storage large enough for Godot's ABI String handle.
 // Treat it as uninitialized until a string_init_* helper or Godot API has
@@ -396,6 +399,89 @@ node_path_hash :: proc "contextless" (p: ^NodePath) -> i64 {
 	return call_builtin_method_ptr_ret(node_path_hash_method.method, const_node_path_ptr(p), i64)
 }
 
+// ArrayStorage is raw storage large enough for Godot's ABI Array handle. Treat
+// it as uninitialized until an array_init_* helper or Godot API has constructed
+// an Array in it.
+ArrayStorage :: [GDExtensionArray_Size]u8
+
+// Array is initialized Godot Array storage. Every proc returning an Array
+// transfers ownership to the caller; destroy it with array_free when finished.
+Array :: distinct ArrayStorage
+
+// array_ptr returns a mutable GDExtension pointer to initialized Array storage.
+array_ptr :: proc "contextless" (a: ^Array) -> TypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(TypePtr)a
+}
+
+// const_array_ptr returns a read-only GDExtension pointer to initialized Array storage.
+const_array_ptr :: proc "contextless" (a: ^Array) -> ConstTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)a
+}
+
+// uninitialized_array_ptr returns a GDExtension pointer to storage that Godot is
+// about to initialize. Do not pass already-owned Array storage here unless the
+// called API explicitly overwrites it without leaking.
+uninitialized_array_ptr :: proc "contextless" (a: ^Array) -> UninitializedTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)a
+}
+
+// array_init_new constructs an empty Array in dest.
+array_init_new :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Array, 0)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest)
+}
+
+// array_new returns an initialized empty Array; call array_free when done.
+array_new :: proc "contextless" () -> (result: Array) {
+	array_init_new(uninitialized_array_ptr(&result))
+	return
+}
+
+// array_init_copy copies an initialized Array into uninitialized storage.
+array_init_copy :: proc "contextless" (dest: UninitializedTypePtr, value: ^Array) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Array, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_array_ptr(value))
+}
+
+// array_copy returns an initialized copy; call array_free when done.
+array_copy :: proc "contextless" (value: ^Array) -> (result: Array) {
+	array_init_copy(uninitialized_array_ptr(&result), value)
+	return
+}
+
+array_free :: proc "contextless" (a: ^Array) {
+	destroy_builtin(.Array, array_ptr(a))
+}
+
+array_push_back_method: BuiltinMethod
+array_size_method: BuiltinMethod
+
+array_push :: proc "contextless" (arr: ^Array, value: ^Variant) {
+	ensure_builtin_method(
+		&array_push_back_method,
+		.Array,
+		cstring("push_back"),
+		ARRAY_PUSH_BACK_HASH,
+	)
+	call_builtin_method_ptr_no_ret(
+		array_push_back_method.method,
+		array_ptr(arr),
+		variant_ptr(value),
+	)
+}
+
+array_size :: proc "contextless" (arr: ^Array) -> i64 {
+	ensure_builtin_method(&array_size_method, .Array, cstring("size"), ARRAY_SIZE_HASH)
+	return call_builtin_method_ptr_ret(array_size_method.method, const_array_ptr(arr), i64)
+}
+
 // VariantStorage is raw storage large enough for Godot's ABI Variant. Treat it
 // as uninitialized until one of the variant_init_* helpers or Godot itself has
 // constructed a Variant in it.
@@ -488,6 +574,12 @@ variant_from_string_name :: proc "contextless" (s: ^StringName) -> (v: Variant) 
 variant_from_node_path :: proc "contextless" (p: ^NodePath) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Node_Path)
 	ctor(uninitialized_variant_ptr(&v), node_path_ptr(p))
+	return
+}
+
+variant_from_array :: proc "contextless" (a: ^Array) -> (v: Variant) {
+	ctor := require_variant_from_type_constructor(.Array)
+	ctor(uninitialized_variant_ptr(&v), array_ptr(a))
 	return
 }
 
@@ -594,6 +686,17 @@ variant_try_node_path :: proc "contextless" (v: ^Variant) -> (value: NodePath, o
 	return variant_to_node_path(v), true
 }
 
+variant_to_array :: proc "contextless" (v: ^Variant) -> (result: Array) {
+	ctor := require_variant_to_type_constructor(.Array)
+	ctor(uninitialized_array_ptr(&result), variant_ptr(v))
+	return
+}
+
+variant_try_array :: proc "contextless" (v: ^Variant) -> (value: Array, ok: bool) {
+	if !variant_is_type(v, .Array) do return Array{}, false
+	return variant_to_array(v), true
+}
+
 variant_string_utf8_len :: proc "contextless" (v: ^Variant) -> (needed: int, ok: bool) {
 	str, type_ok := variant_try_string(v)
 	if !type_ok do return 0, false
@@ -681,49 +784,6 @@ variant_call_checked :: proc "contextless" (
 	return
 }
 
-// ---- Array builtin ----
-
-array_new :: proc "contextless" () -> (v: Variant) {
-	err := variant_construct_checked(.Array, uninitialized_variant_ptr(&v), nil, 0)
-	require_call_ok(&err)
-	return
-}
-
-array_push :: proc "contextless" (arr: ^Variant, value: ^Variant) {
-	push_name_data: StaticStringName
-	static_string_name_init_latin1_cstring(
-		uninitialized_static_string_name_ptr(&push_name_data),
-		cstring("push_back"),
-	)
-	push_name := const_static_string_name_ptr(&push_name_data)
-
-	ret: Variant
-	args := [1]ConstVariantPtr{const_variant_ptr(value)}
-	err := variant_call_checked(arr, push_name, &args[0], 1, uninitialized_variant_ptr(&ret))
-	variant_free_temp(&ret)
-	require_call_ok(&err)
-}
-
-array_size :: proc "contextless" (arr: ^Variant) -> i64 {
-	size_name_data: StaticStringName
-	static_string_name_init_latin1_cstring(
-		uninitialized_static_string_name_ptr(&size_name_data),
-		cstring("size"),
-	)
-	size_name := const_static_string_name_ptr(&size_name_data)
-
-	ret: Variant
-	err := variant_call_checked(arr, size_name, nil, 0, uninitialized_variant_ptr(&ret))
-	if !call_error_ok(&err) {
-		variant_free_temp(&ret)
-		require_call_ok(&err)
-	}
-	dest: i64
-	to_ctor := require_variant_to_type_constructor(.Int)
-	to_ctor(cast(UninitializedTypePtr)&dest, variant_ptr(&ret))
-	variant_free_temp(&ret)
-	return dest
-}
 
 // ---- print() utility function ----
 

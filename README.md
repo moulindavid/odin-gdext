@@ -122,8 +122,10 @@ Current codegen is intentionally incomplete:
   be destroyed. `NodePath` has an initial owned wrapper (`node_path_from_utf8`,
   `node_path_free`, `variant_from_node_path`, and `variant_try_node_path`) plus primitive
   method wrappers and owned `StringName`-returning helpers for names/subnames. Generated
-  API integration is still pending. Treat current `Array` helpers
-  as low-level prototype APIs whose construction/destruction rules may change.
+  API integration is still pending. `Array` has an initial owned-storage wrapper
+  (`array_new`, `array_copy`, `array_free`, `array_push`, `array_size`,
+  `variant_from_array`, and `variant_try_array`), but broader methods, typed arrays,
+  and generated API integration are still pending.
 
 ## Architecture
 

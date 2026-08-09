@@ -33,6 +33,13 @@ node_path_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 }
 
 @(test)
+array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.ArrayStorage), gd.GDExtensionArray_Size)
+	testing.expect_value(t, size_of(gd.Array), gd.GDExtensionArray_Size)
+	testing.expect_value(t, len(gd.ArrayStorage{}), gd.GDExtensionArray_Size)
+}
+
+@(test)
 variant_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	v: gd.Variant
 	_ = gd.variant_ptr(&v)
@@ -69,6 +76,13 @@ node_path_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	_ = gd.uninitialized_node_path_ptr(&p)
 }
 
+@(test)
+array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.Array
+	_ = gd.array_ptr(&a)
+	_ = gd.const_array_ptr(&a)
+	_ = gd.uninitialized_array_ptr(&a)
+}
 
 @(test)
 call_error_ok_reports_only_success :: proc(t: ^testing.T) {
