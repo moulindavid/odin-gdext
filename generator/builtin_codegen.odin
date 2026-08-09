@@ -12,6 +12,8 @@ import "core:strings"
 
 ExtensionApiRoot :: struct {
 	builtin_classes:              []ExtensionApiBuiltinClass `json:"builtin_classes"`,
+	classes:                      []ExtensionApiClass `json:"classes"`,
+	singletons:                   []ExtensionApiSingleton `json:"singletons"`,
 	utility_functions:            []ExtensionApiUtilityFunction `json:"utility_functions"`,
 	builtin_class_member_offsets: []ExtensionApiMemberOffsets `json:"builtin_class_member_offsets"`,
 }
@@ -68,6 +70,39 @@ ExtensionApiConstant :: struct {
 	name:  string `json:"name"`,
 	type:  string `json:"type"`,
 	value: string `json:"value"`,
+}
+
+ExtensionApiClass :: struct {
+	name:      string `json:"name"`,
+	inherits:  string `json:"inherits,omitempty"`,
+	methods:   []ExtensionApiClassMethod `json:"methods,omitempty"`,
+	enums:     []ExtensionApiEnum `json:"enums,omitempty"`,
+	constants: []ExtensionApiClassConstant `json:"constants,omitempty"`,
+}
+
+ExtensionApiClassMethod :: struct {
+	name:         string `json:"name"`,
+	return_value: ExtensionApiClassReturnValue `json:"return_value,omitempty"`,
+	is_static:    bool `json:"is_static,omitempty"`,
+	is_vararg:    bool `json:"is_vararg,omitempty"`,
+	is_virtual:   bool `json:"is_virtual,omitempty"`,
+	hash:         i64 `json:"hash"`,
+	arguments:    []ExtensionApiMethodArg `json:"arguments,omitempty"`,
+}
+
+ExtensionApiClassReturnValue :: struct {
+	type: string `json:"type,omitempty"`,
+}
+
+ExtensionApiClassConstant :: struct {
+	name:  string `json:"name"`,
+	type:  string `json:"type,omitempty"`,
+	value: json.Value `json:"value"`,
+}
+
+ExtensionApiSingleton :: struct {
+	name: string `json:"name"`,
+	type: string `json:"type"`,
 }
 
 ExtensionApiUtilityFunction :: struct {
@@ -255,6 +290,154 @@ param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
 		return fmt.aprintf("%s(%s)", entry.ptr, arg_name)
 	}
 	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
+}
+
+
+odin_identifier_reserved := map[string]bool {
+	"auto_cast"   = true,
+	"bit_field"   = true,
+	"bit_set"     = true,
+	"break"       = true,
+	"case"        = true,
+	"cast"        = true,
+	"context"     = true,
+	"continue"    = true,
+	"defer"       = true,
+	"distinct"    = true,
+	"do"          = true,
+	"dynamic"     = true,
+	"else"        = true,
+	"enum"        = true,
+	"fallthrough" = true,
+	"for"         = true,
+	"foreign"     = true,
+	"if"          = true,
+	"import"      = true,
+	"in"          = true,
+	"map"         = true,
+	"matrix"      = true,
+	"not_in"      = true,
+	"or_else"     = true,
+	"or_return"   = true,
+	"package"     = true,
+	"proc"        = true,
+	"return"      = true,
+	"struct"      = true,
+	"switch"      = true,
+	"transmute"   = true,
+	"typeid"      = true,
+	"union"       = true,
+	"using"       = true,
+	"when"        = true,
+	"where"       = true,
+}
+
+is_ident_alpha :: proc(ch: u8) -> bool {
+	return (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || ch == '_'
+}
+
+is_ident_digit :: proc(ch: u8) -> bool {
+	return ch >= '0' && ch <= '9'
+}
+
+is_ident_upper :: proc(ch: u8) -> bool {
+	return ch >= 'A' && ch <= 'Z'
+}
+
+is_ident_lower :: proc(ch: u8) -> bool {
+	return ch >= 'a' && ch <= 'z'
+}
+
+to_lower_ascii :: proc(ch: u8) -> u8 {
+	if is_ident_upper(ch) do return ch + 32
+	return ch
+}
+
+to_upper_ascii :: proc(ch: u8) -> u8 {
+	if is_ident_lower(ch) do return ch - 32
+	return ch
+}
+
+odin_safe_snake_identifier :: proc(name: string) -> string {
+	b := strings.builder_make(context.temp_allocator)
+	previous_underscore := false
+	previous_was_lower_or_digit := false
+
+	for ch in transmute([]u8)name {
+		if is_ident_alpha(ch) || is_ident_digit(ch) {
+			if is_ident_upper(ch) && previous_was_lower_or_digit && !previous_underscore {
+				strings.write_byte(&b, '_')
+			}
+			strings.write_byte(&b, to_lower_ascii(ch))
+			previous_underscore = false
+			previous_was_lower_or_digit = is_ident_lower(ch) || is_ident_digit(ch)
+		} else if !previous_underscore {
+			strings.write_byte(&b, '_')
+			previous_underscore = true
+			previous_was_lower_or_digit = false
+		}
+	}
+
+	result := strings.to_string(b)
+	for len(result) > 0 && result[len(result) - 1] == '_' {
+		result = result[:len(result) - 1]
+	}
+	if len(result) == 0 {
+		result = "_"
+	}
+	if is_ident_digit(result[0]) {
+		result = fmt.aprintf("_%s", result)
+	}
+	if odin_identifier_reserved[result] {
+		result = fmt.aprintf("%s_", result)
+	}
+	return result
+}
+
+odin_safe_pascal_identifier :: proc(name: string) -> string {
+	snake := odin_safe_snake_identifier(name)
+	b := strings.builder_make(context.temp_allocator)
+	capitalize_next := true
+	for ch in transmute([]u8)snake {
+		if ch == '_' {
+			capitalize_next = true
+			continue
+		}
+		out := ch
+		if capitalize_next {
+			out = to_upper_ascii(ch)
+			capitalize_next = false
+		}
+		strings.write_byte(&b, out)
+	}
+	result := strings.to_string(b)
+	if len(result) == 0 {
+		result = "_"
+	}
+	if is_ident_digit(result[0]) {
+		result = fmt.aprintf("_%s", result)
+	}
+	return result
+}
+
+class_enum_type_name :: proc(class_name, enum_name: string) -> string {
+	return fmt.aprintf(
+		"%s%s",
+		odin_safe_pascal_identifier(class_name),
+		odin_safe_pascal_identifier(enum_name),
+	)
+}
+
+class_constant_name :: proc(class_name, constant_name: string) -> string {
+	return fmt.aprintf(
+		"%s_%s",
+		odin_safe_snake_identifier(class_name),
+		odin_safe_snake_identifier(constant_name),
+	)
+}
+
+class_enum_value_name :: proc(value_name: string) -> string {
+	return odin_safe_snake_identifier(value_name)
 }
 
 // ---------------------------------------------------------------------------
@@ -822,6 +1005,639 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	return true
 }
 
+
+// ---------------------------------------------------------------------------
+// Class handle codegen
+// ---------------------------------------------------------------------------
+
+selected_class_names := []string {
+	"Object",
+	"RefCounted",
+	"Resource",
+	"Node",
+	"CanvasItem",
+	"Node2D",
+	"Control",
+}
+
+Selected_Class_Method :: struct {
+	class_name:  string,
+	method_name: string,
+}
+
+selected_class_methods := []Selected_Class_Method {
+	{"Object", "get_class"},
+	{"Object", "is_class"},
+	{"Object", "set_meta"},
+	{"Object", "get_meta"},
+	{"RefCounted", "get_reference_count"},
+	{"Resource", "get_path"},
+	{"Resource", "get_rid"},
+	{"Resource", "set_local_to_scene"},
+	{"Resource", "is_local_to_scene"},
+	{"Node", "get_parent"},
+	{"Node", "is_ancestor_of"},
+	{"Node", "get_path_to"},
+	{"CanvasItem", "set_visible"},
+	{"CanvasItem", "is_visible"},
+	{"CanvasItem", "show"},
+	{"CanvasItem", "hide"},
+	{"CanvasItem", "queue_redraw"},
+	{"CanvasItem", "get_canvas"},
+	{"Node2D", "set_position"},
+	{"Node2D", "get_position"},
+	{"Node2D", "set_rotation"},
+	{"Node2D", "get_rotation"},
+	{"Control", "set_custom_minimum_size"},
+	{"Control", "get_custom_minimum_size"},
+	{"Control", "set_focus_mode"},
+	{"Control", "get_focus_mode"},
+	{"Control", "has_focus"},
+	{"Control", "grab_focus"},
+	{"Control", "release_focus"},
+	{"Control", "set_mouse_filter"},
+	{"Control", "get_mouse_filter"},
+}
+
+is_selected_class :: proc(name: string) -> bool {
+	for selected in selected_class_names {
+		if selected == name do return true
+	}
+	return false
+}
+
+find_class :: proc(root: ^ExtensionApiRoot, name: string) -> (class: ExtensionApiClass, ok: bool) {
+	for c in root.classes {
+		if c.name == name do return c, true
+	}
+	return {}, false
+}
+
+find_class_method :: proc(
+	class: ExtensionApiClass,
+	name: string,
+) -> (
+	method: ExtensionApiClassMethod,
+	ok: bool,
+) {
+	for m in class.methods {
+		if m.name == name do return m, true
+	}
+	return {}, false
+}
+
+class_type_expr :: proc(class_name: string) -> string {
+	if class_name == "Object" do return "core.Object"
+	if class_name == "RefCounted" do return "core.RefCounted"
+	return fmt.aprintf("distinct core.ObjectPtr")
+}
+
+class_handle_expr :: proc(class_name: string) -> string {
+	if class_name == "Object" do return "core.Object"
+	if class_name == "RefCounted" do return "core.RefCounted"
+	return class_name
+}
+
+
+class_enum_type_from_godot :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if !strings.has_prefix(godot_name, "enum::") do return "", false
+	rest := strings.trim_prefix(godot_name, "enum::")
+	parts := strings.split(rest, ".", context.temp_allocator)
+	if len(parts) != 2 do return "", false
+	if !is_selected_class(parts[0]) do return "", false
+	return class_enum_type_name(parts[0], parts[1]), true
+}
+
+class_abi_type_map := map[string]string {
+	"Nil"     = "rawptr",
+	"bool"    = "bool",
+	"int"     = "i64",
+	"int32"   = "i32",
+	"int64"   = "i64",
+	"float"   = "core.GodotReal",
+	"double"  = "f64",
+	"Vector2" = "core.Vector2",
+	"Vector3" = "core.Vector3",
+	"Vector4" = "core.Vector4",
+	"Color"   = "core.Color",
+}
+
+// Class method mapping rules:
+// - Godot Object/class params and returns are borrowed handles by value.
+// - Completed owned value params are borrowed pointers; returns are owned storage.
+// - Variant params are borrowed pointers; Variant returns are owned storage.
+// - Primitive and memory-compatible builtin values are passed by value.
+// - Callable, Signal, varargs, typed arrays, and lifetime-sensitive APIs are deferred.
+resolve_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "" || godot_name == "void" do return "", true
+	if enum_type, enum_ok := class_enum_type_from_godot(godot_name); enum_ok do return enum_type, true
+	if godot_name == "Variant" do return "core.Variant", true
+	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok do return entry.odin, true
+	if is_selected_class(godot_name) do return class_handle_expr(godot_name), true
+	if t, map_ok := class_abi_type_map[godot_name]; map_ok do return t, true
+	return "", false
+}
+
+resolve_class_param_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "Variant" do return "^core.Variant", true
+	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok {
+		return fmt.aprintf("^%s", entry.odin), true
+	}
+	return resolve_class_return_type(godot_name)
+}
+
+class_param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
+	if godot_type == "Variant" do return fmt.aprintf("core.variant_ptr(%s)", arg_name)
+	if entry, ok := completed_core_value_entry(godot_type); ok {
+		return fmt.aprintf("%s(%s)", entry.ptr, arg_name)
+	}
+	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
+}
+
+class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
+	if godot_name == "Callable" || godot_name == "Signal" do return true
+	if strings.has_prefix(godot_name, "typedarray::") do return true
+	if strings.has_prefix(godot_name, "TypedArray") do return true
+	if strings.has_prefix(godot_name, "bitfield::") do return true
+	return false
+}
+
+class_method_deferred_until_safety_model :: proc(class_name, method_name: string) -> bool {
+	if class_name == "Control" && method_name == "force_drag" do return true
+	if class_name == "Resource" && method_name == "duplicate" do return true
+	if class_name == "RefCounted" &&
+	   (method_name == "init_ref" || method_name == "reference" || method_name == "unreference") {
+		return true
+	}
+	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
+		return true
+	}
+	return false
+}
+
+class_method_supported :: proc(class_name: string, method: ExtensionApiClassMethod) -> bool {
+	if method.is_vararg || method.is_virtual do return false
+	if class_method_deferred_until_safety_model(class_name, method.name) do return false
+	if class_type_deferred_until_safety_model(method.return_value.type) do return false
+	if _, ok := resolve_class_return_type(method.return_value.type); !ok do return false
+	for arg in method.arguments {
+		if class_type_deferred_until_safety_model(arg.type) do return false
+		if _, ok := resolve_class_param_type(arg.type); !ok do return false
+	}
+	return true
+}
+
+
+class_inherits_from :: proc(
+	root: ^ExtensionApiRoot,
+	class: ExtensionApiClass,
+	ancestor_name: string,
+) -> bool {
+	ancestor := class.inherits
+	for len(ancestor) > 0 {
+		if ancestor == ancestor_name do return true
+		ancestor_class, ok := find_class(root, ancestor)
+		if !ok do break
+		ancestor = ancestor_class.inherits
+	}
+	return false
+}
+
+class_proc_prefix :: proc(class_name: string) -> string {
+	b := strings.builder_make(context.temp_allocator)
+	for r, i in class_name {
+		if r >= 'A' && r <= 'Z' {
+			if i > 0 {
+				prev := class_name[i - 1]
+				if prev >= 'a' && prev <= 'z' {
+					strings.write_byte(&b, '_')
+				}
+			}
+			strings.write_rune(&b, r + 32)
+		} else {
+			strings.write_rune(&b, r)
+		}
+	}
+	return strings.to_string(b)
+}
+
+
+emit_class_constants_and_enums :: proc(
+	b: ^strings.Builder,
+	selected: map[string]ExtensionApiClass,
+) {
+	strings.write_string(b, "// ---- Class enums and constants ----\n\n")
+	strings.write_string(
+		b,
+		"// Constants are prefixed with the class name to avoid package-level collisions.\n",
+	)
+	strings.write_string(b, "// Enum values are scoped to their generated enum type.\n\n")
+
+	for class_name in selected_class_names {
+		class := selected[class_name]
+		if len(class.enums) == 0 && len(class.constants) == 0 do continue
+
+		fmt.sbprintf(b, "// %s\n\n", class.name)
+		for enum_ in class.enums {
+			enum_type := class_enum_type_name(class.name, enum_.name)
+			fmt.sbprintf(b, "%s :: enum i64 {{\n", enum_type)
+			used_values := make(map[string]bool, len(enum_.values))
+			for value in enum_.values {
+				value_name := class_enum_value_name(value.name)
+				if used_values[value_name] {
+					value_name = fmt.aprintf("%s_%d", value_name, value.value)
+				}
+				used_values[value_name] = true
+				fmt.sbprintf(b, "\t%s = %d,\n", value_name, value.value)
+			}
+			delete(used_values)
+			strings.write_string(b, "}\n\n")
+		}
+
+		used_constants := make(map[string]bool, len(class.constants))
+		for constant in class.constants {
+			constant_name := class_constant_name(class.name, constant.name)
+			if used_constants[constant_name] {
+				constant_name = fmt.aprintf("%s_%d", constant_name, constant.value)
+			}
+			used_constants[constant_name] = true
+			fmt.sbprintf(b, "%s :: %d\n", constant_name, constant.value)
+		}
+		delete(used_constants)
+		if len(class.constants) > 0 {
+			strings.write_string(b, "\n")
+		}
+	}
+}
+
+emit_class_downcast :: proc(
+	b: ^strings.Builder,
+	source_name: string,
+	source_type: string,
+	target_name: string,
+	target_type: string,
+) {
+	source_lower := class_proc_prefix(source_name)
+	target_lower := class_proc_prefix(target_name)
+	fmt.sbprintf(
+		b,
+		"%s_is_%s :: proc \"contextless\" (self: %s) -> bool {{\n",
+		source_lower,
+		target_lower,
+		source_type,
+	)
+	strings.write_string(b, "\tif core.ObjectPtr(self) == nil {return false}\n")
+	fmt.sbprintf(
+		b,
+		"\treturn core.is_class(core.ObjectPtr(self), core.static_string_name_ptr(&%s_class_name_data))\n",
+		target_lower,
+	)
+	strings.write_string(b, "}\n\n")
+
+	fmt.sbprintf(
+		b,
+		"%s_try_as_%s :: proc \"contextless\" (self: %s) -> (value: %s, ok: bool) {{\n",
+		source_lower,
+		target_lower,
+		source_type,
+		target_type,
+	)
+	fmt.sbprintf(
+		b,
+		"\treturn core.cast_to(core.ObjectPtr(self), core.static_string_name_ptr(&%s_class_name_data), %s)\n",
+		target_lower,
+		target_type,
+	)
+	strings.write_string(b, "}\n\n")
+}
+
+emit_class_downcasts :: proc(
+	b: ^strings.Builder,
+	root: ^ExtensionApiRoot,
+	selected: map[string]ExtensionApiClass,
+) {
+	strings.write_string(b, "// ---- Checked downcasts and class identity helpers ----\n\n")
+	strings.write_string(
+		b,
+		"// These helpers keep downcasts checked through Object.is_class/core.cast_to.\n",
+	)
+	strings.write_string(b, "// Nil objects always return ok=false for try_as helpers.\n\n")
+
+	for source_name in selected_class_names {
+		source_type := class_handle_expr(source_name)
+
+		for target_name in selected_class_names {
+			if source_name == target_name do continue
+			target_class := selected[target_name]
+			if !class_inherits_from(root, target_class, source_name) do continue
+
+			emit_class_downcast(
+				b,
+				source_name,
+				source_type,
+				target_name,
+				class_handle_expr(target_name),
+			)
+		}
+	}
+}
+
+emit_class_upcast :: proc(b: ^strings.Builder, class: ExtensionApiClass, ancestor: string) {
+	lower := class_proc_prefix(class.name)
+	ancestor_lower := class_proc_prefix(ancestor)
+	ancestor_type := class_handle_expr(ancestor)
+	fmt.sbprintf(
+		b,
+		"%s_as_%s :: proc \"contextless\" (self: %s) -> %s {{\n",
+		lower,
+		ancestor_lower,
+		class.name,
+		ancestor_type,
+	)
+	fmt.sbprintf(b, "\treturn %s(self)\n", ancestor_type)
+	strings.write_string(b, "}\n\n")
+}
+
+emit_class_binding_storage :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
+	strings.write_string(b, "// ---- Binding initialization ----\n\n")
+	strings.write_string(b, "class_bindings_initialized: bool\n\n")
+
+	for name in selected_class_names {
+		prefix := class_proc_prefix(name)
+		fmt.sbprintf(b, "%s_class_name_data: core.StaticStringName\n", prefix)
+	}
+	strings.write_string(b, "\n")
+
+	for entry in selected_class_methods {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok {
+			fmt.eprintfln("ERROR: class %q missing from extension_api.json", entry.class_name)
+			return false
+		}
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok {
+			fmt.eprintfln(
+				"ERROR: method %q.%q missing from extension_api.json",
+				entry.class_name,
+				entry.method_name,
+			)
+			return false
+		}
+
+		class_prefix := class_proc_prefix(entry.class_name)
+		method_prefix := class_proc_prefix(entry.method_name)
+		fmt.sbprintf(
+			b,
+			"%s_%s_method_name_data: core.StaticStringName\n",
+			class_prefix,
+			method_prefix,
+		)
+		fmt.sbprintf(
+			b,
+			"%s_%s_method_bind: core.MethodBindPtr // hash %d\n\n",
+			class_prefix,
+			method_prefix,
+			method.hash,
+		)
+	}
+	return true
+}
+
+emit_init_static_string_name :: proc(b: ^strings.Builder, storage_name, literal: string) {
+	fmt.sbprintf(
+		b,
+		"\tcore.static_string_name_init_latin1_cstring(\n" +
+		"\t\tcore.uninitialized_static_string_name_ptr(&%s),\n" +
+		"\t\tcstring(\"%s\"),\n" +
+		"\t)\n",
+		storage_name,
+		literal,
+	)
+}
+
+emit_class_binding_init :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
+	strings.write_string(b, "init_class_bindings :: proc \"contextless\" () {\n")
+	strings.write_string(b, "\tif class_bindings_initialized do return\n\n")
+	strings.write_string(b, "\tcore.init_class_casting()\n\n")
+
+	for name in selected_class_names {
+		prefix := class_proc_prefix(name)
+		emit_init_static_string_name(b, fmt.aprintf("%s_class_name_data", prefix), name)
+	}
+	strings.write_string(b, "\n")
+
+	for entry in selected_class_methods {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok do return false
+
+		class_prefix := class_proc_prefix(entry.class_name)
+		method_prefix := class_proc_prefix(entry.method_name)
+		method_name_storage := fmt.aprintf("%s_%s_method_name_data", class_prefix, method_prefix)
+		emit_init_static_string_name(b, method_name_storage, entry.method_name)
+		fmt.sbprintf(
+			b,
+			"\t%s_%s_method_bind = core.require_classdb_method_bind(\n" +
+			"\t\tcore.const_static_string_name_ptr(&%s_class_name_data),\n" +
+			"\t\tcore.const_static_string_name_ptr(&%s),\n" +
+			"\t\t%d,\n" +
+			"\t)\n",
+			class_prefix,
+			method_prefix,
+			class_prefix,
+			method_name_storage,
+			method.hash,
+		)
+	}
+
+	strings.write_string(b, "\n\tclass_bindings_initialized = true\n")
+	strings.write_string(b, "}\n\n")
+	return true
+}
+
+emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
+	strings.write_string(b, "// ---- Selected class methods ----\n\n")
+
+	for entry in selected_class_methods {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok do return false
+		if !class_method_supported(entry.class_name, method) {
+			fmt.eprintfln(
+				"ERROR: unsupported selected class method %s.%s",
+				entry.class_name,
+				entry.method_name,
+			)
+			return false
+		}
+
+		class_prefix := class_proc_prefix(entry.class_name)
+		method_prefix := class_proc_prefix(entry.method_name)
+		proc_name := fmt.aprintf("%s_%s", class_prefix, method_prefix)
+		method_bind_name := fmt.aprintf("%s_%s_method_bind", class_prefix, method_prefix)
+		self_type := class_handle_expr(entry.class_name)
+		returns_void := method.return_value.type == "" || method.return_value.type == "void"
+		ret_type := ""
+		if !returns_void {
+			resolved_ret, ret_ok := resolve_class_return_type(method.return_value.type)
+			if !ret_ok do return false
+			ret_type = resolved_ret
+			if method.return_value.type == "Variant" {
+				fmt.sbprintf(
+					b,
+					"// %s returns an initialized Variant; call core.variant_free when done.\n",
+					proc_name,
+				)
+			} else if entry_value, entry_ok := completed_core_value_entry(
+				method.return_value.type,
+			); entry_ok {
+				fmt.sbprintf(
+					b,
+					"// %s returns initialized %s storage; call %s when done.\n",
+					proc_name,
+					entry_value.godot,
+					entry_value.free,
+				)
+			} else if is_selected_class(method.return_value.type) {
+				fmt.sbprintf(
+					b,
+					"// %s returns a borrowed %s handle; do not free or unref it.\n",
+					proc_name,
+					method.return_value.type,
+				)
+			}
+		}
+
+		fmt.sbprintf(b, "%s :: proc \"contextless\" (self: %s", proc_name, self_type)
+		for arg in method.arguments {
+			param_type, param_ok := resolve_class_param_type(arg.type)
+			if !param_ok do return false
+			fmt.sbprintf(b, ", %s: %s", arg.name, param_type)
+		}
+		if returns_void {
+			strings.write_string(b, ") {\n")
+		} else {
+			fmt.sbprintf(b, ") -> %s {{\n", ret_type)
+		}
+
+		for arg in method.arguments {
+			if arg.type == "Variant" do continue
+			if _, ok := completed_core_value_entry(arg.type); ok do continue
+			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
+		}
+
+		if returns_void {
+			fmt.sbprintf(
+				b,
+				"\tcore.call_method_ptr_no_ret(%s, core.ObjectPtr(self)",
+				method_bind_name,
+			)
+		} else {
+			fmt.sbprintf(
+				b,
+				"\treturn core.call_method_ptr_ret(%s, %s, core.ObjectPtr(self)",
+				method_bind_name,
+				ret_type,
+			)
+		}
+		for arg in method.arguments {
+			fmt.sbprintf(b, ",\n\t\t%s", class_param_ptr_expr(arg.name, arg.type))
+		}
+		strings.write_string(b, ")\n")
+		strings.write_string(b, "}\n\n")
+	}
+
+	return true
+}
+
+generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
+	path := "bindings/classes/classes.odin"
+
+	b := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&b)
+
+	strings.write_string(
+		&b,
+		"// bindings/classes/classes.odin -- selected Godot class handle bindings.\n",
+	)
+	strings.write_string(&b, "// Auto-generated from extension_api.json. DO NOT EDIT.\n\n")
+	strings.write_string(&b, "package godot_bindings_classes\n\n")
+	strings.write_string(&b, "import core \"godot:core\"\n\n")
+	strings.write_string(
+		&b,
+		"// Generated class handles are borrowed views over Godot-owned objects.\n",
+	)
+	strings.write_string(&b, "// They do not own, retain, unref, or free the underlying object.\n")
+	strings.write_string(
+		&b,
+		"// Class method object parameters and returns are borrowed handles by value.\n\n",
+	)
+
+	if !emit_class_binding_storage(&b, root) {return false}
+	if !emit_class_binding_init(&b, root) {return false}
+
+	selected := make(map[string]ExtensionApiClass, len(selected_class_names))
+	defer delete(selected)
+	for name in selected_class_names {
+		class, ok := find_class(root, name)
+		if !ok {
+			fmt.eprintfln("ERROR: class %q missing from extension_api.json", name)
+			return false
+		}
+		selected[name] = class
+	}
+
+	for name in selected_class_names {
+		class := selected[name]
+		fmt.sbprintf(
+			&b,
+			"// %s inherits %s.\n",
+			class.name,
+			class.inherits if len(class.inherits) > 0 else "<none>",
+		)
+		fmt.sbprintf(&b, "%s :: %s\n\n", class.name, class_type_expr(class.name))
+	}
+
+	for name in selected_class_names {
+		class := selected[name]
+		if class.name == "Object" do continue
+
+		strings.write_string(&b, "// ---- ")
+		strings.write_string(&b, class.name)
+		strings.write_string(&b, " upcasts ----\n\n")
+
+		ancestor := class.inherits
+		for len(ancestor) > 0 {
+			if is_selected_class(ancestor) {
+				emit_class_upcast(&b, class, ancestor)
+			}
+			ancestor_class, ok := find_class(root, ancestor)
+			if !ok do break
+			ancestor = ancestor_class.inherits
+		}
+	}
+
+	emit_class_downcasts(&b, root, selected)
+	emit_class_constants_and_enums(&b, selected)
+
+	strings.write_string(
+		&b,
+		"// Callable, Signal, varargs, typed arrays, and lifetime-sensitive APIs are not generated yet.\n\n",
+	)
+
+	if !emit_class_method_wrappers(&b, root) {return false}
+
+	err := os.write_entire_file(path, transmute([]byte)strings.to_string(b))
+	if err != nil {
+		fmt.eprintfln("ERROR: %v", err)
+		return false
+	}
+	fmt.printfln("  %s  (%d class handles)", path, len(selected_class_names))
+	return true
+}
+
 // ---------------------------------------------------------------------------
 // Entry point -- called from main.odin for `--builtin` flag.
 // ---------------------------------------------------------------------------
@@ -856,6 +1672,7 @@ generate_builtin_bindings :: proc(json_path: string) -> bool {
 	}
 
 	if !generate_utility_bindings(&root) {return false}
+	if !generate_class_bindings(&root) {return false}
 
 	return true
 }

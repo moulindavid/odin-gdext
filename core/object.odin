@@ -65,9 +65,11 @@ variant_try_object :: proc "contextless" (v: ^Variant) -> (value: ObjectPtr, ok:
 is_class_method_name_data: StaticStringName
 object_class_name_data: StaticStringName
 is_class_method_bind: MethodBindPtr
+class_casting_initialized: bool
 
-// Call once, during module init, before any cast is attempted.
-init_class_casting :: proc() {
+// Call during module init, before any cast is attempted.
+init_class_casting :: proc "contextless" () {
+	if class_casting_initialized do return
 	static_string_name_init_latin1_cstring(
 		uninitialized_static_string_name_ptr(&is_class_method_name_data),
 		cstring("is_class"),
@@ -81,6 +83,7 @@ init_class_casting :: proc() {
 		const_static_string_name_ptr(&is_class_method_name_data),
 		2619796661,
 	)
+	class_casting_initialized = true
 }
 
 // is_class checks whether obj is an instance of (or derives from) class_name.

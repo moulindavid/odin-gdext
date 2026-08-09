@@ -95,82 +95,82 @@ _ready :: proc(self: Player) {
 Implementation order:
 
 1. Parse class metadata from `extension_api.json`.
-   - [ ] Add generator structs for `classes`, `singletons`, class methods,
+   - [x] Add generator structs for `classes`, `singletons`, class methods,
      constants, enums, inheritance, return values, arguments, hashes, and flags
      needed for class generation.
-   - [ ] Inspect representative metadata for `Object`, `Node`, `Node2D`,
+   - [x] Inspect representative metadata for `Object`, `Node`, `Node2D`,
      `CanvasItem`, `Resource`, and `RefCounted` before emitting broad output.
-   - [ ] Keep generation deterministic and report or skip unsupported method
+   - [x] Keep generation deterministic and report or skip unsupported method
      shapes explicitly.
 
 2. Generate minimal class handle files.
-   - [ ] Add a generated class package such as `bindings/classes`.
-   - [ ] Generate borrowed object handle types using the existing model:
+   - [x] Add a generated class package such as `bindings/classes`.
+   - [x] Generate borrowed object handle types using the existing model:
      `Object` as `core.Object`, other classes as `distinct core.ObjectPtr`.
-   - [ ] Generate explicit upcast helpers such as `node2d_as_node`,
+   - [x] Generate explicit upcast helpers such as `node2d_as_node`,
      `node2d_as_canvas_item`, and `node2d_as_object`.
-   - [ ] Document that generated class handles do not own or free Godot objects.
+   - [x] Document that generated class handles do not own or free Godot objects.
 
 3. Generate class binding initialization.
-   - [ ] Generate process-lifetime `StaticStringName` storage for class and
+   - [x] Generate process-lifetime `StaticStringName` storage for class and
      method names.
-   - [ ] Generate `MethodBindPtr` caches resolved with
+   - [x] Generate `MethodBindPtr` caches resolved with
      `core.require_classdb_method_bind`.
-   - [ ] Generate one explicit `init_class_bindings` entry point and call it
+   - [x] Generate one explicit `init_class_bindings` entry point and call it
      from the extension initialization path before generated class methods are
      used.
-   - [ ] Preserve Priority 0 nil/trap checks for unresolved function pointers
+   - [x] Preserve Priority 0 nil/trap checks for unresolved function pointers
      and method binds.
 
 4. Generate a first safe method-wrapper slice.
-   - [ ] Start with `Object`, `Node`, and `Node2D` only.
-   - [ ] Generate non-vararg, non-virtual methods whose argument and return
+   - [x] Start with selected `Object` and `Node2D` methods only.
+   - [x] Generate non-vararg, non-virtual methods whose argument and return
      types are already covered by Priority 1 value-type rules.
-   - [ ] First runtime target: `node2d_set_position` and
+   - [x] First runtime target: `node2d_set_position` and
      `node2d_get_position` through `object_method_bind_ptrcall`.
-   - [ ] Add hello smoke coverage that calls generated class methods from the
+   - [x] Add hello smoke coverage that calls generated class methods from the
      extension.
 
 5. Define class method type-mapping rules.
-   - [ ] Object/class parameters and returns are borrowed handles by value; no
+   - [x] Object/class parameters and returns are borrowed handles by value; no
      generated wrapper takes ownership of a Godot object.
-   - [ ] Completed owned value types keep the Priority 1 rule: borrowed
+   - [x] Completed owned value types keep the Priority 1 rule: borrowed
      pointer parameters and owned initialized return values with explicit
      destruction comments.
-   - [ ] Primitive and memory-compatible builtin values are passed by value
+   - [x] Primitive and memory-compatible builtin values are passed by value
      using the documented Godot 4.7 `GodotReal` ABI rule for `float`.
-   - [ ] `Variant` parameters remain borrowed as `^core.Variant`; Variant
+   - [x] `Variant` parameters remain borrowed as `^core.Variant`; Variant
      returns are owned and must be destroyed with `core.variant_free`.
-   - [ ] Skip `Callable`, `Signal`, vararg methods, and unsupported typed-array
+   - [x] Skip `Callable`, `Signal`, vararg methods, and unsupported typed-array
      or object-lifetime-sensitive APIs until their safety model is explicit.
 
 6. Generate safe downcasts and class identity helpers.
-   - [ ] Generate wrappers around `core.cast_to` for selected classes, using
+   - [x] Generate wrappers around `core.cast_to` for selected classes, using
      Godot `is_class` checks before reinterpretation.
-   - [ ] Return `(value, ok)` for checked downcasts and treat nil objects as
+   - [x] Return `(value, ok)` for checked downcasts and treat nil objects as
      failed casts.
-   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 7. Generate class constants and enums.
-   - [ ] Emit Odin-safe names for class enums and constants.
-   - [ ] Include important notification and mode constants, especially for
+   - [x] Emit Odin-safe names for class enums and constants.
+   - [x] Include important notification and mode constants, especially for
      `Object`, `Node`, and common scene classes.
-   - [ ] Keep output deterministic and avoid collisions with generated method
+   - [x] Keep output deterministic and avoid collisions with generated method
      and type names.
 
 8. Integrate generated classes into the public facade.
-   - [ ] Re-export selected class handle types and free-function wrappers from
+   - [x] Re-export selected class handle types and free-function wrappers from
      `godot/godot.odin`.
-   - [ ] Keep examples importing only `godot:godot` for normal usage.
-   - [ ] Add checks/tests proving generated class APIs compile without importing
+   - [x] Keep examples importing only `godot:godot` for normal usage.
+   - [x] Add checks/tests proving generated class APIs compile without importing
      internal generated packages directly.
 
 9. Expand class coverage incrementally.
-   - [ ] After `Object`/`Node`/`Node2D` works, add `CanvasItem`, `Control`,
+   - [x] After `Object`/`Node`/`Node2D` works, add `CanvasItem`, `Control`,
      `Resource`, `RefCounted`, and other common scene/resource classes.
-   - [ ] Avoid generating the full 1000+ class API until skip rules, type
+   - [x] Avoid generating the full 1000+ class API until skip rules, type
      mapping, inheritance helpers, and smoke coverage are stable.
-   - [ ] Prefer fixing generator logic over patching generated files manually.
+   - [x] Prefer fixing generator logic over patching generated files manually.
 
 Priority 2 is complete when a small but useful generated class API can be used
 from the hello extension, class wrappers preserve object lifetime safety, and CI

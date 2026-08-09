@@ -1,11 +1,14 @@
-// godot/godot.odin -- Small convenience facade.
+// godot/godot.odin -- Public convenience facade.
 //
-// This package intentionally re-exports only a tiny handwritten subset today.
-// Import `godot:bindings` and `godot:bindings/builtin` directly for generated
-// utility and builtin APIs.
+// Prefer this package for normal extension code. It re-exports the stable core
+// value helpers plus the selected generated builtin, utility, and class APIs.
+// Manual class registration still uses some low-level core declarations until
+// the Priority 3 registration helpers exist.
 package godot
 
 import gbind "godot:bindings"
+import gbind_builtin "godot:bindings/builtin"
+import gclass "godot:bindings/classes"
 import gcore "godot:core"
 
 // --- Core types ---
@@ -52,6 +55,11 @@ Vector2 :: gcore.Vector2
 Vector3 :: gcore.Vector3
 Vector4 :: gcore.Vector4
 Color :: gcore.Color
+Resource :: gclass.Resource
+Node :: gclass.Node
+CanvasItem :: gclass.CanvasItem
+Node2D :: gclass.Node2D
+Control :: gclass.Control
 
 // --- Core functions ---
 is_nil :: gcore.is_nil
@@ -62,6 +70,112 @@ object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
 godot_context :: gcore.godot_context
+init_class_bindings :: gclass.init_class_bindings
+ref_counted_as_object :: gclass.ref_counted_as_object
+resource_as_ref_counted :: gclass.resource_as_ref_counted
+resource_as_object :: gclass.resource_as_object
+ref_counted_get_reference_count :: gclass.ref_counted_get_reference_count
+resource_get_path :: gclass.resource_get_path
+resource_get_rid :: gclass.resource_get_rid
+resource_set_local_to_scene :: gclass.resource_set_local_to_scene
+resource_is_local_to_scene :: gclass.resource_is_local_to_scene
+node_as_object :: gclass.node_as_object
+node_get_parent :: gclass.node_get_parent
+node_is_ancestor_of :: gclass.node_is_ancestor_of
+node_get_path_to :: gclass.node_get_path_to
+canvas_item_set_visible :: gclass.canvas_item_set_visible
+canvas_item_is_visible :: gclass.canvas_item_is_visible
+canvas_item_show :: gclass.canvas_item_show
+canvas_item_hide :: gclass.canvas_item_hide
+canvas_item_queue_redraw :: gclass.canvas_item_queue_redraw
+canvas_item_get_canvas :: gclass.canvas_item_get_canvas
+canvas_item_as_node :: gclass.canvas_item_as_node
+canvas_item_as_object :: gclass.canvas_item_as_object
+node2d_as_canvas_item :: gclass.node2d_as_canvas_item
+node2d_as_node :: gclass.node2d_as_node
+node2d_as_object :: gclass.node2d_as_object
+object_get_class :: gclass.object_get_class
+object_is_class :: gclass.object_is_class
+object_set_meta :: gclass.object_set_meta
+object_get_meta :: gclass.object_get_meta
+node2d_set_position :: gclass.node2d_set_position
+node2d_get_position :: gclass.node2d_get_position
+node2d_set_rotation :: gclass.node2d_set_rotation
+node2d_get_rotation :: gclass.node2d_get_rotation
+control_set_custom_minimum_size :: gclass.control_set_custom_minimum_size
+control_get_custom_minimum_size :: gclass.control_get_custom_minimum_size
+control_set_focus_mode :: gclass.control_set_focus_mode
+control_get_focus_mode :: gclass.control_get_focus_mode
+control_has_focus :: gclass.control_has_focus
+control_grab_focus :: gclass.control_grab_focus
+control_release_focus :: gclass.control_release_focus
+control_set_mouse_filter :: gclass.control_set_mouse_filter
+control_get_mouse_filter :: gclass.control_get_mouse_filter
+control_as_canvas_item :: gclass.control_as_canvas_item
+control_as_node :: gclass.control_as_node
+control_as_object :: gclass.control_as_object
+object_is_ref_counted :: gclass.object_is_ref_counted
+object_try_as_ref_counted :: gclass.object_try_as_ref_counted
+object_is_resource :: gclass.object_is_resource
+object_try_as_resource :: gclass.object_try_as_resource
+object_is_node :: gclass.object_is_node
+object_try_as_node :: gclass.object_try_as_node
+object_is_canvas_item :: gclass.object_is_canvas_item
+object_try_as_canvas_item :: gclass.object_try_as_canvas_item
+object_is_node2d :: gclass.object_is_node2d
+object_try_as_node2d :: gclass.object_try_as_node2d
+object_is_control :: gclass.object_is_control
+object_try_as_control :: gclass.object_try_as_control
+ref_counted_is_resource :: gclass.ref_counted_is_resource
+ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
+node_is_canvas_item :: gclass.node_is_canvas_item
+node_try_as_canvas_item :: gclass.node_try_as_canvas_item
+node_is_node2d :: gclass.node_is_node2d
+node_try_as_node2d :: gclass.node_try_as_node2d
+node_is_control :: gclass.node_is_control
+node_try_as_control :: gclass.node_try_as_control
+canvas_item_is_node2d :: gclass.canvas_item_is_node2d
+canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
+canvas_item_is_control :: gclass.canvas_item_is_control
+canvas_item_try_as_control :: gclass.canvas_item_try_as_control
+
+// --- Class enums and constants ---
+ObjectConnectFlags :: gclass.ObjectConnectFlags
+ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
+NodeProcessMode :: gclass.NodeProcessMode
+NodeProcessThreadGroup :: gclass.NodeProcessThreadGroup
+NodeProcessThreadMessages :: gclass.NodeProcessThreadMessages
+NodePhysicsInterpolationMode :: gclass.NodePhysicsInterpolationMode
+NodeDuplicateFlags :: gclass.NodeDuplicateFlags
+NodeInternalMode :: gclass.NodeInternalMode
+NodeAutoTranslateMode :: gclass.NodeAutoTranslateMode
+CanvasItemTextureFilter :: gclass.CanvasItemTextureFilter
+CanvasItemTextureRepeat :: gclass.CanvasItemTextureRepeat
+CanvasItemClipChildrenMode :: gclass.CanvasItemClipChildrenMode
+CanvasItemOversamplingWithScale :: gclass.CanvasItemOversamplingWithScale
+ControlFocusMode :: gclass.ControlFocusMode
+ControlFocusBehaviorRecursive :: gclass.ControlFocusBehaviorRecursive
+ControlMouseBehaviorRecursive :: gclass.ControlMouseBehaviorRecursive
+ControlCursorShape :: gclass.ControlCursorShape
+ControlLayoutPreset :: gclass.ControlLayoutPreset
+ControlLayoutPresetMode :: gclass.ControlLayoutPresetMode
+ControlSizeFlags :: gclass.ControlSizeFlags
+ControlMouseFilter :: gclass.ControlMouseFilter
+object_notification_postinitialize :: gclass.object_notification_postinitialize
+object_notification_predelete :: gclass.object_notification_predelete
+object_notification_extension_reloaded :: gclass.object_notification_extension_reloaded
+node_notification_enter_tree :: gclass.node_notification_enter_tree
+node_notification_exit_tree :: gclass.node_notification_exit_tree
+node_notification_ready :: gclass.node_notification_ready
+node_notification_process :: gclass.node_notification_process
+node_notification_physics_process :: gclass.node_notification_physics_process
+canvas_item_notification_draw :: gclass.canvas_item_notification_draw
+canvas_item_notification_transform_changed :: gclass.canvas_item_notification_transform_changed
+canvas_item_notification_visibility_changed :: gclass.canvas_item_notification_visibility_changed
+control_notification_resized :: gclass.control_notification_resized
+control_notification_focus_enter :: gclass.control_notification_focus_enter
+control_notification_focus_exit :: gclass.control_notification_focus_exit
+control_notification_theme_changed :: gclass.control_notification_theme_changed
 
 // --- String ---
 string_ptr :: gcore.string_ptr
@@ -404,6 +518,16 @@ variant_construct_checked :: gcore.variant_construct_checked
 variant_call_checked :: gcore.variant_call_checked
 print :: gcore.print
 print_init :: gcore.print_init
+
+// --- Generated builtin helpers used by the public facade smoke path ---
+color_to_html :: gbind_builtin.color_to_html
+color_html :: gbind_builtin.color_html
+vector2_new3 :: gbind_builtin.vector2_new3
+vector2_to_variant :: gbind_builtin.vector2_to_variant
+vector2_try_from_variant :: gbind_builtin.vector2_try_from_variant
+vector2_length :: gbind_builtin.vector2_length
+vector2_normalized :: gbind_builtin.vector2_normalized
+vector2_dot :: gbind_builtin.vector2_dot
 
 // --- Utility functions ---
 sin :: gbind.sin

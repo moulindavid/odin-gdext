@@ -1,7 +1,6 @@
 package hello
 
 import "core:fmt"
-import gbv2 "godot:bindings/builtin"
 import gd "godot:core"
 import gt "godot:godot"
 
@@ -26,12 +25,98 @@ HelloData :: struct {
 
 // ---- Class lifecycle callbacks ----
 
-NOTIFICATION_READY :: 13
 
 create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool) -> gd.ObjectPtr {
 	context = gt.godot_context()
 	object := gd.construct_object(hello_parent_name)
 	if object == nil {return nil}
+
+	node2d := gt.Node2D(object)
+	gt.node2d_set_position(node2d, gt.Vector2{100, 50})
+	position := gt.node2d_get_position(node2d)
+	gt.node2d_set_rotation(node2d, 1.25)
+	rotation := gt.node2d_get_rotation(node2d)
+	buf: [256]u8
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated Node2D position: (%v,%v) rotation=%.2f (expect 100,50,1.25)",
+			position.x,
+			position.y,
+			rotation,
+		),
+	)
+
+	node := gt.node2d_as_node(node2d)
+	parent := gt.node_get_parent(node)
+	self_is_ancestor := gt.node_is_ancestor_of(node, node)
+	path_to_self := gt.node_get_path_to(node, node, false)
+	path_to_self_hash := gt.node_path_hash(&path_to_self)
+	gt.node_path_free(&path_to_self)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated Node mapping: parent_nil=%v self_ancestor=%v path_hash=%v (expect true,false,owned)",
+			gt.is_nil(gt.Object(parent)),
+			self_is_ancestor,
+			path_to_self_hash,
+		),
+	)
+
+	cast_node2d, cast_node2d_ok := gt.object_try_as_node2d(gt.Object(object))
+	cast_node, cast_node_ok := gt.object_try_as_node(gt.Object(object))
+	nil_object: gt.Object
+	nil_node2d, nil_node2d_ok := gt.object_try_as_node2d(nil_object)
+	downcast_identity_ok :=
+		gt.node2d_as_object(cast_node2d) == object &&
+		gt.node_as_object(cast_node) == object &&
+		gt.node2d_as_object(nil_node2d) == nil
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated downcasts: is_node2d=%v object->Node2D=%v object->Node=%v nil->Node2D=%v identity=%v (expect true,true,true,false,true)",
+			gt.object_is_node2d(gt.Object(object)),
+			cast_node2d_ok,
+			cast_node_ok,
+			nil_node2d_ok,
+			downcast_identity_ok,
+		),
+	)
+
+	canvas_item := gt.node2d_as_canvas_item(node2d)
+	gt.canvas_item_hide(canvas_item)
+	hidden := gt.canvas_item_is_visible(canvas_item)
+	gt.canvas_item_show(canvas_item)
+	shown := gt.canvas_item_is_visible(canvas_item)
+	gt.canvas_item_queue_redraw(canvas_item)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated CanvasItem mapping: hidden=%v shown=%v (expect false,true)",
+			hidden,
+			shown,
+		),
+	)
+
+	meta_name := gt.string_name_from_utf8_cstring(cstring("odin_meta_value"))
+	meta_value := gt.variant_from_int(1234)
+	gt.object_set_meta(gt.Object(object), &meta_name, &meta_value)
+	meta_default := gt.variant_nil()
+	meta_back := gt.object_get_meta(gt.Object(object), &meta_name, &meta_default)
+	meta_int, meta_ok := gt.variant_try_int(&meta_back)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated Variant mapping: meta=%v/%v (expect 1234/true)",
+			meta_int,
+			meta_ok,
+		),
+	)
+	gt.variant_free(&meta_back)
+	gt.variant_free(&meta_default)
+	gt.variant_free(&meta_value)
+	gt.string_name_free(&meta_name)
+
 	self_ := new_clone(HelloData{object = object})
 	gd.set_instance(object, hello_class_name, self_)
 	gd.set_instance_binding(object, self_, &hello_instance_binding_callbacks)
@@ -47,7 +132,7 @@ free_instance :: proc "c" (class_userdata: rawptr, instance: gd.ClassInstancePtr
 notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reversed: bool) {
 	if instance == nil {return}
 	context = gt.godot_context()
-	if what == NOTIFICATION_READY {
+	if what == gt.node_notification_ready {
 		hn := hello_node_unwrap(instance)
 		gd.debug_print("Hello from Odin!")
 
@@ -64,7 +149,7 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 		gd.debug_print(
 			fmt.bprintf(
 				buf[:],
-				"is_class Node2D: %v (expect false)",
+				"is_class Node2D: %v (expect true)",
 				gt.is_class(obj, node2d_class_name),
 			),
 		)
@@ -80,6 +165,18 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 			),
 		)
 		gt.variant_free(&v)
+
+		node2d := gt.Node2D(obj)
+		gt.node2d_set_position(node2d, gt.Vector2{100, 50})
+		position := gt.node2d_get_position(node2d)
+		gd.debug_print(
+			fmt.bprintf(
+				buf[:],
+				"generated Node2D position: (%v,%v) (expect 100,50)",
+				position.x,
+				position.y,
+			),
+		)
 
 		// Utility functions
 		gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
@@ -212,7 +309,7 @@ register_classes :: proc() {
 	)
 	gd.static_string_name_init_latin1_cstring(
 		gd.uninitialized_static_string_name_ptr(&parent_name_data),
-		cstring("Node"),
+		cstring("Node2D"),
 	)
 	gd.static_string_name_init_latin1_cstring(
 		gd.uninitialized_static_string_name_ptr(&node_class_name_data),
@@ -222,7 +319,7 @@ register_classes :: proc() {
 		gd.uninitialized_static_string_name_ptr(&node2d_class_name_data),
 		cstring("Node2D"),
 	)
-	gt.init_class_casting()
+	gt.init_class_bindings()
 
 	class_info := gd.ClassCreationInfo {
 		is_virtual                  = false,
@@ -823,12 +920,12 @@ register_classes :: proc() {
 			gt.string_nocasecmp_to(&gs, &gs_case) == 0,
 		),
 	)
-	generated_html := gbv2.color_to_html(gt.Color{0.25, 0.5, 0.75, 1}, true)
+	generated_html := gt.color_to_html(gt.Color{0.25, 0.5, 0.75, 1}, true)
 	generated_html_text, generated_html_ok, generated_html_needed := gt.string_to_utf8(
 		&generated_html,
 		utf8_buf[:],
 	)
-	generated_color := gbv2.color_html(&generated_html)
+	generated_color := gt.color_html(&generated_html)
 	gd.debug_print(
 		fmt.bprintf(
 			buf[:],
@@ -930,9 +1027,9 @@ register_classes :: proc() {
 	gt.node_path_free(&np)
 
 	// Test: Vector2 built-in
-	vec := gbv2.vector2_new3(3.0, 4.0)
-	vec_variant := gbv2.vector2_to_variant(vec)
-	vec_back, vec_back_ok := gbv2.vector2_try_from_variant(&vec_variant)
+	vec := gt.vector2_new3(3.0, 4.0)
+	vec_variant := gt.vector2_to_variant(vec)
+	vec_back, vec_back_ok := gt.vector2_try_from_variant(&vec_variant)
 	gd.debug_print(
 		fmt.bprintf(
 			buf[:],
@@ -944,11 +1041,11 @@ register_classes :: proc() {
 	)
 	gt.variant_free(&vec_variant)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
-	len := gbv2.vector2_length(vec)
+	len := gt.vector2_length(vec)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))
-	n := gbv2.vector2_normalized(vec)
+	n := gt.vector2_normalized(vec)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).normalized(): (%v, %v)", n.x, n.y))
-	dot := gbv2.vector2_dot(vec, gbv2.Vector2{1, 0})
+	dot := gt.vector2_dot(vec, gt.Vector2{1, 0})
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).dot(1,0): %v (expect 3)", dot))
 
 	// Utility function smoke test
