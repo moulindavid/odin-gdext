@@ -32,6 +32,20 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	context = gt.godot_context()
 	object := gd.construct_object(hello_parent_name)
 	if object == nil {return nil}
+
+	node2d := gt.Node2D(object)
+	gt.node2d_set_position(node2d, gt.Vector2{100, 50})
+	position := gt.node2d_get_position(node2d)
+	buf: [128]u8
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated Node2D position: (%v,%v) (expect 100,50)",
+			position.x,
+			position.y,
+		),
+	)
+
 	self_ := new_clone(HelloData{object = object})
 	gd.set_instance(object, hello_class_name, self_)
 	gd.set_instance_binding(object, self_, &hello_instance_binding_callbacks)
@@ -64,7 +78,7 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 		gd.debug_print(
 			fmt.bprintf(
 				buf[:],
-				"is_class Node2D: %v (expect false)",
+				"is_class Node2D: %v (expect true)",
 				gt.is_class(obj, node2d_class_name),
 			),
 		)
@@ -80,6 +94,18 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 			),
 		)
 		gt.variant_free(&v)
+
+		node2d := gt.Node2D(obj)
+		gt.node2d_set_position(node2d, gt.Vector2{100, 50})
+		position := gt.node2d_get_position(node2d)
+		gd.debug_print(
+			fmt.bprintf(
+				buf[:],
+				"generated Node2D position: (%v,%v) (expect 100,50)",
+				position.x,
+				position.y,
+			),
+		)
 
 		// Utility functions
 		gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
@@ -212,7 +238,7 @@ register_classes :: proc() {
 	)
 	gd.static_string_name_init_latin1_cstring(
 		gd.uninitialized_static_string_name_ptr(&parent_name_data),
-		cstring("Node"),
+		cstring("Node2D"),
 	)
 	gd.static_string_name_init_latin1_cstring(
 		gd.uninitialized_static_string_name_ptr(&node_class_name_data),

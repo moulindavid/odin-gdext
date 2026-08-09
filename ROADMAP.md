@@ -123,12 +123,12 @@ Implementation order:
      and method binds.
 
 4. Generate a first safe method-wrapper slice.
-   - [ ] Start with `Object`, `Node`, and `Node2D` only.
-   - [ ] Generate non-vararg, non-virtual methods whose argument and return
+   - [x] Start with selected `Object` and `Node2D` methods only.
+   - [x] Generate non-vararg, non-virtual methods whose argument and return
      types are already covered by Priority 1 value-type rules.
-   - [ ] First runtime target: `node2d_set_position` and
+   - [x] First runtime target: `node2d_set_position` and
      `node2d_get_position` through `object_method_bind_ptrcall`.
-   - [ ] Add hello smoke coverage that calls generated class methods from the
+   - [x] Add hello smoke coverage that calls generated class methods from the
      extension.
 
 5. Define class method type-mapping rules.

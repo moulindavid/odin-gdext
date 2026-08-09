@@ -923,6 +923,54 @@ class_handle_expr :: proc(class_name: string) -> string {
 	return class_name
 }
 
+class_abi_type_map := map[string]string {
+	"Nil"     = "rawptr",
+	"bool"    = "bool",
+	"int"     = "i64",
+	"int32"   = "i32",
+	"int64"   = "i64",
+	"float"   = "core.GodotReal",
+	"double"  = "f64",
+	"Vector2" = "core.Vector2",
+	"Vector3" = "core.Vector3",
+	"Vector4" = "core.Vector4",
+	"Color"   = "core.Color",
+}
+
+resolve_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "" || godot_name == "void" do return "", true
+	if godot_name == "Variant" do return "core.Variant", true
+	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok do return entry.odin, true
+	if is_selected_class(godot_name) do return class_handle_expr(godot_name), true
+	if t, map_ok := class_abi_type_map[godot_name]; map_ok do return t, true
+	return "", false
+}
+
+resolve_class_param_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "Variant" do return "^core.Variant", true
+	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok {
+		return fmt.aprintf("^%s", entry.odin), true
+	}
+	return resolve_class_return_type(godot_name)
+}
+
+class_param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
+	if godot_type == "Variant" do return fmt.aprintf("core.variant_ptr(%s)", arg_name)
+	if entry, ok := completed_core_value_entry(godot_type); ok {
+		return fmt.aprintf("%s(%s)", entry.ptr, arg_name)
+	}
+	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
+}
+
+class_method_supported :: proc(method: ExtensionApiClassMethod) -> bool {
+	if method.is_vararg || method.is_virtual do return false
+	if _, ok := resolve_class_return_type(method.return_value.type); !ok do return false
+	for arg in method.arguments {
+		if _, ok := resolve_class_param_type(arg.type); !ok do return false
+	}
+	return true
+}
+
 class_proc_prefix :: proc(class_name: string) -> string {
 	b := strings.builder_make(context.temp_allocator)
 	for r, i in class_name {
@@ -1055,6 +1103,95 @@ emit_class_binding_init :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) ->
 	return true
 }
 
+emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
+	strings.write_string(b, "// ---- Selected class methods ----\n\n")
+
+	for entry in selected_class_methods {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok do return false
+		if !class_method_supported(method) {
+			fmt.eprintfln(
+				"ERROR: unsupported selected class method %s.%s",
+				entry.class_name,
+				entry.method_name,
+			)
+			return false
+		}
+
+		class_prefix := class_proc_prefix(entry.class_name)
+		method_prefix := class_proc_prefix(entry.method_name)
+		proc_name := fmt.aprintf("%s_%s", class_prefix, method_prefix)
+		method_bind_name := fmt.aprintf("%s_%s_method_bind", class_prefix, method_prefix)
+		self_type := class_handle_expr(entry.class_name)
+		returns_void := method.return_value.type == "" || method.return_value.type == "void"
+		ret_type := ""
+		if !returns_void {
+			resolved_ret, ret_ok := resolve_class_return_type(method.return_value.type)
+			if !ret_ok do return false
+			ret_type = resolved_ret
+			if method.return_value.type == "Variant" {
+				fmt.sbprintf(
+					b,
+					"// %s returns an initialized Variant; call core.variant_free when done.\n",
+					proc_name,
+				)
+			} else if entry_value, entry_ok := completed_core_value_entry(
+				method.return_value.type,
+			); entry_ok {
+				fmt.sbprintf(
+					b,
+					"// %s returns initialized %s storage; call %s when done.\n",
+					proc_name,
+					entry_value.godot,
+					entry_value.free,
+				)
+			}
+		}
+
+		fmt.sbprintf(b, "%s :: proc \"contextless\" (self: %s", proc_name, self_type)
+		for arg in method.arguments {
+			param_type, param_ok := resolve_class_param_type(arg.type)
+			if !param_ok do return false
+			fmt.sbprintf(b, ", %s: %s", arg.name, param_type)
+		}
+		if returns_void {
+			strings.write_string(b, ") {\n")
+		} else {
+			fmt.sbprintf(b, ") -> %s {{\n", ret_type)
+		}
+
+		for arg in method.arguments {
+			if arg.type == "Variant" do continue
+			if _, ok := completed_core_value_entry(arg.type); ok do continue
+			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
+		}
+
+		if returns_void {
+			fmt.sbprintf(
+				b,
+				"\tcore.call_method_ptr_no_ret(%s, core.ObjectPtr(self)",
+				method_bind_name,
+			)
+		} else {
+			fmt.sbprintf(
+				b,
+				"\treturn core.call_method_ptr_ret(%s, %s, core.ObjectPtr(self)",
+				method_bind_name,
+				ret_type,
+			)
+		}
+		for arg in method.arguments {
+			fmt.sbprintf(b, ",\n\t\t%s", class_param_ptr_expr(arg.name, arg.type))
+		}
+		strings.write_string(b, ")\n")
+		strings.write_string(b, "}\n\n")
+	}
+
+	return true
+}
+
 generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	path := "bindings/classes/classes.odin"
 
@@ -1120,6 +1257,8 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 			ancestor = ancestor_class.inherits
 		}
 	}
+
+	if !emit_class_method_wrappers(&b, root) {return false}
 
 	err := os.write_entire_file(path, transmute([]byte)strings.to_string(b))
 	if err != nil {
