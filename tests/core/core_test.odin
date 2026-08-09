@@ -26,6 +26,11 @@ vector3_matches_generated_storage_layout :: proc(t: ^testing.T) {
 }
 
 @(test)
+vector4_matches_generated_storage_layout :: proc(t: ^testing.T) {
+	testing.expect_value(t, size_of(gd.Vector4), 4 * size_of(f32))
+}
+
+@(test)
 string_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
 	testing.expect_value(t, size_of(gd.StringStorage), gd.GDExtensionString_Size)
 	testing.expect_value(t, size_of(gd.String), gd.GDExtensionString_Size)
@@ -136,6 +141,21 @@ packed_vector3_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) 
 }
 
 @(test)
+packed_vector4_array_storage_matches_documented_abi_size :: proc(t: ^testing.T) {
+	testing.expect_value(
+		t,
+		size_of(gd.PackedVector4ArrayStorage),
+		gd.GDExtensionPackedVector4Array_Size,
+	)
+	testing.expect_value(t, size_of(gd.PackedVector4Array), gd.GDExtensionPackedVector4Array_Size)
+	testing.expect_value(
+		t,
+		len(gd.PackedVector4ArrayStorage{}),
+		gd.GDExtensionPackedVector4Array_Size,
+	)
+}
+
+@(test)
 variant_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
 	v: gd.Variant
 	_ = gd.variant_ptr(&v)
@@ -242,6 +262,14 @@ packed_vector3_array_pointer_helpers_preserve_storage_address :: proc(t: ^testin
 	_ = gd.packed_vector3_array_ptr(&a)
 	_ = gd.const_packed_vector3_array_ptr(&a)
 	_ = gd.uninitialized_packed_vector3_array_ptr(&a)
+}
+
+@(test)
+packed_vector4_array_pointer_helpers_preserve_storage_address :: proc(t: ^testing.T) {
+	a: gd.PackedVector4Array
+	_ = gd.packed_vector4_array_ptr(&a)
+	_ = gd.const_packed_vector4_array_ptr(&a)
+	_ = gd.uninitialized_packed_vector4_array_ptr(&a)
 }
 
 @(test)

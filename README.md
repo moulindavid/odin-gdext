@@ -135,7 +135,7 @@ Current codegen is intentionally incomplete:
   `packed_byte_array_size`, `packed_byte_array_is_empty`, `variant_from_packed_byte_array`,
   and `variant_try_packed_byte_array`). `PackedInt32Array`, `PackedInt64Array`, `PackedFloat32Array`, and
   `PackedFloat64Array` mirror that initial owned-storage/basic-method/Variant-conversion pattern.
-  `PackedVector2Array` and `PackedVector3Array` add the same pattern for generated-builtin-compatible
+  `PackedVector2Array`, `PackedVector3Array`, and `PackedVector4Array` add the same pattern for generated-builtin-compatible
   vector storage. Broader methods, typed arrays/dictionaries, the other packed arrays, and
   generated API integration are still pending.
 - Godot API `float` values use the centralized `GodotReal` alias. It is `f64`

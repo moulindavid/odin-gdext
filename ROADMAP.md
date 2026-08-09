@@ -31,13 +31,13 @@ Remaining implementation order:
 
 1. Finish shared storage for generated memory-compatible builtin elements.
    - [x] Move `Vector3` storage to `core` and make generated `Vector3` alias it.
-   - [ ] Move `Vector4` storage to `core` and make generated `Vector4` alias it.
+   - [x] Move `Vector4` storage to `core` and make generated `Vector4` alias it.
    - [ ] Move `Color` storage to `core` and make generated `Color` alias it.
    - [ ] Keep generated builtin methods using the same shared storage types as handwritten core wrappers.
 
 2. Finish the remaining simple packed arrays.
    - [x] `PackedVector3Array`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
-   - [ ] `PackedVector4Array`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
+   - [x] `PackedVector4Array`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
    - [ ] `PackedColorArray`: owned wrapper, pointer helpers, new/copy/free, basic methods, Variant conversions, tests, and hello smoke coverage.
 
 3. Stabilize `String` enough for generated APIs.
@@ -69,7 +69,7 @@ Remaining implementation order:
 Priority 1 can be considered complete when common value types used by generated
 APIs have explicit ownership rules, CI and hello smoke tests cover the important
 destruction paths, and any remaining raw/unsafe surfaces are intentional and
-documented. :shrug: 
+documented. 
 
 ## Priority 2 - generated class bindings
 

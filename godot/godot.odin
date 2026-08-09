@@ -38,10 +38,13 @@ PackedVector2ArrayStorage :: gcore.PackedVector2ArrayStorage
 PackedVector2Array :: gcore.PackedVector2Array
 PackedVector3ArrayStorage :: gcore.PackedVector3ArrayStorage
 PackedVector3Array :: gcore.PackedVector3Array
+PackedVector4ArrayStorage :: gcore.PackedVector4ArrayStorage
+PackedVector4Array :: gcore.PackedVector4Array
 StringRepr :: gcore.StringRepr
 GodotReal :: gcore.GodotReal
 Vector2 :: gcore.Vector2
 Vector3 :: gcore.Vector3
+Vector4 :: gcore.Vector4
 
 // --- Core functions ---
 is_nil :: gcore.is_nil
@@ -243,6 +246,22 @@ packed_vector3_array_get :: gcore.packed_vector3_array_get
 packed_vector3_array_set :: gcore.packed_vector3_array_set
 packed_vector3_array_push :: gcore.packed_vector3_array_push
 
+// --- PackedVector4Array ---
+packed_vector4_array_ptr :: gcore.packed_vector4_array_ptr
+const_packed_vector4_array_ptr :: gcore.const_packed_vector4_array_ptr
+uninitialized_packed_vector4_array_ptr :: gcore.uninitialized_packed_vector4_array_ptr
+packed_vector4_array_init_new :: gcore.packed_vector4_array_init_new
+packed_vector4_array_new :: gcore.packed_vector4_array_new
+packed_vector4_array_init_copy :: gcore.packed_vector4_array_init_copy
+packed_vector4_array_copy :: gcore.packed_vector4_array_copy
+packed_vector4_array_free :: gcore.packed_vector4_array_free
+packed_vector4_array_size :: gcore.packed_vector4_array_size
+packed_vector4_array_is_empty :: gcore.packed_vector4_array_is_empty
+packed_vector4_array_clear :: gcore.packed_vector4_array_clear
+packed_vector4_array_get :: gcore.packed_vector4_array_get
+packed_vector4_array_set :: gcore.packed_vector4_array_set
+packed_vector4_array_push :: gcore.packed_vector4_array_push
+
 // --- Variant ---
 variant_type :: gcore.variant_type
 variant_is_type :: gcore.variant_is_type
@@ -269,6 +288,7 @@ variant_from_packed_float32_array :: gcore.variant_from_packed_float32_array
 variant_from_packed_float64_array :: gcore.variant_from_packed_float64_array
 variant_from_packed_vector2_array :: gcore.variant_from_packed_vector2_array
 variant_from_packed_vector3_array :: gcore.variant_from_packed_vector3_array
+variant_from_packed_vector4_array :: gcore.variant_from_packed_vector4_array
 variant_from_utf8 :: gcore.variant_from_utf8
 variant_from_cstring :: gcore.variant_from_cstring
 variant_to_float :: gcore.variant_to_float
@@ -299,6 +319,8 @@ variant_to_packed_vector2_array :: gcore.variant_to_packed_vector2_array
 variant_try_packed_vector2_array :: gcore.variant_try_packed_vector2_array
 variant_to_packed_vector3_array :: gcore.variant_to_packed_vector3_array
 variant_try_packed_vector3_array :: gcore.variant_try_packed_vector3_array
+variant_to_packed_vector4_array :: gcore.variant_to_packed_vector4_array
+variant_try_packed_vector4_array :: gcore.variant_try_packed_vector4_array
 variant_string_utf8_len :: gcore.variant_string_utf8_len
 variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float
