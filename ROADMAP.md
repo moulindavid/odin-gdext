@@ -30,11 +30,26 @@ Implement proper wrappers and ownership rules for:
   - [x] Runtime type inspection and exact-type `try` conversions for bool, int, and float Variants.
   - [x] Exact String Variant extraction to caller-provided UTF-8 buffers.
   - [ ] Richer conversion coverage for object, builtin, and other complex Variant conversions.
+    - [x] Exact Object Variant extraction with `variant_try_object`.
+    - [x] Generated exact-type `{builtin}_try_from_variant` helpers for current memory-compatible builtin types.
+    - [ ] Additional complex conversions for StringName, NodePath, RID, Callable, Signal, Array, Dictionary, and packed arrays.
 - [ ] `String`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, UTF-8 construction/extraction, and Variant conversion helpers.
+  - [ ] Broader String methods/operators and generated API integration.
 - [ ] `StringName`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, cstring UTF-8 construction, and Variant conversion helpers.
+  - [x] Static/non-static naming policy integration for generated and handwritten APIs.
+    - [x] `StaticStringName` wrapper for process-lifetime literals, integrated into core lazy builtin-method lookup and handwritten core helpers.
+    - [x] Replace example/manual registration raw StringName storage with policy helpers.
+    - [x] Generated utility lookup uses `StaticStringName` policy helpers instead of raw storage casts.
 - [ ] `NodePath`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, UTF-8/String construction, copy/free helpers, and Variant conversion helpers.
+  - [x] Primitive method wrappers for `is_absolute`, name/subname counts, and hash.
+  - [x] Owned `StringName`-returning helpers for names/subnames and concatenated names/subnames.
 - [ ] `Array`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `push`, `size`, and Variant conversion helpers.
 - [ ] `Dictionary`
+  - [x] Initial owned-storage wrapper, checked pointer adapters, new/copy/free helpers, `set`, `has`, `size`, `is_empty`, and Variant conversion helpers.
 - [ ] packed arrays
 
 ## Priority 2 - generated class bindings

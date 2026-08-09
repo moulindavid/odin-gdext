@@ -70,8 +70,15 @@ notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reverse
 		)
 
 		v := gt.object_to_variant(obj)
-		back := gt.object_from_variant(&v)
-		gd.debug_print(fmt.bprintf(buf[:], "variant roundtrip: %v (expect true)", back == obj))
+		back, back_ok := gt.variant_try_object(&v)
+		gd.debug_print(
+			fmt.bprintf(
+				buf[:],
+				"variant object roundtrip: %v / %v (expect true / true)",
+				back == obj,
+				back_ok,
+			),
+		)
 		gt.variant_free(&v)
 
 		// Utility functions
@@ -115,8 +122,8 @@ add_ptrcall :: proc "c" (
 	(cast(^f64)r_ret)^ = a + b
 }
 
-add_method_name_data: [8]u8
-add_method_name := gd.StringNamePtr(&add_method_name_data[0])
+add_method_name_data: gd.StaticStringName
+add_method_name := gd.const_static_string_name_ptr(&add_method_name_data)
 add_arg_info := [2]gd.PropertyInfo{{type = .Float}, {type = .Float}}
 add_arg_meta := [2]gd.ClassMethodArgumentMetadata{.None, .None}
 add_return_info := gd.PropertyInfo {
@@ -124,38 +131,34 @@ add_return_info := gd.PropertyInfo {
 }
 add_method_info: gd.ClassMethodInfo
 
-add_arg_a_name_data: [8]u8
-add_arg_a_name := gd.StringNamePtr(&add_arg_a_name_data[0])
-add_arg_b_name_data: [8]u8
-add_arg_b_name := gd.StringNamePtr(&add_arg_b_name_data[0])
+add_arg_a_name_data: gd.StaticStringName
+add_arg_a_name := gd.const_static_string_name_ptr(&add_arg_a_name_data)
+add_arg_b_name_data: gd.StaticStringName
+add_arg_b_name := gd.const_static_string_name_ptr(&add_arg_b_name_data)
 
-empty_name_data: [8]u8
-empty_name := gd.StringNamePtr(&empty_name_data[0])
-empty_str_data: [8]u8
-empty_str := gd.StringPtr(&empty_str_data[0])
+empty_name_data: gd.StaticStringName
+empty_name := gd.const_static_string_name_ptr(&empty_name_data)
+empty_str_data: gd.String
+empty_str := gd.const_string_ptr(&empty_str_data)
 
 register_methods :: proc() {
-	gd.string_name_new_with_latin1_chars(
-		cast(gd.UninitializedStringNamePtr)&add_method_name_data[0],
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&add_method_name_data),
 		cstring("add"),
-		true,
 	)
-	gd.string_name_new_with_latin1_chars(
-		cast(gd.UninitializedStringNamePtr)&add_arg_a_name_data[0],
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&add_arg_a_name_data),
 		cstring("a"),
-		true,
 	)
-	gd.string_name_new_with_latin1_chars(
-		cast(gd.UninitializedStringNamePtr)&add_arg_b_name_data[0],
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&add_arg_b_name_data),
 		cstring("b"),
-		true,
 	)
-	gd.string_name_new_with_latin1_chars(
-		cast(gd.UninitializedStringNamePtr)&empty_name_data[0],
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&empty_name_data),
 		cstring(""),
-		true,
 	)
-	gd.string_new_with_latin1_chars(cast(gd.UninitializedStringPtr)&empty_str_data[0], cstring(""))
+	gd.string_new_with_latin1_chars(gd.uninitialized_string_ptr(&empty_str_data), cstring(""))
 
 	add_arg_info[0].name = add_arg_a_name
 	add_arg_info[0].class_name = empty_name
@@ -182,18 +185,16 @@ register_methods :: proc() {
 	gd.debug_print("[odin-gdext] Method add registered!")
 }
 
-// ---- Storage for StringNames (8 bytes each) ----
+// ---- Static StringName storage ----
 
-// StringNamePtr is const StringName* in C. We store the actual data in byte
-// arrays and pass pointers to those arrays.
-hello_name_data: [8]u8
-parent_name_data: [8]u8
-hello_class_name := gd.StringNamePtr(&hello_name_data[0])
-hello_parent_name := gd.StringNamePtr(&parent_name_data[0])
-node_class_name_data: [8]u8
-node_class_name := gd.StringNamePtr(&node_class_name_data[0])
-node2d_class_name_data: [8]u8
-node2d_class_name := gd.StringNamePtr(&node2d_class_name_data[0])
+hello_name_data: gd.StaticStringName
+parent_name_data: gd.StaticStringName
+hello_class_name := gd.const_static_string_name_ptr(&hello_name_data)
+hello_parent_name := gd.const_static_string_name_ptr(&parent_name_data)
+node_class_name_data: gd.StaticStringName
+node_class_name := gd.const_static_string_name_ptr(&node_class_name_data)
+node2d_class_name_data: gd.StaticStringName
+node2d_class_name := gd.const_static_string_name_ptr(&node2d_class_name_data)
 
 hello_instance_binding_callbacks := gd.InstanceBindingCallbacks {
 	create_callback    = nil,
@@ -205,10 +206,22 @@ register_classes :: proc() {
 	context = gt.godot_context()
 	gd.debug_print("[odin-gdext] Registering HelloNode...")
 
-	gd.string_name_new_with_latin1_chars(hello_class_name, cstring("HelloNode"), true)
-	gd.string_name_new_with_latin1_chars(hello_parent_name, cstring("Node"), true)
-	gd.string_name_new_with_latin1_chars(node_class_name, cstring("Node"), true)
-	gd.string_name_new_with_latin1_chars(node2d_class_name, cstring("Node2D"), true)
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&hello_name_data),
+		cstring("HelloNode"),
+	)
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&parent_name_data),
+		cstring("Node"),
+	)
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&node_class_name_data),
+		cstring("Node"),
+	)
+	gd.static_string_name_init_latin1_cstring(
+		gd.uninitialized_static_string_name_ptr(&node2d_class_name_data),
+		cstring("Node2D"),
+	)
 	gt.init_class_casting()
 
 	class_info := gd.ClassCreationInfo {
@@ -279,7 +292,7 @@ register_classes :: proc() {
 	gt.variant_free(&vi)
 	gt.variant_free(&vb)
 
-	// Test: Array variant
+	// Test: owned Array wrapper and Array Variant extraction
 	arr := gt.array_new()
 	v1 := gt.variant_from_float(10.0)
 	v2 := gt.variant_from_float(20.0)
@@ -287,9 +300,43 @@ register_classes :: proc() {
 	gt.array_push(&arr, &v2)
 	size := gt.array_size(&arr)
 	gd.debug_print(fmt.bprintf(buf[:], "Array size: %v (expect 2)", size))
+	arr_v := gt.variant_from_array(&arr)
+	arr_back, arr_back_ok := gt.variant_try_array(&arr_v)
+	gd.debug_print(fmt.bprintf(buf[:], "variant_try_array(arr_v): %v (expect true)", arr_back_ok))
+	if arr_back_ok do gt.array_free(&arr_back)
+	gt.variant_free(&arr_v)
 	gt.variant_free(&v1)
 	gt.variant_free(&v2)
-	gt.variant_free(&arr)
+	gt.array_free(&arr)
+
+	// Test: owned Dictionary wrapper and Dictionary Variant extraction
+	dict := gt.dictionary_new()
+	dict_key := gt.variant_from_cstring(cstring("answer"))
+	dict_value := gt.variant_from_int(42)
+	dict_set_ok := gt.dictionary_set(&dict, &dict_key, &dict_value)
+	dict_has_key := gt.dictionary_has(&dict, &dict_key)
+	dict_size := gt.dictionary_size(&dict)
+	dict_empty := gt.dictionary_is_empty(&dict)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"Dictionary: set=%v has=%v size=%v empty=%v (expect true / true / 1 / false)",
+			dict_set_ok,
+			dict_has_key,
+			dict_size,
+			dict_empty,
+		),
+	)
+	dict_v := gt.variant_from_dictionary(&dict)
+	dict_back, dict_back_ok := gt.variant_try_dictionary(&dict_v)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "variant_try_dictionary(dict_v): %v (expect true)", dict_back_ok),
+	)
+	if dict_back_ok do gt.dictionary_free(&dict_back)
+	gt.variant_free(&dict_v)
+	gt.variant_free(&dict_key)
+	gt.variant_free(&dict_value)
+	gt.dictionary_free(&dict)
 
 	// Test: print utility function
 	gt.print_init()
@@ -308,8 +355,129 @@ register_classes :: proc() {
 	)
 	gt.variant_free(&vs)
 
+	// Test: owned String wrapper and String Variant extraction
+	gs := gt.string_from_utf8("Owned Godot String")
+	string_text, string_ok, string_needed := gt.string_to_utf8(&gs, utf8_buf[:])
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"string_to_utf8(gs): %v / %v / %v bytes (expect owned string / true)",
+			string_text,
+			string_ok,
+			string_needed,
+		),
+	)
+	gsv := gt.variant_from_string(&gs)
+	gs_back, gs_back_ok := gt.variant_try_string(&gsv)
+	if gs_back_ok {
+		defer gt.string_free(&gs_back)
+		back_text, back_ok, back_needed := gt.string_to_utf8(&gs_back, utf8_buf[:])
+		gd.debug_print(
+			fmt.bprintf(
+				buf[:],
+				"variant_try_string(gsv): %v / %v / %v bytes (expect owned string / true)",
+				back_text,
+				back_ok,
+				back_needed,
+			),
+		)
+	}
+	gt.variant_free(&gsv)
+	gt.string_free(&gs)
+
+	// Test: owned StringName wrapper and StringName Variant extraction
+	sn := gt.string_name_from_utf8_cstring(cstring("HelloNode"))
+	snv := gt.variant_from_string_name(&sn)
+	sn_back, sn_back_ok := gt.variant_try_string_name(&snv)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "variant_try_string_name(snv): %v (expect true)", sn_back_ok),
+	)
+	if sn_back_ok do gt.string_name_free(&sn_back)
+	gt.variant_free(&snv)
+	gt.string_name_free(&sn)
+
+	// Test: owned NodePath wrapper and NodePath Variant extraction
+	np := gt.node_path_from_utf8("../HelloNode")
+	npv := gt.variant_from_node_path(&np)
+	np_back, np_back_ok := gt.variant_try_node_path(&npv)
+	gd.debug_print(fmt.bprintf(buf[:], "variant_try_node_path(npv): %v (expect true)", np_back_ok))
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"node_path: absolute=%v names=%v subnames=%v hash>0=%v (expect false / 2 / 0 / true)",
+			gt.node_path_is_absolute(&np),
+			gt.node_path_get_name_count(&np),
+			gt.node_path_get_subname_count(&np),
+			gt.node_path_hash(&np) != 0,
+		),
+	)
+	name := gt.node_path_get_name(&np, 1)
+	name_v := gt.variant_from_string_name(&name)
+	name_back, name_ok := gt.variant_try_string_name(&name_v)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "node_path_get_name -> StringName: %v (expect true)", name_ok),
+	)
+	if name_ok do gt.string_name_free(&name_back)
+	gt.variant_free(&name_v)
+	gt.string_name_free(&name)
+
+	concat_names := gt.node_path_get_concatenated_names(&np)
+	concat_names_v := gt.variant_from_string_name(&concat_names)
+	concat_names_back, concat_names_ok := gt.variant_try_string_name(&concat_names_v)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"node_path_get_concatenated_names -> StringName: %v (expect true)",
+			concat_names_ok,
+		),
+	)
+	if concat_names_ok do gt.string_name_free(&concat_names_back)
+	gt.variant_free(&concat_names_v)
+	gt.string_name_free(&concat_names)
+
+	np_sub := gt.node_path_from_utf8("HelloNode:foo")
+	subname := gt.node_path_get_subname(&np_sub, 0)
+	subname_v := gt.variant_from_string_name(&subname)
+	subname_back, subname_ok := gt.variant_try_string_name(&subname_v)
+	gd.debug_print(
+		fmt.bprintf(buf[:], "node_path_get_subname -> StringName: %v (expect true)", subname_ok),
+	)
+	if subname_ok do gt.string_name_free(&subname_back)
+	gt.variant_free(&subname_v)
+	gt.string_name_free(&subname)
+
+	concat_subnames := gt.node_path_get_concatenated_subnames(&np_sub)
+	concat_subnames_v := gt.variant_from_string_name(&concat_subnames)
+	concat_subnames_back, concat_subnames_ok := gt.variant_try_string_name(&concat_subnames_v)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"node_path_get_concatenated_subnames -> StringName: %v (expect true)",
+			concat_subnames_ok,
+		),
+	)
+	if concat_subnames_ok do gt.string_name_free(&concat_subnames_back)
+	gt.variant_free(&concat_subnames_v)
+	gt.string_name_free(&concat_subnames)
+	gt.node_path_free(&np_sub)
+	if np_back_ok do gt.node_path_free(&np_back)
+	gt.variant_free(&npv)
+	gt.node_path_free(&np)
+
 	// Test: Vector2 built-in
 	vec := gbv2.vector2_new3(3.0, 4.0)
+	vec_variant := gbv2.vector2_to_variant(vec)
+	vec_back, vec_back_ok := gbv2.vector2_try_from_variant(&vec_variant)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"Vector2 variant roundtrip: (%v, %v) / %v (expect 3,4 / true)",
+			vec_back.x,
+			vec_back.y,
+			vec_back_ok,
+		),
+	)
+	gt.variant_free(&vec_variant)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
 	len := gbv2.vector2_length(vec)
 	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))

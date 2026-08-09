@@ -147,6 +147,17 @@ call_builtin_method_ptr_ret :: proc "contextless" (
 	return ret
 }
 
+// Invoke a builtin method that writes an initialized return value into caller-provided storage.
+call_builtin_method_ptr_ret_into :: proc "contextless" (
+	method: PtrBuiltInMethod,
+	base: TypePtr,
+	ret: TypePtr,
+	args: ..TypePtr,
+) {
+	if method == nil || ret == nil do _trap_nil_godot_function()
+	method(base, raw_data(args), ret, i32(len(args)))
+}
+
 // Invoke a builtin method that returns nothing.
 call_builtin_method_ptr_no_ret :: proc "contextless" (
 	method: PtrBuiltInMethod,
@@ -290,7 +301,7 @@ destroy_builtin :: proc "contextless" (type: VariantType, ptr: TypePtr) {
 // BuiltinMethod holds a resolved builtin method pointer and its StringName
 // storage. Used by generated bindings for one-time lazy resolution.
 BuiltinMethod :: struct {
-	name_data: [8]u8,
+	name_data: StaticStringName,
 	method:    PtrBuiltInMethod,
 	init:      bool,
 	mutex:     sync.Mutex,
@@ -308,12 +319,14 @@ ensure_builtin_method :: proc "contextless" (
 
 	if bm.init do return
 
-	if string_name_new_with_latin1_chars == nil do _trap_nil_godot_function()
 	if variant_get_ptr_builtin_method == nil do _trap_nil_godot_function()
-	string_name_new_with_latin1_chars(cast(UninitializedStringNamePtr)&bm.name_data, name, true)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&bm.name_data),
+		name,
+	)
 	method := variant_get_ptr_builtin_method(
 		variant_type,
-		cast(ConstStringNamePtr)&bm.name_data,
+		const_static_string_name_ptr(&bm.name_data),
 		hash,
 	)
 	if method == nil do _trap_nil_godot_function()
@@ -325,10 +338,11 @@ ensure_builtin_method :: proc "contextless" (
 // String / StringName
 // ---------------------------------------------------------------------------
 
-// Construct a StringName from a null-terminated Latin-1/UTF-8 C string.
-// `static = true` signals Godot the name lives for the process lifetime, so
-// it can skip ref-counting; use it for string literals only.
-// In Godot 4.7+, StringNames are internally managed -- no explicit destroy needed.
+// Construct a raw StringName from a null-terminated Latin-1 C string.
+// `static = true` signals Godot the name lives for the process lifetime, so it
+// can reuse the literal buffer; use it for string literals only and never destroy
+// that static StringName. For owned, non-static names, prefer the StringName
+// wrapper helpers and call string_name_free when done.
 string_name_new :: proc "contextless" (
 	dest: UninitializedStringNamePtr,
 	str: cstring,

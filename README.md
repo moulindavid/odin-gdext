@@ -107,11 +107,28 @@ Current codegen is intentionally incomplete:
   `CallError` helpers and checked wrappers for `variant_call` /
   `variant_construct`. Generated wrappers borrow `^core.Variant` parameters and
   document owned `core.Variant` returns. Runtime type inspection, exact-type
-  `variant_try_bool` / `variant_try_int` / `variant_try_float`, and caller-buffer
-  `variant_try_utf8` String extraction helpers are available, but broader complex
-  conversion coverage is still incomplete.
-  Treat current `String`, `StringName`, and `Array` helpers as low-level
-  prototype APIs whose construction/destruction rules may change.
+  `variant_try_bool` / `variant_try_int` / `variant_try_float`, `variant_try_object`,
+  caller-buffer `variant_try_utf8` String extraction, and generated exact-type
+  `{builtin}_try_from_variant` helpers for current memory-compatible builtin types
+  are available, but broader complex conversion coverage is still incomplete.
+  `String` has an initial owned-storage wrapper (`string_from_utf8`,
+  `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`),
+  but broader String methods/operators and generated API integration are still pending.
+  `StringName` has an initial owned, non-static wrapper (`string_name_from_utf8_cstring`,
+  `string_name_free`, `variant_from_string_name`, and `variant_try_string_name`) plus
+  a `StaticStringName` wrapper for process-lifetime literals used by core/generated
+  builtin-method and utility lookup helpers, plus the hello example's manual
+  registration data. Static names must only use process-lifetime strings and must never
+  be destroyed. `NodePath` has an initial owned wrapper (`node_path_from_utf8`,
+  `node_path_free`, `variant_from_node_path`, and `variant_try_node_path`) plus primitive
+  method wrappers and owned `StringName`-returning helpers for names/subnames. Generated
+  API integration is still pending. `Array` has an initial owned-storage wrapper
+  (`array_new`, `array_copy`, `array_free`, `array_push`, `array_size`,
+  `variant_from_array`, and `variant_try_array`). `Dictionary` has the same initial
+  owned-storage pattern plus `dictionary_set`, `dictionary_has`, `dictionary_size`,
+  `dictionary_is_empty`, `variant_from_dictionary`, and `variant_try_dictionary`.
+  Broader methods, typed arrays/dictionaries, packed arrays, and generated API integration
+  are still pending.
 
 ## Architecture
 
