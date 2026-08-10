@@ -148,6 +148,8 @@ variant_from_string_name_ptr :: gcore.variant_from_string_name_ptr
 init_signal_emission :: gcore.init_signal_emission
 object_emit_signal_0_checked :: gcore.object_emit_signal_0_checked
 object_emit_signal_0 :: gcore.object_emit_signal_0
+object_emit_signal_1_godot_real_checked :: gcore.object_emit_signal_1_godot_real_checked
+object_emit_signal_1_godot_real :: gcore.object_emit_signal_1_godot_real
 godot_context :: gcore.godot_context
 init_class_bindings :: gclass.init_class_bindings
 ref_counted_as_object :: gclass.ref_counted_as_object

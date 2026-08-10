@@ -279,7 +279,7 @@ then expand coverage once smoke tests prove the ABI path.
    - [x] Add a `ClassSignalDescriptor` helper.
    - [x] Register signals from stable descriptor storage.
    - [x] Support no-argument signals first.
-   - [ ] Add simple typed signal arguments only after no-argument signal
+   - [x] Add simple typed signal arguments only after no-argument signal
      registration has smoke coverage.
    - [x] Keep names, argument metadata, and hint strings alive for the registered
      class lifetime.
@@ -287,7 +287,7 @@ then expand coverage once smoke tests prove the ABI path.
 5. Add safe signal emission helpers.
    - [x] Provide helpers around Godot object signal emission.
    - [x] Start with no-argument signal emission.
-   - [ ] Add fixed-arity primitive helpers after the no-argument path works.
+   - [x] Add fixed-arity primitive helpers after the no-argument path works.
    - [x] Ensure temporary `Variant` values are destroyed on every path.
    - [x] Return or trap on `GDExtensionCallError` consistently.
    - [x] Defer broad vararg emission helpers.

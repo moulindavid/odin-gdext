@@ -108,13 +108,56 @@ object_emit_signal_0_checked :: proc "contextless" (
 		uninitialized_variant_ptr(&ret),
 		&err,
 	)
-	variant_free(&ret)
+	if call_error_ok(&err) do variant_free(&ret)
 	variant_free(&signal_variant)
 	return
 }
 
 object_emit_signal_0 :: proc "contextless" (object: ObjectPtr, signal_name: ConstStringNamePtr) {
 	err := object_emit_signal_0_checked(object, signal_name)
+	require_call_ok(&err)
+}
+
+object_emit_signal_1_godot_real_checked :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	value: GodotReal,
+) -> (
+	err: CallError,
+) {
+	if object == nil || signal_name == nil do _trap_nil_godot_function()
+	init_signal_emission()
+
+	if object_method_bind_call == nil do _trap_nil_godot_function()
+	if emit_signal_method_bind == nil do _trap_nil_godot_function()
+
+	signal_variant := variant_from_string_name_ptr(signal_name)
+	value_variant := variant_from_float(value)
+	args := [2]ConstVariantPtr {
+		const_variant_ptr(&signal_variant),
+		const_variant_ptr(&value_variant),
+	}
+	ret: Variant
+	object_method_bind_call(
+		emit_signal_method_bind,
+		object,
+		&args[0],
+		2,
+		uninitialized_variant_ptr(&ret),
+		&err,
+	)
+	if call_error_ok(&err) do variant_free(&ret)
+	variant_free(&value_variant)
+	variant_free(&signal_variant)
+	return
+}
+
+object_emit_signal_1_godot_real :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	value: GodotReal,
+) {
+	err := object_emit_signal_1_godot_real_checked(object, signal_name, value)
 	require_call_ok(&err)
 }
 

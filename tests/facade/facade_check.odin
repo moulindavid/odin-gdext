@@ -435,4 +435,7 @@ signal_emission_facade_compile_smoke :: proc "contextless" (
 	err := gt.object_emit_signal_0_checked(object, signal_name)
 	_ = err
 	gt.object_emit_signal_0(object, signal_name)
+	err = gt.object_emit_signal_1_godot_real_checked(object, signal_name, 1.5)
+	_ = err
+	gt.object_emit_signal_1_godot_real(object, signal_name, 1.5)
 }
