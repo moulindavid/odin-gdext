@@ -285,12 +285,12 @@ then expand coverage once smoke tests prove the ABI path.
      class lifetime.
 
 5. Add safe signal emission helpers.
-   - [ ] Provide helpers around Godot object signal emission.
-   - [ ] Start with no-argument signal emission.
+   - [x] Provide helpers around Godot object signal emission.
+   - [x] Start with no-argument signal emission.
    - [ ] Add fixed-arity primitive helpers after the no-argument path works.
-   - [ ] Ensure temporary `Variant` values are destroyed on every path.
-   - [ ] Return or trap on `GDExtensionCallError` consistently.
-   - [ ] Defer broad vararg emission helpers.
+   - [x] Ensure temporary `Variant` values are destroyed on every path.
+   - [x] Return or trap on `GDExtensionCallError` consistently.
+   - [x] Defer broad vararg emission helpers.
 
 6. Promote notification dispatch into virtual-style helpers.
    - [ ] Add a user-facing virtual callback descriptor for common node callbacks.

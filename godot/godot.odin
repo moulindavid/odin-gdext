@@ -142,6 +142,10 @@ class_method_set_int_ptrcall :: gcore.class_method_set_int_ptrcall
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
+variant_from_string_name_ptr :: gcore.variant_from_string_name_ptr
+init_signal_emission :: gcore.init_signal_emission
+object_emit_signal_0_checked :: gcore.object_emit_signal_0_checked
+object_emit_signal_0 :: gcore.object_emit_signal_0
 godot_context :: gcore.godot_context
 init_class_bindings :: gclass.init_class_bindings
 ref_counted_as_object :: gclass.ref_counted_as_object

@@ -410,3 +410,13 @@ signal_registration_facade_compile_smoke :: proc "contextless" (
 		gt.ClassSignalDescriptor{name = facade_signal_name},
 	)
 }
+
+signal_emission_facade_compile_smoke :: proc "contextless" (
+	object: gt.ObjectPtr,
+	signal_name: gt.ConstStringNamePtr,
+) {
+	gt.init_signal_emission()
+	err := gt.object_emit_signal_0_checked(object, signal_name)
+	_ = err
+	gt.object_emit_signal_0(object, signal_name)
+}

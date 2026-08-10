@@ -9,7 +9,7 @@ HelloNode :: distinct gt.ObjectPtr
 
 // HelloNode typed API -- per-class free functions.
 // This pattern mirrors what codegen will produce for Node, Node2D, etc.
-hello_node_object :: proc(self: HelloNode) -> gt.ObjectPtr {
+hello_node_object :: proc "contextless" (self: HelloNode) -> gt.ObjectPtr {
 	return gt.ObjectPtr(self)
 }
 hello_node_from_instance :: proc "contextless" (
@@ -212,6 +212,7 @@ add_adapter_method :: proc "contextless" (
 ) {
 	self, self_ok := hello_node_from_instance(instance)
 	if !self_ok do return 0, false
+	gt.object_emit_signal_0(hello_node_object(self), pinged_signal_name)
 	return add(self, a, b), true
 }
 
