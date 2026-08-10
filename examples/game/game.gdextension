@@ -1,0 +1,8 @@
+[configuration]
+
+entry_symbol = "game_library_init"
+compatibility_minimum = "4.7"
+
+[libraries]
+linuxbsd.x86_64 = "bin/game.so"
+windows.x86_64 = "bin/game.dll"

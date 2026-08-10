@@ -24,12 +24,12 @@ metadata, and unregister cleanup during deinitialization.
      classes during deinitialization.
 
 2. Add a cleaner example project or template.
-   - [ ] Create a beginner-facing example that demonstrates one small game-like
+   - [x] Create a beginner-facing example that demonstrates one small game-like
      feature.
-   - [ ] Keep the normal example importing only `godot:godot`.
-   - [ ] Keep the example focused on user workflow rather than exhaustive smoke
+   - [x] Keep the normal example importing only `godot:godot`.
+   - [x] Keep the example focused on user workflow rather than exhaustive smoke
      coverage.
-   - [ ] Include a scene, script, `.gdextension` file, and Makefile target path
+   - [x] Include a scene, script, `.gdextension` file, and Makefile target path
      that mirror a real project layout.
 
 3. Split the current hello example responsibilities.
