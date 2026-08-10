@@ -1,14 +1,5 @@
-// lib.odin -- core helpers built on top of the generated GDExtension interface.
-//
-// This file is hand-written. It provides:
-//   - convenient aliases for the generated GDExtension* types
-//   - ptrcall helpers for calling through resolved function pointers
-//   - helpers for constructing/destroying builtin Variant types
-//   - helpers for registering extension classes
-//
-// It intentionally stays close to the C API; ergonomic, type-safe wrappers
-// live in the generated `godot` package.
-// TODO: might need changes
+// Handwritten core helpers over the generated GDExtension interface.
+// Keep this layer close to the C API; safer public APIs belong in godot:godot.
 
 
 package godot_core
@@ -16,9 +7,7 @@ package godot_core
 import "base:intrinsics"
 import "core:sync"
 
-// ---------------------------------------------------------------------------
-// Type aliases (canonical generated names in interface_defs.odin)
-// ---------------------------------------------------------------------------
+// Type aliases for generated interface names.
 
 VariantPtr :: GDExtensionVariantPtr
 ConstVariantPtr :: GDExtensionConstVariantPtr
@@ -61,7 +50,7 @@ ClassCreationInfo :: GDExtensionClassCreationInfo6
 InstanceBindingCallbacks :: GDExtensionInstanceBindingCallbacks
 CallableCustomInfo :: GDExtensionCallableCustomInfo2
 
-// Callback proc types (for class registration etc.)
+// Callback proc types used by class registration.
 ClassMethodCall :: GDExtensionClassMethodCall
 ClassMethodPtrCall :: GDExtensionClassMethodPtrCall
 ClassCreateInstance :: GDExtensionClassCreateInstance3
@@ -98,9 +87,7 @@ PtrUtilityFunction :: GDExtensionPtrUtilityFunction
 VariantFromTypeConstructor :: GDExtensionVariantFromTypeConstructorFunc
 TypeFromVariantConstructor :: GDExtensionTypeFromVariantConstructorFunc
 
-// ---------------------------------------------------------------------------
-// Calling through resolved function pointers
-// ---------------------------------------------------------------------------
+// Calls through resolved function pointers.
 
 _trap_nil_godot_function :: proc "contextless" () -> ! {
 	intrinsics.debug_trap()
@@ -215,9 +202,7 @@ call_utility_function_ptr_no_ret :: proc "contextless" (
 	func(cast(TypePtr)nil, raw_data(args), i32(len(args)))
 }
 
-// ---------------------------------------------------------------------------
-// Builtin type construction / destruction
-// ---------------------------------------------------------------------------
+// Builtin type construction and destruction.
 
 require_variant_from_type_constructor :: proc "contextless" (
 	type: VariantType,
@@ -294,12 +279,9 @@ destroy_builtin :: proc "contextless" (type: VariantType, ptr: TypePtr) {
 	}
 }
 
-// ---------------------------------------------------------------------------
-// Lazy-init for builtin methods
-// ---------------------------------------------------------------------------
+// Lazy builtin method lookup.
 
-// BuiltinMethod holds a resolved builtin method pointer and its StringName
-// storage. Used by generated bindings for one-time lazy resolution.
+// Cached builtin method pointer plus stable StringName storage.
 BuiltinMethod :: struct {
 	name_data: StaticStringName,
 	method:    PtrBuiltInMethod,
@@ -334,9 +316,7 @@ ensure_builtin_method :: proc "contextless" (
 	bm.init = true
 }
 
-// ---------------------------------------------------------------------------
-// String / StringName
-// ---------------------------------------------------------------------------
+// Raw String and StringName helpers.
 
 // Construct a raw StringName from a null-terminated Latin-1 C string.
 // `static = true` signals Godot the name lives for the process lifetime, so it
@@ -356,9 +336,7 @@ string_new :: proc "contextless" (dest: UninitializedStringPtr, str: cstring) {
 	string_new_with_latin1_chars(dest, str)
 }
 
-// ---------------------------------------------------------------------------
-// Class names
-// ---------------------------------------------------------------------------
+// Class names.
 
 // ClassName is process-lifetime StaticStringName storage for class and parent
 // names used by registration. Keep the backing storage global or otherwise
@@ -380,9 +358,7 @@ class_name_init_latin1_cstring :: proc "contextless" (name: ^ClassName, value: c
 	)
 }
 
-// ---------------------------------------------------------------------------
-// Class registration
-// ---------------------------------------------------------------------------
+// Class registration.
 
 // Register an extension class using the current (Godot 4.7) creation info.
 register_class :: proc "contextless" (
@@ -1191,9 +1167,7 @@ register_class_signal_with_descriptor :: proc "contextless" (
 	register_class_signal(class_name, desc.name, desc.argument_info, desc.argument_count)
 }
 
-// ---------------------------------------------------------------------------
-// Objects
-// ---------------------------------------------------------------------------
+// Objects.
 
 // Set the GDExtension instance data for an object.
 set_instance :: proc "contextless" (
@@ -1247,9 +1221,7 @@ construct_object :: proc "contextless" (class_name: ConstStringNamePtr) -> Objec
 	return classdb_construct_object3(class_name)
 }
 
-// ---------------------------------------------------------------------------
-// Misc
-// ---------------------------------------------------------------------------
+// Misc.
 
 // Verify the runtime Godot version matches expectations (>= major.minor).
 check_version :: proc "contextless" (major, minor, patch: u32) -> bool {
@@ -1258,16 +1230,12 @@ check_version :: proc "contextless" (major, minor, patch: u32) -> bool {
 	return var.major > major || (var.major == major && var.minor >= minor)
 }
 
-// ---------------------------------------------------------------------------
-// Logging (bypasses Godot's print_error / print_warning prefix)
-// ---------------------------------------------------------------------------
+// Logging.
 
 // Write a line to stdout. Avoids the ERROR:/WARNING: prefix that
 // print_error / print_warning add. In headless mode stdout is the terminal;
 // in the editor it goes to the terminal that launched Godot.
-// TODO: replace with godot.print() once the high-level godot package
-// is generated. Uses Odin's fmt under the hood; callers must have set
-// context = godot_context() first.
+// Uses Odin's fmt; callers must set context = godot_context() first.
 import "core:fmt"
 
 debug_print :: proc(msg: string) {

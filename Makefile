@@ -1,7 +1,3 @@
-# ---------------------------------------------------------------------------
-# odin-gdext -- Odin bindings for Godot 4 GDExtension
-# ---------------------------------------------------------------------------
-
 COLLECTION := godot
 ROOT      := $(shell pwd)
 ODIN      := odin
@@ -24,17 +20,14 @@ EXTENSION_API  := extension_api.json
 BUILTIN_STAMP  := bindings/builtin/.stamp
 CLASSES_STAMP  := bindings/classes/.stamp
 
-# Build the codegen tool itself.
 $(CODEGEN): $(wildcard generator/*.odin generator/**/*.odin)
 	@mkdir -p bin
 	$(ODIN) build generator -out:$(CODEGEN) -o:speed
 
-# Generate the FFI interface files.
 $(INTERFACE_OUT): $(INTERFACE_JSON) $(CODEGEN)
 	@echo ">> Generating interface bindings..."
 	$(CODEGEN) $(INTERFACE_JSON)
 
-# Generate builtin type + utility function bindings from extension_api.json.
 $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 	@echo ">> Generating builtin + utility bindings..."
 	@mkdir -p bindings/builtin bindings/classes
@@ -44,16 +37,12 @@ $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 
 .PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot check-facade test-unit hello prepare-hello-cache test-hello ci clean
 
-# Build the codegen tool.
 codegen: $(CODEGEN)
 
-# Generate the FFI interface.
 interface: $(INTERFACE_OUT)
 
-# Generate builtin type + utility bindings.
 builtins: $(BUILTIN_STAMP)
 
-# Dump the full Godot extension API (builtin classes, utility functions, etc.).
 $(EXTENSION_API):
 	@echo ">> Dumping extension API..."
 	godot --headless --dump-extension-api $(EXTENSION_API)
@@ -71,25 +60,20 @@ fmt:
 	odinfmt -w -path:examples
 	odinfmt -w -path:tests
 
-# Check formatting without mutating the working tree.
 fmt-check:
 	scripts/fmt-check.sh
 
-# Type-check the core package.
 check: interface
 	$(ODIN) check core -no-entry-point $(ODIN_CHECK_FLAGS)
 
-# Type-check the generator.
 check-generator:
 	$(ODIN) check generator $(ODIN_CHECK_FLAGS)
 
-# Type-check generated binding packages.
 check-bindings: interface builtins
 	$(ODIN) check bindings -no-entry-point $(ODIN_CHECK_FLAGS)
 	$(ODIN) check bindings/builtin -no-entry-point $(ODIN_CHECK_FLAGS)
 	$(ODIN) check bindings/classes -no-entry-point $(ODIN_CHECK_FLAGS)
 
-# Type-check the public facade package.
 check-godot: interface builtins
 	$(ODIN) check godot -no-entry-point $(ODIN_CHECK_FLAGS)
 
@@ -103,7 +87,6 @@ check-facade: interface builtins
 test-unit: interface
 	$(ODIN) test tests/core $(ODIN_TEST_FLAGS)
 
-# Build the hello-world extension shared library.
 hello: interface builtins
 	@mkdir -p examples/hello/bin
 	$(ODIN) build examples/hello/src \
@@ -119,7 +102,6 @@ prepare-hello-cache:
 	@printf '%s\n' 'res://hello.gdextension' > examples/hello/.godot/extension_list.cfg
 	@touch examples/hello/.godot/.gdignore
 
-# Test in Godot headless.
 test-hello: hello prepare-hello-cache
 	godot --headless --path examples/hello --quit
 

@@ -1,18 +1,5 @@
-// godot-core/object.odin -- Typed object handle system.
-//
-// Each Godot class is represented as `distinct ObjectPtr`.
-// Per-class API surface is generated as free functions.
-//
-// Pattern for a class (codegen'd):
-//   Node2D :: distinct ObjectPtr
-//
-//   node2d_object :: proc(self: Node2D) -> ObjectPtr { return ObjectPtr(self) }
-//   node2d_unwrap :: proc(instance: ClassInstancePtr, data_type: typeid) -> Node2D { ... }
-//
-// Usage:
-//   n: Node2D = node2d_unwrap(instance)
-//   pos := node2d_get_position(n)
-//   upcast := ObjectPtr(n)  // cast to base ObjectPtr
+// Typed object handle helpers.
+// Class handles are borrowed views over Godot-owned objects unless documented otherwise.
 package godot_core
 
 
@@ -26,13 +13,13 @@ RefCounted :: distinct ObjectPtr
 // functions. Convert to an Odin string via variant layer helpers.
 StringRepr :: distinct [8]u8
 
-// ---- Null check ----
+// Null checks.
 
 is_nil :: proc "contextless" (obj: Object) -> bool {
 	return ObjectPtr(obj) == nil
 }
 
-// ---- Variant conversion ----
+// Variant conversion.
 
 // object_to_variant wraps an ObjectPtr into an initialized Variant. The caller
 // owns the returned Variant and must destroy it with variant_free.
@@ -60,7 +47,7 @@ variant_try_object :: proc "contextless" (v: ^Variant) -> (value: ObjectPtr, ok:
 	return object_from_variant(v), true
 }
 
-// ---- Signal emission ----
+// Signal emission.
 
 emit_signal_method_name_data: StaticStringName
 signal_emission_object_class_name_data: StaticStringName
@@ -161,7 +148,7 @@ object_emit_signal_1_godot_real :: proc "contextless" (
 	require_call_ok(&err)
 }
 
-// ---- Class identity (is_class-based casting) ----
+// Class identity and checked casts.
 
 is_class_method_name_data: StaticStringName
 object_class_name_data: StaticStringName

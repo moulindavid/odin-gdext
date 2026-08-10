@@ -2,9 +2,7 @@ package facade_tests
 
 import gt "godot:godot"
 
-// Compile-only smoke coverage for public generated class APIs. This package
-// intentionally imports only godot:godot, proving normal users do not need to
-// import internal generated class packages directly.
+// Compile-only facade smoke coverage. Users should not need internal generated imports.
 class_facade_compile_smoke :: proc "contextless" (
 	object: gt.Object,
 	node2d: gt.Node2D,

@@ -6,9 +6,7 @@ import "core:fmt"
 import "core:os"
 import "core:strings"
 
-// ---------------------------------------------------------------------------
-// JSON model structs -- mirror gdextension_interface.json schema
-// ---------------------------------------------------------------------------
+// JSON model for gdextension_interface.json.
 
 Header :: struct {
 	_copyright:     []string `json:"_copyright"`,
@@ -70,16 +68,12 @@ HeaderInterfaceFunction :: struct {
 	arguments:    []HeaderArgument `json:"arguments,omitempty"`,
 }
 
-// ---------------------------------------------------------------------------
-// Output file paths
-// ---------------------------------------------------------------------------
+// Output file paths.
 
 OUT_INTERFACE_DEFS :: "core/interface_defs.odin"
 OUT_INTERFACE :: "core/interface.odin"
 
-// ---------------------------------------------------------------------------
-// C type → Odin type mapping
-// ---------------------------------------------------------------------------
+// C type to Odin type mapping.
 
 map_c_type :: proc(c_type: string, defined: ^map[string]bool) -> string {
 	if c_type == "" {return "rawptr"}
@@ -161,9 +155,7 @@ map_c_type :: proc(c_type: string, defined: ^map[string]bool) -> string {
 	return "rawptr"
 }
 
-// ---------------------------------------------------------------------------
-// Name conversion helpers
-// ---------------------------------------------------------------------------
+// Name conversion helpers.
 
 to_pascal :: proc(snake: string) -> string {
 	b := strings.builder_make(context.temp_allocator)
@@ -235,9 +227,7 @@ ilog2 :: proc(x: u64) -> int {
 	return n
 }
 
-// ---------------------------------------------------------------------------
-// Doc comment emission
-// ---------------------------------------------------------------------------
+// Doc comment emission.
 
 emit_doc :: proc(
 	b: ^strings.Builder,
@@ -280,9 +270,7 @@ emit_doc :: proc(
 	fmt.sbprintf(b, "%s */\n", indent)
 }
 
-// ---------------------------------------------------------------------------
-// Type generation
-// ---------------------------------------------------------------------------
+// Type generation.
 
 gen_alias :: proc(b: ^strings.Builder, t: HeaderType, defined: ^map[string]bool) {
 	emit_doc(b, t.description, t.since, t.deprecated, "")
@@ -292,8 +280,7 @@ gen_alias :: proc(b: ^strings.Builder, t: HeaderType, defined: ^map[string]bool)
 
 gen_handle :: proc(b: ^strings.Builder, t: HeaderType) {
 	emit_doc(b, t.description, t.since, t.deprecated, "")
-	// TODO: migrate handles to distinct rawptr aliases once core/examples have
-	// explicit casts for const/uninitialized pointer roles.
+	// Keep pointer aliases raw until const and uninitialized roles are modeled explicitly.
 	fmt.sbprintf(b, "%s :: rawptr\n\n", t.name)
 }
 
@@ -353,9 +340,7 @@ gen_struct :: proc(b: ^strings.Builder, t: HeaderType, defined: ^map[string]bool
 	strings.write_string(b, "}\n\n")
 }
 
-// ---------------------------------------------------------------------------
-// Proc type emission (shared by function types & interface function types)
-// ---------------------------------------------------------------------------
+// Proc type emission shared by function types and interface function types.
 
 write_proc_type :: proc(
 	b: ^strings.Builder,
@@ -385,9 +370,7 @@ write_proc_type :: proc(
 	strings.write_byte(b, '\n')
 }
 
-// ---------------------------------------------------------------------------
-// Interface function → proc type alias  (interface_defs.odin)
-// ---------------------------------------------------------------------------
+// Interface function proc aliases for interface_defs.odin.
 
 gen_interface_proc_type :: proc(
 	b: ^strings.Builder,
@@ -407,9 +390,7 @@ interface_function_is_required :: proc(f: HeaderInterfaceFunction) -> bool {
 	return true
 }
 
-// ---------------------------------------------------------------------------
-// Interface globals + init()  (interface.odin)
-// ---------------------------------------------------------------------------
+// Interface globals and init() for interface.odin.
 
 gen_globals_and_init :: proc(iface: []HeaderInterfaceFunction) -> string {
 	b := strings.builder_make(context.temp_allocator)
@@ -460,9 +441,7 @@ gen_globals_and_init :: proc(iface: []HeaderInterfaceFunction) -> string {
 	return strings.to_string(b)
 }
 
-// ---------------------------------------------------------------------------
-// Main entry point
-// ---------------------------------------------------------------------------
+// Main entry point.
 
 main :: proc() {
 	if len(os.args) < 2 {
@@ -484,7 +463,7 @@ main :: proc() {
 
 	json_path := os.args[1]
 
-	// ---- read JSON ----
+	// Read JSON.
 	data, err := os.read_entire_file_from_path(json_path, context.temp_allocator)
 	if err != nil {
 		fmt.eprintfln("ERROR: cannot read %s: %v", json_path, err)
@@ -498,14 +477,14 @@ main :: proc() {
 		os.exit(1)
 	}
 
-	// ---- build set of defined type names ----
+	// Build set of defined type names.
 	defined := make(map[string]bool, len(header.types))
 	defer delete(defined)
 	for t in header.types {
 		defined[t.name] = true
 	}
 
-	// ---- generate interface_defs.odin ----
+	// Generate interface_defs.odin.
 	defs := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&defs)
 
@@ -540,7 +519,7 @@ main :: proc() {
 		os.exit(1)
 	}
 
-	// ---- generate + write interface.odin ----
+	// Generate interface.odin.
 	iface_header := fmt.aprintf(
 		"// Code generated by bindgen from %s. DO NOT EDIT.\n\npackage godot_core\n\n",
 		json_path,

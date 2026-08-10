@@ -3,12 +3,10 @@ package hello
 import "core:fmt"
 import gt "godot:godot"
 
-// ---- Typed handle ----
+// Local typed handle used by the example.
 
 HelloNode :: distinct gt.ObjectPtr
 
-// HelloNode typed API -- per-class free functions.
-// This pattern mirrors what codegen will produce for Node, Node2D, etc.
 hello_node_object :: proc "contextless" (self: HelloNode) -> gt.ObjectPtr {
 	return gt.ObjectPtr(self)
 }
@@ -23,14 +21,14 @@ hello_node_from_instance :: proc "contextless" (
 	return HelloNode(data.object), true
 }
 
-// ---- Per-instance data ----
+// Extension-owned instance data.
 
 HelloData :: struct {
 	object: gt.ObjectPtr,
 	speed:  gt.GodotReal,
 }
 
-// ---- Class lifecycle callbacks ----
+// Class lifecycle callbacks.
 
 
 create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool) -> gt.ObjectPtr {
@@ -180,7 +178,7 @@ hello_ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
 		),
 	)
 
-	// Utility functions
+	// Generated utility smoke checks.
 	gt.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
 	gt.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
 	gt.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
@@ -195,7 +193,7 @@ notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reverse
 	if gt.dispatch_node_virtual_callbacks(instance, what, reversed, &hello_node_virtuals) do return
 }
 
-// ---- Method: add(a, b) -> a + b ----
+// Method adapters.
 
 add :: proc "contextless" (self: HelloNode, a: gt.GodotReal, b: gt.GodotReal) -> gt.GodotReal {
 	_ = self
@@ -518,7 +516,7 @@ register_signals :: proc() {
 	gt.debug_print("[odin-gdext] Signals pinged and speed_changed registered!")
 }
 
-// ---- Process-lifetime class name storage ----
+// Process-lifetime registration metadata.
 
 hello_name_data: gt.ClassName
 parent_name_data: gt.ClassName
@@ -562,7 +560,7 @@ register_classes :: proc() {
 	register_properties()
 	register_signals()
 
-	// Test: variant round-trip (float, int, bool)
+	// Variant primitive round-trip.
 	vf := gt.variant_from_float(3.14)
 	vi := gt.variant_from_int(-42)
 	vb := gt.variant_from_bool(true)
@@ -593,8 +591,7 @@ register_classes :: proc() {
 	gt.variant_free(&vb)
 
 
-	// Test: lightweight RID wrapper and Variant extraction. Destroying this wrapper
-	// only destroys the RID value storage, not any Godot server-side resource.
+	// RID values do not own the server resource they identify.
 	rid := gt.rid_new()
 	rid_copy := gt.rid_copy(&rid)
 	rid_v := gt.variant_from_rid(&rid)
@@ -614,7 +611,7 @@ register_classes :: proc() {
 	gt.rid_free(&rid_copy)
 	gt.rid_free(&rid)
 
-	// Test: owned Array wrapper and Array Variant extraction
+	// Array wrapper and Variant extraction.
 	arr := gt.array_new()
 	v1 := gt.variant_from_float(10.0)
 	v2 := gt.variant_from_float(20.0)
@@ -658,7 +655,7 @@ register_classes :: proc() {
 	gt.variant_free(&v2)
 	gt.array_free(&arr)
 
-	// Test: owned Dictionary wrapper and Dictionary Variant extraction
+	// Dictionary wrapper and Variant extraction.
 	dict := gt.dictionary_new()
 	dict_key := gt.variant_from_cstring(cstring("answer"))
 	dict_value := gt.variant_from_int(42)
@@ -701,7 +698,7 @@ register_classes :: proc() {
 	gt.variant_free(&dict_value)
 	gt.dictionary_free(&dict)
 
-	// Test: owned PackedByteArray wrapper and Variant extraction
+	// PackedByteArray wrapper and Variant extraction.
 	bytes := gt.packed_byte_array_new()
 	gt.packed_byte_array_push(&bytes, 7)
 	gt.packed_byte_array_push(&bytes, 42)
@@ -733,7 +730,7 @@ register_classes :: proc() {
 	gt.variant_free(&bytes_v)
 	gt.packed_byte_array_free(&bytes)
 
-	// Test: owned PackedInt32Array wrapper and Variant extraction
+	// PackedInt32Array wrapper and Variant extraction.
 	ints := gt.packed_int32_array_new()
 	gt.packed_int32_array_push(&ints, -10)
 	gt.packed_int32_array_push(&ints, 2048)
@@ -765,7 +762,7 @@ register_classes :: proc() {
 	gt.variant_free(&ints_v)
 	gt.packed_int32_array_free(&ints)
 
-	// Test: owned PackedInt64Array wrapper and Variant extraction
+	// PackedInt64Array wrapper and Variant extraction.
 	wide_ints := gt.packed_int64_array_new()
 	gt.packed_int64_array_push(&wide_ints, -10000000000)
 	gt.packed_int64_array_push(&wide_ints, 9000000000)
@@ -797,7 +794,7 @@ register_classes :: proc() {
 	gt.variant_free(&wide_ints_v)
 	gt.packed_int64_array_free(&wide_ints)
 
-	// Test: owned PackedFloat32Array wrapper and Variant extraction
+	// PackedFloat32Array wrapper and Variant extraction.
 	floats32 := gt.packed_float32_array_new()
 	gt.packed_float32_array_push(&floats32, f32(1.5))
 	gt.packed_float32_array_push(&floats32, f32(-2.25))
@@ -829,7 +826,7 @@ register_classes :: proc() {
 	gt.variant_free(&floats32_v)
 	gt.packed_float32_array_free(&floats32)
 
-	// Test: owned PackedFloat64Array wrapper and Variant extraction
+	// PackedFloat64Array wrapper and Variant extraction.
 	floats64 := gt.packed_float64_array_new()
 	gt.packed_float64_array_push(&floats64, 1.5)
 	gt.packed_float64_array_push(&floats64, -2.25)
@@ -862,7 +859,7 @@ register_classes :: proc() {
 	gt.packed_float64_array_free(&floats64)
 
 
-	// Test: owned PackedStringArray wrapper and owned String element extraction
+	// PackedStringArray returns owned String elements.
 	strings := gt.packed_string_array_new()
 	strings_first_input := gt.string_from_utf8("alpha")
 	strings_second_input := gt.string_from_utf8("beta")
@@ -914,7 +911,7 @@ register_classes :: proc() {
 	gt.string_free(&strings_first_input)
 	gt.packed_string_array_free(&strings)
 
-	// Test: owned PackedVector2Array wrapper and Variant extraction
+	// PackedVector2Array wrapper and Variant extraction.
 	vectors2 := gt.packed_vector2_array_new()
 	gt.packed_vector2_array_push(&vectors2, gt.Vector2{3, 4})
 	gt.packed_vector2_array_push(&vectors2, gt.Vector2{-1, 2})
@@ -948,7 +945,7 @@ register_classes :: proc() {
 	gt.variant_free(&vectors2_v)
 	gt.packed_vector2_array_free(&vectors2)
 
-	// Test: owned PackedVector3Array wrapper and Variant extraction
+	// PackedVector3Array wrapper and Variant extraction.
 	vectors3 := gt.packed_vector3_array_new()
 	gt.packed_vector3_array_push(&vectors3, gt.Vector3{1, 2, 3})
 	gt.packed_vector3_array_push(&vectors3, gt.Vector3{-1, -2, -3})
@@ -985,7 +982,7 @@ register_classes :: proc() {
 	gt.packed_vector3_array_free(&vectors3)
 
 
-	// Test: owned PackedVector4Array wrapper and Variant extraction
+	// PackedVector4Array wrapper and Variant extraction.
 	vectors4 := gt.packed_vector4_array_new()
 	gt.packed_vector4_array_push(&vectors4, gt.Vector4{1, 2, 3, 4})
 	gt.packed_vector4_array_push(&vectors4, gt.Vector4{-1, -2, -3, -4})
@@ -1024,7 +1021,7 @@ register_classes :: proc() {
 	gt.packed_vector4_array_free(&vectors4)
 
 
-	// Test: owned PackedColorArray wrapper and Variant extraction
+	// PackedColorArray wrapper and Variant extraction.
 	colors := gt.packed_color_array_new()
 	gt.packed_color_array_push(&colors, gt.Color{1, 0, 0, 1})
 	gt.packed_color_array_push(&colors, gt.Color{0, 1, 0, 1})
@@ -1062,7 +1059,7 @@ register_classes :: proc() {
 	gt.variant_free(&colors_v)
 	gt.packed_color_array_free(&colors)
 
-	// Test: print utility function
+	// print utility function.
 	gt.print_init()
 	vs := gt.variant_from_cstring(cstring("Hello from Odin via Variant!"))
 	gt.print(gt.variant_ptr(&vs))
@@ -1079,7 +1076,7 @@ register_classes :: proc() {
 	)
 	gt.variant_free(&vs)
 
-	// Test: owned String wrapper and String Variant extraction
+	// String wrapper and Variant extraction.
 	gs := gt.string_from_utf8("Owned Godot String")
 	gs_prefix := gt.string_from_utf8("Owned")
 	gs_suffix := gt.string_from_utf8("String")
@@ -1150,7 +1147,7 @@ register_classes :: proc() {
 	gt.string_free(&gs_prefix)
 	gt.string_free(&gs)
 
-	// Test: owned StringName wrapper and StringName Variant extraction
+	// StringName wrapper and Variant extraction.
 	sn := gt.string_name_from_utf8_cstring(cstring("HelloNode"))
 	snv := gt.variant_from_string_name(&sn)
 	sn_back, sn_back_ok := gt.variant_try_string_name(&snv)
@@ -1161,7 +1158,7 @@ register_classes :: proc() {
 	gt.variant_free(&snv)
 	gt.string_name_free(&sn)
 
-	// Test: owned NodePath wrapper and NodePath Variant extraction
+	// NodePath wrapper and Variant extraction.
 	np := gt.node_path_from_utf8("../HelloNode")
 	npv := gt.variant_from_node_path(&np)
 	np_back, np_back_ok := gt.variant_try_node_path(&npv)
@@ -1229,7 +1226,7 @@ register_classes :: proc() {
 	gt.variant_free(&npv)
 	gt.node_path_free(&np)
 
-	// Test: Vector2 built-in
+	// Vector2 generated builtin.
 	vec := gt.vector2_new3(3.0, 4.0)
 	vec_variant := gt.vector2_to_variant(vec)
 	vec_back, vec_back_ok := gt.vector2_try_from_variant(&vec_variant)
@@ -1251,13 +1248,13 @@ register_classes :: proc() {
 	dot := gt.vector2_dot(vec, gt.Vector2{1, 0})
 	gt.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).dot(1,0): %v (expect 3)", dot))
 
-	// Utility function smoke test
+	// Utility function smoke check.
 	gt.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
 	gt.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
 	gt.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
 }
 
-// ---- Entry point ----
+// GDExtension entry point.
 
 @(export)
 hello_library_init :: proc "c" (

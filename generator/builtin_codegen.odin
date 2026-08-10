@@ -6,9 +6,7 @@ import "core:fmt"
 import "core:os"
 import "core:strings"
 
-// ---------------------------------------------------------------------------
-// JSON model -- extension_api.json schema
-// ---------------------------------------------------------------------------
+// JSON model for extension_api.json.
 
 ExtensionApiRoot :: struct {
 	builtin_classes:              []ExtensionApiBuiltinClass `json:"builtin_classes"`,
@@ -133,12 +131,7 @@ ExtensionApiMemberOffsetEntry :: struct {
 	meta:   string `json:"meta"`,
 }
 
-// ---------------------------------------------------------------------------
-// Type mapping: Godot name → Odin name
-//
-// Two separate maps because GDExtension uses different sizes for members
-// (native storage, f32) vs method args/returns (Godot `float` ABI, core.GodotReal).
-// ---------------------------------------------------------------------------
+// Type mapping. Members use native storage; methods use the Godot `float` ABI.
 
 member_type_map := map[string]string {
 	"Nil"     = "rawptr",
@@ -440,10 +433,7 @@ class_enum_value_name :: proc(value_name: string) -> string {
 	return odin_safe_snake_identifier(value_name)
 }
 
-// ---------------------------------------------------------------------------
-// Variant type enum name: JSON uses names like "AABB", "Transform2D" but
-// GDExtensionVariantType uses .Aabb, .Transform2d.
-// ---------------------------------------------------------------------------
+// Variant enum names differ from JSON names, for example AABB -> .Aabb.
 
 variant_enum_name_map := map[string]string {
 	"Transform2D" = "Transform2d",
@@ -456,9 +446,7 @@ variant_enum_name :: proc(json_name: string) -> string {
 	return json_name
 }
 
-// ---------------------------------------------------------------------------
-// Skip list: complex types needing manual handling.
-// ---------------------------------------------------------------------------
+// Types skipped until their ownership or ABI rules are explicit.
 
 skip_builtins := map[string]bool {
 	"Nil"                = true,
@@ -485,9 +473,7 @@ skip_builtins := map[string]bool {
 	"PackedVector4Array" = true,
 }
 
-// ---------------------------------------------------------------------------
-// Constructor name heuristic
-// ---------------------------------------------------------------------------
+// Constructor naming.
 
 constructor_name :: proc(lower: string, index: i32, n_args: int) -> string {
 	if index == 0 {return fmt.aprintf("%s_new", lower)}
@@ -496,9 +482,7 @@ constructor_name :: proc(lower: string, index: i32, n_args: int) -> string {
 	return fmt.aprintf("%s_new%d", lower, index)
 }
 
-// ---------------------------------------------------------------------------
-// Emitters
-// ---------------------------------------------------------------------------
+// Builtin emitters.
 
 // Emit the Odin struct definition matching Godot's memory layout.
 // Uses real member data from builtin_class_member_offsets if available;
@@ -652,7 +636,7 @@ emit_methods :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 	strings.write_string(b, "// ---- Methods ----\n\n")
 
 	for m in c.methods {
-		if m.is_vararg {continue} 	// skip vararg methods for now
+		if m.is_vararg {continue}
 
 		method_var := fmt.aprintf("_%s_%s", lower, m.name)
 		fmt.sbprintf(b, "@(private=\"file\")\n%s: core.BuiltinMethod\n\n", method_var)
@@ -795,8 +779,7 @@ emit_enums :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 	}
 }
 
-// Emit constants. These are constructor expressions like "Vector2(0, 0)".
-// We emit them as commented documentation for now.
+// Emit builtin constants as comments until constructor expressions are supported.
 emit_constants :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 	if len(c.constants) == 0 {return}
 	strings.write_string(
@@ -811,9 +794,7 @@ emit_constants :: proc(b: ^strings.Builder, c: ExtensionApiBuiltinClass) {
 	strings.write_string(b, "\n")
 }
 
-// ---------------------------------------------------------------------------
-// Main generation for one builtin class
-// ---------------------------------------------------------------------------
+// Builtin class generation.
 
 generate_one :: proc(
 	c: ExtensionApiBuiltinClass,
@@ -857,9 +838,7 @@ generate_one :: proc(
 	return true
 }
 
-// ---------------------------------------------------------------------------
-// Utility function codegen
-// ---------------------------------------------------------------------------
+// Utility function generation.
 
 // Return types that need complex struct storage.
 skip_util_return := map[string]bool {
@@ -1006,9 +985,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 }
 
 
-// ---------------------------------------------------------------------------
-// Class handle codegen
-// ---------------------------------------------------------------------------
+// Class handle generation.
 
 selected_class_names := []string {
 	"Object",
@@ -1638,9 +1615,7 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	return true
 }
 
-// ---------------------------------------------------------------------------
-// Entry point -- called from main.odin for `--builtin` flag.
-// ---------------------------------------------------------------------------
+// Entry point for the --builtin generation path.
 
 generate_builtin_bindings :: proc(json_path: string) -> bool {
 	init_type_maps()
@@ -1658,8 +1633,7 @@ generate_builtin_bindings :: proc(json_path: string) -> bool {
 		return false
 	}
 
-	// Build real struct member map from offset data (computed properties excluded).
-	// Use the first build configuration only (matches the running Godot build).
+	// Use member offsets from the first build configuration, matching the running Godot build.
 	real_members := make(map[string][]ExtensionApiMemberOffsetEntry, 32)
 	if len(root.builtin_class_member_offsets) > 0 {
 		for c in root.builtin_class_member_offsets[0].classes {

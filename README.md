@@ -260,7 +260,7 @@ odin-gdext/
 │   ├── classes/              <- selected generated class wrappers
 │   └── utilities.odin        <- generated @GlobalScope functions
 ├── godot/                    <- thin re-export facade
-└── examples/hello/           <- minimal GDExtension proving the pipeline
+└── examples/hello/           <- smoke-tested example extension
 ```
 
 - `core/` -- handwritten runtime: C-ABI types, owned Variant storage helpers,
@@ -277,7 +277,7 @@ odin-gdext/
   and packed arrays are not complete yet.
 - `bindings/utilities.odin` -- code-generated non-vararg @GlobalScope utility
   functions whose return and argument types are currently supported. Utilities
-  involving unsupported complex types are skipped for now.
+  involving unsupported complex types are skipped until their safety rules are defined.
 - `godot/` -- small handwritten convenience facade, not a complete re-export of
   every generated API.
 

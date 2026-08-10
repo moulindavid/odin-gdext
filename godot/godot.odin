@@ -1,9 +1,5 @@
-// godot/godot.odin -- Public convenience facade.
-//
-// Prefer this package for normal extension code. It re-exports the stable core
-// value helpers plus selected generated builtin, utility, class, and user-class
-// registration APIs. Low-level `godot:core` remains available for advanced code,
-// but normal examples should not need to import it directly.
+// Public convenience facade for normal extension code.
+// Low-level godot:core remains available for advanced GDExtension work.
 package godot
 
 import gbind "godot:bindings"
