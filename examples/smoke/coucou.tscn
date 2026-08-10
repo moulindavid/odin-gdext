@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://coucou.gd" id="1_1c8th"]
 
-[node name="Hello" type="Node"]
+[node name="Coucou" type="Node" unique_id=713535598]
 script = ExtResource("1_1c8th")
 
 [node name="Label" type="Label" parent="."]

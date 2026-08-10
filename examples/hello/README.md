@@ -1,37 +1,16 @@
-# Hello GDExtension example
+# Hello example
 
-Build from the repository root:
+This is the small beginner example. Godot owns the scene and input; Odin
+registers `HelloNode` with one method, one property, and one signal:
 
-```sh
-make hello
-```
+- `roll_math() -> float`
+- `speed: float`
+- `speed_changed(value: float)`
 
-Run the headless smoke test:
+Run it from the repository root with:
 
 ```sh
 make test-hello
 ```
 
-Or open this directory as a Godot project. The extension registers `HelloNode`,
-then `coucou.gd` creates it and calls:
-
-```gdscript
-var node: Object = ClassDB.instantiate("HelloNode")
-var result: Variant = node.call("add", 7.0, 6.0)
-```
-
-Expected output includes:
-
-```text
-HelloNode created!
-hello.add(7.0, 6.0) = 13.0
-```
-
-This example is intentionally low-level and manual. It demonstrates the current
-prototype pipeline: generated GDExtension interface bindings, manual class
-registration, a GDScript-callable method, basic Variant conversion, generated
-math/utility binding smoke checks, and class unregistration during module
-deinitialization.
-
-If it does not open in Godot or the smoke test does not run, the generated
-bindings, extension build, or local Godot setup may need to be refreshed.
+For broad internal coverage, use the smoke example.
