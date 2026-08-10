@@ -12,15 +12,15 @@ metadata, and unregister cleanup during deinitialization.
 ## Plan
 
 1. Add `docs/USING_IN_GODOT.md`.
-   - [ ] Explain how to build the extension shared library.
-   - [ ] Explain where to place the `.gdextension` file and compiled library in
+   - [x] Explain how to build the extension shared library.
+   - [x] Explain where to place the `.gdextension` file and compiled library in
      a Godot project.
-   - [ ] Show the minimal Odin extension entry point and class registration
+   - [x] Show the minimal Odin extension entry point and class registration
      shape.
-   - [ ] Show how to instantiate an Odin-backed class from GDScript.
-   - [ ] Show how to call an Odin method, read/write a property, and connect to
+   - [x] Show how to instantiate an Odin-backed class from GDScript.
+   - [x] Show how to call an Odin method, read/write a property, and connect to
      a signal.
-   - [ ] Document required cleanup: freeing owned values and unregistering
+   - [x] Document required cleanup: freeing owned values and unregistering
      classes during deinitialization.
 
 2. Add a cleaner example project or template.
