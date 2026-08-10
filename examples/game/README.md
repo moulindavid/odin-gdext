@@ -10,7 +10,7 @@ with:
 - `difficulty: float`
 - `damage_rolled(value: float)`
 
-Run it from the repository root with the example target once it is available:
+Run it from the repository root with:
 
 ```sh
 make example-game

@@ -42,11 +42,11 @@ metadata, and unregister cleanup during deinitialization.
    - [x] Avoid making the beginner example look like a test dump.
 
 4. Add a Makefile target for the example workflow.
-   - [ ] Add a target such as `make example-game`.
-   - [ ] Build the extension, prepare the Godot project files, and run the
+   - [x] Add a target such as `make example-game`.
+   - [x] Build the extension, prepare the Godot project files, and run the
      example headless when possible.
-   - [ ] Keep `make ci` using deterministic targets and generated-file ordering.
-   - [ ] Document which target a new user should run first.
+   - [x] Keep `make ci` using deterministic targets and generated-file ordering.
+   - [x] Document which target a new user should run first.
 
 5. Document current limitations clearly.
    - [ ] State that the current recommended model is hybrid Godot plus Odin:

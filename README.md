@@ -19,6 +19,14 @@ via the *GDExtension* C API.
 
 ## Quick start
 
+For the beginner Godot workflow, start with:
+
+```sh
+make example-game
+```
+
+That builds `examples/game/bin/game.so`, prepares the Godot extension cache, and runs the small example project headless. For lower-level validation and generation workflows:
+
 ```sh
 # Dump Godot's extension API (requires Godot 4.7 on PATH)
 make extension-api
@@ -59,13 +67,15 @@ It performs a clean validation pass in a fixed order:
 7. `make check-bindings`
 8. `make check-godot`
 9. `make test-unit`
-10. `make test-hello`
+10. `make test-smoke`
+11. `make test-hello`
+12. `make example-game`
 
 `make test-unit` is the minimal Odin unit-test harness for focused tests that do
 not need to launch Godot. Odin's test runner allocates internally, so that target
 keeps `-vet` and `-strict-style` but intentionally omits
 `-default-to-nil-allocator`. Runtime integration is still covered by
-`make test-hello`, which builds the example extension and runs Godot headless.
+`make test-smoke`, which keeps broad runtime coverage, plus the beginner `make example-game` workflow.
 
 The GitHub Actions workflow in `.github/workflows/ci.yml` installs Odin,
 downloads `odinfmt` from the OLS tooling releases, downloads Godot 4.7, and runs

@@ -4,7 +4,7 @@
 input, UI, resources, and editor workflow, while Odin owns focused gameplay
 logic and selected extension classes.
 
-This guide uses the current `examples/hello` project as the reference shape.
+This guide uses the current `examples/game` project as the reference shape.
 
 ## Requirements
 
@@ -20,17 +20,18 @@ The project targets Godot 4.7's `float_64` API shape through `GodotReal`.
 From the repository root:
 
 ```sh
-make hello
+make example-game
 ```
 
-This generates the required GDExtension interface and selected bindings, then
-builds the example shared library at:
+This generates the required GDExtension interface and selected bindings, builds
+the beginner example shared library at:
 
 ```text
-examples/hello/bin/hello.so
+examples/game/bin/game.so
 ```
 
-For a clean runtime check:
+and runs the Godot project headless. The lower-level hello example remains
+available with:
 
 ```sh
 make test-hello
@@ -59,12 +60,12 @@ where the compiled shared library lives. The current hello example uses:
 ```ini
 [configuration]
 
-entry_symbol = "hello_library_init"
+entry_symbol = "game_library_init"
 compatibility_minimum = "4.7"
 
 [libraries]
-linuxbsd.x86_64 = "bin/hello.so"
-windows.x86_64 = "bin/hello.dll"
+linuxbsd.x86_64 = "bin/game.so"
+windows.x86_64 = "bin/game.dll"
 ```
 
 The `entry_symbol` must match the exported Odin initialization procedure. The
@@ -85,7 +86,7 @@ those classes during deinitialization.
 The important shape is:
 
 ```odin
-hello_library_init :: proc "c" (
+game_library_init :: proc "c" (
     get_proc_address: gt.InterfaceGetProcAddress,
     library: gt.ClassLibraryPtr,
     initialization: ^gt.Initialization,
