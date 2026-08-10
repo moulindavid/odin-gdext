@@ -136,60 +136,63 @@ free_instance :: proc "c" (class_userdata: rawptr, instance: gd.ClassInstancePtr
 	free(self_)
 }
 
+hello_ready :: proc(instance: gd.ClassInstancePtr, reversed: bool) {
+	_ = reversed
+	hn, hn_ok := hello_node_from_instance(instance)
+	if !hn_ok do return
+	gd.debug_print("Hello from Odin!")
+
+	obj := hello_node_object(hn)
+	buf: [128]u8
+	gd.debug_print(fmt.bprintf(buf[:], "is_nil: %v (expect false)", gt.is_nil(gt.Object(obj))))
+	gd.debug_print(
+		fmt.bprintf(buf[:], "is_class Node: %v (expect true)", gt.is_class(obj, node_class_name)),
+	)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"is_class Node2D: %v (expect true)",
+			gt.is_class(obj, node2d_class_name),
+		),
+	)
+
+	v := gt.object_to_variant(obj)
+	back, back_ok := gt.variant_try_object(&v)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"variant object roundtrip: %v / %v (expect true / true)",
+			back == obj,
+			back_ok,
+		),
+	)
+	gt.variant_free(&v)
+
+	node2d := gt.Node2D(obj)
+	gt.node2d_set_position(node2d, gt.Vector2{100, 50})
+	position := gt.node2d_get_position(node2d)
+	gd.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated Node2D position: (%v,%v) (expect 100,50)",
+			position.x,
+			position.y,
+		),
+	)
+
+	// Utility functions
+	gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
+	gd.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
+	gd.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
+}
+
+hello_node_notifications := gt.NodeNotificationHandlers {
+	ready = hello_ready,
+}
+
 notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
-	if what == gt.node_notification_ready {
-		hn, hn_ok := hello_node_from_instance(instance)
-		if !hn_ok do return
-		gd.debug_print("Hello from Odin!")
-
-		obj := hello_node_object(hn)
-		buf: [128]u8
-		gd.debug_print(fmt.bprintf(buf[:], "is_nil: %v (expect false)", gt.is_nil(gt.Object(obj))))
-		gd.debug_print(
-			fmt.bprintf(
-				buf[:],
-				"is_class Node: %v (expect true)",
-				gt.is_class(obj, node_class_name),
-			),
-		)
-		gd.debug_print(
-			fmt.bprintf(
-				buf[:],
-				"is_class Node2D: %v (expect true)",
-				gt.is_class(obj, node2d_class_name),
-			),
-		)
-
-		v := gt.object_to_variant(obj)
-		back, back_ok := gt.variant_try_object(&v)
-		gd.debug_print(
-			fmt.bprintf(
-				buf[:],
-				"variant object roundtrip: %v / %v (expect true / true)",
-				back == obj,
-				back_ok,
-			),
-		)
-		gt.variant_free(&v)
-
-		node2d := gt.Node2D(obj)
-		gt.node2d_set_position(node2d, gt.Vector2{100, 50})
-		position := gt.node2d_get_position(node2d)
-		gd.debug_print(
-			fmt.bprintf(
-				buf[:],
-				"generated Node2D position: (%v,%v) (expect 100,50)",
-				position.x,
-				position.y,
-			),
-		)
-
-		// Utility functions
-		gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
-		gd.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
-		gd.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
-	}
+	if gt.dispatch_node_notification(instance, what, reversed, &hello_node_notifications) do return
 }
 
 // ---- Method: add(a, b) -> a + b ----

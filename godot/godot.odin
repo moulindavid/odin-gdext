@@ -211,6 +211,58 @@ control_notification_focus_enter :: gclass.control_notification_focus_enter
 control_notification_focus_exit :: gclass.control_notification_focus_exit
 control_notification_theme_changed :: gclass.control_notification_theme_changed
 
+// --- Notification helpers ---
+NodeNotificationHandler :: #type proc(instance: ClassInstancePtr, reversed: bool)
+
+NodeNotificationHandlers :: struct {
+	enter_tree:      NodeNotificationHandler,
+	exit_tree:       NodeNotificationHandler,
+	ready:           NodeNotificationHandler,
+	process:         NodeNotificationHandler,
+	physics_process: NodeNotificationHandler,
+}
+
+// dispatch_node_notification calls a typed handler for common Node lifecycle
+// notifications and returns true when a handler ran. Unknown notifications and
+// nil handlers are left to the caller so raw notification numbers remain usable.
+dispatch_node_notification :: proc(
+	instance: ClassInstancePtr,
+	what: i32,
+	reversed: bool,
+	handlers: ^NodeNotificationHandlers,
+) -> bool {
+	if handlers == nil do return false
+
+	switch what {
+	case node_notification_enter_tree:
+		if handlers.enter_tree != nil {
+			handlers.enter_tree(instance, reversed)
+			return true
+		}
+	case node_notification_exit_tree:
+		if handlers.exit_tree != nil {
+			handlers.exit_tree(instance, reversed)
+			return true
+		}
+	case node_notification_ready:
+		if handlers.ready != nil {
+			handlers.ready(instance, reversed)
+			return true
+		}
+	case node_notification_process:
+		if handlers.process != nil {
+			handlers.process(instance, reversed)
+			return true
+		}
+	case node_notification_physics_process:
+		if handlers.physics_process != nil {
+			handlers.physics_process(instance, reversed)
+			return true
+		}
+	}
+	return false
+}
+
 // --- String ---
 string_ptr :: gcore.string_ptr
 const_string_ptr :: gcore.const_string_ptr

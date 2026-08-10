@@ -120,6 +120,31 @@ The helper only calls Godot's `set_instance` and `set_instance_binding` for the
 caller-provided pointer. It does not allocate, retain, unref, or free extension
 owned data.
 
+Notification helpers provide a small dispatch pattern for common `Node`
+lifecycle notifications while keeping raw notification numbers available for
+advanced handling:
+
+```odin
+ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
+	_ = reversed
+	self, ok := gt.class_instance_data(instance, PlayerData)
+	if !ok do return
+	_ = self
+}
+
+player_notifications := gt.NodeNotificationHandlers{
+	ready = ready,
+}
+
+notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+	context = gt.godot_context()
+	if gt.dispatch_node_notification(instance, what, reversed, &player_notifications) do return
+	if what == gt.node_notification_ready {
+		// Raw notification numbers remain available when needed.
+	}
+}
+```
+
 Method registration helpers use explicit descriptors over caller-owned stable
 metadata storage. For advanced signatures, call and ptrcall callbacks can stay
 fully explicit so Variant construction/destruction and ptrcall ABI casts remain

@@ -218,10 +218,10 @@ boilerplate in every extension.
      object-lifetime-sensitive signatures.
 
 6. Add notification dispatch helpers.
-   - [ ] Provide a small pattern for dispatching common notifications such as
+   - [x] Provide a small pattern for dispatching common notifications such as
      ready, process, physics process, enter tree, and exit tree.
-   - [ ] Keep raw notification numbers available for advanced usage.
-   - [ ] Prepare this path for Priority 4 virtual callback helpers.
+   - [x] Keep raw notification numbers available for advanced usage.
+   - [x] Prepare this path for Priority 4 virtual callback helpers.
 
 7. Move normal examples to the public facade.
    - [ ] Keep hello importing only `godot:godot` for normal usage.

@@ -97,10 +97,27 @@ facade_free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInst
 	_ = instance
 }
 
-facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+facade_ready_notification :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
 	_ = instance
-	_ = what
 	_ = reversed
+}
+
+facade_process_notification :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
+	_ = instance
+	_ = reversed
+}
+
+facade_node_notifications := gt.NodeNotificationHandlers {
+	ready   = facade_ready_notification,
+	process = facade_process_notification,
+}
+
+facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+	context = gt.godot_context()
+	if gt.dispatch_node_notification(instance, what, reversed, &facade_node_notifications) do return
+	if what == gt.node_notification_ready {
+		_ = what
+	}
 }
 
 registration_facade_compile_smoke :: proc "contextless" () {
