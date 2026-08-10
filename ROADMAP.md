@@ -178,35 +178,67 @@ checks generated class bindings alongside the existing value-type bindings.
 
 ## Priority 3 - user class registration helpers
 
-Build a small Odin-friendly helper layer over manual `ClassCreationInfo` and
-`ClassMethodInfo` construction. Simple free
-functions and typed descriptors should be enough to make examples and user
-extensions much easier to write.
+Build a small Odin-friendly helper layer over manual class registration while
+preserving explicit ownership, callback, and cleanup rules. The goal is not to
+hide GDExtension behind magic, but to make normal user classes practical without
+requiring direct `ClassCreationInfo`, `ClassMethodInfo`, or instance-binding
+boilerplate in every extension.
 
-Possible shape:
+1. Add minimal class registration helpers.
+   - [x] Provide a helper that builds `ClassCreationInfo` with safe defaults.
+   - [x] Keep create/free/notification callbacks explicit.
+   - [x] Keep unregistering classes explicit during deinitialization.
+   - [x] Update hello to use the helper instead of direct
+     `classdb_register_extension_class6`.
 
-```odin
-gt.register_class(
-	library,
-	"HelloNode",
-	"Node",
-	create_instance,
-	free_instance,
-)
-```
+2. Add static class-name helpers.
+   - [x] Make process-lifetime `StaticStringName` class and parent names easier
+     to initialize.
+   - [x] Document that the backing storage must outlive the registered class.
+   - [x] Avoid returning pointers to temporary StringName storage.
 
-```odin
-gt.register_method(
-	HelloNode,
-	"add",
-	add,
-	params = {gt.param("a", gt.GodotReal), gt.param("b", gt.GodotReal)},
-	ret = gt.GodotReal,
-)
-```
+3. Add instance binding helpers.
+   - [x] Wrap `set_instance` and `set_instance_binding` into a small helper.
+   - [x] Add checked helpers for retrieving typed Odin instance data from
+     `ClassInstancePtr`.
+   - [x] Keep allocation and freeing of extension-owned data explicit.
 
-The first goal is ergonomic wrappers for today's manual registration path; later
-codegen can emit the same descriptors for larger class APIs.
+4. Add method metadata registration helpers.
+   - [x] Provide descriptors for method name, return type, arguments, metadata,
+     call callback, and ptrcall callback.
+   - [x] Build `ClassMethodInfo` and `PropertyInfo` safely from stable storage.
+   - [x] Update hello's `add` method registration to use the helper.
+   - [x] Preserve explicit Variant destruction and ptrcall ABI rules.
+
+5. Add typed method adapter helpers for simple signatures.
+   - [x] Start with fixed arity primitive signatures such as
+     `GodotReal, GodotReal -> GodotReal`.
+   - [x] Generate or provide explicit adapters for both call and ptrcall paths.
+   - [x] Defer varargs, default arguments, `Callable`, `Signal`, and complex
+     object-lifetime-sensitive signatures.
+
+6. Add notification dispatch helpers.
+   - [x] Provide a small pattern for dispatching common notifications such as
+     ready, process, physics process, enter tree, and exit tree.
+   - [x] Keep raw notification numbers available for advanced usage.
+   - [x] Prepare this path for Priority 4 virtual callback helpers.
+
+7. Move normal examples to the public facade.
+   - [x] Keep hello importing only `godot:godot` for normal usage.
+   - [x] Re-export only the registration pieces intended for users.
+   - [x] Keep low-level `godot:core` access available but unnecessary for common
+     class registration.
+
+8. Add coverage for registration helpers.
+   - [x] Add facade compile checks for class and method registration helpers.
+   - [x] Keep hello smoke coverage exercising class creation, method
+     registration, instance binding, notifications, and unregister cleanup.
+   - [x] Run `make ci` before considering Priority 3 complete.
+
+Priority 3 is considered complete for the current Godot 4.7 prototype: normal
+examples can use the public facade for class registration, instance binding,
+method metadata, simple typed method adapters, notification dispatch, and
+explicit unregister cleanup.
 
 ## Priority 4 - properties, signals, notifications, and virtuals
 

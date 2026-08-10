@@ -1,9 +1,9 @@
 // godot/godot.odin -- Public convenience facade.
 //
 // Prefer this package for normal extension code. It re-exports the stable core
-// value helpers plus the selected generated builtin, utility, and class APIs.
-// Manual class registration still uses some low-level core declarations until
-// the Priority 3 registration helpers exist.
+// value helpers plus selected generated builtin, utility, class, and user-class
+// registration APIs. Low-level `godot:core` remains available for advanced code,
+// but normal examples should not need to import it directly.
 package godot
 
 import gbind "godot:bindings"
@@ -14,6 +14,33 @@ import gcore "godot:core"
 // --- Core types ---
 Object :: gcore.Object
 RefCounted :: gcore.RefCounted
+ObjectPtr :: gcore.ObjectPtr
+ClassInstancePtr :: gcore.ClassInstancePtr
+ClassLibraryPtr :: gcore.ClassLibraryPtr
+InterfaceGetProcAddress :: gcore.GDExtensionInterfaceGetProcAddress
+Initialization :: gcore.Initialization
+InitializationLevel :: gcore.InitializationLevel
+VariantPtr :: gcore.VariantPtr
+ConstVariantPtr :: gcore.ConstVariantPtr
+StringNamePtr :: gcore.StringNamePtr
+ConstStringNamePtr :: gcore.ConstStringNamePtr
+StringPtr :: gcore.StringPtr
+ConstStringPtr :: gcore.ConstStringPtr
+CallError :: gcore.CallError
+ClassCreateInstance :: gcore.ClassCreateInstance
+ClassFreeInstance :: gcore.ClassFreeInstance
+ClassNotification :: gcore.ClassNotification
+ClassMethodCall :: gcore.ClassMethodCall
+ClassMethodPtrCall :: gcore.ClassMethodPtrCall
+ClassMethodArgumentMetadata :: gcore.ClassMethodArgumentMetadata
+PropertyInfo :: gcore.PropertyInfo
+ClassMethodInfo :: gcore.ClassMethodInfo
+MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
+ClassMethodDescriptor :: gcore.ClassMethodDescriptor
+ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
+ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
+InstanceBindingCallbacks :: gcore.InstanceBindingCallbacks
+VariantType :: gcore.VariantType
 VariantStorage :: gcore.VariantStorage
 Variant :: gcore.Variant
 StringStorage :: gcore.StringStorage
@@ -21,6 +48,7 @@ String :: gcore.String
 StringNameStorage :: gcore.StringNameStorage
 StringName :: gcore.StringName
 StaticStringName :: gcore.StaticStringName
+ClassName :: gcore.ClassName
 NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
 RIDStorage :: gcore.RIDStorage
@@ -62,10 +90,23 @@ Node2D :: gclass.Node2D
 Control :: gclass.Control
 
 // --- Core functions ---
+init :: gcore.init
+construct_object :: gcore.construct_object
+debug_print :: gcore.debug_print
 is_nil :: gcore.is_nil
 is_class :: gcore.is_class
 cast_to :: gcore.cast_to
 init_class_casting :: gcore.init_class_casting
+register_class_with_defaults :: gcore.register_class_with_defaults
+unregister_class :: gcore.unregister_class
+attach_instance :: gcore.attach_instance
+class_instance_data :: gcore.class_instance_data
+init_method_property_info :: gcore.init_method_property_info
+init_class_method_info :: gcore.init_class_method_info
+register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
+class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
+class_method_godot_real2_to_godot_real_ptrcall ::
+	gcore.class_method_godot_real2_to_godot_real_ptrcall
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
@@ -177,6 +218,58 @@ control_notification_focus_enter :: gclass.control_notification_focus_enter
 control_notification_focus_exit :: gclass.control_notification_focus_exit
 control_notification_theme_changed :: gclass.control_notification_theme_changed
 
+// --- Notification helpers ---
+NodeNotificationHandler :: #type proc(instance: ClassInstancePtr, reversed: bool)
+
+NodeNotificationHandlers :: struct {
+	enter_tree:      NodeNotificationHandler,
+	exit_tree:       NodeNotificationHandler,
+	ready:           NodeNotificationHandler,
+	process:         NodeNotificationHandler,
+	physics_process: NodeNotificationHandler,
+}
+
+// dispatch_node_notification calls a typed handler for common Node lifecycle
+// notifications and returns true when a handler ran. Unknown notifications and
+// nil handlers are left to the caller so raw notification numbers remain usable.
+dispatch_node_notification :: proc(
+	instance: ClassInstancePtr,
+	what: i32,
+	reversed: bool,
+	handlers: ^NodeNotificationHandlers,
+) -> bool {
+	if handlers == nil do return false
+
+	switch what {
+	case node_notification_enter_tree:
+		if handlers.enter_tree != nil {
+			handlers.enter_tree(instance, reversed)
+			return true
+		}
+	case node_notification_exit_tree:
+		if handlers.exit_tree != nil {
+			handlers.exit_tree(instance, reversed)
+			return true
+		}
+	case node_notification_ready:
+		if handlers.ready != nil {
+			handlers.ready(instance, reversed)
+			return true
+		}
+	case node_notification_process:
+		if handlers.process != nil {
+			handlers.process(instance, reversed)
+			return true
+		}
+	case node_notification_physics_process:
+		if handlers.physics_process != nil {
+			handlers.physics_process(instance, reversed)
+			return true
+		}
+	}
+	return false
+}
+
 // --- String ---
 string_ptr :: gcore.string_ptr
 const_string_ptr :: gcore.const_string_ptr
@@ -208,6 +301,8 @@ static_string_name_ptr :: gcore.static_string_name_ptr
 const_static_string_name_ptr :: gcore.const_static_string_name_ptr
 uninitialized_static_string_name_ptr :: gcore.uninitialized_static_string_name_ptr
 static_string_name_init_latin1_cstring :: gcore.static_string_name_init_latin1_cstring
+class_name_ptr :: gcore.class_name_ptr
+class_name_init_latin1_cstring :: gcore.class_name_init_latin1_cstring
 
 // --- NodePath ---
 node_path_ptr :: gcore.node_path_ptr

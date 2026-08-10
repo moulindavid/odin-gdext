@@ -4,10 +4,10 @@
 via the *GDExtension* C API.
 
 > **Status:** early prototype. Current smoke-tested scope: Godot 4.7
-> single-precision C ABI generation, manual class registration, manual lifecycle
-> callbacks, manual method registration, basic Variant helpers, typed object
-> handle experiments, generated math builtin bindings, and partial utility
-> function bindings.
+> single-precision C ABI generation, manual lifecycle callbacks, registration
+> helpers for user classes and simple methods, basic Variant helpers, typed
+> object handle experiments, generated math builtin bindings, and partial
+> utility function bindings.
 
 ## Requirements
 
@@ -74,16 +74,121 @@ them instead of requiring generated output commits.
 
 ## Imports
 
-The `godot:godot` package is a small convenience facade for the handwritten core
-helpers plus a few common utilities. It is not yet a complete facade over all
-generated APIs. Import generated packages directly when you need them:
+Normal examples should start with the public facade only:
 
 ```odin
-import gt "godot:godot"              // convenience facade: context, Variant helpers, a few utilities
-import gd "godot:core"               // GDExtension C-ABI types/functions and runtime helpers
-import bind "godot:bindings"         // generated @GlobalScope utilities
+import gt "godot:godot"
+```
+
+The facade re-exports the stable core value helpers, selected generated builtin,
+utility, and class APIs, and the registration pieces needed by the hello example.
+Low-level `godot:core` remains available for advanced GDExtension C ABI work,
+but common class registration should not need to import it directly. Import
+internal generated packages directly only when working outside the selected
+facade coverage:
+
+```odin
+import bind "godot:bindings"            // generated @GlobalScope utilities
 import builtin "godot:bindings/builtin" // generated builtin-type bindings
 ```
+
+## User class registration notes
+
+For class and parent names, use `ClassName` storage through the public facade:
+
+```odin
+player_name_data: gt.ClassName
+player_parent_name_data: gt.ClassName
+player_name := gt.class_name_ptr(&player_name_data)
+player_parent_name := gt.class_name_ptr(&player_parent_name_data)
+
+gt.class_name_init_latin1_cstring(&player_name_data, cstring("Player"))
+gt.class_name_init_latin1_cstring(&player_parent_name_data, cstring("Node2D"))
+```
+
+The backing `ClassName` storage must outlive the registered class. Use global or
+otherwise process-lifetime storage for registered class names and parent names.
+Do not create class-name storage as a temporary local value and keep the returned
+pointer after that storage goes out of scope.
+
+Instance data remains extension-owned. Allocate it explicitly in your create
+callback, attach it with `gt.attach_instance`, retrieve it with
+`gt.class_instance_data`, and free it explicitly in your free callback:
+
+```odin
+self := new_clone(PlayerData{object = object})
+gt.attach_instance(object, player_name, self, &player_instance_binding_callbacks)
+
+self, ok := gt.class_instance_data(instance, PlayerData)
+if ok do free(self)
+```
+
+The helper only calls Godot's `set_instance` and `set_instance_binding` for the
+caller-provided pointer. It does not allocate, retain, unref, or free extension
+owned data.
+
+Notification helpers provide a small dispatch pattern for common `Node`
+lifecycle notifications while keeping raw notification numbers available for
+advanced handling:
+
+```odin
+ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
+	_ = reversed
+	self, ok := gt.class_instance_data(instance, PlayerData)
+	if !ok do return
+	_ = self
+}
+
+player_notifications := gt.NodeNotificationHandlers{
+	ready = ready,
+}
+
+notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+	context = gt.godot_context()
+	if gt.dispatch_node_notification(instance, what, reversed, &player_notifications) do return
+	if what == gt.node_notification_ready {
+		// Raw notification numbers remain available when needed.
+	}
+}
+```
+
+Method registration helpers use explicit descriptors over caller-owned stable
+metadata storage. For advanced signatures, call and ptrcall callbacks can stay
+fully explicit so Variant construction/destruction and ptrcall ABI casts remain
+under user control. For the first simple case, `GodotReal, GodotReal ->
+GodotReal`, the facade also exposes typed callbacks backed by stable adapter
+userdata:
+
+```odin
+gt.init_method_property_info(&arg_info[0], gt.MethodPropertyDescriptor{
+	type = .Float,
+	name = arg_name,
+	class_name = empty_name,
+	hint_string = empty_string,
+})
+
+// Global or otherwise process-lifetime storage.
+real2_adapter: gt.ClassMethodGodotReal2ToGodotRealAdapter
+real2_adapter.method = add_adapter_method
+
+gt.register_class_method_with_descriptor(class_name, &method_info, gt.ClassMethodDescriptor{
+	name = method_name,
+	method_userdata = &real2_adapter,
+	call_func = gt.class_method_godot_real2_to_godot_real_call,
+	ptrcall_func = gt.class_method_godot_real2_to_godot_real_ptrcall,
+	return_value_info = &return_info,
+	argument_count = 2,
+	arguments_info = &arg_info[0],
+	arguments_metadata = &arg_meta[0],
+})
+```
+
+The helper fills `PropertyInfo` and `ClassMethodInfo`; it does not copy or own
+metadata arrays and does not change Variant/ptrcall ownership rules. Keep method
+names, argument names, hint strings, `PropertyInfo`, metadata arrays,
+`ClassMethodInfo`, and adapter userdata storage alive for the registration call.
+Varargs, default arguments, `Callable`, `Signal`, and object-lifetime-sensitive
+method adapters are intentionally deferred until their safety model is explicit.
 
 ## API coverage
 

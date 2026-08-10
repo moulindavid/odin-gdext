@@ -357,6 +357,30 @@ string_new :: proc "contextless" (dest: UninitializedStringPtr, str: cstring) {
 }
 
 // ---------------------------------------------------------------------------
+// Class names
+// ---------------------------------------------------------------------------
+
+// ClassName is process-lifetime StaticStringName storage for class and parent
+// names used by registration. Keep the backing storage global or otherwise
+// alive until the class is unregistered. Do not allocate it as a temporary.
+ClassName :: distinct StaticStringName
+
+// class_name_ptr returns a stable pointer into caller-owned ClassName storage.
+// The pointer is only as long-lived as the storage passed here.
+class_name_ptr :: proc "contextless" (name: ^ClassName) -> ConstStringNamePtr {
+	if name == nil do _trap_nil_godot_function()
+	return const_static_string_name_ptr(cast(^StaticStringName)name)
+}
+
+class_name_init_latin1_cstring :: proc "contextless" (name: ^ClassName, value: cstring) {
+	if name == nil do _trap_nil_godot_function()
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(cast(^StaticStringName)name),
+		value,
+	)
+}
+
+// ---------------------------------------------------------------------------
 // Class registration
 // ---------------------------------------------------------------------------
 
@@ -369,8 +393,250 @@ register_class :: proc "contextless" (
 	classdb_register_extension_class6(library, class_name, parent_class_name, info)
 }
 
+// Register an instantiable extension class with safe defaults for unsupported
+// callbacks. The class and parent names must point to process-lifetime
+// StringName storage, and user code remains responsible for explicit
+// unregistration during deinitialization.
+register_class_with_defaults :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	parent_class_name: ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func: ClassFreeInstance,
+	notification_func: ClassNotification,
+	class_userdata: rawptr = nil,
+) {
+	info := ClassCreationInfo {
+		is_virtual                  = false,
+		is_abstract                 = false,
+		is_exposed                  = true,
+		is_runtime                  = false,
+		icon_path                   = nil,
+		set_func                    = nil,
+		get_func                    = nil,
+		get_property_list_func      = nil,
+		free_property_list_func     = nil,
+		property_can_revert_func    = nil,
+		property_get_revert_func    = nil,
+		validate_property_func      = nil,
+		notification_func           = notification_func,
+		to_string_func              = nil,
+		reference_func              = nil,
+		unreference_func            = nil,
+		create_instance_func        = create_instance_func,
+		free_instance_func          = free_instance_func,
+		recreate_instance_func      = nil,
+		get_virtual_func            = nil,
+		get_virtual_call_data_func  = nil,
+		call_virtual_with_data_func = nil,
+		class_userdata              = class_userdata,
+	}
+	register_class(class_name, parent_class_name, &info)
+}
+
 unregister_class :: proc "contextless" (class_name: ConstStringNamePtr) {
 	classdb_unregister_extension_class(library, class_name)
+}
+
+MethodPropertyDescriptor :: struct {
+	type:        VariantType,
+	name:        StringNamePtr,
+	class_name:  StringNamePtr,
+	hint_string: StringPtr,
+	hint:        u32,
+	usage:       u32,
+}
+
+ClassMethodDescriptor :: struct {
+	name:                  StringNamePtr,
+	method_userdata:       rawptr,
+	call_func:             ClassMethodCall,
+	ptrcall_func:          ClassMethodPtrCall,
+	method_flags:          u32,
+	return_value_info:     ^PropertyInfo,
+	return_value_metadata: ClassMethodArgumentMetadata,
+	argument_count:        u32,
+	arguments_info:        ^PropertyInfo,
+	arguments_metadata:    ^ClassMethodArgumentMetadata,
+}
+
+// init_method_property_info fills caller-owned PropertyInfo storage. Name,
+// class_name, and hint_string must point to storage that remains valid while
+// Godot reads the method metadata. Use process-lifetime StringName storage for
+// names and stable String storage for hint text.
+init_method_property_info :: proc "contextless" (
+	info: ^PropertyInfo,
+	desc: MethodPropertyDescriptor,
+) {
+	if info == nil || desc.name == nil || desc.class_name == nil || desc.hint_string == nil {
+		_trap_nil_godot_function()
+	}
+	info.type = desc.type
+	info.name = desc.name
+	info.class_name = desc.class_name
+	info.hint = desc.hint
+	info.hint_string = desc.hint_string
+	info.usage = desc.usage
+}
+
+// init_class_method_info fills caller-owned ClassMethodInfo storage from stable
+// caller-owned metadata. This helper does not generate adapters and does not
+// alter Variant or ptrcall ABI rules; call_func and ptrcall_func remain explicit.
+init_class_method_info :: proc "contextless" (
+	info: ^ClassMethodInfo,
+	desc: ClassMethodDescriptor,
+) {
+	if info == nil || desc.name == nil || desc.call_func == nil || desc.ptrcall_func == nil {
+		_trap_nil_godot_function()
+	}
+	if desc.return_value_info != nil && desc.return_value_info.name == nil {
+		_trap_nil_godot_function()
+	}
+	if desc.argument_count > 0 && (desc.arguments_info == nil || desc.arguments_metadata == nil) {
+		_trap_nil_godot_function()
+	}
+	info.name = desc.name
+	info.method_userdata = desc.method_userdata
+	info.call_func = desc.call_func
+	info.ptrcall_func = desc.ptrcall_func
+	info.method_flags = desc.method_flags
+	info.has_return_value = desc.return_value_info != nil
+	info.return_value_info = desc.return_value_info
+	info.return_value_metadata = desc.return_value_metadata
+	info.argument_count = desc.argument_count
+	info.arguments_info = desc.arguments_info
+	info.arguments_metadata = desc.arguments_metadata
+	info.default_argument_count = 0
+	info.default_arguments = nil
+}
+
+register_class_method_with_descriptor :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	info: ^ClassMethodInfo,
+	desc: ClassMethodDescriptor,
+) {
+	if class_name == nil do _trap_nil_godot_function()
+	init_class_method_info(info, desc)
+	register_class_method(class_name, info)
+}
+
+ClassMethodGodotReal2ToGodotReal :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	a: GodotReal,
+	b: GodotReal,
+) -> (
+	value: GodotReal,
+	ok: bool,
+)
+
+ClassMethodGodotReal2ToGodotRealAdapter :: struct {
+	method: ClassMethodGodotReal2ToGodotReal,
+}
+
+_set_call_error :: proc "contextless" (
+	err: ^CallError,
+	error: CallErrorType,
+	argument: i32 = 0,
+	expected: i32 = 0,
+) {
+	if err == nil do return
+	err.error = error
+	err.argument = argument
+	err.expected = expected
+}
+
+// class_method_godot_real2_to_godot_real_call adapts a fixed-arity
+// GodotReal, GodotReal -> GodotReal method to the Variant call ABI. Store a
+// process-lifetime ClassMethodGodotReal2ToGodotRealAdapter in method_userdata.
+class_method_godot_real2_to_godot_real_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil || r_return == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 2 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 2)
+		return
+	}
+	if p_argument_count > 2 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 2)
+		return
+	}
+	if p_args == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Float)
+		return
+	}
+
+	adapter := cast(^ClassMethodGodotReal2ToGodotRealAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	if p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Float)
+		return
+	}
+	a, a_ok := variant_try_float(cast(^Variant)p_args[0])
+	if !a_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Float)
+		return
+	}
+	if p_args[1] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 1, cast(i32)VariantType.Float)
+		return
+	}
+	b, b_ok := variant_try_float(cast(^Variant)p_args[1])
+	if !b_ok {
+		_set_call_error(r_error, .Invalid_Argument, 1, cast(i32)VariantType.Float)
+		return
+	}
+
+	value, ok := adapter.method(p_instance, a, b)
+	if !ok {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+
+	rv := variant_from_float(value)
+	variant_init_copy(r_return, &rv)
+	variant_free(&rv)
+	_set_call_error(r_error, .Ok)
+}
+
+// class_method_godot_real2_to_godot_real_ptrcall adapts the same method to the
+// validated ptrcall ABI. Godot validates argument count and type metadata before
+// this path, so it reads the two GodotReal arguments directly.
+class_method_godot_real2_to_godot_real_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	if method_userdata == nil || p_instance == nil || p_args == nil || r_ret == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodGodotReal2ToGodotRealAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	a := (cast(^GodotReal)p_args[0])^
+	b := (cast(^GodotReal)p_args[1])^
+	value, ok := adapter.method(p_instance, a, b)
+	if !ok do _trap_godot_call_error()
+	(cast(^GodotReal)r_ret)^ = value
 }
 
 // Register a method on an extension class.
@@ -417,6 +683,35 @@ set_instance_binding :: proc "contextless" (
 	callbacks: ^InstanceBindingCallbacks,
 ) {
 	object_set_instance_binding(object, library, instance, callbacks)
+}
+
+// attach_instance associates caller-allocated Odin instance data with a Godot
+// object. It does not allocate, retain, or free the instance data; user code
+// remains responsible for freeing it from the class free callback.
+attach_instance :: proc "contextless" (
+	object: ObjectPtr,
+	class_name: ConstStringNamePtr,
+	instance: rawptr,
+	callbacks: ^InstanceBindingCallbacks,
+) {
+	if object == nil || class_name == nil || instance == nil || callbacks == nil {
+		_trap_nil_godot_function()
+	}
+	set_instance(object, class_name, instance)
+	set_instance_binding(object, instance, callbacks)
+}
+
+// class_instance_data returns typed Odin instance data previously attached to a
+// Godot object. A nil ClassInstancePtr is treated as a failed lookup.
+class_instance_data :: proc "contextless" (
+	instance: ClassInstancePtr,
+	$T: typeid,
+) -> (
+	data: ^T,
+	ok: bool,
+) {
+	if instance == nil do return nil, false
+	return cast(^T)instance, true
 }
 
 // Construct a plain Object of the given class.
