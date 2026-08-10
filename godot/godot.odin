@@ -35,10 +35,28 @@ ClassMethodPtrCall :: gcore.ClassMethodPtrCall
 ClassMethodArgumentMetadata :: gcore.ClassMethodArgumentMetadata
 PropertyInfo :: gcore.PropertyInfo
 ClassMethodInfo :: gcore.ClassMethodInfo
+EditorVisibleClassDescriptor :: gcore.EditorVisibleClassDescriptor
+PropertyUsageStorage :: gcore.PropertyUsageStorage
+PropertyUsageEditor :: gcore.PropertyUsageEditor
+PropertyUsageDefault :: gcore.PropertyUsageDefault
 MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
+ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
+ClassSignalDescriptor :: gcore.ClassSignalDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
+ClassMethodGetGodotReal :: gcore.ClassMethodGetGodotReal
+ClassMethodGetGodotRealAdapter :: gcore.ClassMethodGetGodotRealAdapter
+ClassMethodSetGodotReal :: gcore.ClassMethodSetGodotReal
+ClassMethodSetGodotRealAdapter :: gcore.ClassMethodSetGodotRealAdapter
+ClassMethodGetBool :: gcore.ClassMethodGetBool
+ClassMethodGetBoolAdapter :: gcore.ClassMethodGetBoolAdapter
+ClassMethodSetBool :: gcore.ClassMethodSetBool
+ClassMethodSetBoolAdapter :: gcore.ClassMethodSetBoolAdapter
+ClassMethodGetInt :: gcore.ClassMethodGetInt
+ClassMethodGetIntAdapter :: gcore.ClassMethodGetIntAdapter
+ClassMethodSetInt :: gcore.ClassMethodSetInt
+ClassMethodSetIntAdapter :: gcore.ClassMethodSetIntAdapter
 InstanceBindingCallbacks :: gcore.InstanceBindingCallbacks
 VariantType :: gcore.VariantType
 VariantStorage :: gcore.VariantStorage
@@ -97,19 +115,41 @@ is_nil :: gcore.is_nil
 is_class :: gcore.is_class
 cast_to :: gcore.cast_to
 init_class_casting :: gcore.init_class_casting
+register_editor_visible_class :: gcore.register_editor_visible_class
 register_class_with_defaults :: gcore.register_class_with_defaults
 unregister_class :: gcore.unregister_class
 attach_instance :: gcore.attach_instance
 class_instance_data :: gcore.class_instance_data
 init_method_property_info :: gcore.init_method_property_info
+init_class_property_info :: gcore.init_class_property_info
 init_class_method_info :: gcore.init_class_method_info
+register_class_property_with_descriptor :: gcore.register_class_property_with_descriptor
+register_class_signal_with_descriptor :: gcore.register_class_signal_with_descriptor
 register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall
+class_method_get_godot_real_call :: gcore.class_method_get_godot_real_call
+class_method_get_godot_real_ptrcall :: gcore.class_method_get_godot_real_ptrcall
+class_method_set_godot_real_call :: gcore.class_method_set_godot_real_call
+class_method_set_godot_real_ptrcall :: gcore.class_method_set_godot_real_ptrcall
+class_method_get_bool_call :: gcore.class_method_get_bool_call
+class_method_get_bool_ptrcall :: gcore.class_method_get_bool_ptrcall
+class_method_set_bool_call :: gcore.class_method_set_bool_call
+class_method_set_bool_ptrcall :: gcore.class_method_set_bool_ptrcall
+class_method_get_int_call :: gcore.class_method_get_int_call
+class_method_get_int_ptrcall :: gcore.class_method_get_int_ptrcall
+class_method_set_int_call :: gcore.class_method_set_int_call
+class_method_set_int_ptrcall :: gcore.class_method_set_int_ptrcall
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
+variant_from_string_name_ptr :: gcore.variant_from_string_name_ptr
+init_signal_emission :: gcore.init_signal_emission
+object_emit_signal_0_checked :: gcore.object_emit_signal_0_checked
+object_emit_signal_0 :: gcore.object_emit_signal_0
+object_emit_signal_1_godot_real_checked :: gcore.object_emit_signal_1_godot_real_checked
+object_emit_signal_1_godot_real :: gcore.object_emit_signal_1_godot_real
 godot_context :: gcore.godot_context
 init_class_bindings :: gclass.init_class_bindings
 ref_counted_as_object :: gclass.ref_counted_as_object
@@ -220,6 +260,7 @@ control_notification_theme_changed :: gclass.control_notification_theme_changed
 
 // --- Notification helpers ---
 NodeNotificationHandler :: #type proc(instance: ClassInstancePtr, reversed: bool)
+NodeRawNotificationHandler :: #type proc(instance: ClassInstancePtr, what: i32, reversed: bool)
 
 NodeNotificationHandlers :: struct {
 	enter_tree:      NodeNotificationHandler,
@@ -227,6 +268,15 @@ NodeNotificationHandlers :: struct {
 	ready:           NodeNotificationHandler,
 	process:         NodeNotificationHandler,
 	physics_process: NodeNotificationHandler,
+}
+
+NodeVirtualCallbacks :: struct {
+	enter_tree:       NodeNotificationHandler,
+	exit_tree:        NodeNotificationHandler,
+	ready:            NodeNotificationHandler,
+	process:          NodeNotificationHandler,
+	physics_process:  NodeNotificationHandler,
+	raw_notification: NodeRawNotificationHandler,
 }
 
 // dispatch_node_notification calls a typed handler for common Node lifecycle
@@ -266,6 +316,52 @@ dispatch_node_notification :: proc(
 			handlers.physics_process(instance, reversed)
 			return true
 		}
+	}
+	return false
+}
+
+// dispatch_node_virtual_callbacks is the user-facing Node virtual notification
+// descriptor path. The process callbacks are raw notification callbacks and do
+// not synthesize _process(delta) or _physics_process(delta) data.
+dispatch_node_virtual_callbacks :: proc(
+	instance: ClassInstancePtr,
+	what: i32,
+	reversed: bool,
+	callbacks: ^NodeVirtualCallbacks,
+) -> bool {
+	if callbacks == nil do return false
+
+	switch what {
+	case node_notification_enter_tree:
+		if callbacks.enter_tree != nil {
+			callbacks.enter_tree(instance, reversed)
+			return true
+		}
+	case node_notification_exit_tree:
+		if callbacks.exit_tree != nil {
+			callbacks.exit_tree(instance, reversed)
+			return true
+		}
+	case node_notification_ready:
+		if callbacks.ready != nil {
+			callbacks.ready(instance, reversed)
+			return true
+		}
+	case node_notification_process:
+		if callbacks.process != nil {
+			callbacks.process(instance, reversed)
+			return true
+		}
+	case node_notification_physics_process:
+		if callbacks.physics_process != nil {
+			callbacks.physics_process(instance, reversed)
+			return true
+		}
+	}
+
+	if callbacks.raw_notification != nil {
+		callbacks.raw_notification(instance, what, reversed)
+		return true
 	}
 	return false
 }

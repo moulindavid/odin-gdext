@@ -9,7 +9,7 @@ HelloNode :: distinct gt.ObjectPtr
 
 // HelloNode typed API -- per-class free functions.
 // This pattern mirrors what codegen will produce for Node, Node2D, etc.
-hello_node_object :: proc(self: HelloNode) -> gt.ObjectPtr {
+hello_node_object :: proc "contextless" (self: HelloNode) -> gt.ObjectPtr {
 	return gt.ObjectPtr(self)
 }
 hello_node_from_instance :: proc "contextless" (
@@ -27,6 +27,7 @@ hello_node_from_instance :: proc "contextless" (
 
 HelloData :: struct {
 	object: gt.ObjectPtr,
+	speed:  gt.GodotReal,
 }
 
 // ---- Class lifecycle callbacks ----
@@ -123,7 +124,7 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	gt.variant_free(&meta_value)
 	gt.string_name_free(&meta_name)
 
-	self_ := new_clone(HelloData{object = object})
+	self_ := new_clone(HelloData{object = object, speed = 120.0})
 	gt.attach_instance(object, hello_class_name, self_, &hello_instance_binding_callbacks)
 	return object
 }
@@ -185,13 +186,13 @@ hello_ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
 	gt.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
 }
 
-hello_node_notifications := gt.NodeNotificationHandlers {
+hello_node_virtuals := gt.NodeVirtualCallbacks {
 	ready = hello_ready,
 }
 
 notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
-	if gt.dispatch_node_notification(instance, what, reversed, &hello_node_notifications) do return
+	if gt.dispatch_node_virtual_callbacks(instance, what, reversed, &hello_node_virtuals) do return
 }
 
 // ---- Method: add(a, b) -> a + b ----
@@ -211,11 +212,64 @@ add_adapter_method :: proc "contextless" (
 ) {
 	self, self_ok := hello_node_from_instance(instance)
 	if !self_ok do return 0, false
+	gt.object_emit_signal_0(hello_node_object(self), pinged_signal_name)
 	return add(self, a, b), true
 }
 
 add_method_adapter := gt.ClassMethodGodotReal2ToGodotRealAdapter {
 	method = add_adapter_method,
+}
+
+roll_math :: proc "contextless" (self: HelloNode) -> gt.GodotReal {
+	_ = self
+	r := gt.randf() * 10.0
+	wave := gt.sin(r) + gt.cos(r * 0.5)
+	return r * r + wave * 5.0
+}
+
+roll_math_adapter_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	self, self_ok := hello_node_from_instance(instance)
+	if !self_ok do return 0, false
+	return roll_math(self), true
+}
+
+roll_math_method_adapter := gt.ClassMethodGetGodotRealAdapter {
+	method = roll_math_adapter_method,
+}
+
+get_speed_adapter_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	self_, self_ok := gt.class_instance_data(instance, HelloData)
+	if !self_ok do return 0, false
+	return self_.speed, true
+}
+
+set_speed_adapter_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: gt.GodotReal,
+) -> bool {
+	self_, self_ok := gt.class_instance_data(instance, HelloData)
+	if !self_ok do return false
+	self_.speed = value
+	gt.object_emit_signal_1_godot_real(self_.object, speed_changed_signal_name, value)
+	return true
+}
+
+get_speed_method_adapter := gt.ClassMethodGetGodotRealAdapter {
+	method = get_speed_adapter_method,
+}
+
+set_speed_method_adapter := gt.ClassMethodSetGodotRealAdapter {
+	method = set_speed_adapter_method,
 }
 
 add_method_name_data: gt.StaticStringName
@@ -229,11 +283,36 @@ add_arg_a_name_data: gt.StaticStringName
 add_arg_a_name := gt.const_static_string_name_ptr(&add_arg_a_name_data)
 add_arg_b_name_data: gt.StaticStringName
 add_arg_b_name := gt.const_static_string_name_ptr(&add_arg_b_name_data)
+roll_math_method_name_data: gt.StaticStringName
+roll_math_method_name := gt.const_static_string_name_ptr(&roll_math_method_name_data)
+roll_math_return_info: gt.PropertyInfo
+roll_math_method_info: gt.ClassMethodInfo
 
 empty_name_data: gt.StaticStringName
 empty_name := gt.const_static_string_name_ptr(&empty_name_data)
 empty_str_data: gt.String
 empty_str := gt.const_string_ptr(&empty_str_data)
+
+speed_property_name_data: gt.StaticStringName
+speed_setter_name_data: gt.StaticStringName
+speed_getter_name_data: gt.StaticStringName
+speed_property_name := gt.const_static_string_name_ptr(&speed_property_name_data)
+speed_setter_name := gt.const_static_string_name_ptr(&speed_setter_name_data)
+speed_getter_name := gt.const_static_string_name_ptr(&speed_getter_name_data)
+speed_property_info: gt.PropertyInfo
+speed_get_return_info: gt.PropertyInfo
+speed_set_arg_info: gt.PropertyInfo
+speed_set_arg_meta := [1]gt.ClassMethodArgumentMetadata{.None}
+speed_get_method_info: gt.ClassMethodInfo
+speed_set_method_info: gt.ClassMethodInfo
+
+pinged_signal_name_data: gt.StaticStringName
+pinged_signal_name := gt.const_static_string_name_ptr(&pinged_signal_name_data)
+speed_changed_signal_name_data: gt.StaticStringName
+speed_changed_arg_name_data: gt.StaticStringName
+speed_changed_signal_name := gt.const_static_string_name_ptr(&speed_changed_signal_name_data)
+speed_changed_arg_name := gt.const_static_string_name_ptr(&speed_changed_arg_name_data)
+speed_changed_arg_info: gt.PropertyInfo
 
 register_methods :: proc() {
 	gt.static_string_name_init_latin1_cstring(
@@ -249,8 +328,24 @@ register_methods :: proc() {
 		cstring("b"),
 	)
 	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&roll_math_method_name_data),
+		cstring("roll_math"),
+	)
+	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&empty_name_data),
 		cstring(""),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&speed_property_name_data),
+		cstring("speed"),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&speed_setter_name_data),
+		cstring("set_speed"),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&speed_getter_name_data),
+		cstring("get_speed"),
 	)
 	gt.string_init_utf8(gt.uninitialized_string_ptr(&empty_str_data), "")
 
@@ -297,7 +392,130 @@ register_methods :: proc() {
 			arguments_metadata = &add_arg_meta[0],
 		},
 	)
-	gt.debug_print("[odin-gdext] Method add registered!")
+	gt.init_method_property_info(
+		&roll_math_return_info,
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = roll_math_method_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.register_class_method_with_descriptor(
+		hello_class_name,
+		&roll_math_method_info,
+		gt.ClassMethodDescriptor {
+			name = roll_math_method_name,
+			method_userdata = &roll_math_method_adapter,
+			call_func = gt.class_method_get_godot_real_call,
+			ptrcall_func = gt.class_method_get_godot_real_ptrcall,
+			return_value_info = &roll_math_return_info,
+			return_value_metadata = .None,
+		},
+	)
+	gt.debug_print("[odin-gdext] Methods add and roll_math registered!")
+
+	gt.init_method_property_info(
+		&speed_get_return_info,
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = speed_property_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.register_class_method_with_descriptor(
+		hello_class_name,
+		&speed_get_method_info,
+		gt.ClassMethodDescriptor {
+			name = speed_getter_name,
+			method_userdata = &get_speed_method_adapter,
+			call_func = gt.class_method_get_godot_real_call,
+			ptrcall_func = gt.class_method_get_godot_real_ptrcall,
+			return_value_info = &speed_get_return_info,
+			return_value_metadata = .None,
+		},
+	)
+
+	gt.init_method_property_info(
+		&speed_set_arg_info,
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = speed_property_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.register_class_method_with_descriptor(
+		hello_class_name,
+		&speed_set_method_info,
+		gt.ClassMethodDescriptor {
+			name = speed_setter_name,
+			method_userdata = &set_speed_method_adapter,
+			call_func = gt.class_method_set_godot_real_call,
+			ptrcall_func = gt.class_method_set_godot_real_ptrcall,
+			argument_count = 1,
+			arguments_info = &speed_set_arg_info,
+			arguments_metadata = &speed_set_arg_meta[0],
+		},
+	)
+	gt.debug_print("[odin-gdext] Property accessors registered!")
+}
+
+register_properties :: proc() {
+	gt.register_class_property_with_descriptor(
+		hello_class_name,
+		&speed_property_info,
+		gt.ClassPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Float,
+				name = speed_property_name,
+				class_name = empty_name,
+				hint_string = empty_str,
+				usage = gt.PropertyUsageDefault,
+			},
+			setter = speed_setter_name,
+			getter = speed_getter_name,
+		},
+	)
+	gt.debug_print("[odin-gdext] Property speed registered!")
+}
+
+register_signals :: proc() {
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&pinged_signal_name_data),
+		cstring("pinged"),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&speed_changed_signal_name_data),
+		cstring("speed_changed"),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&speed_changed_arg_name_data),
+		cstring("value"),
+	)
+	gt.register_class_signal_with_descriptor(
+		hello_class_name,
+		gt.ClassSignalDescriptor{name = pinged_signal_name},
+	)
+	gt.init_method_property_info(
+		&speed_changed_arg_info,
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = speed_changed_arg_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.register_class_signal_with_descriptor(
+		hello_class_name,
+		gt.ClassSignalDescriptor {
+			name = speed_changed_signal_name,
+			argument_info = &speed_changed_arg_info,
+			argument_count = 1,
+		},
+	)
+	gt.debug_print("[odin-gdext] Signals pinged and speed_changed registered!")
 }
 
 // ---- Process-lifetime class name storage ----
@@ -327,18 +545,22 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&node2d_class_name_data, cstring("Node2D"))
 	gt.init_class_bindings()
 
-	gt.register_class_with_defaults(
-		hello_class_name,
-		hello_parent_name,
-		create_instance,
-		free_instance,
-		notification_func,
+	gt.register_editor_visible_class(
+		gt.EditorVisibleClassDescriptor {
+			class_name = hello_class_name,
+			parent_class_name = hello_parent_name,
+			create_instance_func = create_instance,
+			free_instance_func = free_instance,
+			notification_func = notification_func,
+		},
 	)
 	gt.debug_print("[odin-gdext] HelloNode registered!")
 
 	buf: [160]u8
 
 	register_methods()
+	register_properties()
+	register_signals()
 
 	// Test: variant round-trip (float, int, bool)
 	vf := gt.variant_from_float(3.14)
@@ -1062,5 +1284,6 @@ deinitialize_module :: proc "c" (user_data: rawptr, level: gt.InitializationLeve
 	context = gt.godot_context()
 	if level != .Scene {return}
 	gt.unregister_class(hello_class_name)
+	gt.string_free(&empty_str_data)
 	gt.debug_print("[odin-gdext] HelloNode unregistered!")
 }

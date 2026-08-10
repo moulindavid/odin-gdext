@@ -2839,6 +2839,13 @@ variant_from_string_name :: proc "contextless" (s: ^StringName) -> (v: Variant) 
 	return
 }
 
+variant_from_string_name_ptr :: proc "contextless" (s: ConstStringNamePtr) -> (v: Variant) {
+	if s == nil do _trap_nil_godot_function()
+	ctor := require_variant_from_type_constructor(.String_Name)
+	ctor(uninitialized_variant_ptr(&v), s)
+	return
+}
+
 variant_from_node_path :: proc "contextless" (p: ^NodePath) -> (v: Variant) {
 	ctor := require_variant_from_type_constructor(.Node_Path)
 	ctor(uninitialized_variant_ptr(&v), node_path_ptr(p))

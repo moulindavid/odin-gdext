@@ -251,80 +251,80 @@ ergonomics until their safety model is explicit. Prefer small typed helpers firs
 then expand coverage once smoke tests prove the ABI path.
 
 1. Add property registration descriptors.
-   - [ ] Add a `ClassPropertyDescriptor` helper.
-   - [ ] Wrap Godot 4.7 class property registration behind a safe helper.
-   - [ ] Reuse the existing `PropertyInfo` construction pattern from method
+   - [x] Add a `ClassPropertyDescriptor` helper.
+   - [x] Wrap Godot 4.7 class property registration behind a safe helper.
+   - [x] Reuse the existing `PropertyInfo` construction pattern from method
      metadata helpers.
-   - [ ] Keep getter and setter method names explicit and stored in stable
+   - [x] Keep getter and setter method names explicit and stored in stable
      `StringName` storage.
-   - [ ] Support a first simple property shape: name, type, getter, setter,
+   - [x] Support a first simple property shape: name, type, getter, setter,
      hint, hint string, and usage flags.
-   - [ ] Update hello with one editor-visible `GodotReal` property.
+   - [x] Update hello with one editor-visible `GodotReal` property.
 
 2. Add typed getter and setter adapters for simple properties.
-   - [ ] Start with `GodotReal -> void` setter and `void -> GodotReal` getter.
-   - [ ] Generate or provide explicit adapters for both call and ptrcall paths.
-   - [ ] Preserve the documented Godot 4.7 `GodotReal` ABI rule for `float`.
-   - [ ] Add `bool` and `i64` only after the real-valued path is covered.
-   - [ ] Defer object, array, dictionary, `String`, and complex builtin
+   - [x] Start with `GodotReal -> void` setter and `void -> GodotReal` getter.
+   - [x] Generate or provide explicit adapters for both call and ptrcall paths.
+   - [x] Preserve the documented Godot 4.7 `GodotReal` ABI rule for `float`.
+   - [x] Add `bool` and `i64` only after the real-valued path is covered.
+   - [x] Defer object, array, dictionary, `String`, and complex builtin
      properties until primitive property flow is stable.
 
 3. Add hello property smoke coverage.
-   - [ ] Register the property through the public facade.
-   - [ ] Keep hello importing only `godot:godot`.
-   - [ ] Exercise the getter and setter path where practical.
-   - [ ] Preserve explicit instance-data allocation, free, and unregister cleanup.
+   - [x] Register the property through the public facade.
+   - [x] Keep hello importing only `godot:godot`.
+   - [x] Exercise the getter and setter path where practical.
+   - [x] Preserve explicit instance-data allocation, free, and unregister cleanup.
 
 4. Add signal declaration helpers.
-   - [ ] Add a `ClassSignalDescriptor` helper.
-   - [ ] Register signals from stable descriptor storage.
-   - [ ] Support no-argument signals first.
-   - [ ] Add simple typed signal arguments only after no-argument signal
+   - [x] Add a `ClassSignalDescriptor` helper.
+   - [x] Register signals from stable descriptor storage.
+   - [x] Support no-argument signals first.
+   - [x] Add simple typed signal arguments only after no-argument signal
      registration has smoke coverage.
-   - [ ] Keep names, argument metadata, and hint strings alive for the registered
+   - [x] Keep names, argument metadata, and hint strings alive for the registered
      class lifetime.
 
 5. Add safe signal emission helpers.
-   - [ ] Provide helpers around Godot object signal emission.
-   - [ ] Start with no-argument signal emission.
-   - [ ] Add fixed-arity primitive helpers after the no-argument path works.
-   - [ ] Ensure temporary `Variant` values are destroyed on every path.
-   - [ ] Return or trap on `GDExtensionCallError` consistently.
-   - [ ] Defer broad vararg emission helpers.
+   - [x] Provide helpers around Godot object signal emission.
+   - [x] Start with no-argument signal emission.
+   - [x] Add fixed-arity primitive helpers after the no-argument path works.
+   - [x] Ensure temporary `Variant` values are destroyed on every path.
+   - [x] Return or trap on `GDExtensionCallError` consistently.
+   - [x] Defer broad vararg emission helpers.
 
 6. Promote notification dispatch into virtual-style helpers.
-   - [ ] Add a user-facing virtual callback descriptor for common node callbacks.
-   - [ ] Map Godot notifications to Odin callbacks such as ready, enter tree,
+   - [x] Add a user-facing virtual callback descriptor for common node callbacks.
+   - [x] Map Godot notifications to Odin callbacks such as ready, enter tree,
      exit tree, process, and physics process where the Godot API provides the
      required data safely.
-   - [ ] Keep raw notification numbers available for advanced usage.
-   - [ ] Preserve explicit `reversed` handling.
-   - [ ] Do not fake `_process(delta)` or `_physics_process(delta)` until the
+   - [x] Keep raw notification numbers available for advanced usage.
+   - [x] Preserve explicit `reversed` handling.
+   - [x] Do not fake `_process(delta)` or `_physics_process(delta)` until the
      delta source and callback path are verified.
 
 7. Add editor-visible class metadata helpers.
-   - [ ] Investigate the Godot 4.7 requirements for editor-visible extension
+   - [x] Investigate the Godot 4.7 requirements for editor-visible extension
      classes.
-   - [ ] Keep first support minimal: class name, parent class, methods,
+   - [x] Keep first support minimal: class name, parent class, methods,
      properties, and signals.
-   - [ ] Defer optional `@tool` or tool-script style workflows.
-   - [ ] Document any metadata storage that must outlive registration.
+   - [x] Defer optional `@tool` or tool-script style workflows.
+   - [x] Document any metadata storage that must outlive registration.
 
 8. Re-export Priority 4 helpers through the public facade.
-   - [ ] Re-export only property, signal, and virtual helpers intended for
+   - [x] Re-export only property, signal, and virtual helpers intended for
      normal users.
-   - [ ] Keep low-level `godot:core` access available but unnecessary for common
+   - [x] Keep low-level `godot:core` access available but unnecessary for common
      property and signal registration.
-   - [ ] Re-export common notification constants where they improve normal usage.
-   - [ ] Keep examples importing only `godot:godot`.
+   - [x] Re-export common notification constants where they improve normal usage.
+   - [x] Keep examples importing only `godot:godot`.
 
 9. Add coverage for properties, signals, and virtual helpers.
-   - [ ] Add facade compile checks for property descriptors, getter and setter
+   - [x] Add facade compile checks for property descriptors, getter and setter
      adapters, signal descriptors, signal emission helpers, and virtual helpers.
-   - [ ] Keep hello smoke coverage exercising class creation, method
+   - [x] Keep hello smoke coverage exercising class creation, method
      registration, property registration, signal registration or emission,
      instance binding, notifications, and unregister cleanup.
-   - [ ] Run `make ci` before considering Priority 4 complete.
+   - [x] Run `make ci` before considering Priority 4 complete.
 
 ## Priority 5 - fix documentations, examples, maybe other side stuff
 

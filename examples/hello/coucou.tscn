@@ -4,3 +4,10 @@
 
 [node name="Coucou" type="Node" unique_id=713535598]
 script = ExtResource("1_1c8th")
+
+[node name="Label" type="Label" parent="."]
+offset_left = 24.0
+offset_top = 24.0
+offset_right = 760.0
+offset_bottom = 64.0
+text = "Press Space to call Odin roll_math()"

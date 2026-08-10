@@ -137,13 +137,26 @@ facade_process_notification :: proc(instance: gt.ClassInstancePtr, reversed: boo
 	_ = reversed
 }
 
+facade_raw_notification :: proc(instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+	_ = instance
+	_ = what
+	_ = reversed
+}
+
 facade_node_notifications := gt.NodeNotificationHandlers {
 	ready   = facade_ready_notification,
 	process = facade_process_notification,
 }
 
+facade_node_virtuals := gt.NodeVirtualCallbacks {
+	ready            = facade_ready_notification,
+	process          = facade_process_notification,
+	raw_notification = facade_raw_notification,
+}
+
 facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
+	if gt.dispatch_node_virtual_callbacks(instance, what, reversed, &facade_node_virtuals) do return
 	if gt.dispatch_node_notification(instance, what, reversed, &facade_node_notifications) do return
 	if what == gt.node_notification_ready {
 		_ = what
@@ -153,13 +166,16 @@ facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, rever
 registration_facade_compile_smoke :: proc "contextless" () {
 	gt.class_name_init_latin1_cstring(&facade_class_name_data, cstring("FacadeSmoke"))
 	gt.class_name_init_latin1_cstring(&facade_parent_name_data, cstring("Node2D"))
-	gt.register_class_with_defaults(
-		facade_class_name,
-		facade_parent_name,
-		facade_create_instance,
-		facade_free_instance,
-		facade_notification,
+	gt.register_editor_visible_class(
+		gt.EditorVisibleClassDescriptor {
+			class_name = facade_class_name,
+			parent_class_name = facade_parent_name,
+			create_instance_func = facade_create_instance,
+			free_instance_func = facade_free_instance,
+			notification_func = facade_notification,
+		},
 	)
+	_ = gt.register_class_with_defaults
 	gt.unregister_class(facade_class_name)
 }
 
@@ -249,4 +265,177 @@ method_registration_facade_compile_smoke :: proc "contextless" (
 			arguments_metadata = &facade_method_arg_meta[0],
 		},
 	)
+}
+
+facade_property_name_data: gt.StaticStringName
+facade_property_setter_name_data: gt.StaticStringName
+facade_property_getter_name_data: gt.StaticStringName
+facade_property_name := gt.const_static_string_name_ptr(&facade_property_name_data)
+facade_property_setter_name := gt.const_static_string_name_ptr(&facade_property_setter_name_data)
+facade_property_getter_name := gt.const_static_string_name_ptr(&facade_property_getter_name_data)
+facade_property_info: gt.PropertyInfo
+
+property_registration_facade_compile_smoke :: proc "contextless" (
+	class_name: gt.ConstStringNamePtr,
+) {
+	gt.init_class_property_info(
+		&facade_property_info,
+		gt.ClassPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Float,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			setter = facade_property_setter_name,
+			getter = facade_property_getter_name,
+		},
+	)
+	gt.register_class_property_with_descriptor(
+		class_name,
+		&facade_property_info,
+		gt.ClassPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Float,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			setter = facade_property_setter_name,
+			getter = facade_property_getter_name,
+		},
+	)
+}
+
+facade_get_real_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	_ = instance
+	return 1, true
+}
+
+facade_set_real_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: gt.GodotReal,
+) -> bool {
+	_ = instance
+	_ = value
+	return true
+}
+
+facade_get_real_adapter := gt.ClassMethodGetGodotRealAdapter {
+	method = facade_get_real_method,
+}
+
+facade_set_real_adapter := gt.ClassMethodSetGodotRealAdapter {
+	method = facade_set_real_method,
+}
+
+godot_real_property_adapter_facade_compile_smoke :: proc "contextless" () {
+	_ = gt.ClassMethodGetGodotReal(facade_get_real_method)
+	_ = gt.ClassMethodSetGodotReal(facade_set_real_method)
+	_ = facade_get_real_adapter
+	_ = facade_set_real_adapter
+	_ = gt.class_method_get_godot_real_call
+	_ = gt.class_method_get_godot_real_ptrcall
+	_ = gt.class_method_set_godot_real_call
+	_ = gt.class_method_set_godot_real_ptrcall
+}
+
+facade_get_bool_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: bool,
+	ok: bool,
+) {
+	_ = instance
+	return true, true
+}
+
+facade_set_bool_method :: proc "contextless" (instance: gt.ClassInstancePtr, value: bool) -> bool {
+	_ = instance
+	_ = value
+	return true
+}
+
+facade_get_int_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: i64,
+	ok: bool,
+) {
+	_ = instance
+	return 42, true
+}
+
+facade_set_int_method :: proc "contextless" (instance: gt.ClassInstancePtr, value: i64) -> bool {
+	_ = instance
+	_ = value
+	return true
+}
+
+facade_get_bool_adapter := gt.ClassMethodGetBoolAdapter {
+	method = facade_get_bool_method,
+}
+
+facade_set_bool_adapter := gt.ClassMethodSetBoolAdapter {
+	method = facade_set_bool_method,
+}
+
+facade_get_int_adapter := gt.ClassMethodGetIntAdapter {
+	method = facade_get_int_method,
+}
+
+facade_set_int_adapter := gt.ClassMethodSetIntAdapter {
+	method = facade_set_int_method,
+}
+
+bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
+	_ = gt.ClassMethodGetBool(facade_get_bool_method)
+	_ = gt.ClassMethodSetBool(facade_set_bool_method)
+	_ = facade_get_bool_adapter
+	_ = facade_set_bool_adapter
+	_ = gt.class_method_get_bool_call
+	_ = gt.class_method_get_bool_ptrcall
+	_ = gt.class_method_set_bool_call
+	_ = gt.class_method_set_bool_ptrcall
+
+	_ = gt.ClassMethodGetInt(facade_get_int_method)
+	_ = gt.ClassMethodSetInt(facade_set_int_method)
+	_ = facade_get_int_adapter
+	_ = facade_set_int_adapter
+	_ = gt.class_method_get_int_call
+	_ = gt.class_method_get_int_ptrcall
+	_ = gt.class_method_set_int_call
+	_ = gt.class_method_set_int_ptrcall
+}
+
+facade_signal_name_data: gt.StaticStringName
+facade_signal_name := gt.const_static_string_name_ptr(&facade_signal_name_data)
+
+signal_registration_facade_compile_smoke :: proc "contextless" (
+	class_name: gt.ConstStringNamePtr,
+) {
+	gt.register_class_signal_with_descriptor(
+		class_name,
+		gt.ClassSignalDescriptor{name = facade_signal_name},
+	)
+}
+
+signal_emission_facade_compile_smoke :: proc "contextless" (
+	object: gt.ObjectPtr,
+	signal_name: gt.ConstStringNamePtr,
+) {
+	gt.init_signal_emission()
+	err := gt.object_emit_signal_0_checked(object, signal_name)
+	_ = err
+	gt.object_emit_signal_0(object, signal_name)
+	err = gt.object_emit_signal_1_godot_real_checked(object, signal_name, 1.5)
+	_ = err
+	gt.object_emit_signal_1_godot_real(object, signal_name, 1.5)
 }
