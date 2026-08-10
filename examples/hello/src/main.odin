@@ -1,17 +1,16 @@
 package hello
 
 import "core:fmt"
-import gd "godot:core"
 import gt "godot:godot"
 
 // ---- Typed handle ----
 
-HelloNode :: distinct gd.ObjectPtr
+HelloNode :: distinct gt.ObjectPtr
 
 // HelloNode typed API -- per-class free functions.
 // This pattern mirrors what codegen will produce for Node, Node2D, etc.
-hello_node_object :: proc(self: HelloNode) -> gd.ObjectPtr {
-	return gd.ObjectPtr(self)
+hello_node_object :: proc(self: HelloNode) -> gt.ObjectPtr {
+	return gt.ObjectPtr(self)
 }
 hello_node_from_instance :: proc "contextless" (
 	instance: gt.ClassInstancePtr,
@@ -27,15 +26,15 @@ hello_node_from_instance :: proc "contextless" (
 // ---- Per-instance data ----
 
 HelloData :: struct {
-	object: gd.ObjectPtr,
+	object: gt.ObjectPtr,
 }
 
 // ---- Class lifecycle callbacks ----
 
 
-create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool) -> gd.ObjectPtr {
+create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool) -> gt.ObjectPtr {
 	context = gt.godot_context()
-	object := gd.construct_object(hello_parent_name)
+	object := gt.construct_object(hello_parent_name)
 	if object == nil {return nil}
 
 	node2d := gt.Node2D(object)
@@ -44,7 +43,7 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	gt.node2d_set_rotation(node2d, 1.25)
 	rotation := gt.node2d_get_rotation(node2d)
 	buf: [256]u8
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"generated Node2D position: (%v,%v) rotation=%.2f (expect 100,50,1.25)",
@@ -60,7 +59,7 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	path_to_self := gt.node_get_path_to(node, node, false)
 	path_to_self_hash := gt.node_path_hash(&path_to_self)
 	gt.node_path_free(&path_to_self)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"generated Node mapping: parent_nil=%v self_ancestor=%v path_hash=%v (expect true,false,owned)",
@@ -78,7 +77,7 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 		gt.node2d_as_object(cast_node2d) == object &&
 		gt.node_as_object(cast_node) == object &&
 		gt.node2d_as_object(nil_node2d) == nil
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"generated downcasts: is_node2d=%v object->Node2D=%v object->Node=%v nil->Node2D=%v identity=%v (expect true,true,true,false,true)",
@@ -96,7 +95,7 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	gt.canvas_item_show(canvas_item)
 	shown := gt.canvas_item_is_visible(canvas_item)
 	gt.canvas_item_queue_redraw(canvas_item)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"generated CanvasItem mapping: hidden=%v shown=%v (expect false,true)",
@@ -111,7 +110,7 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	meta_default := gt.variant_nil()
 	meta_back := gt.object_get_meta(gt.Object(object), &meta_name, &meta_default)
 	meta_int, meta_ok := gt.variant_try_int(&meta_back)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"generated Variant mapping: meta=%v/%v (expect 1234/true)",
@@ -129,26 +128,26 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	return object
 }
 
-free_instance :: proc "c" (class_userdata: rawptr, instance: gd.ClassInstancePtr) {
+free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr) {
 	context = gt.godot_context()
 	self_, ok := gt.class_instance_data(instance, HelloData)
 	if !ok do return
 	free(self_)
 }
 
-hello_ready :: proc(instance: gd.ClassInstancePtr, reversed: bool) {
+hello_ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
 	_ = reversed
 	hn, hn_ok := hello_node_from_instance(instance)
 	if !hn_ok do return
-	gd.debug_print("Hello from Odin!")
+	gt.debug_print("Hello from Odin!")
 
 	obj := hello_node_object(hn)
 	buf: [128]u8
-	gd.debug_print(fmt.bprintf(buf[:], "is_nil: %v (expect false)", gt.is_nil(gt.Object(obj))))
-	gd.debug_print(
+	gt.debug_print(fmt.bprintf(buf[:], "is_nil: %v (expect false)", gt.is_nil(gt.Object(obj))))
+	gt.debug_print(
 		fmt.bprintf(buf[:], "is_class Node: %v (expect true)", gt.is_class(obj, node_class_name)),
 	)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"is_class Node2D: %v (expect true)",
@@ -158,7 +157,7 @@ hello_ready :: proc(instance: gd.ClassInstancePtr, reversed: bool) {
 
 	v := gt.object_to_variant(obj)
 	back, back_ok := gt.variant_try_object(&v)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"variant object roundtrip: %v / %v (expect true / true)",
@@ -171,7 +170,7 @@ hello_ready :: proc(instance: gd.ClassInstancePtr, reversed: bool) {
 	node2d := gt.Node2D(obj)
 	gt.node2d_set_position(node2d, gt.Vector2{100, 50})
 	position := gt.node2d_get_position(node2d)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"generated Node2D position: (%v,%v) (expect 100,50)",
@@ -181,16 +180,16 @@ hello_ready :: proc(instance: gd.ClassInstancePtr, reversed: bool) {
 	)
 
 	// Utility functions
-	gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
-	gd.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
-	gd.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
+	gt.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
+	gt.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
+	gt.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
 }
 
 hello_node_notifications := gt.NodeNotificationHandlers {
 	ready = hello_ready,
 }
 
-notification_func :: proc "c" (instance: gd.ClassInstancePtr, what: i32, reversed: bool) {
+notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
 	if gt.dispatch_node_notification(instance, what, reversed, &hello_node_notifications) do return
 }
@@ -253,7 +252,7 @@ register_methods :: proc() {
 		gt.uninitialized_static_string_name_ptr(&empty_name_data),
 		cstring(""),
 	)
-	gd.string_new_with_latin1_chars(gt.uninitialized_string_ptr(&empty_str_data), cstring(""))
+	gt.string_init_utf8(gt.uninitialized_string_ptr(&empty_str_data), "")
 
 	gt.init_method_property_info(
 		&add_arg_info[0],
@@ -298,7 +297,7 @@ register_methods :: proc() {
 			arguments_metadata = &add_arg_meta[0],
 		},
 	)
-	gd.debug_print("[odin-gdext] Method add registered!")
+	gt.debug_print("[odin-gdext] Method add registered!")
 }
 
 // ---- Process-lifetime class name storage ----
@@ -320,7 +319,7 @@ hello_instance_binding_callbacks := gt.InstanceBindingCallbacks {
 
 register_classes :: proc() {
 	context = gt.godot_context()
-	gd.debug_print("[odin-gdext] Registering HelloNode...")
+	gt.debug_print("[odin-gdext] Registering HelloNode...")
 
 	gt.class_name_init_latin1_cstring(&hello_name_data, cstring("HelloNode"))
 	gt.class_name_init_latin1_cstring(&parent_name_data, cstring("Node2D"))
@@ -335,7 +334,7 @@ register_classes :: proc() {
 		free_instance,
 		notification_func,
 	)
-	gd.debug_print("[odin-gdext] HelloNode registered!")
+	gt.debug_print("[odin-gdext] HelloNode registered!")
 
 	buf: [160]u8
 
@@ -345,16 +344,16 @@ register_classes :: proc() {
 	vf := gt.variant_from_float(3.14)
 	vi := gt.variant_from_int(-42)
 	vb := gt.variant_from_bool(true)
-	gd.debug_print(fmt.bprintf(buf[:], "Float: %v (expect 3.14)", gt.variant_to_float(&vf)))
-	gd.debug_print(fmt.bprintf(buf[:], "Int:   %v (expect -42)", gt.variant_to_int(&vi)))
-	gd.debug_print(fmt.bprintf(buf[:], "Bool:  %v (expect true)", gt.variant_to_bool(&vb)))
-	gd.debug_print(fmt.bprintf(buf[:], "Float type: %v (expect Float)", gt.variant_type(&vf)))
+	gt.debug_print(fmt.bprintf(buf[:], "Float: %v (expect 3.14)", gt.variant_to_float(&vf)))
+	gt.debug_print(fmt.bprintf(buf[:], "Int:   %v (expect -42)", gt.variant_to_int(&vi)))
+	gt.debug_print(fmt.bprintf(buf[:], "Bool:  %v (expect true)", gt.variant_to_bool(&vb)))
+	gt.debug_print(fmt.bprintf(buf[:], "Float type: %v (expect Float)", gt.variant_type(&vf)))
 	vf_try, vf_ok := gt.variant_try_float(&vf)
 	vi_as_float, vi_as_float_ok := gt.variant_try_float(&vi)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(buf[:], "try_float(vf): %v / %v (expect 3.14 / true)", vf_try, vf_ok),
 	)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"try_float(vi): %v / %v (expect 0 / false)",
@@ -363,7 +362,7 @@ register_classes :: proc() {
 		),
 	)
 	nil_variant := gt.variant_nil()
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(buf[:], "Nil Variant: %v (expect true)", gt.variant_is_nil(&nil_variant)),
 	)
 	gt.variant_free(&nil_variant)
@@ -378,7 +377,7 @@ register_classes :: proc() {
 	rid_copy := gt.rid_copy(&rid)
 	rid_v := gt.variant_from_rid(&rid)
 	rid_back, rid_back_ok := gt.variant_try_rid(&rid_v)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"RID: valid=%v id=%v copy_id=%v roundtrip=%v (expect false / 0 / 0 / true)",
@@ -410,7 +409,7 @@ register_classes :: proc() {
 	arr_first_after_set_value, arr_first_after_set_ok := gt.variant_try_float(&arr_first_after_set)
 	gt.array_clear(&arr)
 	arr_empty_after_clear := gt.array_is_empty(&arr)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"Array: size=%v get0=%v/%v has10=%v erase_size=%v set0=%v/%v clear_empty=%v",
@@ -430,7 +429,7 @@ register_classes :: proc() {
 	gt.array_push(&arr, &v2)
 	arr_v := gt.variant_from_array(&arr)
 	arr_back, arr_back_ok := gt.variant_try_array(&arr_v)
-	gd.debug_print(fmt.bprintf(buf[:], "variant_try_array(arr_v): %v (expect true)", arr_back_ok))
+	gt.debug_print(fmt.bprintf(buf[:], "variant_try_array(arr_v): %v (expect true)", arr_back_ok))
 	if arr_back_ok do gt.array_free(&arr_back)
 	gt.variant_free(&arr_v)
 	gt.variant_free(&v1)
@@ -453,7 +452,7 @@ register_classes :: proc() {
 	gt.dictionary_clear(&dict)
 	dict_empty_after_clear := gt.dictionary_is_empty(&dict)
 	_ = gt.dictionary_set(&dict, &dict_key, &dict_value)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"Dictionary: set=%v has=%v size=%v empty=%v get=%v/%v erase=%v erase_size=%v clear_empty=%v",
@@ -471,7 +470,7 @@ register_classes :: proc() {
 	gt.variant_free(&dict_got)
 	dict_v := gt.variant_from_dictionary(&dict)
 	dict_back, dict_back_ok := gt.variant_try_dictionary(&dict_v)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(buf[:], "variant_try_dictionary(dict_v): %v (expect true)", dict_back_ok),
 	)
 	if dict_back_ok do gt.dictionary_free(&dict_back)
@@ -497,7 +496,7 @@ register_classes :: proc() {
 	}
 	gt.packed_byte_array_clear(&bytes)
 	bytes_empty_after_clear := gt.packed_byte_array_is_empty(&bytes)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedByteArray: size=%v get0=%v set1=%v roundtrip=%v/%v clear_empty=%v",
@@ -529,7 +528,7 @@ register_classes :: proc() {
 	}
 	gt.packed_int32_array_clear(&ints)
 	ints_empty_after_clear := gt.packed_int32_array_is_empty(&ints)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedInt32Array: size=%v get0=%v set1=%v roundtrip=%v/%v clear_empty=%v",
@@ -561,7 +560,7 @@ register_classes :: proc() {
 	}
 	gt.packed_int64_array_clear(&wide_ints)
 	wide_ints_empty_after_clear := gt.packed_int64_array_is_empty(&wide_ints)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedInt64Array: size=%v get0=%v set1=%v roundtrip=%v/%v clear_empty=%v",
@@ -593,7 +592,7 @@ register_classes :: proc() {
 	}
 	gt.packed_float32_array_clear(&floats32)
 	floats32_empty_after_clear := gt.packed_float32_array_is_empty(&floats32)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedFloat32Array: size=%v get0=%v set1=%v roundtrip=%v/%v clear_empty=%v",
@@ -625,7 +624,7 @@ register_classes :: proc() {
 	}
 	gt.packed_float64_array_clear(&floats64)
 	floats64_empty_after_clear := gt.packed_float64_array_is_empty(&floats64)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedFloat64Array: size=%v get0=%v set1=%v roundtrip=%v/%v clear_empty=%v",
@@ -671,7 +670,7 @@ register_classes :: proc() {
 	)
 	gt.packed_string_array_clear(&strings)
 	strings_empty_after_clear := gt.packed_string_array_is_empty(&strings)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedStringArray: size=%v get0=%v/%v set1=%v/%v roundtrip=%v/%v clear_empty=%v",
@@ -710,7 +709,7 @@ register_classes :: proc() {
 	}
 	gt.packed_vector2_array_clear(&vectors2)
 	vectors2_empty_after_clear := gt.packed_vector2_array_is_empty(&vectors2)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedVector2Array: size=%v get0=(%v,%v) set1=(%v,%v) roundtrip=%v/%v clear_empty=%v",
@@ -744,7 +743,7 @@ register_classes :: proc() {
 	}
 	gt.packed_vector3_array_clear(&vectors3)
 	vectors3_empty_after_clear := gt.packed_vector3_array_is_empty(&vectors3)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedVector3Array: size=%v get0=(%v,%v,%v) set1=(%v,%v,%v) roundtrip=%v/%v clear_empty=%v",
@@ -781,7 +780,7 @@ register_classes :: proc() {
 	}
 	gt.packed_vector4_array_clear(&vectors4)
 	vectors4_empty_after_clear := gt.packed_vector4_array_is_empty(&vectors4)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedVector4Array: size=%v get0=(%v,%v,%v,%v) set1=(%v,%v,%v,%v) roundtrip=%v/%v clear_empty=%v",
@@ -820,7 +819,7 @@ register_classes :: proc() {
 	}
 	gt.packed_color_array_clear(&colors)
 	colors_empty_after_clear := gt.packed_color_array_is_empty(&colors)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"PackedColorArray: size=%v get0=(%v,%v,%v,%v) set1=(%v,%v,%v,%v) roundtrip=%v/%v clear_empty=%v",
@@ -847,7 +846,7 @@ register_classes :: proc() {
 	gt.print(gt.variant_ptr(&vs))
 	utf8_buf: [128]u8
 	utf8_text, utf8_ok, utf8_needed := gt.variant_try_utf8(&vs, utf8_buf[:])
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"try_utf8(vs): %v / %v / %v bytes (expect message / true)",
@@ -865,7 +864,7 @@ register_classes :: proc() {
 	gs_needle := gt.string_from_utf8("Godot")
 	gs_case := gt.string_from_utf8("owned godot string")
 	string_text, string_ok, string_needed := gt.string_to_utf8(&gs, utf8_buf[:])
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"string_to_utf8(gs): %v / %v / %v bytes (expect owned string / true)",
@@ -879,7 +878,7 @@ register_classes :: proc() {
 	if gs_back_ok {
 		defer gt.string_free(&gs_back)
 		back_text, back_ok, back_needed := gt.string_to_utf8(&gs_back, utf8_buf[:])
-		gd.debug_print(
+		gt.debug_print(
 			fmt.bprintf(
 				buf[:],
 				"variant_try_string(gsv): %v / %v / %v bytes (expect owned string / true)",
@@ -889,7 +888,7 @@ register_classes :: proc() {
 			),
 		)
 	}
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"string methods: len=%v empty=%v hash>0=%v begins=%v ends=%v contains=%v nocase=%v",
@@ -908,7 +907,7 @@ register_classes :: proc() {
 		utf8_buf[:],
 	)
 	generated_color := gt.color_html(&generated_html)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"generated String return: %v / %v / %v bytes -> color=(%v,%v,%v,%v)",
@@ -933,7 +932,7 @@ register_classes :: proc() {
 	sn := gt.string_name_from_utf8_cstring(cstring("HelloNode"))
 	snv := gt.variant_from_string_name(&sn)
 	sn_back, sn_back_ok := gt.variant_try_string_name(&snv)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(buf[:], "variant_try_string_name(snv): %v (expect true)", sn_back_ok),
 	)
 	if sn_back_ok do gt.string_name_free(&sn_back)
@@ -944,8 +943,8 @@ register_classes :: proc() {
 	np := gt.node_path_from_utf8("../HelloNode")
 	npv := gt.variant_from_node_path(&np)
 	np_back, np_back_ok := gt.variant_try_node_path(&npv)
-	gd.debug_print(fmt.bprintf(buf[:], "variant_try_node_path(npv): %v (expect true)", np_back_ok))
-	gd.debug_print(
+	gt.debug_print(fmt.bprintf(buf[:], "variant_try_node_path(npv): %v (expect true)", np_back_ok))
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"node_path: absolute=%v names=%v subnames=%v hash>0=%v (expect false / 2 / 0 / true)",
@@ -958,7 +957,7 @@ register_classes :: proc() {
 	name := gt.node_path_get_name(&np, 1)
 	name_v := gt.variant_from_string_name(&name)
 	name_back, name_ok := gt.variant_try_string_name(&name_v)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(buf[:], "node_path_get_name -> StringName: %v (expect true)", name_ok),
 	)
 	if name_ok do gt.string_name_free(&name_back)
@@ -968,7 +967,7 @@ register_classes :: proc() {
 	concat_names := gt.node_path_get_concatenated_names(&np)
 	concat_names_v := gt.variant_from_string_name(&concat_names)
 	concat_names_back, concat_names_ok := gt.variant_try_string_name(&concat_names_v)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"node_path_get_concatenated_names -> StringName: %v (expect true)",
@@ -983,7 +982,7 @@ register_classes :: proc() {
 	subname := gt.node_path_get_subname(&np_sub, 0)
 	subname_v := gt.variant_from_string_name(&subname)
 	subname_back, subname_ok := gt.variant_try_string_name(&subname_v)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(buf[:], "node_path_get_subname -> StringName: %v (expect true)", subname_ok),
 	)
 	if subname_ok do gt.string_name_free(&subname_back)
@@ -993,7 +992,7 @@ register_classes :: proc() {
 	concat_subnames := gt.node_path_get_concatenated_subnames(&np_sub)
 	concat_subnames_v := gt.variant_from_string_name(&concat_subnames)
 	concat_subnames_back, concat_subnames_ok := gt.variant_try_string_name(&concat_subnames_v)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"node_path_get_concatenated_subnames -> StringName: %v (expect true)",
@@ -1012,7 +1011,7 @@ register_classes :: proc() {
 	vec := gt.vector2_new3(3.0, 4.0)
 	vec_variant := gt.vector2_to_variant(vec)
 	vec_back, vec_back_ok := gt.vector2_try_from_variant(&vec_variant)
-	gd.debug_print(
+	gt.debug_print(
 		fmt.bprintf(
 			buf[:],
 			"Vector2 variant roundtrip: (%v, %v) / %v (expect 3,4 / true)",
@@ -1022,29 +1021,29 @@ register_classes :: proc() {
 		),
 	)
 	gt.variant_free(&vec_variant)
-	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
+	gt.debug_print(fmt.bprintf(buf[:], "Vector2(3,4): (%v, %v) (expect 3,4)", vec.x, vec.y))
 	len := gt.vector2_length(vec)
-	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))
+	gt.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).length(): %v (expect 5)", len))
 	n := gt.vector2_normalized(vec)
-	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).normalized(): (%v, %v)", n.x, n.y))
+	gt.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).normalized(): (%v, %v)", n.x, n.y))
 	dot := gt.vector2_dot(vec, gt.Vector2{1, 0})
-	gd.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).dot(1,0): %v (expect 3)", dot))
+	gt.debug_print(fmt.bprintf(buf[:], "Vector2(3,4).dot(1,0): %v (expect 3)", dot))
 
 	// Utility function smoke test
-	gd.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
-	gd.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
-	gd.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
+	gt.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
+	gt.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
+	gt.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
 }
 
 // ---- Entry point ----
 
 @(export)
 hello_library_init :: proc "c" (
-	get_proc_address: gd.GDExtensionInterfaceGetProcAddress,
-	library: gd.GDExtensionClassLibraryPtr,
-	initialization: ^gd.GDExtensionInitialization,
+	get_proc_address: gt.InterfaceGetProcAddress,
+	library: gt.ClassLibraryPtr,
+	initialization: ^gt.Initialization,
 ) -> bool {
-	gd.init(library, get_proc_address)
+	gt.init(library, get_proc_address)
 
 	initialization.initialize = initialize_module
 	initialization.deinitialize = deinitialize_module
@@ -1053,13 +1052,13 @@ hello_library_init :: proc "c" (
 	return true
 }
 
-initialize_module :: proc "c" (user_data: rawptr, level: gd.InitializationLevel) {
+initialize_module :: proc "c" (user_data: rawptr, level: gt.InitializationLevel) {
 	context = gt.godot_context()
 	if level != .Scene {return}
 	register_classes()
 }
 
-deinitialize_module :: proc "c" (user_data: rawptr, level: gd.InitializationLevel) {
+deinitialize_module :: proc "c" (user_data: rawptr, level: gt.InitializationLevel) {
 	context = gt.godot_context()
 	if level != .Scene {return}
 	gt.unregister_class(hello_class_name)

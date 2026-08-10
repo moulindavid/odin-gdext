@@ -224,9 +224,9 @@ boilerplate in every extension.
    - [x] Prepare this path for Priority 4 virtual callback helpers.
 
 7. Move normal examples to the public facade.
-   - [ ] Keep hello importing only `godot:godot` for normal usage.
-   - [ ] Re-export only the registration pieces intended for users.
-   - [ ] Keep low-level `godot:core` access available but unnecessary for common
+   - [x] Keep hello importing only `godot:godot` for normal usage.
+   - [x] Re-export only the registration pieces intended for users.
+   - [x] Keep low-level `godot:core` access available but unnecessary for common
      class registration.
 
 8. Add coverage for registration helpers.

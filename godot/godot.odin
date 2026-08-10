@@ -1,9 +1,9 @@
 // godot/godot.odin -- Public convenience facade.
 //
 // Prefer this package for normal extension code. It re-exports the stable core
-// value helpers plus the selected generated builtin, utility, and class APIs.
-// Manual class registration still uses some low-level core declarations until
-// the Priority 3 registration helpers exist.
+// value helpers plus selected generated builtin, utility, class, and user-class
+// registration APIs. Low-level `godot:core` remains available for advanced code,
+// but normal examples should not need to import it directly.
 package godot
 
 import gbind "godot:bindings"
@@ -16,6 +16,10 @@ Object :: gcore.Object
 RefCounted :: gcore.RefCounted
 ObjectPtr :: gcore.ObjectPtr
 ClassInstancePtr :: gcore.ClassInstancePtr
+ClassLibraryPtr :: gcore.ClassLibraryPtr
+InterfaceGetProcAddress :: gcore.GDExtensionInterfaceGetProcAddress
+Initialization :: gcore.Initialization
+InitializationLevel :: gcore.InitializationLevel
 VariantPtr :: gcore.VariantPtr
 ConstVariantPtr :: gcore.ConstVariantPtr
 StringNamePtr :: gcore.StringNamePtr
@@ -86,6 +90,9 @@ Node2D :: gclass.Node2D
 Control :: gclass.Control
 
 // --- Core functions ---
+init :: gcore.init
+construct_object :: gcore.construct_object
+debug_print :: gcore.debug_print
 is_nil :: gcore.is_nil
 is_class :: gcore.is_class
 cast_to :: gcore.cast_to

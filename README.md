@@ -74,14 +74,21 @@ them instead of requiring generated output commits.
 
 ## Imports
 
-The `godot:godot` package is a small convenience facade for the handwritten core
-helpers plus a few common utilities. It is not yet a complete facade over all
-generated APIs. Import generated packages directly when you need them:
+Normal examples should start with the public facade only:
 
 ```odin
-import gt "godot:godot"              // convenience facade: context, Variant helpers, a few utilities
-import gd "godot:core"               // GDExtension C-ABI types/functions and runtime helpers
-import bind "godot:bindings"         // generated @GlobalScope utilities
+import gt "godot:godot"
+```
+
+The facade re-exports the stable core value helpers, selected generated builtin,
+utility, and class APIs, and the registration pieces needed by the hello example.
+Low-level `godot:core` remains available for advanced GDExtension C ABI work,
+but common class registration should not need to import it directly. Import
+internal generated packages directly only when working outside the selected
+facade coverage:
+
+```odin
+import bind "godot:bindings"            // generated @GlobalScope utilities
 import builtin "godot:bindings/builtin" // generated builtin-type bindings
 ```
 
