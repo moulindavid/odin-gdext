@@ -4,17 +4,17 @@
 via the *GDExtension* C API.
 
 > **Status:** early prototype. Current smoke-tested scope: Godot 4.7
-> single-precision C ABI generation, manual lifecycle callbacks, registration
-> helpers for user classes and simple methods, basic Variant helpers, typed
-> object handle experiments, generated math builtin bindings, and partial
-> utility function bindings.
+> Godot 4.7 float ABI generation, manual lifecycle callbacks, registration
+> helpers for user classes and simple methods/properties/signals, basic Variant
+> helpers, typed object handle experiments, selected generated class wrappers,
+> generated math builtin bindings, and partial utility function bindings.
 
 ## Requirements
 
 - Odin compiler on `PATH` (currently validated with `dev-2026-07`).
 - `odinfmt` on `PATH`.
 - Godot **4.7** on `PATH`.
-- Currently targets Godot's **single-precision** build/API only.
+- Currently targets Godot 4.7's `float_64` API shape through `GodotReal`.
 - `make` and a platform toolchain capable of building shared libraries.
 
 ## Quick start
@@ -207,84 +207,60 @@ method adapters are intentionally deferred until their safety model is explicit.
 
 ## API coverage
 
-Current codegen is intentionally incomplete:
+This project is still a prototype. It aims for a small, safe, smoke-tested
+subset before broad Godot API coverage. Detailed sequencing lives in
+[ROADMAP.md](ROADMAP.md).
 
-- Builtin generation focuses on simple/math builtins. Complex/value-owning
-  builtins such as `String`, `StringName`, `NodePath`, `RID`, `Callable`,
-  `Signal`, `Array`, `Dictionary`, and packed arrays are skipped until their
-  ownership, lifetime, and ABI rules are implemented properly.
-- Utility generation skips varargs and signatures involving unsupported complex
-  return/argument types, including `String`, `Object`, `RID`, `Variant` returns,
-  and several packed arrays. `Variant` arguments are generated as borrowed
-  `^core.Variant` parameters to avoid unsafe owned-storage bit copies. Generated
-  utilities are available from `godot:bindings`; only a tiny subset is
-  re-exported by `godot:godot`.
-- Engine object class wrappers are planned, but not generated yet.
-- Properties, signals, and virtual method overrides are not implemented yet.
-- Ownership rules for value types are still being stabilized. `Variant` now has
-  explicit owned-storage helpers (`variant_nil`, `variant_copy`,
-  `variant_init_copy`, pointer adapters, and `variant_free`) plus minimal
-  `CallError` helpers and checked wrappers for `variant_call` /
-  `variant_construct`. Generated wrappers borrow `^core.Variant` parameters and
-  document owned `core.Variant` returns. Runtime type inspection, exact-type
-  `variant_try_bool` / `variant_try_int` / `variant_try_float`, `variant_try_object`,
-  caller-buffer `variant_try_utf8` String extraction, and generated exact-type
-  `{builtin}_try_from_variant` helpers for current memory-compatible builtin types
-  are available, but broader complex conversion coverage is still incomplete.
-  `String` has an initial owned-storage wrapper (`string_from_utf8`,
-  `string_to_utf8`, `string_free`, `variant_from_string`, and `variant_try_string`)
-  plus safe borrowed-input method wrappers for length, emptiness, hash, compare,
-  prefix/suffix, and contains checks. Generated builtin APIs now use borrowed parameters for completed owned core
-  values (`^core.String`, `^core.Array`, `^core.PackedStringArray`, etc.) and
-  owned initialized returns with explicit destruction comments. Unsupported complex values like `Callable` and `Signal` remain raw/skipped until
-  their object-lifetime, vararg, and registration semantics are designed alongside
-  Priority 3/4 signal and registration helpers.
-  `StringName` has an initial owned, non-static wrapper (`string_name_from_utf8_cstring`,
-  `string_name_free`, `variant_from_string_name`, and `variant_try_string_name`) plus
-  a `StaticStringName` wrapper for process-lifetime literals used by core/generated
-  builtin-method and utility lookup helpers, plus the hello example's manual
-  registration data. Static names must only use process-lifetime strings and must never
-  be destroyed. `NodePath` has an initial owned wrapper (`node_path_from_utf8`,
-  `node_path_free`, `variant_from_node_path`, and `variant_try_node_path`) plus primitive
-  method wrappers and owned `StringName`-returning helpers for names/subnames. Generated
-  API integration is still pending. `RID` has a lightweight 8-byte wrapper (`rid_new`,
-  `rid_copy`, `rid_free`, `rid_is_valid`, `rid_get_id`, `variant_from_rid`, and
-  `variant_try_rid`); destroying the wrapper does not free the underlying server resource.
-  `Array` has an initial owned-storage wrapper
-  (`array_new`, `array_copy`, `array_free`, `array_push`, `array_size`, `array_get`,
-  `array_set`, `array_clear`, `array_erase`, `array_has`, `array_is_empty`,
-  `variant_from_array`, and `variant_try_array`). `Dictionary` has the same initial
-  owned-storage pattern plus `dictionary_set`, `dictionary_get`, `dictionary_get_or_default`,
-  `dictionary_has`, `dictionary_erase`, `dictionary_clear`, `dictionary_size`,
-  `dictionary_is_empty`, `variant_from_dictionary`, and `variant_try_dictionary`.
-  `PackedByteArray` has an initial owned-storage wrapper (`packed_byte_array_new`,
-  `packed_byte_array_copy`, `packed_byte_array_free`, `packed_byte_array_push`,
-  `packed_byte_array_get`, `packed_byte_array_set`, `packed_byte_array_clear`,
-  `packed_byte_array_size`, `packed_byte_array_is_empty`, `variant_from_packed_byte_array`,
-  and `variant_try_packed_byte_array`). `PackedInt32Array`, `PackedInt64Array`, `PackedFloat32Array`, and
-  `PackedFloat64Array` mirror that initial owned-storage/basic-method/Variant-conversion pattern.
-  `PackedStringArray` follows the same array ownership pattern and returns owned
-  `String` elements from `packed_string_array_get` that must be freed.
-  `PackedVector2Array`, `PackedVector3Array`, `PackedVector4Array`, and `PackedColorArray` add the same pattern for generated-builtin-compatible
-  vector storage. Broader methods, typed arrays/dictionaries, the other packed arrays, and
-  generated API integration are still pending.
-- Godot API `float` values use the centralized `GodotReal` alias. It is `f64`
-  for the currently supported Godot 4.7 `float_64` target; concrete storage
-  types such as `PackedFloat32Array` still expose `f32` elements. `Vector2` and `Vector3` storage are
-  centralized in `godot:core`, and generated APIs alias that storage so packed
-  vector arrays and generated vector methods use the same Odin types.
+### Usable now
+
+- Runtime: generated GDExtension interface bindings, Godot-backed allocator
+  context, checked function-pointer loading, and CI validation.
+- Values: owned-storage helpers for `Variant`, `String`, `StringName`,
+  `StaticStringName`, `NodePath`, `RID`, `Array`, `Dictionary`, packed arrays,
+  and generated math builtins.
+- Generated APIs: math/simple builtin wrappers, supported non-vararg
+  `@GlobalScope` utilities, and selected class handles for `Object`,
+  `RefCounted`, `Resource`, `Node`, `CanvasItem`, `Node2D`, and `Control`.
+- User classes: registration helpers, stable class names, instance binding,
+  method/property/signal descriptors, simple `GodotReal` method adapters, node
+  notification dispatch, and editor-visible metadata.
+- Facade: normal examples can import only `godot:godot`. The hello example
+  covers class creation, methods, property access, signal emission,
+  notifications, and unregister cleanup.
+
+### Still incomplete
+
+- Full 1000+ class coverage.
+- `Callable`, `Signal`, typed arrays/dictionaries, and broad complex conversions.
+- Varargs, default arguments, and object-lifetime-sensitive signatures.
+- Broad typed method adapter generation and full virtual callback helpers.
+- Other Godot versions and precision targets. Current float ABI assumptions are
+  centralized behind `GodotReal`.
+
+### Ownership rules to remember
+
+- Object/class handles are borrowed by value. Generated wrappers do not own
+  Godot objects.
+- Owned value wrappers must be destroyed explicitly with their matching free
+  helper, for example `variant_free`, `string_free`, or `array_free`.
+- Generated wrappers borrow completed owned value parameters by pointer and
+  return initialized owned values with destruction comments.
+- Registration metadata storage must outlive the registration that uses it. Use
+  process-lifetime storage for class names, method names, property names, signal
+  names, and hint strings.
 
 ## Architecture
 
 ```
 odin-gdext/
-├── generator/                ← codegen (FFI, builtin types, utilities)
-├── core/                     ← C-ABI + handwritten runtime
+├── generator/                <- codegen (FFI, builtin types, utilities, classes)
+├── core/                     <- C-ABI + handwritten runtime
 ├── bindings/
-│   ├── builtin/              ← generated builtin type bindings
-│   └── utilities.odin        ← generated @GlobalScope functions
-├── godot/                    ← thin re-export facade
-└── examples/hello/           ← minimal GDExtension proving the pipeline
+│   ├── builtin/              <- generated builtin type bindings
+│   ├── classes/              <- selected generated class wrappers
+│   └── utilities.odin        <- generated @GlobalScope functions
+├── godot/                    <- thin re-export facade
+└── examples/hello/           <- minimal GDExtension proving the pipeline
 ```
 
 - `core/` -- handwritten runtime: C-ABI types, owned Variant storage helpers,
@@ -310,13 +286,13 @@ odin-gdext/
 | Layer | Description | Status |
 |-------|-------------|--------|
 | `core/` | C-ABI types, helpers, owned Variant storage helpers, typed handle experiments, context | Partial |
-| `generator/` | Codegen for FFI, builtin types, utility functions | Partial |
+| `generator/` | Codegen for FFI, builtin types, utility functions, selected classes | Partial |
 | `bindings/builtin/` | Math/simple builtin types (Vector2..Projection) with methods | Partial |
 | `bindings/utilities.odin` | Supported @GlobalScope utility functions | Partial |
 | `godot/` facade | Small convenience re-export package | Partial |
-| `bindings/` (classes) | Per-class API wrappers for engine classes | Planned |
-| Properties/signals | Getter/setter hooks on registered classes | Planned |
-| Virtual methods | Override engine virtuals from Odin | Planned |
+| `bindings/classes/` | Selected per-class API wrappers for engine classes | Partial |
+| Properties/signals | Descriptors, registration helpers, and simple emission helpers | Partial |
+| Virtual callbacks | Notification dispatch helpers for common Node lifecycle callbacks | Partial |
 
 ## Roadmap
 
