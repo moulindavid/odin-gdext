@@ -270,10 +270,10 @@ then expand coverage once smoke tests prove the ABI path.
      properties until primitive property flow is stable.
 
 3. Add hello property smoke coverage.
-   - [ ] Register the property through the public facade.
-   - [ ] Keep hello importing only `godot:godot`.
-   - [ ] Exercise the getter and setter path where practical.
-   - [ ] Preserve explicit instance-data allocation, free, and unregister cleanup.
+   - [x] Register the property through the public facade.
+   - [x] Keep hello importing only `godot:godot`.
+   - [x] Exercise the getter and setter path where practical.
+   - [x] Preserve explicit instance-data allocation, free, and unregister cleanup.
 
 4. Add signal declaration helpers.
    - [ ] Add a `ClassSignalDescriptor` helper.
