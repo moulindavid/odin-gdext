@@ -1,71 +1,121 @@
 # Roadmap
 
-This roadmap now tracks the next practical goal: make `odin-gdext` easy to try
-inside a normal Godot project.
+This roadmap tracks the next work needed to move `odin-gdext` from a usable
+hybrid-feature prototype toward a more rust-gdext-like foundation.
 
-Rules to keep : explicit
-ownership, no raw offset poking, checked function pointers, stable registration
-metadata, and unregister cleanup during deinitialization.
+## Invariants
 
-## Current goal: real Godot project usage
+Keep these rules intact while adding features:
+
+- Explicit ownership for Godot values. Owned `Variant`, `String`, `StringName`,
+  `NodePath`, arrays, dictionaries, packed arrays, and similar values must have
+  matching destruction paths.
+- Object and class handles are borrowed unless a helper explicitly documents a
+  retain/reference rule.
+- No raw offset poking in examples, generated code, or public helpers.
+- Resolved GDExtension function pointers and method binds must be checked or
+  trapped before use.
+- Registration metadata must live long enough for the Godot registration that
+  uses it.
+- Extension classes must unregister during deinitialization.
+- Normal examples should import only `godot:godot`.
+
+## Completed baseline
+
+The project is currently usable for hybrid Godot plus Odin features:
+
+- Priority 0 safety baseline for allocators, Variant/String cleanup, function
+  pointer checks, and registration cleanup.
+- Priority 0.5 CI baseline with generated binding checks, unit tests, facade
+  checks, and Godot headless smoke coverage.
+- Priority 1 core value ownership and conversion helpers for `Variant`,
+  strings, names, paths, RID, containers, packed arrays, and generated math
+  builtins.
+- Priority 2 selected generated class handles, constants, enums, downcasts, and
+  public facade exports.
+- Priority 3 user class registration helpers for class creation, instance
+  binding, method metadata, simple typed adapters, and notifications.
+- Priority 4 early properties, signals, notification dispatch, and virtual-style
+  helpers.
+- Real usage layer: `docs/USING_IN_GODOT.md`, a beginner game example,
+  split hello/smoke examples, `make example-game`, and documented limitations.
+
+## Current goal: safe object and user-class model
+
+The next step toward rust-gdext-like structure is to make the object/reference
+model explicit before expanding generated class coverage too far. This should
+clarify what Odin owns, what Godot owns, and what can safely be stored across
+callbacks.
 
 ## Plan
 
-1. Add `docs/USING_IN_GODOT.md`.
-   - [x] Explain how to build the extension shared library.
-   - [x] Explain where to place the `.gdextension` file and compiled library in
-     a Godot project.
-   - [x] Show the minimal Odin extension entry point and class registration
-     shape.
-   - [x] Show how to instantiate an Odin-backed class from GDScript.
-   - [x] Show how to call an Odin method, read/write a property, and connect to
-     a signal.
-   - [x] Document required cleanup: freeing owned values and unregistering
-     classes during deinitialization.
+1. Define object handle ownership rules.
+   - [ ] Document borrowed Godot object/class handles in `docs/USING_IN_GODOT.md`
+     and README.
+   - [ ] Document extension-owned instance data and how it differs from Godot
+     object lifetime.
+   - [ ] Document when storing `ObjectPtr` or typed class handles in Odin data is
+     allowed, and what remains unsafe.
+   - [ ] Document current `RefCounted` and `Resource` limitations.
+   - [ ] Add a small compile or smoke check showing safe storage of the owning
+     Godot object pointer inside extension-owned instance data.
 
-2. Add a cleaner example project or template.
-   - [x] Create a beginner-facing example that demonstrates one small game-like
-     feature.
-   - [x] Keep the normal example importing only `godot:godot`.
-   - [x] Keep the example focused on user workflow rather than exhaustive smoke
-     coverage.
-   - [x] Include a scene, script, `.gdextension` file, and Makefile target path
-     that mirror a real project layout.
+2. Add typed object handle helper APIs.
+   - [ ] Add nil-safe helper procedures for selected typed handles.
+   - [ ] Add checked conversion helpers from `Object` to selected typed handles
+     where generated downcasts are not enough for user code.
+   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [ ] Keep all object/class handle helpers borrowed by value.
 
-3. Split the current hello example responsibilities.
-   - [x] Keep `hello` as a simple beginner example.
-   - [x] Move broad internal coverage into a separate `smoke` example or test
-     fixture.
-   - [x] Keep CI coverage for class creation, methods, properties, signal
-     emission, notifications, instance binding, value conversions, and unregister
-     cleanup.
-   - [x] Avoid making the beginner example look like a test dump.
+3. Decide the first `RefCounted` and `Resource` safety layer.
+   - [ ] Inspect Godot 4.7 GDExtension APIs available for reference counting.
+   - [ ] Decide whether public retain/unref helpers are safe enough now or must
+     remain deferred.
+   - [ ] Prevent public docs and examples from implying that Odin owns ordinary
+     Godot objects.
+   - [ ] Add tests or facade checks for the chosen rule.
 
-4. Add a Makefile target for the example workflow.
-   - [x] Add a target such as `make example-game`.
-   - [x] Build the extension, prepare the Godot project files, and run the
-     example headless when possible.
-   - [x] Keep `make ci` using deterministic targets and generated-file ordering.
-   - [x] Document which target a new user should run first.
+4. Improve user class descriptors.
+   - [ ] Reduce repeated class/method/property/signal boilerplate without hiding
+     ownership or metadata lifetime.
+   - [ ] Keep create/free callbacks explicit.
+   - [ ] Keep registration and unregistration explicit.
+   - [ ] Provide a compact descriptor pattern that examples can share.
+   - [ ] Update `examples/hello` or `examples/game` only after the helper is
+     clearer than the current explicit code.
 
-5. Document current limitations clearly.
-   - [x] State that the current recommended model is hybrid Godot plus Odin:
-     Godot/GDScript owns scenes, input, UI, and resources while Odin owns focused
-     logic and selected extension classes.
-   - [x] List incomplete areas: broad class coverage, rich node lookup/resource
-     loading helpers, `Callable`, ergonomic `Signal`, varargs/default arguments,
-     object-lifetime-sensitive signatures, and full virtual callbacks.
-   - [x] Document the current Godot 4.7 `GodotReal` assumption.
-   - [x] Keep a short checklist for deciding whether a feature is safe to build
-     with the current API.
+5. Broaden typed method adapter coverage for common signatures.
+   - [ ] `() -> void`.
+   - [ ] `() -> bool`.
+   - [ ] `() -> int`.
+   - [ ] `(float) -> void`.
+   - [ ] `(int) -> void`.
+   - [ ] `(bool) -> void`.
+   - [ ] Defer `String`, object handles, varargs, default arguments, `Callable`,
+     `Signal`, and object-lifetime-sensitive signatures until ownership is
+     explicit.
 
-## Done when
+6. Shape a coherent public Variant conversion pattern.
+   - [ ] Group existing `variant_from_*` helpers behind an Odin-friendly proc
+     group or naming pattern.
+   - [ ] Group checked extraction helpers behind a matching `try` pattern.
+   - [ ] Keep borrowed parameters and owned returns obvious at call sites.
+   - [ ] Add facade compile coverage for representative conversions.
 
-- A new developer can follow `docs/USING_IN_GODOT.md` and create or run a small
-  Godot project that calls Odin code.
-- The beginner example is easy to skim and is not overloaded with internal smoke
-  checks.
-- Internal smoke coverage still exists and runs in CI.
+7. Expand generated class APIs only after the above rules are stable.
+   - [ ] Add more common scene/resource classes incrementally.
+   - [ ] Keep skip rules deterministic for unsupported signatures.
+   - [ ] Prefer generator fixes over manual patches to generated files.
+   - [ ] Keep generated methods aligned with the borrowed object handle model.
+
+## Validation
+
+- README and usage docs clearly explain borrowed object handles,
+  extension-owned instance data, and current `RefCounted` limitations.
+- Public helpers make nil checks, upcasts, downcasts, and object storage rules
+  easy to follow.
+- Common simple method signatures can be registered without hand-writing Variant
+  and ptrcall plumbing.
+- Examples remain beginner-friendly while smoke coverage still protects the
+  low-level safety rules.
 - `make ci` passes.
-- README points users to the usage guide and clearly labels the project as a
-  hybrid-feature prototype, not a complete Godot API binding yet.
