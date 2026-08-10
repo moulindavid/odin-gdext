@@ -456,6 +456,12 @@ ClassPropertyDescriptor :: struct {
 	getter:   ConstStringNamePtr,
 }
 
+ClassSignalDescriptor :: struct {
+	name:           ConstStringNamePtr,
+	argument_info:  ^PropertyInfo,
+	argument_count: i64,
+}
+
 ClassMethodDescriptor :: struct {
 	name:                  StringNamePtr,
 	method_userdata:       rawptr,
@@ -1136,6 +1142,17 @@ register_class_signal :: proc "contextless" (
 		argument_info,
 		argument_count,
 	)
+}
+
+register_class_signal_with_descriptor :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	desc: ClassSignalDescriptor,
+) {
+	if class_name == nil || desc.name == nil || desc.argument_count < 0 {
+		_trap_nil_godot_function()
+	}
+	if desc.argument_count > 0 && desc.argument_info == nil do _trap_nil_godot_function()
+	register_class_signal(class_name, desc.name, desc.argument_info, desc.argument_count)
 }
 
 // ---------------------------------------------------------------------------

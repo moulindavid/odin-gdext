@@ -398,3 +398,15 @@ bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.class_method_set_int_call
 	_ = gt.class_method_set_int_ptrcall
 }
+
+facade_signal_name_data: gt.StaticStringName
+facade_signal_name := gt.const_static_string_name_ptr(&facade_signal_name_data)
+
+signal_registration_facade_compile_smoke :: proc "contextless" (
+	class_name: gt.ConstStringNamePtr,
+) {
+	gt.register_class_signal_with_descriptor(
+		class_name,
+		gt.ClassSignalDescriptor{name = facade_signal_name},
+	)
+}

@@ -8,12 +8,19 @@ func _ready() -> void:
 		return
 
 	print("HelloNode created!")
+	var has_pinged_signal := node.has_signal("pinged")
+	print("hello.has_signal(pinged) = ", has_pinged_signal)
 	node.speed = 240.0
 	var speed: Variant = node.speed
 	print("hello.speed = ", speed)
 	var result: Variant = node.call("add", 7.0, 6.0)
 	print("hello.add(7.0, 6.0) = ", result)
 	node.free()
+
+	if not has_pinged_signal:
+		push_error("HelloNode.pinged signal was not registered")
+		get_tree().quit(1)
+		return
 
 	if speed != 240.0:
 		push_error("HelloNode.speed returned %s, expected 240.0" % speed)

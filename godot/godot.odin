@@ -40,6 +40,7 @@ PropertyUsageEditor :: gcore.PropertyUsageEditor
 PropertyUsageDefault :: gcore.PropertyUsageDefault
 MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
 ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
+ClassSignalDescriptor :: gcore.ClassSignalDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
@@ -121,6 +122,7 @@ init_method_property_info :: gcore.init_method_property_info
 init_class_property_info :: gcore.init_class_property_info
 init_class_method_info :: gcore.init_class_method_info
 register_class_property_with_descriptor :: gcore.register_class_property_with_descriptor
+register_class_signal_with_descriptor :: gcore.register_class_signal_with_descriptor
 register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::

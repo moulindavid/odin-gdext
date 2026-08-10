@@ -278,6 +278,9 @@ speed_set_arg_meta := [1]gt.ClassMethodArgumentMetadata{.None}
 speed_get_method_info: gt.ClassMethodInfo
 speed_set_method_info: gt.ClassMethodInfo
 
+pinged_signal_name_data: gt.StaticStringName
+pinged_signal_name := gt.const_static_string_name_ptr(&pinged_signal_name_data)
+
 register_methods :: proc() {
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&add_method_name_data),
@@ -420,6 +423,18 @@ register_properties :: proc() {
 	gt.debug_print("[odin-gdext] Property speed registered!")
 }
 
+register_signals :: proc() {
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&pinged_signal_name_data),
+		cstring("pinged"),
+	)
+	gt.register_class_signal_with_descriptor(
+		hello_class_name,
+		gt.ClassSignalDescriptor{name = pinged_signal_name},
+	)
+	gt.debug_print("[odin-gdext] Signal pinged registered!")
+}
+
 // ---- Process-lifetime class name storage ----
 
 hello_name_data: gt.ClassName
@@ -460,6 +475,7 @@ register_classes :: proc() {
 
 	register_methods()
 	register_properties()
+	register_signals()
 
 	// Test: variant round-trip (float, int, bool)
 	vf := gt.variant_from_float(3.14)

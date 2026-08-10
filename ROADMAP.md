@@ -276,12 +276,12 @@ then expand coverage once smoke tests prove the ABI path.
    - [x] Preserve explicit instance-data allocation, free, and unregister cleanup.
 
 4. Add signal declaration helpers.
-   - [ ] Add a `ClassSignalDescriptor` helper.
-   - [ ] Register signals from stable descriptor storage.
-   - [ ] Support no-argument signals first.
+   - [x] Add a `ClassSignalDescriptor` helper.
+   - [x] Register signals from stable descriptor storage.
+   - [x] Support no-argument signals first.
    - [ ] Add simple typed signal arguments only after no-argument signal
      registration has smoke coverage.
-   - [ ] Keep names, argument metadata, and hint strings alive for the registered
+   - [x] Keep names, argument metadata, and hint strings alive for the registered
      class lifetime.
 
 5. Add safe signal emission helpers.
