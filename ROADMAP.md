@@ -265,8 +265,8 @@ then expand coverage once smoke tests prove the ABI path.
    - [x] Start with `GodotReal -> void` setter and `void -> GodotReal` getter.
    - [x] Generate or provide explicit adapters for both call and ptrcall paths.
    - [x] Preserve the documented Godot 4.7 `GodotReal` ABI rule for `float`.
-   - [ ] Add `bool` and `i64` only after the real-valued path is covered.
-   - [ ] Defer object, array, dictionary, `String`, and complex builtin
+   - [x] Add `bool` and `i64` only after the real-valued path is covered.
+   - [x] Defer object, array, dictionary, `String`, and complex builtin
      properties until primitive property flow is stable.
 
 3. Add hello property smoke coverage.

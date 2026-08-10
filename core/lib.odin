@@ -580,6 +580,40 @@ ClassMethodSetGodotRealAdapter :: struct {
 	method: ClassMethodSetGodotReal,
 }
 
+ClassMethodGetBool :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+) -> (
+	value: bool,
+	ok: bool,
+)
+
+ClassMethodGetBoolAdapter :: struct {
+	method: ClassMethodGetBool,
+}
+
+ClassMethodSetBool :: #type proc "contextless" (instance: ClassInstancePtr, value: bool) -> bool
+
+ClassMethodSetBoolAdapter :: struct {
+	method: ClassMethodSetBool,
+}
+
+ClassMethodGetInt :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+) -> (
+	value: i64,
+	ok: bool,
+)
+
+ClassMethodGetIntAdapter :: struct {
+	method: ClassMethodGetInt,
+}
+
+ClassMethodSetInt :: #type proc "contextless" (instance: ClassInstancePtr, value: i64) -> bool
+
+ClassMethodSetIntAdapter :: struct {
+	method: ClassMethodSetInt,
+}
+
 _set_call_error :: proc "contextless" (
 	err: ^CallError,
 	error: CallErrorType,
@@ -815,6 +849,268 @@ class_method_set_godot_real_ptrcall :: proc "c" (
 	if adapter.method == nil do _trap_nil_godot_function()
 
 	value := (cast(^GodotReal)p_args[0])^
+	if !adapter.method(p_instance, value) do _trap_godot_call_error()
+}
+
+class_method_get_bool_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || r_return == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count > 0 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 0)
+		return
+	}
+
+	adapter := cast(^ClassMethodGetBoolAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, ok := adapter.method(p_instance)
+	if !ok {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+
+	rv := variant_from_bool(value)
+	variant_init_copy(r_return, &rv)
+	variant_free(&rv)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_get_bool_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || p_instance == nil || r_ret == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodGetBoolAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value, ok := adapter.method(p_instance)
+	if !ok do _trap_godot_call_error()
+	(cast(^bool)r_ret)^ = value
+}
+
+class_method_set_bool_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 1 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 1)
+		return
+	}
+	if p_argument_count > 1 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 1)
+		return
+	}
+	if p_args == nil || p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Bool)
+		return
+	}
+
+	adapter := cast(^ClassMethodSetBoolAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, value_ok := variant_try_bool(cast(^Variant)p_args[0])
+	if !value_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Bool)
+		return
+	}
+	if !adapter.method(p_instance, value) {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if r_return != nil do variant_init_nil(r_return)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_set_bool_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = r_ret
+	if method_userdata == nil || p_instance == nil || p_args == nil || p_args[0] == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodSetBoolAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value := (cast(^bool)p_args[0])^
+	if !adapter.method(p_instance, value) do _trap_godot_call_error()
+}
+
+class_method_get_int_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || r_return == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count > 0 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 0)
+		return
+	}
+
+	adapter := cast(^ClassMethodGetIntAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, ok := adapter.method(p_instance)
+	if !ok {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+
+	rv := variant_from_int(value)
+	variant_init_copy(r_return, &rv)
+	variant_free(&rv)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_get_int_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || p_instance == nil || r_ret == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodGetIntAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value, ok := adapter.method(p_instance)
+	if !ok do _trap_godot_call_error()
+	(cast(^i64)r_ret)^ = value
+}
+
+class_method_set_int_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 1 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 1)
+		return
+	}
+	if p_argument_count > 1 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 1)
+		return
+	}
+	if p_args == nil || p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Int)
+		return
+	}
+
+	adapter := cast(^ClassMethodSetIntAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, value_ok := variant_try_int(cast(^Variant)p_args[0])
+	if !value_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Int)
+		return
+	}
+	if !adapter.method(p_instance, value) {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if r_return != nil do variant_init_nil(r_return)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_set_int_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = r_ret
+	if method_userdata == nil || p_instance == nil || p_args == nil || p_args[0] == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodSetIntAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value := (cast(^i64)p_args[0])^
 	if !adapter.method(p_instance, value) do _trap_godot_call_error()
 }
 

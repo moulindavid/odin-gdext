@@ -330,3 +330,71 @@ godot_real_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.class_method_set_godot_real_call
 	_ = gt.class_method_set_godot_real_ptrcall
 }
+
+facade_get_bool_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: bool,
+	ok: bool,
+) {
+	_ = instance
+	return true, true
+}
+
+facade_set_bool_method :: proc "contextless" (instance: gt.ClassInstancePtr, value: bool) -> bool {
+	_ = instance
+	_ = value
+	return true
+}
+
+facade_get_int_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: i64,
+	ok: bool,
+) {
+	_ = instance
+	return 42, true
+}
+
+facade_set_int_method :: proc "contextless" (instance: gt.ClassInstancePtr, value: i64) -> bool {
+	_ = instance
+	_ = value
+	return true
+}
+
+facade_get_bool_adapter := gt.ClassMethodGetBoolAdapter {
+	method = facade_get_bool_method,
+}
+
+facade_set_bool_adapter := gt.ClassMethodSetBoolAdapter {
+	method = facade_set_bool_method,
+}
+
+facade_get_int_adapter := gt.ClassMethodGetIntAdapter {
+	method = facade_get_int_method,
+}
+
+facade_set_int_adapter := gt.ClassMethodSetIntAdapter {
+	method = facade_set_int_method,
+}
+
+bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
+	_ = gt.ClassMethodGetBool(facade_get_bool_method)
+	_ = gt.ClassMethodSetBool(facade_set_bool_method)
+	_ = facade_get_bool_adapter
+	_ = facade_set_bool_adapter
+	_ = gt.class_method_get_bool_call
+	_ = gt.class_method_get_bool_ptrcall
+	_ = gt.class_method_set_bool_call
+	_ = gt.class_method_set_bool_ptrcall
+
+	_ = gt.ClassMethodGetInt(facade_get_int_method)
+	_ = gt.ClassMethodSetInt(facade_set_int_method)
+	_ = facade_get_int_adapter
+	_ = facade_set_int_adapter
+	_ = gt.class_method_get_int_call
+	_ = gt.class_method_get_int_ptrcall
+	_ = gt.class_method_set_int_call
+	_ = gt.class_method_set_int_ptrcall
+}
