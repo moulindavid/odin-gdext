@@ -319,12 +319,12 @@ then expand coverage once smoke tests prove the ABI path.
    - [x] Keep examples importing only `godot:godot`.
 
 9. Add coverage for properties, signals, and virtual helpers.
-   - [ ] Add facade compile checks for property descriptors, getter and setter
+   - [x] Add facade compile checks for property descriptors, getter and setter
      adapters, signal descriptors, signal emission helpers, and virtual helpers.
-   - [ ] Keep hello smoke coverage exercising class creation, method
+   - [x] Keep hello smoke coverage exercising class creation, method
      registration, property registration, signal registration or emission,
      instance binding, notifications, and unregister cleanup.
-   - [ ] Run `make ci` before considering Priority 4 complete.
+   - [x] Run `make ci` before considering Priority 4 complete.
 
 ## Priority 5 - fix documentations, examples, maybe other side stuff
 
