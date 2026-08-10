@@ -1,0 +1,8 @@
+[configuration]
+
+entry_symbol = "hello_library_init"
+compatibility_minimum = "4.7"
+
+[libraries]
+linuxbsd.x86_64 = "bin/smoke.so"
+windows.x86_64 = "bin/smoke.dll"

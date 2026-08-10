@@ -33,13 +33,13 @@ metadata, and unregister cleanup during deinitialization.
      that mirror a real project layout.
 
 3. Split the current hello example responsibilities.
-   - [ ] Keep `hello` as a simple beginner example.
-   - [ ] Move broad internal coverage into a separate `smoke` example or test
+   - [x] Keep `hello` as a simple beginner example.
+   - [x] Move broad internal coverage into a separate `smoke` example or test
      fixture.
-   - [ ] Keep CI coverage for class creation, methods, properties, signal
+   - [x] Keep CI coverage for class creation, methods, properties, signal
      emission, notifications, instance binding, value conversions, and unregister
      cleanup.
-   - [ ] Avoid making the beginner example look like a test dump.
+   - [x] Avoid making the beginner example look like a test dump.
 
 4. Add a Makefile target for the example workflow.
    - [ ] Add a target such as `make example-game`.

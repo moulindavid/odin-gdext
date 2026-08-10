@@ -35,7 +35,7 @@ $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 	@touch $(BUILTIN_STAMP)
 	@touch $(CLASSES_STAMP)
 
-.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot check-facade test-unit hello prepare-hello-cache test-hello ci clean
+.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot check-facade test-unit hello prepare-hello-cache test-hello smoke prepare-smoke-cache test-smoke ci clean
 
 codegen: $(CODEGEN)
 
@@ -105,6 +105,21 @@ prepare-hello-cache:
 test-hello: hello prepare-hello-cache
 	godot --headless --path examples/hello --quit
 
+smoke: interface builtins
+	@mkdir -p examples/smoke/bin
+	$(ODIN) build examples/smoke/src \
+		$(ODIN_FLAGS_COMMON) \
+		-build-mode:shared \
+		-out:examples/smoke/bin/smoke.so
+
+prepare-smoke-cache:
+	@mkdir -p examples/smoke/.godot
+	@printf '%s\n' 'res://smoke.gdextension' > examples/smoke/.godot/extension_list.cfg
+	@touch examples/smoke/.godot/.gdignore
+
+test-smoke: smoke prepare-smoke-cache
+	godot --headless --path examples/smoke --quit
+
 # Full local/CI validation baseline. Keep this ordered and non-parallel so
 # generated files are created before packages that import them are checked.
 ci:
@@ -118,12 +133,16 @@ ci:
 	$(MAKE) check-godot
 	$(MAKE) check-facade
 	$(MAKE) test-unit
+	$(MAKE) test-smoke
 	$(MAKE) test-hello
 
 clean:
 	rm -rf examples/hello/bin/
 	rm -rf examples/hello/.godot/
 	rm -f examples/hello/*.uid
+	rm -rf examples/smoke/bin/
+	rm -rf examples/smoke/.godot/
+	rm -f examples/smoke/*.uid
 	rm -f core/interface_defs.odin core/interface.odin
 	rm -f bindings/builtin/*.odin bindings/utilities.odin
 	rm -f bindings/classes/*.odin
