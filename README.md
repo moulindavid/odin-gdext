@@ -154,6 +154,27 @@ The helper only calls Godot's `set_instance` and `set_instance_binding` for the
 caller-provided pointer. It does not allocate, retain, unref, or free extension
 owned data.
 
+Object and class handles in the facade are borrowed by default. This includes
+`ObjectPtr`, selected typed handles such as `Node` or `Node2D`, and the current
+`RefCounted` and `Resource` handles. Generated wrappers do not take ownership of
+Godot objects, and storing a handle in Odin data does not keep that object alive.
+
+It is safe for extension-owned instance data to store the owning object pointer
+as a borrowed handle when that data is attached in the create callback and freed
+in the matching free callback:
+
+```odin
+PlayerData :: struct {
+    object: gt.ObjectPtr, // borrowed owner pointer, not owned by Odin
+}
+```
+
+Use stored object handles only while Godot still owns the object and the instance
+binding is alive. Do not free Godot objects from Odin through these handles, do
+not use them after the free callback runs, and do not treat `RefCounted` or
+`Resource` handles as retained references until a public retain/unref model is
+added.
+
 Notification helpers provide a small dispatch pattern for common `Node`
 lifecycle notifications while keeping raw notification numbers available for
 advanced handling:
@@ -231,7 +252,7 @@ subset before broad Godot API coverage. Detailed sequencing lives in
   `StaticStringName`, `NodePath`, `RID`, `Array`, `Dictionary`, packed arrays,
   and generated math builtins.
 - Generated APIs: math/simple builtin wrappers, supported non-vararg
-  `@GlobalScope` utilities, and selected class handles for `Object`,
+  `@GlobalScope` utilities, and selected borrowed class handles for `Object`,
   `RefCounted`, `Resource`, `Node`, `CanvasItem`, `Node2D`, and `Control`.
 - User classes: registration helpers, stable class names, instance binding,
   method/property/signal descriptors, simple `GodotReal` method adapters, node
@@ -265,12 +286,16 @@ and a small Godot smoke path can exercise the feature.
 
 ### Ownership rules to remember
 
-- Object/class handles are borrowed by value. Generated wrappers do not own
-  Godot objects.
+- Object/class handles are borrowed by value. Generated wrappers do not own,
+  retain, unref, or free Godot objects.
 - Owned value wrappers must be destroyed explicitly with their matching free
   helper, for example `variant_free`, `string_free`, or `array_free`.
 - Generated wrappers borrow completed owned value parameters by pointer and
   return initialized owned values with destruction comments.
+- Extension-owned instance data is allocated and freed by your callbacks. It
+  may store the owning Godot object pointer only as a borrowed handle.
+- `RefCounted` and `Resource` handles are not retained by the public facade yet;
+  treat them as borrowed until an explicit reference-count helper exists.
 - Registration metadata storage must outlive the registration that uses it. Use
   process-lifetime storage for class names, method names, property names, signal
   names, and hint strings.

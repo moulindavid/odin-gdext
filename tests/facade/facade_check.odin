@@ -72,7 +72,13 @@ facade_class_name := gt.class_name_ptr(&facade_class_name_data)
 facade_parent_name := gt.class_name_ptr(&facade_parent_name_data)
 
 FacadeData :: struct {
+	// Borrowed owner pointer. This does not retain, unref, or free the Godot object.
 	object: gt.ObjectPtr,
+}
+
+FacadeStoredOwnerSmoke :: struct {
+	// Safe only while Godot still owns the object and the instance binding is alive.
+	owner: gt.ObjectPtr,
 }
 
 facade_instance_binding_callbacks := gt.InstanceBindingCallbacks {
@@ -183,10 +189,18 @@ instance_binding_facade_compile_smoke :: proc "contextless" (
 	data: ^FacadeData,
 	instance: gt.ClassInstancePtr,
 ) {
+	if data != nil do data.object = object
 	gt.attach_instance(object, class_name, data, &facade_instance_binding_callbacks)
 	checked, checked_ok := gt.class_instance_data(instance, FacadeData)
 	_ = checked
 	_ = checked_ok
+}
+
+borrowed_owner_storage_facade_compile_smoke :: proc "contextless" (object: gt.ObjectPtr) {
+	storage := FacadeStoredOwnerSmoke {
+		owner = object,
+	}
+	_ = storage
 }
 
 facade_method_name_data: gt.StaticStringName

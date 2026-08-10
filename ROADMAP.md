@@ -50,14 +50,14 @@ callbacks.
 ## Plan
 
 1. Define object handle ownership rules.
-   - [ ] Document borrowed Godot object/class handles in `docs/USING_IN_GODOT.md`
+   - [x] Document borrowed Godot object/class handles in `docs/USING_IN_GODOT.md`
      and README.
-   - [ ] Document extension-owned instance data and how it differs from Godot
+   - [x] Document extension-owned instance data and how it differs from Godot
      object lifetime.
-   - [ ] Document when storing `ObjectPtr` or typed class handles in Odin data is
+   - [x] Document when storing `ObjectPtr` or typed class handles in Odin data is
      allowed, and what remains unsafe.
-   - [ ] Document current `RefCounted` and `Resource` limitations.
-   - [ ] Add a small compile or smoke check showing safe storage of the owning
+   - [x] Document current `RefCounted` and `Resource` limitations.
+   - [x] Add a small compile or smoke check showing safe storage of the owning
      Godot object pointer inside extension-owned instance data.
 
 2. Add typed object handle helper APIs.
