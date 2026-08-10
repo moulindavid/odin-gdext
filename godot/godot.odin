@@ -35,10 +35,18 @@ ClassMethodPtrCall :: gcore.ClassMethodPtrCall
 ClassMethodArgumentMetadata :: gcore.ClassMethodArgumentMetadata
 PropertyInfo :: gcore.PropertyInfo
 ClassMethodInfo :: gcore.ClassMethodInfo
+PropertyUsageStorage :: gcore.PropertyUsageStorage
+PropertyUsageEditor :: gcore.PropertyUsageEditor
+PropertyUsageDefault :: gcore.PropertyUsageDefault
 MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
+ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
+ClassMethodGetGodotReal :: gcore.ClassMethodGetGodotReal
+ClassMethodGetGodotRealAdapter :: gcore.ClassMethodGetGodotRealAdapter
+ClassMethodSetGodotReal :: gcore.ClassMethodSetGodotReal
+ClassMethodSetGodotRealAdapter :: gcore.ClassMethodSetGodotRealAdapter
 InstanceBindingCallbacks :: gcore.InstanceBindingCallbacks
 VariantType :: gcore.VariantType
 VariantStorage :: gcore.VariantStorage
@@ -102,11 +110,17 @@ unregister_class :: gcore.unregister_class
 attach_instance :: gcore.attach_instance
 class_instance_data :: gcore.class_instance_data
 init_method_property_info :: gcore.init_method_property_info
+init_class_property_info :: gcore.init_class_property_info
 init_class_method_info :: gcore.init_class_method_info
+register_class_property_with_descriptor :: gcore.register_class_property_with_descriptor
 register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall
+class_method_get_godot_real_call :: gcore.class_method_get_godot_real_call
+class_method_get_godot_real_ptrcall :: gcore.class_method_get_godot_real_ptrcall
+class_method_set_godot_real_call :: gcore.class_method_set_godot_real_call
+class_method_set_godot_real_ptrcall :: gcore.class_method_set_godot_real_ptrcall
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object

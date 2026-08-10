@@ -251,20 +251,20 @@ ergonomics until their safety model is explicit. Prefer small typed helpers firs
 then expand coverage once smoke tests prove the ABI path.
 
 1. Add property registration descriptors.
-   - [ ] Add a `ClassPropertyDescriptor` helper.
-   - [ ] Wrap Godot 4.7 class property registration behind a safe helper.
-   - [ ] Reuse the existing `PropertyInfo` construction pattern from method
+   - [x] Add a `ClassPropertyDescriptor` helper.
+   - [x] Wrap Godot 4.7 class property registration behind a safe helper.
+   - [x] Reuse the existing `PropertyInfo` construction pattern from method
      metadata helpers.
-   - [ ] Keep getter and setter method names explicit and stored in stable
+   - [x] Keep getter and setter method names explicit and stored in stable
      `StringName` storage.
-   - [ ] Support a first simple property shape: name, type, getter, setter,
+   - [x] Support a first simple property shape: name, type, getter, setter,
      hint, hint string, and usage flags.
-   - [ ] Update hello with one editor-visible `GodotReal` property.
+   - [x] Update hello with one editor-visible `GodotReal` property.
 
 2. Add typed getter and setter adapters for simple properties.
-   - [ ] Start with `GodotReal -> void` setter and `void -> GodotReal` getter.
-   - [ ] Generate or provide explicit adapters for both call and ptrcall paths.
-   - [ ] Preserve the documented Godot 4.7 `GodotReal` ABI rule for `float`.
+   - [x] Start with `GodotReal -> void` setter and `void -> GodotReal` getter.
+   - [x] Generate or provide explicit adapters for both call and ptrcall paths.
+   - [x] Preserve the documented Godot 4.7 `GodotReal` ABI rule for `float`.
    - [ ] Add `bool` and `i64` only after the real-valued path is covered.
    - [ ] Defer object, array, dictionary, `String`, and complex builtin
      properties until primitive property flow is stable.

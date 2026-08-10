@@ -437,6 +437,10 @@ unregister_class :: proc "contextless" (class_name: ConstStringNamePtr) {
 	classdb_unregister_extension_class(library, class_name)
 }
 
+PropertyUsageStorage :: u32(2)
+PropertyUsageEditor :: u32(4)
+PropertyUsageDefault :: PropertyUsageStorage | PropertyUsageEditor
+
 MethodPropertyDescriptor :: struct {
 	type:        VariantType,
 	name:        StringNamePtr,
@@ -444,6 +448,12 @@ MethodPropertyDescriptor :: struct {
 	hint_string: StringPtr,
 	hint:        u32,
 	usage:       u32,
+}
+
+ClassPropertyDescriptor :: struct {
+	property: MethodPropertyDescriptor,
+	setter:   ConstStringNamePtr,
+	getter:   ConstStringNamePtr,
 }
 
 ClassMethodDescriptor :: struct {
@@ -509,6 +519,24 @@ init_class_method_info :: proc "contextless" (
 	info.default_arguments = nil
 }
 
+init_class_property_info :: proc "contextless" (
+	info: ^PropertyInfo,
+	desc: ClassPropertyDescriptor,
+) {
+	if desc.setter == nil || desc.getter == nil do _trap_nil_godot_function()
+	init_method_property_info(info, desc.property)
+}
+
+register_class_property_with_descriptor :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	info: ^PropertyInfo,
+	desc: ClassPropertyDescriptor,
+) {
+	if class_name == nil do _trap_nil_godot_function()
+	init_class_property_info(info, desc)
+	classdb_register_extension_class_property(library, class_name, info, desc.setter, desc.getter)
+}
+
 register_class_method_with_descriptor :: proc "contextless" (
 	class_name: ConstStringNamePtr,
 	info: ^ClassMethodInfo,
@@ -530,6 +558,26 @@ ClassMethodGodotReal2ToGodotReal :: #type proc "contextless" (
 
 ClassMethodGodotReal2ToGodotRealAdapter :: struct {
 	method: ClassMethodGodotReal2ToGodotReal,
+}
+
+ClassMethodGetGodotReal :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+) -> (
+	value: GodotReal,
+	ok: bool,
+)
+
+ClassMethodGetGodotRealAdapter :: struct {
+	method: ClassMethodGetGodotReal,
+}
+
+ClassMethodSetGodotReal :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	value: GodotReal,
+) -> bool
+
+ClassMethodSetGodotRealAdapter :: struct {
+	method: ClassMethodSetGodotReal,
 }
 
 _set_call_error :: proc "contextless" (
@@ -637,6 +685,137 @@ class_method_godot_real2_to_godot_real_ptrcall :: proc "c" (
 	value, ok := adapter.method(p_instance, a, b)
 	if !ok do _trap_godot_call_error()
 	(cast(^GodotReal)r_ret)^ = value
+}
+
+class_method_get_godot_real_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || r_return == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count > 0 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 0)
+		return
+	}
+
+	adapter := cast(^ClassMethodGetGodotRealAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, ok := adapter.method(p_instance)
+	if !ok {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+
+	rv := variant_from_float(value)
+	variant_init_copy(r_return, &rv)
+	variant_free(&rv)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_get_godot_real_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || p_instance == nil || r_ret == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodGetGodotRealAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value, ok := adapter.method(p_instance)
+	if !ok do _trap_godot_call_error()
+	(cast(^GodotReal)r_ret)^ = value
+}
+
+class_method_set_godot_real_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 1 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 1)
+		return
+	}
+	if p_argument_count > 1 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 1)
+		return
+	}
+	if p_args == nil || p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Float)
+		return
+	}
+
+	adapter := cast(^ClassMethodSetGodotRealAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, value_ok := variant_try_float(cast(^Variant)p_args[0])
+	if !value_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Float)
+		return
+	}
+	if !adapter.method(p_instance, value) {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if r_return != nil do variant_init_nil(r_return)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_set_godot_real_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = r_ret
+	if method_userdata == nil || p_instance == nil || p_args == nil || p_args[0] == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodSetGodotRealAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value := (cast(^GodotReal)p_args[0])^
+	if !adapter.method(p_instance, value) do _trap_godot_call_error()
 }
 
 // Register a method on an extension class.

@@ -27,6 +27,7 @@ hello_node_from_instance :: proc "contextless" (
 
 HelloData :: struct {
 	object: gt.ObjectPtr,
+	speed:  gt.GodotReal,
 }
 
 // ---- Class lifecycle callbacks ----
@@ -123,7 +124,7 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 	gt.variant_free(&meta_value)
 	gt.string_name_free(&meta_name)
 
-	self_ := new_clone(HelloData{object = object})
+	self_ := new_clone(HelloData{object = object, speed = 120.0})
 	gt.attach_instance(object, hello_class_name, self_, &hello_instance_binding_callbacks)
 	return object
 }
@@ -218,6 +219,35 @@ add_method_adapter := gt.ClassMethodGodotReal2ToGodotRealAdapter {
 	method = add_adapter_method,
 }
 
+get_speed_adapter_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	self_, self_ok := gt.class_instance_data(instance, HelloData)
+	if !self_ok do return 0, false
+	return self_.speed, true
+}
+
+set_speed_adapter_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: gt.GodotReal,
+) -> bool {
+	self_, self_ok := gt.class_instance_data(instance, HelloData)
+	if !self_ok do return false
+	self_.speed = value
+	return true
+}
+
+get_speed_method_adapter := gt.ClassMethodGetGodotRealAdapter {
+	method = get_speed_adapter_method,
+}
+
+set_speed_method_adapter := gt.ClassMethodSetGodotRealAdapter {
+	method = set_speed_adapter_method,
+}
+
 add_method_name_data: gt.StaticStringName
 add_method_name := gt.const_static_string_name_ptr(&add_method_name_data)
 add_arg_info: [2]gt.PropertyInfo
@@ -235,6 +265,19 @@ empty_name := gt.const_static_string_name_ptr(&empty_name_data)
 empty_str_data: gt.String
 empty_str := gt.const_string_ptr(&empty_str_data)
 
+speed_property_name_data: gt.StaticStringName
+speed_setter_name_data: gt.StaticStringName
+speed_getter_name_data: gt.StaticStringName
+speed_property_name := gt.const_static_string_name_ptr(&speed_property_name_data)
+speed_setter_name := gt.const_static_string_name_ptr(&speed_setter_name_data)
+speed_getter_name := gt.const_static_string_name_ptr(&speed_getter_name_data)
+speed_property_info: gt.PropertyInfo
+speed_get_return_info: gt.PropertyInfo
+speed_set_arg_info: gt.PropertyInfo
+speed_set_arg_meta := [1]gt.ClassMethodArgumentMetadata{.None}
+speed_get_method_info: gt.ClassMethodInfo
+speed_set_method_info: gt.ClassMethodInfo
+
 register_methods :: proc() {
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&add_method_name_data),
@@ -251,6 +294,18 @@ register_methods :: proc() {
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&empty_name_data),
 		cstring(""),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&speed_property_name_data),
+		cstring("speed"),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&speed_setter_name_data),
+		cstring("set_speed"),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&speed_getter_name_data),
+		cstring("get_speed"),
 	)
 	gt.string_init_utf8(gt.uninitialized_string_ptr(&empty_str_data), "")
 
@@ -298,6 +353,71 @@ register_methods :: proc() {
 		},
 	)
 	gt.debug_print("[odin-gdext] Method add registered!")
+
+	gt.init_method_property_info(
+		&speed_get_return_info,
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = speed_property_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.register_class_method_with_descriptor(
+		hello_class_name,
+		&speed_get_method_info,
+		gt.ClassMethodDescriptor {
+			name = speed_getter_name,
+			method_userdata = &get_speed_method_adapter,
+			call_func = gt.class_method_get_godot_real_call,
+			ptrcall_func = gt.class_method_get_godot_real_ptrcall,
+			return_value_info = &speed_get_return_info,
+			return_value_metadata = .None,
+		},
+	)
+
+	gt.init_method_property_info(
+		&speed_set_arg_info,
+		gt.MethodPropertyDescriptor {
+			type = .Float,
+			name = speed_property_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.register_class_method_with_descriptor(
+		hello_class_name,
+		&speed_set_method_info,
+		gt.ClassMethodDescriptor {
+			name = speed_setter_name,
+			method_userdata = &set_speed_method_adapter,
+			call_func = gt.class_method_set_godot_real_call,
+			ptrcall_func = gt.class_method_set_godot_real_ptrcall,
+			argument_count = 1,
+			arguments_info = &speed_set_arg_info,
+			arguments_metadata = &speed_set_arg_meta[0],
+		},
+	)
+	gt.debug_print("[odin-gdext] Property accessors registered!")
+}
+
+register_properties :: proc() {
+	gt.register_class_property_with_descriptor(
+		hello_class_name,
+		&speed_property_info,
+		gt.ClassPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Float,
+				name = speed_property_name,
+				class_name = empty_name,
+				hint_string = empty_str,
+				usage = gt.PropertyUsageDefault,
+			},
+			setter = speed_setter_name,
+			getter = speed_getter_name,
+		},
+	)
+	gt.debug_print("[odin-gdext] Property speed registered!")
 }
 
 // ---- Process-lifetime class name storage ----
@@ -339,6 +459,7 @@ register_classes :: proc() {
 	buf: [160]u8
 
 	register_methods()
+	register_properties()
 
 	// Test: variant round-trip (float, int, bool)
 	vf := gt.variant_from_float(3.14)

@@ -250,3 +250,83 @@ method_registration_facade_compile_smoke :: proc "contextless" (
 		},
 	)
 }
+
+facade_property_name_data: gt.StaticStringName
+facade_property_setter_name_data: gt.StaticStringName
+facade_property_getter_name_data: gt.StaticStringName
+facade_property_name := gt.const_static_string_name_ptr(&facade_property_name_data)
+facade_property_setter_name := gt.const_static_string_name_ptr(&facade_property_setter_name_data)
+facade_property_getter_name := gt.const_static_string_name_ptr(&facade_property_getter_name_data)
+facade_property_info: gt.PropertyInfo
+
+property_registration_facade_compile_smoke :: proc "contextless" (
+	class_name: gt.ConstStringNamePtr,
+) {
+	gt.init_class_property_info(
+		&facade_property_info,
+		gt.ClassPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Float,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			setter = facade_property_setter_name,
+			getter = facade_property_getter_name,
+		},
+	)
+	gt.register_class_property_with_descriptor(
+		class_name,
+		&facade_property_info,
+		gt.ClassPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Float,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			setter = facade_property_setter_name,
+			getter = facade_property_getter_name,
+		},
+	)
+}
+
+facade_get_real_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	_ = instance
+	return 1, true
+}
+
+facade_set_real_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: gt.GodotReal,
+) -> bool {
+	_ = instance
+	_ = value
+	return true
+}
+
+facade_get_real_adapter := gt.ClassMethodGetGodotRealAdapter {
+	method = facade_get_real_method,
+}
+
+facade_set_real_adapter := gt.ClassMethodSetGodotRealAdapter {
+	method = facade_set_real_method,
+}
+
+godot_real_property_adapter_facade_compile_smoke :: proc "contextless" () {
+	_ = gt.ClassMethodGetGodotReal(facade_get_real_method)
+	_ = gt.ClassMethodSetGodotReal(facade_set_real_method)
+	_ = facade_get_real_adapter
+	_ = facade_set_real_adapter
+	_ = gt.class_method_get_godot_real_call
+	_ = gt.class_method_get_godot_real_ptrcall
+	_ = gt.class_method_set_godot_real_call
+	_ = gt.class_method_set_godot_real_ptrcall
+}
