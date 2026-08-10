@@ -230,11 +230,15 @@ boilerplate in every extension.
      class registration.
 
 8. Add coverage for registration helpers.
-   - [ ] Add facade compile checks for class and method registration helpers.
-   - [ ] Keep hello smoke coverage exercising class creation, method
+   - [x] Add facade compile checks for class and method registration helpers.
+   - [x] Keep hello smoke coverage exercising class creation, method
      registration, instance binding, notifications, and unregister cleanup.
-   - [ ] Run `make ci` before considering Priority 3 complete.
+   - [x] Run `make ci` before considering Priority 3 complete.
 
+Priority 3 is considered complete for the current Godot 4.7 prototype: normal
+examples can use the public facade for class registration, instance binding,
+method metadata, simple typed method adapters, notification dispatch, and
+explicit unregister cleanup.
 
 ## Priority 4 - properties, signals, notifications, and virtuals
 

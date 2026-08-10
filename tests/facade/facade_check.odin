@@ -97,6 +97,36 @@ facade_free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInst
 	_ = instance
 }
 
+facade_initialize_module :: proc "c" (user_data: rawptr, level: gt.InitializationLevel) {
+	_ = user_data
+	if level != .Scene {return}
+}
+
+facade_deinitialize_module :: proc "c" (user_data: rawptr, level: gt.InitializationLevel) {
+	_ = user_data
+	if level != .Scene {return}
+}
+
+facade_entrypoint_compile_smoke :: proc "c" (
+	get_proc_address: gt.InterfaceGetProcAddress,
+	library: gt.ClassLibraryPtr,
+	initialization: ^gt.Initialization,
+) -> bool {
+	gt.init(library, get_proc_address)
+	initialization.initialize = facade_initialize_module
+	initialization.deinitialize = facade_deinitialize_module
+	initialization.minimum_initialization_level = .Scene
+	initialization.userdata = nil
+	return true
+}
+
+facade_runtime_helper_compile_smoke :: proc(class_name: gt.ConstStringNamePtr) -> gt.ObjectPtr {
+	context = gt.godot_context()
+	object := gt.construct_object(class_name)
+	gt.debug_print("facade runtime helper compile smoke")
+	return object
+}
+
 facade_ready_notification :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
 	_ = instance
 	_ = reversed

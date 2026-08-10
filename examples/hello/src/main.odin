@@ -1062,4 +1062,5 @@ deinitialize_module :: proc "c" (user_data: rawptr, level: gt.InitializationLeve
 	context = gt.godot_context()
 	if level != .Scene {return}
 	gt.unregister_class(hello_class_name)
+	gt.debug_print("[odin-gdext] HelloNode unregistered!")
 }
