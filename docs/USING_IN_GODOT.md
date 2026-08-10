@@ -13,8 +13,6 @@ This guide uses the current `examples/game` project as the reference shape.
 - Godot 4.7 on `PATH`.
 - `make` and a native toolchain that can build shared libraries.
 
-The project targets Godot 4.7's `float_64` API shape through `GodotReal`.
-
 ## Build the extension library
 
 From the repository root:
