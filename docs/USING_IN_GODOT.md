@@ -111,16 +111,16 @@ Once the extension is loaded, GDScript can instantiate the registered class by
 name:
 
 ```gdscript
-var hello_node := ClassDB.instantiate("HelloNode")
-add_child(hello_node)
+var brain := ClassDB.instantiate("GameBrain")
+add_child(brain)
 ```
 
 If GDScript creates the node directly, GDScript should also free it when done:
 
 ```gdscript
 func _exit_tree() -> void:
-    if hello_node != null:
-        hello_node.queue_free()
+    if brain != null:
+        brain.queue_free()
 ```
 
 The extension class itself should unregister during extension deinitialization.
@@ -131,7 +131,7 @@ Odin methods registered through GDExtension can be called from GDScript like any
 Godot method:
 
 ```gdscript
-var value := hello_node.call("roll_math")
+var value := brain.call("roll_damage")
 print(value)
 ```
 
@@ -145,11 +145,11 @@ Editor-visible properties are registered with explicit getter and setter method
 names. From GDScript, use normal property access or `set` and `get`:
 
 ```gdscript
-hello_node.speed = 3.5
-print(hello_node.speed)
+brain.difficulty = 3.5
+print(brain.difficulty)
 
-hello_node.set("speed", 7.0)
-print(hello_node.get("speed"))
+brain.set("difficulty", 7.0)
+print(brain.get("difficulty"))
 ```
 
 The getter and setter names passed during registration must live in stable
@@ -160,14 +160,10 @@ The getter and setter names passed during registration must live in stable
 Signals registered by the Odin extension can be connected from GDScript:
 
 ```gdscript
-hello_node.connect("pinged", _on_pinged)
-hello_node.connect("speed_changed", _on_speed_changed)
+brain.connect("damage_rolled", _on_damage_rolled)
 
-func _on_pinged() -> void:
-    print("Odin signal received")
-
-func _on_speed_changed(value: float) -> void:
-    print("new speed: ", value)
+func _on_damage_rolled(value: float) -> void:
+    print("Odin damage roll: ", value)
 ```
 
 Signal emission helpers destroy temporary `Variant` values on every path. If you
@@ -189,6 +185,37 @@ Keep these rules visible when building real features:
 - Class registration metadata must outlive the registered class.
 - Registered extension classes must be unregistered during extension
   deinitialization.
+
+## Current limitations
+
+The current recommended model is hybrid Godot plus Odin:
+
+- Godot and GDScript own scenes, input, UI, resources, node lookup, and editor
+  workflow.
+- Odin owns focused logic and selected extension classes with simple methods,
+  properties, and signals.
+
+Incomplete areas to plan around:
+
+- broad generated class coverage beyond the selected common classes
+- ergonomic resource loading and node lookup helpers
+- `Callable` and broad `Signal` APIs
+- varargs, default arguments, and object-lifetime-sensitive signatures
+- full virtual callback helpers such as `_process(delta)` and
+  `_physics_process(delta)`
+- Godot versions or precision modes other than the current Godot 4.7
+  `GodotReal` assumption
+
+Before moving a feature into Odin, check that:
+
+1. The Godot APIs you need are available through `godot:godot` or can be wrapped
+   with a small explicit helper.
+2. Any owned Godot value has a clear matching free call.
+3. Any object handle stays borrowed and is not retained as if Odin owned it.
+4. Any registered name or metadata lives at least until class unregistration.
+5. The method signature fits an existing safe adapter, or you are ready to keep
+   Variant and ptrcall handling explicit.
+6. A small Godot smoke path can exercise the feature headless.
 
 ## Current recommended use
 

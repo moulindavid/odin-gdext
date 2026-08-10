@@ -3,7 +3,9 @@
 **odin-gdext** provides Odin language bindings for [Godot 4](https://godotengine.org/)
 via the *GDExtension* C API.
 
-> **Status:** early prototype. Current smoke-tested scope: Godot 4.7
+> **Status:** hybrid-feature prototype. You can use it for focused Odin-backed
+> game systems inside a normal Godot project, but it is not a complete Godot API
+> binding yet. Current smoke-tested scope: Godot 4.7
 > Godot 4.7 float ABI generation, manual lifecycle callbacks, registration
 > helpers for user classes and simple methods/properties/signals, basic Variant
 > helpers, typed object handle experiments, selected generated class wrappers,
@@ -234,18 +236,32 @@ subset before broad Godot API coverage. Detailed sequencing lives in
 - User classes: registration helpers, stable class names, instance binding,
   method/property/signal descriptors, simple `GodotReal` method adapters, node
   notification dispatch, and editor-visible metadata.
-- Facade: normal examples can import only `godot:godot`. The hello example
+- Facade: normal examples can import only `godot:godot`. The smoke example
   covers class creation, methods, property access, signal emission,
-  notifications, and unregister cleanup.
+  notifications, value conversions, and unregister cleanup.
 
 ### Still incomplete
+
+The current recommended model is hybrid Godot plus Odin: Godot/GDScript owns
+scenes, input, UI, resources, and editor workflow while Odin owns focused logic
+and selected extension classes.
 
 - Full 1000+ class coverage.
 - `Callable`, `Signal`, typed arrays/dictionaries, and broad complex conversions.
 - Varargs, default arguments, and object-lifetime-sensitive signatures.
-- Broad typed method adapter generation and full virtual callback helpers.
-- Other Godot versions and precision targets. Current float ABI assumptions are
-  centralized behind `GodotReal`.
+- Broad typed method adapter generation and full virtual callback helpers such
+  as `_process(delta)` and `_physics_process(delta)`.
+- Rich node lookup and resource loading helpers.
+- Other Godot versions and precision targets. Current Godot 4.7 float ABI
+  assumptions are centralized behind `GodotReal`.
+
+### Safe-use checklist
+
+Before moving a feature into Odin, verify that the Godot APIs you need are
+available through the facade or can be wrapped explicitly, owned values have a
+matching free call, object handles remain borrowed, registration metadata lives
+long enough, the method signature has a safe adapter or explicit Variant path,
+and a small Godot smoke path can exercise the feature.
 
 ### Ownership rules to remember
 

@@ -49,14 +49,14 @@ metadata, and unregister cleanup during deinitialization.
    - [x] Document which target a new user should run first.
 
 5. Document current limitations clearly.
-   - [ ] State that the current recommended model is hybrid Godot plus Odin:
+   - [x] State that the current recommended model is hybrid Godot plus Odin:
      Godot/GDScript owns scenes, input, UI, and resources while Odin owns focused
      logic and selected extension classes.
-   - [ ] List incomplete areas: broad class coverage, rich node lookup/resource
+   - [x] List incomplete areas: broad class coverage, rich node lookup/resource
      loading helpers, `Callable`, ergonomic `Signal`, varargs/default arguments,
      object-lifetime-sensitive signatures, and full virtual callbacks.
-   - [ ] Document the current Godot 4.7 `GodotReal` assumption.
-   - [ ] Keep a short checklist for deciding whether a feature is safe to build
+   - [x] Document the current Godot 4.7 `GodotReal` assumption.
+   - [x] Keep a short checklist for deciding whether a feature is safe to build
      with the current API.
 
 ## Done when
