@@ -303,12 +303,12 @@ then expand coverage once smoke tests prove the ABI path.
      delta source and callback path are verified.
 
 7. Add editor-visible class metadata helpers.
-   - [ ] Investigate the Godot 4.7 requirements for editor-visible extension
+   - [x] Investigate the Godot 4.7 requirements for editor-visible extension
      classes.
-   - [ ] Keep first support minimal: class name, parent class, methods,
+   - [x] Keep first support minimal: class name, parent class, methods,
      properties, and signals.
-   - [ ] Defer optional `@tool` or tool-script style workflows.
-   - [ ] Document any metadata storage that must outlive registration.
+   - [x] Defer optional `@tool` or tool-script style workflows.
+   - [x] Document any metadata storage that must outlive registration.
 
 8. Re-export Priority 4 helpers through the public facade.
    - [ ] Re-export only property, signal, and virtual helpers intended for

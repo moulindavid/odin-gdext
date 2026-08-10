@@ -35,6 +35,7 @@ ClassMethodPtrCall :: gcore.ClassMethodPtrCall
 ClassMethodArgumentMetadata :: gcore.ClassMethodArgumentMetadata
 PropertyInfo :: gcore.PropertyInfo
 ClassMethodInfo :: gcore.ClassMethodInfo
+EditorVisibleClassDescriptor :: gcore.EditorVisibleClassDescriptor
 PropertyUsageStorage :: gcore.PropertyUsageStorage
 PropertyUsageEditor :: gcore.PropertyUsageEditor
 PropertyUsageDefault :: gcore.PropertyUsageDefault
@@ -114,6 +115,7 @@ is_nil :: gcore.is_nil
 is_class :: gcore.is_class
 cast_to :: gcore.cast_to
 init_class_casting :: gcore.init_class_casting
+register_editor_visible_class :: gcore.register_editor_visible_class
 register_class_with_defaults :: gcore.register_class_with_defaults
 unregister_class :: gcore.unregister_class
 attach_instance :: gcore.attach_instance

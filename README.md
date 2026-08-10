@@ -92,6 +92,21 @@ import bind "godot:bindings"            // generated @GlobalScope utilities
 import builtin "godot:bindings/builtin" // generated builtin-type bindings
 ```
 
+## Editor-visible extension classes
+
+For Godot 4.7, an extension class must be registered with exposed class
+creation metadata, a registered parent class name, and a `.gdextension` file
+that points at the exported entry symbol. User classes should register methods,
+properties, and signals after registering the class. Optional tool-script style
+workflows and custom editor icons are deferred until their lifetime and reload
+behavior is explicit.
+
+Use `godot.register_editor_visible_class` for normal instantiable classes. The
+class name, parent name, method names, property metadata, signal names, and hint
+strings passed to registration helpers must live at least until the class is
+unregistered during extension deinitialization. Process-lifetime `ClassName` and
+`StaticStringName` storage is the intended pattern.
+
 ## User class registration notes
 
 For class and parent names, use `ClassName` storage through the public facade:

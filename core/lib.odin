@@ -393,18 +393,30 @@ register_class :: proc "contextless" (
 	classdb_register_extension_class6(library, class_name, parent_class_name, info)
 }
 
-// Register an instantiable extension class with safe defaults for unsupported
-// callbacks. The class and parent names must point to process-lifetime
-// StringName storage, and user code remains responsible for explicit
-// unregistration during deinitialization.
-register_class_with_defaults :: proc "contextless" (
-	class_name: ConstStringNamePtr,
-	parent_class_name: ConstStringNamePtr,
+EditorVisibleClassDescriptor :: struct {
+	class_name:           ConstStringNamePtr,
+	parent_class_name:    ConstStringNamePtr,
 	create_instance_func: ClassCreateInstance,
-	free_instance_func: ClassFreeInstance,
-	notification_func: ClassNotification,
-	class_userdata: rawptr = nil,
-) {
+	free_instance_func:   ClassFreeInstance,
+	notification_func:    ClassNotification,
+	class_userdata:       rawptr,
+}
+
+// register_editor_visible_class registers an instantiable class using the
+// minimal Godot 4.7 metadata needed for editor visibility: exposed class
+// creation info, a registered parent, then separately registered methods,
+// properties, and signals. The class and parent names must point to
+// process-lifetime StringName storage that outlives the registered class.
+// Method, property, and signal metadata storage must also remain stable while
+// Godot reads it. Optional tool-script style workflows and custom icons are
+// intentionally deferred.
+register_editor_visible_class :: proc "contextless" (desc: EditorVisibleClassDescriptor) {
+	if desc.class_name == nil ||
+	   desc.parent_class_name == nil ||
+	   desc.create_instance_func == nil ||
+	   desc.free_instance_func == nil {
+		_trap_nil_godot_function()
+	}
 	info := ClassCreationInfo {
 		is_virtual                  = false,
 		is_abstract                 = false,
@@ -418,19 +430,43 @@ register_class_with_defaults :: proc "contextless" (
 		property_can_revert_func    = nil,
 		property_get_revert_func    = nil,
 		validate_property_func      = nil,
-		notification_func           = notification_func,
+		notification_func           = desc.notification_func,
 		to_string_func              = nil,
 		reference_func              = nil,
 		unreference_func            = nil,
-		create_instance_func        = create_instance_func,
-		free_instance_func          = free_instance_func,
+		create_instance_func        = desc.create_instance_func,
+		free_instance_func          = desc.free_instance_func,
 		recreate_instance_func      = nil,
 		get_virtual_func            = nil,
 		get_virtual_call_data_func  = nil,
 		call_virtual_with_data_func = nil,
-		class_userdata              = class_userdata,
+		class_userdata              = desc.class_userdata,
 	}
-	register_class(class_name, parent_class_name, &info)
+	register_class(desc.class_name, desc.parent_class_name, &info)
+}
+
+// Register an instantiable extension class with safe defaults for unsupported
+// callbacks. The class and parent names must point to process-lifetime
+// StringName storage, and user code remains responsible for explicit
+// unregistration during deinitialization.
+register_class_with_defaults :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	parent_class_name: ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func: ClassFreeInstance,
+	notification_func: ClassNotification,
+	class_userdata: rawptr = nil,
+) {
+	register_editor_visible_class(
+		EditorVisibleClassDescriptor {
+			class_name = class_name,
+			parent_class_name = parent_class_name,
+			create_instance_func = create_instance_func,
+			free_instance_func = free_instance_func,
+			notification_func = notification_func,
+			class_userdata = class_userdata,
+		},
+	)
 }
 
 unregister_class :: proc "contextless" (class_name: ConstStringNamePtr) {

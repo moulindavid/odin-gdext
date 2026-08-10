@@ -463,12 +463,14 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&node2d_class_name_data, cstring("Node2D"))
 	gt.init_class_bindings()
 
-	gt.register_class_with_defaults(
-		hello_class_name,
-		hello_parent_name,
-		create_instance,
-		free_instance,
-		notification_func,
+	gt.register_editor_visible_class(
+		gt.EditorVisibleClassDescriptor {
+			class_name = hello_class_name,
+			parent_class_name = hello_parent_name,
+			create_instance_func = create_instance,
+			free_instance_func = free_instance,
+			notification_func = notification_func,
+		},
 	)
 	gt.debug_print("[odin-gdext] HelloNode registered!")
 

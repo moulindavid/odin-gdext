@@ -166,13 +166,16 @@ facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, rever
 registration_facade_compile_smoke :: proc "contextless" () {
 	gt.class_name_init_latin1_cstring(&facade_class_name_data, cstring("FacadeSmoke"))
 	gt.class_name_init_latin1_cstring(&facade_parent_name_data, cstring("Node2D"))
-	gt.register_class_with_defaults(
-		facade_class_name,
-		facade_parent_name,
-		facade_create_instance,
-		facade_free_instance,
-		facade_notification,
+	gt.register_editor_visible_class(
+		gt.EditorVisibleClassDescriptor {
+			class_name = facade_class_name,
+			parent_class_name = facade_parent_name,
+			create_instance_func = facade_create_instance,
+			free_instance_func = facade_free_instance,
+			notification_func = facade_notification,
+		},
 	)
+	_ = gt.register_class_with_defaults
 	gt.unregister_class(facade_class_name)
 }
 
