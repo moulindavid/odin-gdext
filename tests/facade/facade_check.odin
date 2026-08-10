@@ -137,13 +137,26 @@ facade_process_notification :: proc(instance: gt.ClassInstancePtr, reversed: boo
 	_ = reversed
 }
 
+facade_raw_notification :: proc(instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+	_ = instance
+	_ = what
+	_ = reversed
+}
+
 facade_node_notifications := gt.NodeNotificationHandlers {
 	ready   = facade_ready_notification,
 	process = facade_process_notification,
 }
 
+facade_node_virtuals := gt.NodeVirtualCallbacks {
+	ready            = facade_ready_notification,
+	process          = facade_process_notification,
+	raw_notification = facade_raw_notification,
+}
+
 facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
+	if gt.dispatch_node_virtual_callbacks(instance, what, reversed, &facade_node_virtuals) do return
 	if gt.dispatch_node_notification(instance, what, reversed, &facade_node_notifications) do return
 	if what == gt.node_notification_ready {
 		_ = what

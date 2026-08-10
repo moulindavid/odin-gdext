@@ -293,13 +293,13 @@ then expand coverage once smoke tests prove the ABI path.
    - [x] Defer broad vararg emission helpers.
 
 6. Promote notification dispatch into virtual-style helpers.
-   - [ ] Add a user-facing virtual callback descriptor for common node callbacks.
-   - [ ] Map Godot notifications to Odin callbacks such as ready, enter tree,
+   - [x] Add a user-facing virtual callback descriptor for common node callbacks.
+   - [x] Map Godot notifications to Odin callbacks such as ready, enter tree,
      exit tree, process, and physics process where the Godot API provides the
      required data safely.
-   - [ ] Keep raw notification numbers available for advanced usage.
-   - [ ] Preserve explicit `reversed` handling.
-   - [ ] Do not fake `_process(delta)` or `_physics_process(delta)` until the
+   - [x] Keep raw notification numbers available for advanced usage.
+   - [x] Preserve explicit `reversed` handling.
+   - [x] Do not fake `_process(delta)` or `_physics_process(delta)` until the
      delta source and callback path are verified.
 
 7. Add editor-visible class metadata helpers.

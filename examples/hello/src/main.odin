@@ -186,13 +186,13 @@ hello_ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
 	gt.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
 }
 
-hello_node_notifications := gt.NodeNotificationHandlers {
+hello_node_virtuals := gt.NodeVirtualCallbacks {
 	ready = hello_ready,
 }
 
 notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
-	if gt.dispatch_node_notification(instance, what, reversed, &hello_node_notifications) do return
+	if gt.dispatch_node_virtual_callbacks(instance, what, reversed, &hello_node_virtuals) do return
 }
 
 // ---- Method: add(a, b) -> a + b ----

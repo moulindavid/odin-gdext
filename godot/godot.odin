@@ -256,6 +256,7 @@ control_notification_theme_changed :: gclass.control_notification_theme_changed
 
 // --- Notification helpers ---
 NodeNotificationHandler :: #type proc(instance: ClassInstancePtr, reversed: bool)
+NodeRawNotificationHandler :: #type proc(instance: ClassInstancePtr, what: i32, reversed: bool)
 
 NodeNotificationHandlers :: struct {
 	enter_tree:      NodeNotificationHandler,
@@ -263,6 +264,15 @@ NodeNotificationHandlers :: struct {
 	ready:           NodeNotificationHandler,
 	process:         NodeNotificationHandler,
 	physics_process: NodeNotificationHandler,
+}
+
+NodeVirtualCallbacks :: struct {
+	enter_tree:       NodeNotificationHandler,
+	exit_tree:        NodeNotificationHandler,
+	ready:            NodeNotificationHandler,
+	process:          NodeNotificationHandler,
+	physics_process:  NodeNotificationHandler,
+	raw_notification: NodeRawNotificationHandler,
 }
 
 // dispatch_node_notification calls a typed handler for common Node lifecycle
@@ -302,6 +312,52 @@ dispatch_node_notification :: proc(
 			handlers.physics_process(instance, reversed)
 			return true
 		}
+	}
+	return false
+}
+
+// dispatch_node_virtual_callbacks is the user-facing Node virtual notification
+// descriptor path. The process callbacks are raw notification callbacks and do
+// not synthesize _process(delta) or _physics_process(delta) data.
+dispatch_node_virtual_callbacks :: proc(
+	instance: ClassInstancePtr,
+	what: i32,
+	reversed: bool,
+	callbacks: ^NodeVirtualCallbacks,
+) -> bool {
+	if callbacks == nil do return false
+
+	switch what {
+	case node_notification_enter_tree:
+		if callbacks.enter_tree != nil {
+			callbacks.enter_tree(instance, reversed)
+			return true
+		}
+	case node_notification_exit_tree:
+		if callbacks.exit_tree != nil {
+			callbacks.exit_tree(instance, reversed)
+			return true
+		}
+	case node_notification_ready:
+		if callbacks.ready != nil {
+			callbacks.ready(instance, reversed)
+			return true
+		}
+	case node_notification_process:
+		if callbacks.process != nil {
+			callbacks.process(instance, reversed)
+			return true
+		}
+	case node_notification_physics_process:
+		if callbacks.physics_process != nil {
+			callbacks.physics_process(instance, reversed)
+			return true
+		}
+	}
+
+	if callbacks.raw_notification != nil {
+		callbacks.raw_notification(instance, what, reversed)
+		return true
 	}
 	return false
 }
