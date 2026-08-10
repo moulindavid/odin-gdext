@@ -311,12 +311,12 @@ then expand coverage once smoke tests prove the ABI path.
    - [x] Document any metadata storage that must outlive registration.
 
 8. Re-export Priority 4 helpers through the public facade.
-   - [ ] Re-export only property, signal, and virtual helpers intended for
+   - [x] Re-export only property, signal, and virtual helpers intended for
      normal users.
-   - [ ] Keep low-level `godot:core` access available but unnecessary for common
+   - [x] Keep low-level `godot:core` access available but unnecessary for common
      property and signal registration.
-   - [ ] Re-export common notification constants where they improve normal usage.
-   - [ ] Keep examples importing only `godot:godot`.
+   - [x] Re-export common notification constants where they improve normal usage.
+   - [x] Keep examples importing only `godot:godot`.
 
 9. Add coverage for properties, signals, and virtual helpers.
    - [ ] Add facade compile checks for property descriptors, getter and setter
