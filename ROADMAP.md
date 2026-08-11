@@ -68,12 +68,12 @@ callbacks.
    - [x] Keep all object/class handle helpers borrowed by value.
 
 3. Decide the first `RefCounted` and `Resource` safety layer.
-   - [ ] Inspect Godot 4.7 GDExtension APIs available for reference counting.
-   - [ ] Decide whether public retain/unref helpers are safe enough now or must
+   - [x] Inspect Godot 4.7 GDExtension APIs available for reference counting.
+   - [x] Decide whether public retain/unref helpers are safe enough now or must
      remain deferred.
-   - [ ] Prevent public docs and examples from implying that Odin owns ordinary
+   - [x] Prevent public docs and examples from implying that Odin owns ordinary
      Godot objects.
-   - [ ] Add tests or facade checks for the chosen rule.
+   - [x] Add tests or facade checks for the chosen rule.
 
 4. Improve user class descriptors.
    - [ ] Reduce repeated class/method/property/signal boilerplate without hiding

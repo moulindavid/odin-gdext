@@ -223,6 +223,19 @@ borrowed_owner_storage_facade_compile_smoke :: proc "contextless" (object: gt.Ob
 	_ = storage
 }
 
+ref_counted_resource_borrowed_policy_compile_smoke :: proc "contextless" (
+	ref_counted: gt.RefCounted,
+	resource: gt.Resource,
+) {
+	_ = gt.ref_counted_is_nil(ref_counted)
+	_ = gt.resource_is_nil(resource)
+	_ = gt.ref_counted_get_reference_count(ref_counted)
+	_ = gt.resource_as_ref_counted(resource)
+	_ = gt.resource_as_object(resource)
+	_, _ = gt.ref_counted_try_as_resource(ref_counted)
+	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
+}
+
 facade_method_name_data: gt.StaticStringName
 facade_method_arg_name_data: gt.StaticStringName
 facade_method_empty_name_data: gt.StaticStringName

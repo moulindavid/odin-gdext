@@ -137,6 +137,13 @@ facade can call selected methods on them, but it does not yet provide a public
 retain/unref-safe wrapper. Do not store a `RefCounted` or `Resource` handle as if
 Odin owns a reference unless you add an explicit, audited lifetime helper first.
 
+This is deliberate. Godot 4.7 exposes low-level reference callbacks and
+`RefCounted.reference` / `RefCounted.unreference`, and constructing a refcounted
+object starts with a reference the caller must eventually release. Those rules
+need an owned wrapper before they are safe in normal user code, so the current
+facade and generated class API keep `RefCounted` and `Resource` methods
+borrowed-only and skip public retain/unref helpers.
+
 ## Instantiate an Odin-backed class from GDScript
 
 Once the extension is loaded, GDScript can instantiate the registered class by

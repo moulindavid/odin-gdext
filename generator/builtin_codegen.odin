@@ -1142,6 +1142,8 @@ class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
 class_method_deferred_until_safety_model :: proc(class_name, method_name: string) -> bool {
 	if class_name == "Control" && method_name == "force_drag" do return true
 	if class_name == "Resource" && method_name == "duplicate" do return true
+	// Public RefCounted/Resource handles are borrowed-only until retain/unref
+	// ownership rules are explicit.
 	if class_name == "RefCounted" &&
 	   (method_name == "init_ref" || method_name == "reference" || method_name == "unreference") {
 		return true

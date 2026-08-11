@@ -175,6 +175,12 @@ not use them after the free callback runs, and do not treat `RefCounted` or
 `Resource` handles as retained references until a public retain/unref model is
 added.
 
+For now, `RefCounted` and `Resource` stay borrowed-only in the public facade.
+Godot 4.7 has low-level reference callbacks and `RefCounted` reference methods,
+but constructing a refcounted object gives the caller a reference that must be
+released later. odin-gdext intentionally defers public retain/unref helpers until
+there is an owned wrapper that can make that balance explicit.
+
 Notification helpers provide a small dispatch pattern for common `Node`
 lifecycle notifications while keeping raw notification numbers available for
 advanced handling:
