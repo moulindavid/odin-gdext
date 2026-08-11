@@ -240,8 +240,11 @@ The helper fills `PropertyInfo` and `ClassMethodInfo`; it does not copy or own
 metadata arrays and does not change Variant/ptrcall ownership rules. Keep method
 names, argument names, hint strings, `PropertyInfo`, metadata arrays,
 `ClassMethodInfo`, and adapter userdata storage alive for the registration call.
-Varargs, default arguments, `Callable`, `Signal`, and object-lifetime-sensitive
-method adapters are intentionally deferred until their safety model is explicit.
+Available simple typed adapters currently cover `() -> void`, `() -> bool`,
+`() -> int`, `() -> GodotReal`, `(bool) -> void`, `(int) -> void`,
+`(GodotReal) -> void`, and `GodotReal, GodotReal -> GodotReal`. Varargs,
+default arguments, `Callable`, `Signal`, and object-lifetime-sensitive method
+adapters are intentionally deferred until their safety model is explicit.
 
 ## API coverage
 

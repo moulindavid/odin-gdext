@@ -85,13 +85,13 @@ callbacks.
      clearer than the current explicit code.
 
 5. Broaden typed method adapter coverage for common signatures.
-   - [ ] `() -> void`.
-   - [ ] `() -> bool`.
-   - [ ] `() -> int`.
-   - [ ] `(float) -> void`.
-   - [ ] `(int) -> void`.
-   - [ ] `(bool) -> void`.
-   - [ ] Defer `String`, object handles, varargs, default arguments, `Callable`,
+   - [x] `() -> void`.
+   - [x] `() -> bool`.
+   - [x] `() -> int`.
+   - [x] `(float) -> void`.
+   - [x] `(int) -> void`.
+   - [x] `(bool) -> void`.
+   - [x] Defer `String`, object handles, varargs, default arguments, `Callable`,
      `Signal`, and object-lifetime-sensitive signatures until ownership is
      explicit.
 

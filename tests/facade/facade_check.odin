@@ -343,6 +343,22 @@ property_registration_facade_compile_smoke :: proc "contextless" (
 	)
 }
 
+facade_void_method :: proc "contextless" (instance: gt.ClassInstancePtr) -> bool {
+	_ = instance
+	return true
+}
+
+facade_void_adapter := gt.ClassMethodVoidAdapter {
+	method = facade_void_method,
+}
+
+void_method_adapter_facade_compile_smoke :: proc "contextless" () {
+	_ = gt.ClassMethodVoid(facade_void_method)
+	_ = facade_void_adapter
+	_ = gt.class_method_void_call
+	_ = gt.class_method_void_ptrcall
+}
+
 facade_get_real_method :: proc "contextless" (
 	instance: gt.ClassInstancePtr,
 ) -> (

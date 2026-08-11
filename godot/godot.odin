@@ -42,6 +42,8 @@ ClassSignalDescriptor :: gcore.ClassSignalDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
+ClassMethodVoid :: gcore.ClassMethodVoid
+ClassMethodVoidAdapter :: gcore.ClassMethodVoidAdapter
 ClassMethodGetGodotReal :: gcore.ClassMethodGetGodotReal
 ClassMethodGetGodotRealAdapter :: gcore.ClassMethodGetGodotRealAdapter
 ClassMethodSetGodotReal :: gcore.ClassMethodSetGodotReal
@@ -128,6 +130,8 @@ register_class_method_with_descriptor :: gcore.register_class_method_with_descri
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall
+class_method_void_call :: gcore.class_method_void_call
+class_method_void_ptrcall :: gcore.class_method_void_ptrcall
 class_method_get_godot_real_call :: gcore.class_method_get_godot_real_call
 class_method_get_godot_real_ptrcall :: gcore.class_method_get_godot_real_ptrcall
 class_method_set_godot_real_call :: gcore.class_method_set_godot_real_call
