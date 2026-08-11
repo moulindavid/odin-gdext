@@ -268,32 +268,21 @@ facade_real2_adapter := gt.ClassMethodGodotReal2ToGodotRealAdapter {
 method_registration_facade_compile_smoke :: proc "contextless" (
 	class_name: gt.ConstStringNamePtr,
 ) {
+	member_defaults := gt.class_member_defaults(
+		facade_method_empty_name,
+		facade_method_empty_string,
+	)
 	gt.init_method_property_info(
 		&facade_method_args[0],
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = facade_method_arg_name,
-			class_name = facade_method_empty_name,
-			hint_string = facade_method_empty_string,
-		},
+		gt.class_member_property(member_defaults, .Float, facade_method_arg_name),
 	)
 	gt.init_method_property_info(
 		&facade_method_args[1],
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = facade_method_arg_name,
-			class_name = facade_method_empty_name,
-			hint_string = facade_method_empty_string,
-		},
+		gt.class_member_property(member_defaults, .Float, facade_method_arg_name),
 	)
 	gt.init_method_property_info(
 		&facade_method_return,
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = facade_method_name,
-			class_name = facade_method_empty_name,
-			hint_string = facade_method_empty_string,
-		},
+		gt.class_member_property(member_defaults, .Float, facade_method_name),
 	)
 	gt.register_class_method_with_descriptor(
 		class_name,

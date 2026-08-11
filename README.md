@@ -214,12 +214,11 @@ GodotReal`, the facade also exposes typed callbacks backed by stable adapter
 userdata:
 
 ```odin
-gt.init_method_property_info(&arg_info[0], gt.MethodPropertyDescriptor{
-	type = .Float,
-	name = arg_name,
-	class_name = empty_name,
-	hint_string = empty_string,
-})
+member_defaults := gt.class_member_defaults(empty_name, empty_string)
+gt.init_method_property_info(
+	&arg_info[0],
+	gt.class_member_property(member_defaults, .Float, arg_name),
+)
 
 // Global or otherwise process-lifetime storage.
 real2_adapter: gt.ClassMethodGodotReal2ToGodotRealAdapter

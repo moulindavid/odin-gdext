@@ -76,12 +76,12 @@ callbacks.
    - [x] Add tests or facade checks for the chosen rule.
 
 4. Improve user class descriptors.
-   - [ ] Reduce repeated class/method/property/signal boilerplate without hiding
+   - [x] Reduce repeated class/method/property/signal boilerplate without hiding
      ownership or metadata lifetime.
-   - [ ] Keep create/free callbacks explicit.
-   - [ ] Keep registration and unregistration explicit.
-   - [ ] Provide a compact descriptor pattern that examples can share.
-   - [ ] Update `examples/hello` or `examples/game` only after the helper is
+   - [x] Keep create/free callbacks explicit.
+   - [x] Keep registration and unregistration explicit.
+   - [x] Provide a compact descriptor pattern that examples can share.
+   - [x] Update `examples/hello` or `examples/game` only after the helper is
      clearer than the current explicit code.
 
 5. Broaden typed method adapter coverage for common signatures.

@@ -462,6 +462,40 @@ MethodPropertyDescriptor :: struct {
 	usage:       u32,
 }
 
+ClassMemberDefaults :: struct {
+	class_name:  StringNamePtr,
+	hint_string: StringPtr,
+	hint:        u32,
+}
+
+class_member_defaults :: proc "contextless" (
+	class_name: StringNamePtr,
+	hint_string: StringPtr,
+	hint: u32 = 0,
+) -> ClassMemberDefaults {
+	if class_name == nil || hint_string == nil do _trap_nil_godot_function()
+	return ClassMemberDefaults{class_name = class_name, hint_string = hint_string, hint = hint}
+}
+
+class_member_property :: proc "contextless" (
+	defaults: ClassMemberDefaults,
+	type: VariantType,
+	name: StringNamePtr,
+	usage: u32 = 0,
+) -> MethodPropertyDescriptor {
+	if defaults.class_name == nil || defaults.hint_string == nil || name == nil {
+		_trap_nil_godot_function()
+	}
+	return MethodPropertyDescriptor {
+		type = type,
+		name = name,
+		class_name = defaults.class_name,
+		hint_string = defaults.hint_string,
+		hint = defaults.hint,
+		usage = usage,
+	}
+}
+
 ClassPropertyDescriptor :: struct {
 	property: MethodPropertyDescriptor,
 	setter:   ConstStringNamePtr,

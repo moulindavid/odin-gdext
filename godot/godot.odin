@@ -36,6 +36,7 @@ PropertyUsageStorage :: gcore.PropertyUsageStorage
 PropertyUsageEditor :: gcore.PropertyUsageEditor
 PropertyUsageDefault :: gcore.PropertyUsageDefault
 MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
+ClassMemberDefaults :: gcore.ClassMemberDefaults
 ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
 ClassSignalDescriptor :: gcore.ClassSignalDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
@@ -116,6 +117,8 @@ register_class_with_defaults :: gcore.register_class_with_defaults
 unregister_class :: gcore.unregister_class
 attach_instance :: gcore.attach_instance
 class_instance_data :: gcore.class_instance_data
+class_member_defaults :: gcore.class_member_defaults
+class_member_property :: gcore.class_member_property
 init_method_property_info :: gcore.init_method_property_info
 init_class_property_info :: gcore.init_class_property_info
 init_class_method_info :: gcore.init_class_method_info

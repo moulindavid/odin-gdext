@@ -131,15 +131,11 @@ register_methods :: proc() {
 		cstring("get_speed"),
 	)
 	gt.string_init_utf8(gt.uninitialized_string_ptr(&empty_str_data), "")
+	member_defaults := gt.class_member_defaults(empty_name, empty_str)
 
 	gt.init_method_property_info(
 		&roll_math_return_info,
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = roll_math_method_name,
-			class_name = empty_name,
-			hint_string = empty_str,
-		},
+		gt.class_member_property(member_defaults, .Float, roll_math_method_name),
 	)
 	gt.register_class_method_with_descriptor(
 		hello_class_name,
@@ -156,12 +152,7 @@ register_methods :: proc() {
 
 	gt.init_method_property_info(
 		&speed_get_return_info,
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = speed_property_name,
-			class_name = empty_name,
-			hint_string = empty_str,
-		},
+		gt.class_member_property(member_defaults, .Float, speed_property_name),
 	)
 	gt.register_class_method_with_descriptor(
 		hello_class_name,
@@ -178,12 +169,7 @@ register_methods :: proc() {
 
 	gt.init_method_property_info(
 		&speed_set_arg_info,
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = speed_property_name,
-			class_name = empty_name,
-			hint_string = empty_str,
-		},
+		gt.class_member_property(member_defaults, .Float, speed_property_name),
 	)
 	gt.register_class_method_with_descriptor(
 		hello_class_name,
@@ -201,17 +187,17 @@ register_methods :: proc() {
 }
 
 register_properties :: proc() {
+	member_defaults := gt.class_member_defaults(empty_name, empty_str)
 	gt.register_class_property_with_descriptor(
 		hello_class_name,
 		&speed_property_info,
 		gt.ClassPropertyDescriptor {
-			property = gt.MethodPropertyDescriptor {
-				type = .Float,
-				name = speed_property_name,
-				class_name = empty_name,
-				hint_string = empty_str,
-				usage = gt.PropertyUsageDefault,
-			},
+			property = gt.class_member_property(
+				member_defaults,
+				.Float,
+				speed_property_name,
+				gt.PropertyUsageDefault,
+			),
 			setter = speed_setter_name,
 			getter = speed_getter_name,
 		},
@@ -227,14 +213,10 @@ register_signals :: proc() {
 		gt.uninitialized_static_string_name_ptr(&speed_changed_arg_name_data),
 		cstring("value"),
 	)
+	member_defaults := gt.class_member_defaults(empty_name, empty_str)
 	gt.init_method_property_info(
 		&speed_changed_arg_info,
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = speed_changed_arg_name,
-			class_name = empty_name,
-			hint_string = empty_str,
-		},
+		gt.class_member_property(member_defaults, .Float, speed_changed_arg_name),
 	)
 	gt.register_class_signal_with_descriptor(
 		hello_class_name,
