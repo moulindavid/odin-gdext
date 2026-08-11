@@ -216,6 +216,107 @@ canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
 canvas_item_try_as_control :: gclass.canvas_item_try_as_control
 
+// --- Borrowed object handle helpers ---
+object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
+	return self == nil
+}
+
+object_is_nil :: proc "contextless" (self: Object) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+ref_counted_is_nil :: proc "contextless" (self: RefCounted) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+resource_is_nil :: proc "contextless" (self: Resource) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+node_is_nil :: proc "contextless" (self: Node) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+canvas_item_is_nil :: proc "contextless" (self: CanvasItem) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+node2d_is_nil :: proc "contextless" (self: Node2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+control_is_nil :: proc "contextless" (self: Control) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {
+	return Object(self)
+}
+
+ref_counted_object_ptr :: proc "contextless" (self: RefCounted) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+resource_object_ptr :: proc "contextless" (self: Resource) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+node_object_ptr :: proc "contextless" (self: Node) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+canvas_item_object_ptr :: proc "contextless" (self: CanvasItem) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+node2d_object_ptr :: proc "contextless" (self: Node2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+control_object_ptr :: proc "contextless" (self: Control) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+object_ptr_try_as_ref_counted :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: RefCounted,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_ref_counted(Object(self))
+}
+
+object_ptr_try_as_resource :: proc "contextless" (self: ObjectPtr) -> (value: Resource, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_resource(Object(self))
+}
+
+object_ptr_try_as_node :: proc "contextless" (self: ObjectPtr) -> (value: Node, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_node(Object(self))
+}
+
+object_ptr_try_as_canvas_item :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CanvasItem,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_canvas_item(Object(self))
+}
+
+object_ptr_try_as_node2d :: proc "contextless" (self: ObjectPtr) -> (value: Node2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_node2d(Object(self))
+}
+
+object_ptr_try_as_control :: proc "contextless" (self: ObjectPtr) -> (value: Control, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_control(Object(self))
+}
+
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
 ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode

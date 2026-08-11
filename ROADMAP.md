@@ -61,11 +61,11 @@ callbacks.
      Godot object pointer inside extension-owned instance data.
 
 2. Add typed object handle helper APIs.
-   - [ ] Add nil-safe helper procedures for selected typed handles.
-   - [ ] Add checked conversion helpers from `Object` to selected typed handles
+   - [x] Add nil-safe helper procedures for selected typed handles.
+   - [x] Add checked conversion helpers from `Object` to selected typed handles
      where generated downcasts are not enough for user code.
-   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
-   - [ ] Keep all object/class handle helpers borrowed by value.
+   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [x] Keep all object/class handle helpers borrowed by value.
 
 3. Decide the first `RefCounted` and `Resource` safety layer.
    - [ ] Inspect Godot 4.7 GDExtension APIs available for reference counting.
