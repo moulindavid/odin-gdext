@@ -50,63 +50,63 @@ callbacks.
 ## Plan
 
 1. Define object handle ownership rules.
-   - [ ] Document borrowed Godot object/class handles in `docs/USING_IN_GODOT.md`
+   - [x] Document borrowed Godot object/class handles in `docs/USING_IN_GODOT.md`
      and README.
-   - [ ] Document extension-owned instance data and how it differs from Godot
+   - [x] Document extension-owned instance data and how it differs from Godot
      object lifetime.
-   - [ ] Document when storing `ObjectPtr` or typed class handles in Odin data is
+   - [x] Document when storing `ObjectPtr` or typed class handles in Odin data is
      allowed, and what remains unsafe.
-   - [ ] Document current `RefCounted` and `Resource` limitations.
-   - [ ] Add a small compile or smoke check showing safe storage of the owning
+   - [x] Document current `RefCounted` and `Resource` limitations.
+   - [x] Add a small compile or smoke check showing safe storage of the owning
      Godot object pointer inside extension-owned instance data.
 
 2. Add typed object handle helper APIs.
-   - [ ] Add nil-safe helper procedures for selected typed handles.
-   - [ ] Add checked conversion helpers from `Object` to selected typed handles
+   - [x] Add nil-safe helper procedures for selected typed handles.
+   - [x] Add checked conversion helpers from `Object` to selected typed handles
      where generated downcasts are not enough for user code.
-   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
-   - [ ] Keep all object/class handle helpers borrowed by value.
+   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [x] Keep all object/class handle helpers borrowed by value.
 
 3. Decide the first `RefCounted` and `Resource` safety layer.
-   - [ ] Inspect Godot 4.7 GDExtension APIs available for reference counting.
-   - [ ] Decide whether public retain/unref helpers are safe enough now or must
+   - [x] Inspect Godot 4.7 GDExtension APIs available for reference counting.
+   - [x] Decide whether public retain/unref helpers are safe enough now or must
      remain deferred.
-   - [ ] Prevent public docs and examples from implying that Odin owns ordinary
+   - [x] Prevent public docs and examples from implying that Odin owns ordinary
      Godot objects.
-   - [ ] Add tests or facade checks for the chosen rule.
+   - [x] Add tests or facade checks for the chosen rule.
 
 4. Improve user class descriptors.
-   - [ ] Reduce repeated class/method/property/signal boilerplate without hiding
+   - [x] Reduce repeated class/method/property/signal boilerplate without hiding
      ownership or metadata lifetime.
-   - [ ] Keep create/free callbacks explicit.
-   - [ ] Keep registration and unregistration explicit.
-   - [ ] Provide a compact descriptor pattern that examples can share.
-   - [ ] Update `examples/hello` or `examples/game` only after the helper is
+   - [x] Keep create/free callbacks explicit.
+   - [x] Keep registration and unregistration explicit.
+   - [x] Provide a compact descriptor pattern that examples can share.
+   - [x] Update `examples/hello` or `examples/game` only after the helper is
      clearer than the current explicit code.
 
 5. Broaden typed method adapter coverage for common signatures.
-   - [ ] `() -> void`.
-   - [ ] `() -> bool`.
-   - [ ] `() -> int`.
-   - [ ] `(float) -> void`.
-   - [ ] `(int) -> void`.
-   - [ ] `(bool) -> void`.
-   - [ ] Defer `String`, object handles, varargs, default arguments, `Callable`,
+   - [x] `() -> void`.
+   - [x] `() -> bool`.
+   - [x] `() -> int`.
+   - [x] `(float) -> void`.
+   - [x] `(int) -> void`.
+   - [x] `(bool) -> void`.
+   - [x] Defer `String`, object handles, varargs, default arguments, `Callable`,
      `Signal`, and object-lifetime-sensitive signatures until ownership is
      explicit.
 
 6. Shape a coherent public Variant conversion pattern.
-   - [ ] Group existing `variant_from_*` helpers behind an Odin-friendly proc
+   - [x] Group existing `variant_from_*` helpers behind an Odin-friendly proc
      group or naming pattern.
-   - [ ] Group checked extraction helpers behind a matching `try` pattern.
-   - [ ] Keep borrowed parameters and owned returns obvious at call sites.
-   - [ ] Add facade compile coverage for representative conversions.
+   - [x] Group checked extraction helpers behind a matching `try` pattern.
+   - [x] Keep borrowed parameters and owned returns obvious at call sites.
+   - [x] Add facade compile coverage for representative conversions.
 
 7. Expand generated class APIs only after the above rules are stable.
-   - [ ] Add more common scene/resource classes incrementally.
-   - [ ] Keep skip rules deterministic for unsupported signatures.
-   - [ ] Prefer generator fixes over manual patches to generated files.
-   - [ ] Keep generated methods aligned with the borrowed object handle model.
+   - [x] Add more common scene/resource classes incrementally.
+   - [x] Keep skip rules deterministic for unsupported signatures.
+   - [x] Prefer generator fixes over manual patches to generated files.
+   - [x] Keep generated methods aligned with the borrowed object handle model.
 
 ## Validation
 

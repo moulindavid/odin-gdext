@@ -36,11 +36,14 @@ PropertyUsageStorage :: gcore.PropertyUsageStorage
 PropertyUsageEditor :: gcore.PropertyUsageEditor
 PropertyUsageDefault :: gcore.PropertyUsageDefault
 MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
+ClassMemberDefaults :: gcore.ClassMemberDefaults
 ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
 ClassSignalDescriptor :: gcore.ClassSignalDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
+ClassMethodVoid :: gcore.ClassMethodVoid
+ClassMethodVoidAdapter :: gcore.ClassMethodVoidAdapter
 ClassMethodGetGodotReal :: gcore.ClassMethodGetGodotReal
 ClassMethodGetGodotRealAdapter :: gcore.ClassMethodGetGodotRealAdapter
 ClassMethodSetGodotReal :: gcore.ClassMethodSetGodotReal
@@ -102,6 +105,8 @@ Node :: gclass.Node
 CanvasItem :: gclass.CanvasItem
 Node2D :: gclass.Node2D
 Control :: gclass.Control
+Sprite2D :: gclass.Sprite2D
+Label :: gclass.Label
 
 // --- Core functions ---
 init :: gcore.init
@@ -116,6 +121,8 @@ register_class_with_defaults :: gcore.register_class_with_defaults
 unregister_class :: gcore.unregister_class
 attach_instance :: gcore.attach_instance
 class_instance_data :: gcore.class_instance_data
+class_member_defaults :: gcore.class_member_defaults
+class_member_property :: gcore.class_member_property
 init_method_property_info :: gcore.init_method_property_info
 init_class_property_info :: gcore.init_class_property_info
 init_class_method_info :: gcore.init_class_method_info
@@ -125,6 +132,8 @@ register_class_method_with_descriptor :: gcore.register_class_method_with_descri
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall
+class_method_void_call :: gcore.class_method_void_call
+class_method_void_ptrcall :: gcore.class_method_void_ptrcall
 class_method_get_godot_real_call :: gcore.class_method_get_godot_real_call
 class_method_get_godot_real_ptrcall :: gcore.class_method_get_godot_real_ptrcall
 class_method_set_godot_real_call :: gcore.class_method_set_godot_real_call
@@ -188,9 +197,51 @@ control_grab_focus :: gclass.control_grab_focus
 control_release_focus :: gclass.control_release_focus
 control_set_mouse_filter :: gclass.control_set_mouse_filter
 control_get_mouse_filter :: gclass.control_get_mouse_filter
+sprite2d_set_centered :: gclass.sprite2d_set_centered
+sprite2d_is_centered :: gclass.sprite2d_is_centered
+sprite2d_set_offset :: gclass.sprite2d_set_offset
+sprite2d_get_offset :: gclass.sprite2d_get_offset
+sprite2d_set_flip_h :: gclass.sprite2d_set_flip_h
+sprite2d_is_flipped_h :: gclass.sprite2d_is_flipped_h
+sprite2d_set_flip_v :: gclass.sprite2d_set_flip_v
+sprite2d_is_flipped_v :: gclass.sprite2d_is_flipped_v
+sprite2d_set_region_enabled :: gclass.sprite2d_set_region_enabled
+sprite2d_is_region_enabled :: gclass.sprite2d_is_region_enabled
+sprite2d_is_pixel_opaque :: gclass.sprite2d_is_pixel_opaque
+sprite2d_set_frame :: gclass.sprite2d_set_frame
+sprite2d_get_frame :: gclass.sprite2d_get_frame
+sprite2d_set_vframes :: gclass.sprite2d_set_vframes
+sprite2d_get_vframes :: gclass.sprite2d_get_vframes
+sprite2d_set_hframes :: gclass.sprite2d_set_hframes
+sprite2d_get_hframes :: gclass.sprite2d_get_hframes
+label_set_text :: gclass.label_set_text
+label_get_text :: gclass.label_get_text
+label_set_clip_text :: gclass.label_set_clip_text
+label_is_clipping_text :: gclass.label_is_clipping_text
+label_set_uppercase :: gclass.label_set_uppercase
+label_is_uppercase :: gclass.label_is_uppercase
+label_get_line_count :: gclass.label_get_line_count
+label_get_visible_line_count :: gclass.label_get_visible_line_count
+label_get_total_character_count :: gclass.label_get_total_character_count
+label_set_visible_characters :: gclass.label_set_visible_characters
+label_get_visible_characters :: gclass.label_get_visible_characters
+label_set_visible_ratio :: gclass.label_set_visible_ratio
+label_get_visible_ratio :: gclass.label_get_visible_ratio
+label_set_lines_skipped :: gclass.label_set_lines_skipped
+label_get_lines_skipped :: gclass.label_get_lines_skipped
+label_set_max_lines_visible :: gclass.label_set_max_lines_visible
+label_get_max_lines_visible :: gclass.label_get_max_lines_visible
 control_as_canvas_item :: gclass.control_as_canvas_item
 control_as_node :: gclass.control_as_node
 control_as_object :: gclass.control_as_object
+sprite2d_as_node2d :: gclass.sprite2d_as_node2d
+sprite2d_as_canvas_item :: gclass.sprite2d_as_canvas_item
+sprite2d_as_node :: gclass.sprite2d_as_node
+sprite2d_as_object :: gclass.sprite2d_as_object
+label_as_control :: gclass.label_as_control
+label_as_canvas_item :: gclass.label_as_canvas_item
+label_as_node :: gclass.label_as_node
+label_as_object :: gclass.label_as_object
 object_is_ref_counted :: gclass.object_is_ref_counted
 object_try_as_ref_counted :: gclass.object_try_as_ref_counted
 object_is_resource :: gclass.object_is_resource
@@ -203,6 +254,10 @@ object_is_node2d :: gclass.object_is_node2d
 object_try_as_node2d :: gclass.object_try_as_node2d
 object_is_control :: gclass.object_is_control
 object_try_as_control :: gclass.object_try_as_control
+object_is_sprite2d :: gclass.object_is_sprite2d
+object_try_as_sprite2d :: gclass.object_try_as_sprite2d
+object_is_label :: gclass.object_is_label
+object_try_as_label :: gclass.object_try_as_label
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 node_is_canvas_item :: gclass.node_is_canvas_item
@@ -211,10 +266,149 @@ node_is_node2d :: gclass.node_is_node2d
 node_try_as_node2d :: gclass.node_try_as_node2d
 node_is_control :: gclass.node_is_control
 node_try_as_control :: gclass.node_try_as_control
+node_is_sprite2d :: gclass.node_is_sprite2d
+node_try_as_sprite2d :: gclass.node_try_as_sprite2d
+node_is_label :: gclass.node_is_label
+node_try_as_label :: gclass.node_try_as_label
 canvas_item_is_node2d :: gclass.canvas_item_is_node2d
 canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
 canvas_item_try_as_control :: gclass.canvas_item_try_as_control
+canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
+canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
+canvas_item_is_label :: gclass.canvas_item_is_label
+canvas_item_try_as_label :: gclass.canvas_item_try_as_label
+node2d_is_sprite2d :: gclass.node2d_is_sprite2d
+node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
+control_is_label :: gclass.control_is_label
+control_try_as_label :: gclass.control_try_as_label
+
+// --- Borrowed object handle helpers ---
+object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
+	return self == nil
+}
+
+object_is_nil :: proc "contextless" (self: Object) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+ref_counted_is_nil :: proc "contextless" (self: RefCounted) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+resource_is_nil :: proc "contextless" (self: Resource) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+node_is_nil :: proc "contextless" (self: Node) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+canvas_item_is_nil :: proc "contextless" (self: CanvasItem) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+node2d_is_nil :: proc "contextless" (self: Node2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+control_is_nil :: proc "contextless" (self: Control) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+sprite2d_is_nil :: proc "contextless" (self: Sprite2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+label_is_nil :: proc "contextless" (self: Label) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {
+	return Object(self)
+}
+
+ref_counted_object_ptr :: proc "contextless" (self: RefCounted) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+resource_object_ptr :: proc "contextless" (self: Resource) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+node_object_ptr :: proc "contextless" (self: Node) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+canvas_item_object_ptr :: proc "contextless" (self: CanvasItem) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+node2d_object_ptr :: proc "contextless" (self: Node2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+control_object_ptr :: proc "contextless" (self: Control) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+sprite2d_object_ptr :: proc "contextless" (self: Sprite2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+label_object_ptr :: proc "contextless" (self: Label) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+object_ptr_try_as_ref_counted :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: RefCounted,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_ref_counted(Object(self))
+}
+
+object_ptr_try_as_resource :: proc "contextless" (self: ObjectPtr) -> (value: Resource, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_resource(Object(self))
+}
+
+object_ptr_try_as_node :: proc "contextless" (self: ObjectPtr) -> (value: Node, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_node(Object(self))
+}
+
+object_ptr_try_as_canvas_item :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CanvasItem,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_canvas_item(Object(self))
+}
+
+object_ptr_try_as_node2d :: proc "contextless" (self: ObjectPtr) -> (value: Node2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_node2d(Object(self))
+}
+
+object_ptr_try_as_control :: proc "contextless" (self: ObjectPtr) -> (value: Control, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_control(Object(self))
+}
+
+object_ptr_try_as_sprite2d :: proc "contextless" (self: ObjectPtr) -> (value: Sprite2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_sprite2d(Object(self))
+}
+
+object_ptr_try_as_label :: proc "contextless" (self: ObjectPtr) -> (value: Label, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_label(Object(self))
+}
 
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
@@ -697,6 +891,131 @@ variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float
 variant_try_int :: gcore.variant_try_int
 variant_try_bool :: gcore.variant_try_bool
+
+// Public Variant conversion grouping. `variant_from` returns an owned initialized
+// Variant that must be destroyed with variant_free. `variant_try` groups checked
+// extraction helpers; owned value results still follow their matching free rule.
+variant_from :: proc {
+	variant_from_float,
+	variant_from_int,
+	variant_from_bool,
+	variant_from_string,
+	variant_from_string_name,
+	variant_from_node_path,
+	variant_from_rid,
+	variant_from_array,
+	variant_from_dictionary,
+	variant_from_packed_byte_array,
+	variant_from_packed_int32_array,
+	variant_from_packed_int64_array,
+	variant_from_packed_float32_array,
+	variant_from_packed_float64_array,
+	variant_from_packed_string_array,
+	variant_from_packed_vector2_array,
+	variant_from_packed_vector3_array,
+	variant_from_packed_vector4_array,
+	variant_from_packed_color_array,
+	variant_from_utf8,
+	variant_from_cstring,
+	object_to_variant,
+}
+
+VariantTryGroup :: struct {
+	float:                #type proc "contextless" (v: ^Variant) -> (value: GodotReal, ok: bool),
+	int:                  #type proc "contextless" (v: ^Variant) -> (value: i64, ok: bool),
+	bool:                 #type proc "contextless" (v: ^Variant) -> (value: bool, ok: bool),
+	string:               #type proc "contextless" (v: ^Variant) -> (value: String, ok: bool),
+	string_name:          #type proc "contextless" (v: ^Variant) -> (value: StringName, ok: bool),
+	node_path:            #type proc "contextless" (v: ^Variant) -> (value: NodePath, ok: bool),
+	rid:                  #type proc "contextless" (v: ^Variant) -> (value: RID, ok: bool),
+	array:                #type proc "contextless" (v: ^Variant) -> (value: Array, ok: bool),
+	dictionary:           #type proc "contextless" (v: ^Variant) -> (value: Dictionary, ok: bool),
+	packed_byte_array:    #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedByteArray,
+		ok: bool,
+	),
+	packed_int32_array:   #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedInt32Array,
+		ok: bool,
+	),
+	packed_int64_array:   #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedInt64Array,
+		ok: bool,
+	),
+	packed_float32_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedFloat32Array,
+		ok: bool,
+	),
+	packed_float64_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedFloat64Array,
+		ok: bool,
+	),
+	packed_string_array:  #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedStringArray,
+		ok: bool,
+	),
+	packed_vector2_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedVector2Array,
+		ok: bool,
+	),
+	packed_vector3_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedVector3Array,
+		ok: bool,
+	),
+	packed_vector4_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedVector4Array,
+		ok: bool,
+	),
+	packed_color_array:   #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedColorArray,
+		ok: bool,
+	),
+	object:               #type proc "contextless" (v: ^Variant) -> (value: ObjectPtr, ok: bool),
+}
+
+variant_try := VariantTryGroup {
+	float                = variant_try_float,
+	int                  = variant_try_int,
+	bool                 = variant_try_bool,
+	string               = variant_try_string,
+	string_name          = variant_try_string_name,
+	node_path            = variant_try_node_path,
+	rid                  = variant_try_rid,
+	array                = variant_try_array,
+	dictionary           = variant_try_dictionary,
+	packed_byte_array    = variant_try_packed_byte_array,
+	packed_int32_array   = variant_try_packed_int32_array,
+	packed_int64_array   = variant_try_packed_int64_array,
+	packed_float32_array = variant_try_packed_float32_array,
+	packed_float64_array = variant_try_packed_float64_array,
+	packed_string_array  = variant_try_packed_string_array,
+	packed_vector2_array = variant_try_packed_vector2_array,
+	packed_vector3_array = variant_try_packed_vector3_array,
+	packed_vector4_array = variant_try_packed_vector4_array,
+	packed_color_array   = variant_try_packed_color_array,
+	object               = variant_try_object,
+}
+
 variant_free :: gcore.variant_free
 variant_free_temp :: gcore.variant_free_temp
 call_error_ok :: gcore.call_error_ok

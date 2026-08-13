@@ -103,6 +103,47 @@ property metadata, signal names, and hint strings must be stored in stable
 storage that outlives the registered class. Use process-lifetime storage for
 registered classes.
 
+## Object handles and instance data ownership
+
+Godot object and class handles exposed by `godot:godot` are borrowed by default.
+An `ObjectPtr`, `Object`, `Node`, `Node2D`, `Resource`, or similar handle is a
+reference to an object owned by Godot unless a helper explicitly documents a
+retain or reference-count rule. Passing one of these handles to a generated
+wrapper does not transfer ownership to Odin, and storing one does not keep the
+Godot object alive.
+
+Extension-owned instance data is separate from the Godot object lifetime. Your
+create callback allocates Odin data, attaches it to the Godot object, and your
+free callback releases that Odin data. It is valid for that data to store the
+owning Godot object pointer as a borrowed handle:
+
+```odin
+GameBrainData :: struct {
+    object: gt.ObjectPtr, // borrowed owner pointer, not owned by Odin
+    difficulty: gt.GodotReal,
+}
+```
+
+Use that stored pointer only while the instance binding is alive, normally inside
+registered method, property, signal, and notification callbacks for the same
+object. Do not treat it as a retained reference, do not free it from Odin, and do
+not use it after the free callback has run. Storing handles to other Godot
+objects is currently unsafe unless normal Godot ownership guarantees their
+lifetime, for example a parent owns a child for the whole use window and your
+code can tolerate the handle becoming invalid when Godot removes it.
+
+`RefCounted` and `Resource` are exposed today as borrowed handles only. The
+facade can call selected methods on them, but it does not yet provide a public
+retain/unref-safe wrapper. Do not store a `RefCounted` or `Resource` handle as if
+Odin owns a reference unless you add an explicit, audited lifetime helper first.
+
+This is deliberate. Godot 4.7 exposes low-level reference callbacks and
+`RefCounted.reference` / `RefCounted.unreference`, and constructing a refcounted
+object starts with a reference the caller must eventually release. Those rules
+need an owned wrapper before they are safe in normal user code, so the current
+facade and generated class API keep `RefCounted` and `Resource` methods
+borrowed-only and skip public retain/unref helpers.
+
 ## Instantiate an Odin-backed class from GDScript
 
 Once the extension is loaded, GDScript can instantiate the registered class by
@@ -174,8 +215,13 @@ Keep these rules visible when building real features:
 - Odin-owned Godot values such as owned `Variant`, `String`, `StringName`,
   `NodePath`, arrays, dictionaries, and packed arrays must be destroyed with the
   matching facade or core helper.
-- `Variant` parameters are normally borrowed. Do not store borrowed Variant
-  pointers beyond the call that provided them.
+- `variant_from(...)` is the public construction proc group for representative
+  Variant conversions. It returns an owned Variant, so still call
+  `variant_free`.
+- `variant_try.float(&variant)` plus the other `variant_try.*` helpers are the
+  public checked extraction grouping. `Variant` parameters are normally
+  borrowed; do not store borrowed Variant pointers beyond the call that provided
+  them.
 - Object and class handles are borrowed Godot objects. Generated wrappers do not
   take ownership of Godot objects.
 - Extension-owned instance data is allocated and freed explicitly by your create

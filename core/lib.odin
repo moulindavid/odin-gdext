@@ -462,6 +462,40 @@ MethodPropertyDescriptor :: struct {
 	usage:       u32,
 }
 
+ClassMemberDefaults :: struct {
+	class_name:  StringNamePtr,
+	hint_string: StringPtr,
+	hint:        u32,
+}
+
+class_member_defaults :: proc "contextless" (
+	class_name: StringNamePtr,
+	hint_string: StringPtr,
+	hint: u32 = 0,
+) -> ClassMemberDefaults {
+	if class_name == nil || hint_string == nil do _trap_nil_godot_function()
+	return ClassMemberDefaults{class_name = class_name, hint_string = hint_string, hint = hint}
+}
+
+class_member_property :: proc "contextless" (
+	defaults: ClassMemberDefaults,
+	type: VariantType,
+	name: StringNamePtr,
+	usage: u32 = 0,
+) -> MethodPropertyDescriptor {
+	if defaults.class_name == nil || defaults.hint_string == nil || name == nil {
+		_trap_nil_godot_function()
+	}
+	return MethodPropertyDescriptor {
+		type = type,
+		name = name,
+		class_name = defaults.class_name,
+		hint_string = defaults.hint_string,
+		hint = defaults.hint,
+		usage = usage,
+	}
+}
+
 ClassPropertyDescriptor :: struct {
 	property: MethodPropertyDescriptor,
 	setter:   ConstStringNamePtr,
@@ -576,6 +610,12 @@ ClassMethodGodotReal2ToGodotReal :: #type proc "contextless" (
 
 ClassMethodGodotReal2ToGodotRealAdapter :: struct {
 	method: ClassMethodGodotReal2ToGodotReal,
+}
+
+ClassMethodVoid :: #type proc "contextless" (instance: ClassInstancePtr) -> bool
+
+ClassMethodVoidAdapter :: struct {
+	method: ClassMethodVoid,
 }
 
 ClassMethodGetGodotReal :: #type proc "contextless" (
@@ -737,6 +777,62 @@ class_method_godot_real2_to_godot_real_ptrcall :: proc "c" (
 	value, ok := adapter.method(p_instance, a, b)
 	if !ok do _trap_godot_call_error()
 	(cast(^GodotReal)r_ret)^ = value
+}
+
+class_method_void_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count > 0 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 0)
+		return
+	}
+
+	adapter := cast(^ClassMethodVoidAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	if !adapter.method(p_instance) {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if r_return != nil do variant_init_nil(r_return)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_void_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = p_args
+	_ = r_ret
+	if method_userdata == nil || p_instance == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodVoidAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+	if !adapter.method(p_instance) do _trap_godot_call_error()
 }
 
 class_method_get_godot_real_call :: proc "c" (

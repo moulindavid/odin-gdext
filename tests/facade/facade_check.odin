@@ -8,6 +8,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	node2d: gt.Node2D,
 	canvas_item: gt.CanvasItem,
 	control: gt.Control,
+	sprite2d: gt.Sprite2D,
+	label: gt.Label,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
@@ -41,6 +43,45 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.control_set_mouse_filter(control, .mouse_filter_pass)
 	_ = gt.control_get_mouse_filter(control)
 
+	gt.sprite2d_set_centered(sprite2d, true)
+	_ = gt.sprite2d_is_centered(sprite2d)
+	gt.sprite2d_set_offset(sprite2d, gt.Vector2{4, 8})
+	_ = gt.sprite2d_get_offset(sprite2d)
+	gt.sprite2d_set_flip_h(sprite2d, true)
+	_ = gt.sprite2d_is_flipped_h(sprite2d)
+	gt.sprite2d_set_flip_v(sprite2d, false)
+	_ = gt.sprite2d_is_flipped_v(sprite2d)
+	gt.sprite2d_set_region_enabled(sprite2d, false)
+	_ = gt.sprite2d_is_region_enabled(sprite2d)
+	_ = gt.sprite2d_is_pixel_opaque(sprite2d, gt.Vector2{})
+	gt.sprite2d_set_frame(sprite2d, 0)
+	_ = gt.sprite2d_get_frame(sprite2d)
+	gt.sprite2d_set_vframes(sprite2d, 1)
+	_ = gt.sprite2d_get_vframes(sprite2d)
+	gt.sprite2d_set_hframes(sprite2d, 1)
+	_ = gt.sprite2d_get_hframes(sprite2d)
+
+	label_text := gt.string_from_utf8("Score: 0")
+	defer gt.string_free(&label_text)
+	gt.label_set_text(label, &label_text)
+	label_text_copy := gt.label_get_text(label)
+	gt.string_free(&label_text_copy)
+	gt.label_set_clip_text(label, true)
+	_ = gt.label_is_clipping_text(label)
+	gt.label_set_uppercase(label, false)
+	_ = gt.label_is_uppercase(label)
+	_ = gt.label_get_line_count(label)
+	_ = gt.label_get_visible_line_count(label)
+	_ = gt.label_get_total_character_count(label)
+	gt.label_set_visible_characters(label, -1)
+	_ = gt.label_get_visible_characters(label)
+	gt.label_set_visible_ratio(label, 1)
+	_ = gt.label_get_visible_ratio(label)
+	gt.label_set_lines_skipped(label, 0)
+	_ = gt.label_get_lines_skipped(label)
+	gt.label_set_max_lines_visible(label, -1)
+	_ = gt.label_get_max_lines_visible(label)
+
 	resource_path := gt.resource_get_path(resource)
 	gt.string_free(&resource_path)
 	resource_rid := gt.resource_get_rid(resource)
@@ -55,6 +96,58 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.object_is_node2d(object)
 	_, _ = gt.object_try_as_node2d(object)
 	_, _ = gt.object_try_as_node(object)
+
+	_ = gt.object_is_nil(object)
+	_ = gt.ref_counted_is_nil(ref_counted)
+	_ = gt.resource_is_nil(resource)
+	_ = gt.node_is_nil(node)
+	_ = gt.canvas_item_is_nil(canvas_item)
+	_ = gt.node2d_is_nil(node2d)
+	_ = gt.control_is_nil(control)
+	_ = gt.sprite2d_is_nil(sprite2d)
+	_ = gt.label_is_nil(label)
+	_ = gt.object_ptr_is_nil(gt.node2d_object_ptr(node2d))
+	_ = gt.object_ptr_as_object(gt.node_object_ptr(node))
+	_ = gt.ref_counted_object_ptr(ref_counted)
+	_ = gt.resource_object_ptr(resource)
+	_ = gt.canvas_item_object_ptr(canvas_item)
+	_ = gt.control_object_ptr(control)
+	_ = gt.sprite2d_object_ptr(sprite2d)
+	_ = gt.label_object_ptr(label)
+	_, _ = gt.object_ptr_try_as_ref_counted(gt.ref_counted_object_ptr(ref_counted))
+	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
+	_, _ = gt.object_ptr_try_as_node(gt.node_object_ptr(node))
+	_, _ = gt.object_ptr_try_as_canvas_item(gt.canvas_item_object_ptr(canvas_item))
+	_, _ = gt.object_ptr_try_as_node2d(gt.node2d_object_ptr(node2d))
+	_, _ = gt.object_ptr_try_as_control(gt.control_object_ptr(control))
+	_, _ = gt.object_ptr_try_as_sprite2d(gt.sprite2d_object_ptr(sprite2d))
+	_, _ = gt.object_ptr_try_as_label(gt.label_object_ptr(label))
+
+	_ = gt.sprite2d_as_node2d(sprite2d)
+	_ = gt.sprite2d_as_canvas_item(sprite2d)
+	_ = gt.sprite2d_as_node(sprite2d)
+	_ = gt.sprite2d_as_object(sprite2d)
+	_ = gt.label_as_control(label)
+	_ = gt.label_as_canvas_item(label)
+	_ = gt.label_as_node(label)
+	_ = gt.label_as_object(label)
+
+	_ = gt.object_is_sprite2d(object)
+	_, _ = gt.object_try_as_sprite2d(object)
+	_ = gt.object_is_label(object)
+	_, _ = gt.object_try_as_label(object)
+	_ = gt.node_is_sprite2d(node)
+	_, _ = gt.node_try_as_sprite2d(node)
+	_ = gt.node_is_label(node)
+	_, _ = gt.node_try_as_label(node)
+	_ = gt.canvas_item_is_sprite2d(canvas_item)
+	_, _ = gt.canvas_item_try_as_sprite2d(canvas_item)
+	_ = gt.canvas_item_is_label(canvas_item)
+	_, _ = gt.canvas_item_try_as_label(canvas_item)
+	_ = gt.node2d_is_sprite2d(node2d)
+	_, _ = gt.node2d_try_as_sprite2d(node2d)
+	_ = gt.control_is_label(control)
+	_, _ = gt.control_try_as_label(control)
 
 	gt.object_set_meta(object, meta_name, meta_value)
 	meta := gt.object_get_meta(object, meta_name, meta_value)
@@ -72,7 +165,13 @@ facade_class_name := gt.class_name_ptr(&facade_class_name_data)
 facade_parent_name := gt.class_name_ptr(&facade_parent_name_data)
 
 FacadeData :: struct {
+	// Borrowed owner pointer. This does not retain, unref, or free the Godot object.
 	object: gt.ObjectPtr,
+}
+
+FacadeStoredOwnerSmoke :: struct {
+	// Safe only while Godot still owns the object and the instance binding is alive.
+	owner: gt.ObjectPtr,
 }
 
 facade_instance_binding_callbacks := gt.InstanceBindingCallbacks {
@@ -183,10 +282,31 @@ instance_binding_facade_compile_smoke :: proc "contextless" (
 	data: ^FacadeData,
 	instance: gt.ClassInstancePtr,
 ) {
+	if data != nil do data.object = object
 	gt.attach_instance(object, class_name, data, &facade_instance_binding_callbacks)
 	checked, checked_ok := gt.class_instance_data(instance, FacadeData)
 	_ = checked
 	_ = checked_ok
+}
+
+borrowed_owner_storage_facade_compile_smoke :: proc "contextless" (object: gt.ObjectPtr) {
+	storage := FacadeStoredOwnerSmoke {
+		owner = object,
+	}
+	_ = storage
+}
+
+ref_counted_resource_borrowed_policy_compile_smoke :: proc "contextless" (
+	ref_counted: gt.RefCounted,
+	resource: gt.Resource,
+) {
+	_ = gt.ref_counted_is_nil(ref_counted)
+	_ = gt.resource_is_nil(resource)
+	_ = gt.ref_counted_get_reference_count(ref_counted)
+	_ = gt.resource_as_ref_counted(resource)
+	_ = gt.resource_as_object(resource)
+	_, _ = gt.ref_counted_try_as_resource(ref_counted)
+	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
 }
 
 facade_method_name_data: gt.StaticStringName
@@ -221,32 +341,21 @@ facade_real2_adapter := gt.ClassMethodGodotReal2ToGodotRealAdapter {
 method_registration_facade_compile_smoke :: proc "contextless" (
 	class_name: gt.ConstStringNamePtr,
 ) {
+	member_defaults := gt.class_member_defaults(
+		facade_method_empty_name,
+		facade_method_empty_string,
+	)
 	gt.init_method_property_info(
 		&facade_method_args[0],
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = facade_method_arg_name,
-			class_name = facade_method_empty_name,
-			hint_string = facade_method_empty_string,
-		},
+		gt.class_member_property(member_defaults, .Float, facade_method_arg_name),
 	)
 	gt.init_method_property_info(
 		&facade_method_args[1],
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = facade_method_arg_name,
-			class_name = facade_method_empty_name,
-			hint_string = facade_method_empty_string,
-		},
+		gt.class_member_property(member_defaults, .Float, facade_method_arg_name),
 	)
 	gt.init_method_property_info(
 		&facade_method_return,
-		gt.MethodPropertyDescriptor {
-			type = .Float,
-			name = facade_method_name,
-			class_name = facade_method_empty_name,
-			hint_string = facade_method_empty_string,
-		},
+		gt.class_member_property(member_defaults, .Float, facade_method_name),
 	)
 	gt.register_class_method_with_descriptor(
 		class_name,
@@ -305,6 +414,22 @@ property_registration_facade_compile_smoke :: proc "contextless" (
 			getter = facade_property_getter_name,
 		},
 	)
+}
+
+facade_void_method :: proc "contextless" (instance: gt.ClassInstancePtr) -> bool {
+	_ = instance
+	return true
+}
+
+facade_void_adapter := gt.ClassMethodVoidAdapter {
+	method = facade_void_method,
+}
+
+void_method_adapter_facade_compile_smoke :: proc "contextless" () {
+	_ = gt.ClassMethodVoid(facade_void_method)
+	_ = facade_void_adapter
+	_ = gt.class_method_void_call
+	_ = gt.class_method_void_ptrcall
 }
 
 facade_get_real_method :: proc "contextless" (
@@ -391,6 +516,29 @@ facade_get_int_adapter := gt.ClassMethodGetIntAdapter {
 
 facade_set_int_adapter := gt.ClassMethodSetIntAdapter {
 	method = facade_set_int_method,
+}
+
+variant_conversion_proc_group_facade_compile_smoke :: proc "contextless" (
+	object: gt.ObjectPtr,
+	string_value: ^gt.String,
+) {
+	v_float := gt.variant_from(gt.GodotReal(2.5))
+	v_int := gt.variant_from(i64(7))
+	v_bool := gt.variant_from(true)
+	v_string := gt.variant_from(string_value)
+	v_object := gt.variant_from(object)
+	defer gt.variant_free(&v_float)
+	defer gt.variant_free(&v_int)
+	defer gt.variant_free(&v_bool)
+	defer gt.variant_free(&v_string)
+	defer gt.variant_free(&v_object)
+
+	_, _ = gt.variant_try.float(&v_float)
+	_, _ = gt.variant_try.int(&v_int)
+	_, _ = gt.variant_try.bool(&v_bool)
+	string_back, string_ok := gt.variant_try.string(&v_string)
+	if string_ok do gt.string_free(&string_back)
+	_, _ = gt.variant_try.object(&v_object)
 }
 
 bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
