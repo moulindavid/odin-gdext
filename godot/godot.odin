@@ -805,6 +805,131 @@ variant_try_utf8 :: gcore.variant_try_utf8
 variant_try_float :: gcore.variant_try_float
 variant_try_int :: gcore.variant_try_int
 variant_try_bool :: gcore.variant_try_bool
+
+// Public Variant conversion grouping. `variant_from` returns an owned initialized
+// Variant that must be destroyed with variant_free. `variant_try` groups checked
+// extraction helpers; owned value results still follow their matching free rule.
+variant_from :: proc {
+	variant_from_float,
+	variant_from_int,
+	variant_from_bool,
+	variant_from_string,
+	variant_from_string_name,
+	variant_from_node_path,
+	variant_from_rid,
+	variant_from_array,
+	variant_from_dictionary,
+	variant_from_packed_byte_array,
+	variant_from_packed_int32_array,
+	variant_from_packed_int64_array,
+	variant_from_packed_float32_array,
+	variant_from_packed_float64_array,
+	variant_from_packed_string_array,
+	variant_from_packed_vector2_array,
+	variant_from_packed_vector3_array,
+	variant_from_packed_vector4_array,
+	variant_from_packed_color_array,
+	variant_from_utf8,
+	variant_from_cstring,
+	object_to_variant,
+}
+
+VariantTryGroup :: struct {
+	float:                #type proc "contextless" (v: ^Variant) -> (value: GodotReal, ok: bool),
+	int:                  #type proc "contextless" (v: ^Variant) -> (value: i64, ok: bool),
+	bool:                 #type proc "contextless" (v: ^Variant) -> (value: bool, ok: bool),
+	string:               #type proc "contextless" (v: ^Variant) -> (value: String, ok: bool),
+	string_name:          #type proc "contextless" (v: ^Variant) -> (value: StringName, ok: bool),
+	node_path:            #type proc "contextless" (v: ^Variant) -> (value: NodePath, ok: bool),
+	rid:                  #type proc "contextless" (v: ^Variant) -> (value: RID, ok: bool),
+	array:                #type proc "contextless" (v: ^Variant) -> (value: Array, ok: bool),
+	dictionary:           #type proc "contextless" (v: ^Variant) -> (value: Dictionary, ok: bool),
+	packed_byte_array:    #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedByteArray,
+		ok: bool,
+	),
+	packed_int32_array:   #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedInt32Array,
+		ok: bool,
+	),
+	packed_int64_array:   #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedInt64Array,
+		ok: bool,
+	),
+	packed_float32_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedFloat32Array,
+		ok: bool,
+	),
+	packed_float64_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedFloat64Array,
+		ok: bool,
+	),
+	packed_string_array:  #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedStringArray,
+		ok: bool,
+	),
+	packed_vector2_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedVector2Array,
+		ok: bool,
+	),
+	packed_vector3_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedVector3Array,
+		ok: bool,
+	),
+	packed_vector4_array: #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedVector4Array,
+		ok: bool,
+	),
+	packed_color_array:   #type proc "contextless" (
+		v: ^Variant,
+	) -> (
+		value: PackedColorArray,
+		ok: bool,
+	),
+	object:               #type proc "contextless" (v: ^Variant) -> (value: ObjectPtr, ok: bool),
+}
+
+variant_try := VariantTryGroup {
+	float                = variant_try_float,
+	int                  = variant_try_int,
+	bool                 = variant_try_bool,
+	string               = variant_try_string,
+	string_name          = variant_try_string_name,
+	node_path            = variant_try_node_path,
+	rid                  = variant_try_rid,
+	array                = variant_try_array,
+	dictionary           = variant_try_dictionary,
+	packed_byte_array    = variant_try_packed_byte_array,
+	packed_int32_array   = variant_try_packed_int32_array,
+	packed_int64_array   = variant_try_packed_int64_array,
+	packed_float32_array = variant_try_packed_float32_array,
+	packed_float64_array = variant_try_packed_float64_array,
+	packed_string_array  = variant_try_packed_string_array,
+	packed_vector2_array = variant_try_packed_vector2_array,
+	packed_vector3_array = variant_try_packed_vector3_array,
+	packed_vector4_array = variant_try_packed_vector4_array,
+	packed_color_array   = variant_try_packed_color_array,
+	object               = variant_try_object,
+}
+
 variant_free :: gcore.variant_free
 variant_free_temp :: gcore.variant_free_temp
 call_error_ok :: gcore.call_error_ok

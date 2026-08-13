@@ -215,8 +215,13 @@ Keep these rules visible when building real features:
 - Odin-owned Godot values such as owned `Variant`, `String`, `StringName`,
   `NodePath`, arrays, dictionaries, and packed arrays must be destroyed with the
   matching facade or core helper.
-- `Variant` parameters are normally borrowed. Do not store borrowed Variant
-  pointers beyond the call that provided them.
+- `variant_from(...)` is the public construction proc group for representative
+  Variant conversions. It returns an owned Variant, so still call
+  `variant_free`.
+- `variant_try.float(&variant)` plus the other `variant_try.*` helpers are the
+  public checked extraction grouping. `Variant` parameters are normally
+  borrowed; do not store borrowed Variant pointers beyond the call that provided
+  them.
 - Object and class handles are borrowed Godot objects. Generated wrappers do not
   take ownership of Godot objects.
 - Extension-owned instance data is allocated and freed explicitly by your create

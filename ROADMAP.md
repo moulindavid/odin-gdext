@@ -96,11 +96,11 @@ callbacks.
      explicit.
 
 6. Shape a coherent public Variant conversion pattern.
-   - [ ] Group existing `variant_from_*` helpers behind an Odin-friendly proc
+   - [x] Group existing `variant_from_*` helpers behind an Odin-friendly proc
      group or naming pattern.
-   - [ ] Group checked extraction helpers behind a matching `try` pattern.
-   - [ ] Keep borrowed parameters and owned returns obvious at call sites.
-   - [ ] Add facade compile coverage for representative conversions.
+   - [x] Group checked extraction helpers behind a matching `try` pattern.
+   - [x] Keep borrowed parameters and owned returns obvious at call sites.
+   - [x] Add facade compile coverage for representative conversions.
 
 7. Expand generated class APIs only after the above rules are stable.
    - [ ] Add more common scene/resource classes incrementally.

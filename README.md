@@ -298,6 +298,10 @@ and a small Godot smoke path can exercise the feature.
   retain, unref, or free Godot objects.
 - Owned value wrappers must be destroyed explicitly with their matching free
   helper, for example `variant_free`, `string_free`, or `array_free`.
+- Use `variant_from(...)` for facade-level Variant construction and
+  `variant_try.float(&variant)` plus the other `variant_try.*` helpers for
+  checked extraction. `variant_from` returns an owned Variant that still needs
+  `variant_free`.
 - Generated wrappers borrow completed owned value parameters by pointer and
   return initialized owned values with destruction comments.
 - Extension-owned instance data is allocated and freed by your callbacks. It

@@ -445,6 +445,29 @@ facade_set_int_adapter := gt.ClassMethodSetIntAdapter {
 	method = facade_set_int_method,
 }
 
+variant_conversion_proc_group_facade_compile_smoke :: proc "contextless" (
+	object: gt.ObjectPtr,
+	string_value: ^gt.String,
+) {
+	v_float := gt.variant_from(gt.GodotReal(2.5))
+	v_int := gt.variant_from(i64(7))
+	v_bool := gt.variant_from(true)
+	v_string := gt.variant_from(string_value)
+	v_object := gt.variant_from(object)
+	defer gt.variant_free(&v_float)
+	defer gt.variant_free(&v_int)
+	defer gt.variant_free(&v_bool)
+	defer gt.variant_free(&v_string)
+	defer gt.variant_free(&v_object)
+
+	_, _ = gt.variant_try.float(&v_float)
+	_, _ = gt.variant_try.int(&v_int)
+	_, _ = gt.variant_try.bool(&v_bool)
+	string_back, string_ok := gt.variant_try.string(&v_string)
+	if string_ok do gt.string_free(&string_back)
+	_, _ = gt.variant_try.object(&v_object)
+}
+
 bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.ClassMethodGetBool(facade_get_bool_method)
 	_ = gt.ClassMethodSetBool(facade_set_bool_method)
