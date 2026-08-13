@@ -105,6 +105,8 @@ Node :: gclass.Node
 CanvasItem :: gclass.CanvasItem
 Node2D :: gclass.Node2D
 Control :: gclass.Control
+Sprite2D :: gclass.Sprite2D
+Label :: gclass.Label
 
 // --- Core functions ---
 init :: gcore.init
@@ -195,9 +197,51 @@ control_grab_focus :: gclass.control_grab_focus
 control_release_focus :: gclass.control_release_focus
 control_set_mouse_filter :: gclass.control_set_mouse_filter
 control_get_mouse_filter :: gclass.control_get_mouse_filter
+sprite2d_set_centered :: gclass.sprite2d_set_centered
+sprite2d_is_centered :: gclass.sprite2d_is_centered
+sprite2d_set_offset :: gclass.sprite2d_set_offset
+sprite2d_get_offset :: gclass.sprite2d_get_offset
+sprite2d_set_flip_h :: gclass.sprite2d_set_flip_h
+sprite2d_is_flipped_h :: gclass.sprite2d_is_flipped_h
+sprite2d_set_flip_v :: gclass.sprite2d_set_flip_v
+sprite2d_is_flipped_v :: gclass.sprite2d_is_flipped_v
+sprite2d_set_region_enabled :: gclass.sprite2d_set_region_enabled
+sprite2d_is_region_enabled :: gclass.sprite2d_is_region_enabled
+sprite2d_is_pixel_opaque :: gclass.sprite2d_is_pixel_opaque
+sprite2d_set_frame :: gclass.sprite2d_set_frame
+sprite2d_get_frame :: gclass.sprite2d_get_frame
+sprite2d_set_vframes :: gclass.sprite2d_set_vframes
+sprite2d_get_vframes :: gclass.sprite2d_get_vframes
+sprite2d_set_hframes :: gclass.sprite2d_set_hframes
+sprite2d_get_hframes :: gclass.sprite2d_get_hframes
+label_set_text :: gclass.label_set_text
+label_get_text :: gclass.label_get_text
+label_set_clip_text :: gclass.label_set_clip_text
+label_is_clipping_text :: gclass.label_is_clipping_text
+label_set_uppercase :: gclass.label_set_uppercase
+label_is_uppercase :: gclass.label_is_uppercase
+label_get_line_count :: gclass.label_get_line_count
+label_get_visible_line_count :: gclass.label_get_visible_line_count
+label_get_total_character_count :: gclass.label_get_total_character_count
+label_set_visible_characters :: gclass.label_set_visible_characters
+label_get_visible_characters :: gclass.label_get_visible_characters
+label_set_visible_ratio :: gclass.label_set_visible_ratio
+label_get_visible_ratio :: gclass.label_get_visible_ratio
+label_set_lines_skipped :: gclass.label_set_lines_skipped
+label_get_lines_skipped :: gclass.label_get_lines_skipped
+label_set_max_lines_visible :: gclass.label_set_max_lines_visible
+label_get_max_lines_visible :: gclass.label_get_max_lines_visible
 control_as_canvas_item :: gclass.control_as_canvas_item
 control_as_node :: gclass.control_as_node
 control_as_object :: gclass.control_as_object
+sprite2d_as_node2d :: gclass.sprite2d_as_node2d
+sprite2d_as_canvas_item :: gclass.sprite2d_as_canvas_item
+sprite2d_as_node :: gclass.sprite2d_as_node
+sprite2d_as_object :: gclass.sprite2d_as_object
+label_as_control :: gclass.label_as_control
+label_as_canvas_item :: gclass.label_as_canvas_item
+label_as_node :: gclass.label_as_node
+label_as_object :: gclass.label_as_object
 object_is_ref_counted :: gclass.object_is_ref_counted
 object_try_as_ref_counted :: gclass.object_try_as_ref_counted
 object_is_resource :: gclass.object_is_resource
@@ -210,6 +254,10 @@ object_is_node2d :: gclass.object_is_node2d
 object_try_as_node2d :: gclass.object_try_as_node2d
 object_is_control :: gclass.object_is_control
 object_try_as_control :: gclass.object_try_as_control
+object_is_sprite2d :: gclass.object_is_sprite2d
+object_try_as_sprite2d :: gclass.object_try_as_sprite2d
+object_is_label :: gclass.object_is_label
+object_try_as_label :: gclass.object_try_as_label
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 node_is_canvas_item :: gclass.node_is_canvas_item
@@ -218,10 +266,22 @@ node_is_node2d :: gclass.node_is_node2d
 node_try_as_node2d :: gclass.node_try_as_node2d
 node_is_control :: gclass.node_is_control
 node_try_as_control :: gclass.node_try_as_control
+node_is_sprite2d :: gclass.node_is_sprite2d
+node_try_as_sprite2d :: gclass.node_try_as_sprite2d
+node_is_label :: gclass.node_is_label
+node_try_as_label :: gclass.node_try_as_label
 canvas_item_is_node2d :: gclass.canvas_item_is_node2d
 canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
 canvas_item_try_as_control :: gclass.canvas_item_try_as_control
+canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
+canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
+canvas_item_is_label :: gclass.canvas_item_is_label
+canvas_item_try_as_label :: gclass.canvas_item_try_as_label
+node2d_is_sprite2d :: gclass.node2d_is_sprite2d
+node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
+control_is_label :: gclass.control_is_label
+control_try_as_label :: gclass.control_try_as_label
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -256,6 +316,14 @@ control_is_nil :: proc "contextless" (self: Control) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+sprite2d_is_nil :: proc "contextless" (self: Sprite2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+label_is_nil :: proc "contextless" (self: Label) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {
 	return Object(self)
 }
@@ -281,6 +349,14 @@ node2d_object_ptr :: proc "contextless" (self: Node2D) -> ObjectPtr {
 }
 
 control_object_ptr :: proc "contextless" (self: Control) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+sprite2d_object_ptr :: proc "contextless" (self: Sprite2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+label_object_ptr :: proc "contextless" (self: Label) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
@@ -322,6 +398,16 @@ object_ptr_try_as_node2d :: proc "contextless" (self: ObjectPtr) -> (value: Node
 object_ptr_try_as_control :: proc "contextless" (self: ObjectPtr) -> (value: Control, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_control(Object(self))
+}
+
+object_ptr_try_as_sprite2d :: proc "contextless" (self: ObjectPtr) -> (value: Sprite2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_sprite2d(Object(self))
+}
+
+object_ptr_try_as_label :: proc "contextless" (self: ObjectPtr) -> (value: Label, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_label(Object(self))
 }
 
 // --- Class enums and constants ---

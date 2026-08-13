@@ -103,10 +103,10 @@ callbacks.
    - [x] Add facade compile coverage for representative conversions.
 
 7. Expand generated class APIs only after the above rules are stable.
-   - [ ] Add more common scene/resource classes incrementally.
-   - [ ] Keep skip rules deterministic for unsupported signatures.
-   - [ ] Prefer generator fixes over manual patches to generated files.
-   - [ ] Keep generated methods aligned with the borrowed object handle model.
+   - [x] Add more common scene/resource classes incrementally.
+   - [x] Keep skip rules deterministic for unsupported signatures.
+   - [x] Prefer generator fixes over manual patches to generated files.
+   - [x] Keep generated methods aligned with the borrowed object handle model.
 
 ## Validation
 
