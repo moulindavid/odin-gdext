@@ -94,12 +94,7 @@ speed_getter_name_data: gt.StaticStringName
 speed_property_name := gt.const_static_string_name_ptr(&speed_property_name_data)
 speed_setter_name := gt.const_static_string_name_ptr(&speed_setter_name_data)
 speed_getter_name := gt.const_static_string_name_ptr(&speed_getter_name_data)
-speed_property_info: gt.PropertyInfo
-speed_get_return_info: gt.PropertyInfo
-speed_set_arg_info: gt.PropertyInfo
-speed_set_arg_meta := [1]gt.ClassMethodArgumentMetadata{.None}
-speed_get_method_info: gt.ClassMethodInfo
-speed_set_method_info: gt.ClassMethodInfo
+speed_property_storage: gt.ClassPrimitivePropertyStorage
 
 speed_changed_signal_name_data: gt.StaticStringName
 speed_changed_arg_name_data: gt.StaticStringName
@@ -146,14 +141,6 @@ init_registration_metadata :: proc() {
 		gt.class_member_property(member_defaults, .Float, roll_math_method_name),
 	)
 	gt.init_method_property_info(
-		&speed_get_return_info,
-		gt.class_member_property(member_defaults, .Float, speed_property_name),
-	)
-	gt.init_method_property_info(
-		&speed_set_arg_info,
-		gt.class_member_property(member_defaults, .Float, speed_property_name),
-	)
-	gt.init_method_property_info(
 		&speed_changed_arg_info,
 		gt.class_member_property(member_defaults, .Float, speed_changed_arg_name),
 	)
@@ -167,6 +154,21 @@ register_classes :: proc() {
 	init_registration_metadata()
 
 	member_defaults := gt.class_member_defaults(empty_name, empty_str)
+	speed_property := gt.class_property_godot_real(
+		&speed_property_storage,
+		gt.ClassTypedPropertyDescriptor {
+			property = gt.class_member_property(
+				member_defaults,
+				.Float,
+				speed_property_name,
+				gt.PropertyUsageDefault,
+			),
+			getter_name = speed_getter_name,
+			setter_name = speed_setter_name,
+		},
+		&get_speed_method_adapter,
+		&set_speed_method_adapter,
+	)
 	methods := [3]gt.OdinClassMethod {
 		{
 			info = &roll_math_method_info,
@@ -179,45 +181,10 @@ register_classes :: proc() {
 				return_value_metadata = .None,
 			},
 		},
-		{
-			info = &speed_get_method_info,
-			descriptor = gt.ClassMethodDescriptor {
-				name = speed_getter_name,
-				method_userdata = &get_speed_method_adapter,
-				call_func = gt.class_method_get_godot_real_call,
-				ptrcall_func = gt.class_method_get_godot_real_ptrcall,
-				return_value_info = &speed_get_return_info,
-				return_value_metadata = .None,
-			},
-		},
-		{
-			info = &speed_set_method_info,
-			descriptor = gt.ClassMethodDescriptor {
-				name = speed_setter_name,
-				method_userdata = &set_speed_method_adapter,
-				call_func = gt.class_method_set_godot_real_call,
-				ptrcall_func = gt.class_method_set_godot_real_ptrcall,
-				argument_count = 1,
-				arguments_info = &speed_set_arg_info,
-				arguments_metadata = &speed_set_arg_meta[0],
-			},
-		},
+		speed_property.getter,
+		speed_property.setter,
 	}
-	properties := [1]gt.OdinClassProperty {
-		{
-			info = &speed_property_info,
-			descriptor = gt.ClassPropertyDescriptor {
-				property = gt.class_member_property(
-					member_defaults,
-					.Float,
-					speed_property_name,
-					gt.PropertyUsageDefault,
-				),
-				setter = speed_setter_name,
-				getter = speed_getter_name,
-			},
-		},
-	}
+	properties := [1]gt.OdinClassProperty{speed_property.property}
 	signals := [1]gt.OdinClassSignal {
 		{
 			descriptor = gt.ClassSignalDescriptor {

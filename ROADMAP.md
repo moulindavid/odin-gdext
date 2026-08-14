@@ -83,11 +83,11 @@ lifetime rules.
    - [x] Update `examples/hello` or `examples/game` to use the pattern.
 
 2. Add typed property adapter helpers.
-   - [ ] Start with primitive properties: `GodotReal`, `int`, and `bool`.
-   - [ ] Add getter and setter adapters that retrieve typed Odin instance data.
-   - [ ] Preserve ptrcall ABI rules.
-   - [ ] Keep temporary `Variant` destruction explicit on call paths.
-   - [ ] Add facade compile coverage and smoke coverage.
+   - [x] Start with primitive properties: `GodotReal`, `int`, and `bool`.
+   - [x] Add getter and setter adapters that retrieve typed Odin instance data.
+   - [x] Preserve ptrcall ABI rules.
+   - [x] Keep temporary `Variant` destruction explicit on call paths.
+   - [x] Add facade compile coverage and smoke coverage.
 
 3. Add typed method adapters for common signatures.
    - [ ] Support `() -> String` and `String -> void` once ownership is clear.

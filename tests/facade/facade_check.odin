@@ -475,6 +475,10 @@ facade_set_real_adapter := gt.ClassMethodSetGodotRealAdapter {
 	method = facade_set_real_method,
 }
 
+facade_real_property_storage: gt.ClassPrimitivePropertyStorage
+facade_bool_property_storage: gt.ClassPrimitivePropertyStorage
+facade_int_property_storage: gt.ClassPrimitivePropertyStorage
+
 godot_real_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.ClassMethodGetGodotReal(facade_get_real_method)
 	_ = gt.ClassMethodSetGodotReal(facade_set_real_method)
@@ -484,6 +488,24 @@ godot_real_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.class_method_get_godot_real_ptrcall
 	_ = gt.class_method_set_godot_real_call
 	_ = gt.class_method_set_godot_real_ptrcall
+
+	property := gt.class_property_godot_real(
+		&facade_real_property_storage,
+		gt.ClassTypedPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Float,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			getter_name = facade_property_getter_name,
+			setter_name = facade_property_setter_name,
+		},
+		&facade_get_real_adapter,
+		&facade_set_real_adapter,
+	)
+	_ = property
 }
 
 facade_get_bool_method :: proc "contextless" (
@@ -567,6 +589,24 @@ bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.class_method_set_bool_call
 	_ = gt.class_method_set_bool_ptrcall
 
+	bool_property := gt.class_property_bool(
+		&facade_bool_property_storage,
+		gt.ClassTypedPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Bool,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			getter_name = facade_property_getter_name,
+			setter_name = facade_property_setter_name,
+		},
+		&facade_get_bool_adapter,
+		&facade_set_bool_adapter,
+	)
+	_ = bool_property
+
 	_ = gt.ClassMethodGetInt(facade_get_int_method)
 	_ = gt.ClassMethodSetInt(facade_set_int_method)
 	_ = facade_get_int_adapter
@@ -575,6 +615,24 @@ bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.class_method_get_int_ptrcall
 	_ = gt.class_method_set_int_call
 	_ = gt.class_method_set_int_ptrcall
+
+	int_property := gt.class_property_int(
+		&facade_int_property_storage,
+		gt.ClassTypedPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Int,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			getter_name = facade_property_getter_name,
+			setter_name = facade_property_setter_name,
+		},
+		&facade_get_int_adapter,
+		&facade_set_int_adapter,
+	)
+	_ = int_property
 }
 
 facade_signal_name_data: gt.StaticStringName

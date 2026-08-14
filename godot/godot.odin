@@ -60,6 +60,9 @@ ClassMethodGetInt :: gcore.ClassMethodGetInt
 ClassMethodGetIntAdapter :: gcore.ClassMethodGetIntAdapter
 ClassMethodSetInt :: gcore.ClassMethodSetInt
 ClassMethodSetIntAdapter :: gcore.ClassMethodSetIntAdapter
+ClassPrimitivePropertyStorage :: gcore.ClassPrimitivePropertyStorage
+ClassTypedPropertyDescriptor :: gcore.ClassTypedPropertyDescriptor
+ClassTypedProperty :: gcore.ClassTypedProperty
 InstanceBindingCallbacks :: gcore.InstanceBindingCallbacks
 VariantType :: gcore.VariantType
 VariantStorage :: gcore.VariantStorage
@@ -152,6 +155,9 @@ class_method_get_int_call :: gcore.class_method_get_int_call
 class_method_get_int_ptrcall :: gcore.class_method_get_int_ptrcall
 class_method_set_int_call :: gcore.class_method_set_int_call
 class_method_set_int_ptrcall :: gcore.class_method_set_int_ptrcall
+class_property_godot_real :: gcore.class_property_godot_real
+class_property_int :: gcore.class_property_int
+class_property_bool :: gcore.class_property_bool
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object

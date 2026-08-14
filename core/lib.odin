@@ -734,6 +734,154 @@ ClassMethodSetIntAdapter :: struct {
 	method: ClassMethodSetInt,
 }
 
+ClassPrimitivePropertyStorage :: struct {
+	property_info:      PropertyInfo,
+	getter_return_info: PropertyInfo,
+	setter_arg_info:    PropertyInfo,
+	setter_arg_meta:    [1]ClassMethodArgumentMetadata,
+	getter_method_info: ClassMethodInfo,
+	setter_method_info: ClassMethodInfo,
+}
+
+ClassTypedPropertyDescriptor :: struct {
+	property:    MethodPropertyDescriptor,
+	getter_name: StringNamePtr,
+	setter_name: StringNamePtr,
+}
+
+ClassTypedProperty :: struct {
+	property: OdinClassProperty,
+	getter:   OdinClassMethod,
+	setter:   OdinClassMethod,
+}
+
+class_property_godot_real :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: ^ClassMethodGetGodotRealAdapter,
+	setter_adapter: ^ClassMethodSetGodotRealAdapter,
+) -> ClassTypedProperty {
+	if storage == nil || getter_adapter == nil || setter_adapter == nil {
+		_trap_nil_godot_function()
+	}
+	return class_property_primitive(
+		storage,
+		desc,
+		getter_adapter,
+		setter_adapter,
+		class_method_get_godot_real_call,
+		class_method_get_godot_real_ptrcall,
+		class_method_set_godot_real_call,
+		class_method_set_godot_real_ptrcall,
+	)
+}
+
+class_property_int :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: ^ClassMethodGetIntAdapter,
+	setter_adapter: ^ClassMethodSetIntAdapter,
+) -> ClassTypedProperty {
+	if storage == nil || getter_adapter == nil || setter_adapter == nil {
+		_trap_nil_godot_function()
+	}
+	return class_property_primitive(
+		storage,
+		desc,
+		getter_adapter,
+		setter_adapter,
+		class_method_get_int_call,
+		class_method_get_int_ptrcall,
+		class_method_set_int_call,
+		class_method_set_int_ptrcall,
+	)
+}
+
+class_property_bool :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: ^ClassMethodGetBoolAdapter,
+	setter_adapter: ^ClassMethodSetBoolAdapter,
+) -> ClassTypedProperty {
+	if storage == nil || getter_adapter == nil || setter_adapter == nil {
+		_trap_nil_godot_function()
+	}
+	return class_property_primitive(
+		storage,
+		desc,
+		getter_adapter,
+		setter_adapter,
+		class_method_get_bool_call,
+		class_method_get_bool_ptrcall,
+		class_method_set_bool_call,
+		class_method_set_bool_ptrcall,
+	)
+}
+
+class_property_primitive :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: rawptr,
+	setter_adapter: rawptr,
+	getter_call: ClassMethodCall,
+	getter_ptrcall: ClassMethodPtrCall,
+	setter_call: ClassMethodCall,
+	setter_ptrcall: ClassMethodPtrCall,
+) -> ClassTypedProperty {
+	if storage == nil ||
+	   desc.property.name == nil ||
+	   desc.property.class_name == nil ||
+	   desc.property.hint_string == nil ||
+	   desc.getter_name == nil ||
+	   desc.setter_name == nil ||
+	   getter_adapter == nil ||
+	   setter_adapter == nil ||
+	   getter_call == nil ||
+	   getter_ptrcall == nil ||
+	   setter_call == nil ||
+	   setter_ptrcall == nil {
+		_trap_nil_godot_function()
+	}
+
+	storage.setter_arg_meta[0] = .None
+	init_method_property_info(&storage.getter_return_info, desc.property)
+	init_method_property_info(&storage.setter_arg_info, desc.property)
+
+	return ClassTypedProperty {
+		property = OdinClassProperty {
+			info = &storage.property_info,
+			descriptor = ClassPropertyDescriptor {
+				property = desc.property,
+				setter = desc.setter_name,
+				getter = desc.getter_name,
+			},
+		},
+		getter = OdinClassMethod {
+			info = &storage.getter_method_info,
+			descriptor = ClassMethodDescriptor {
+				name = desc.getter_name,
+				method_userdata = getter_adapter,
+				call_func = getter_call,
+				ptrcall_func = getter_ptrcall,
+				return_value_info = &storage.getter_return_info,
+				return_value_metadata = .None,
+			},
+		},
+		setter = OdinClassMethod {
+			info = &storage.setter_method_info,
+			descriptor = ClassMethodDescriptor {
+				name = desc.setter_name,
+				method_userdata = setter_adapter,
+				call_func = setter_call,
+				ptrcall_func = setter_ptrcall,
+				argument_count = 1,
+				arguments_info = &storage.setter_arg_info,
+				arguments_metadata = &storage.setter_arg_meta[0],
+			},
+		},
+	}
+}
+
 _set_call_error :: proc "contextless" (
 	err: ^CallError,
 	error: CallErrorType,
