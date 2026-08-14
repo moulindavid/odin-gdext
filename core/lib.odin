@@ -521,6 +521,68 @@ ClassMethodDescriptor :: struct {
 	arguments_metadata:    ^ClassMethodArgumentMetadata,
 }
 
+OdinClassMethod :: struct {
+	info:       ^ClassMethodInfo,
+	descriptor: ClassMethodDescriptor,
+}
+
+OdinClassProperty :: struct {
+	info:       ^PropertyInfo,
+	descriptor: ClassPropertyDescriptor,
+}
+
+OdinClassSignal :: struct {
+	descriptor: ClassSignalDescriptor,
+}
+
+OdinClassDescriptor :: struct {
+	class_name:           ConstStringNamePtr,
+	parent_class_name:    ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func:   ClassFreeInstance,
+	notification_func:    ClassNotification,
+	class_userdata:       rawptr,
+	methods:              []OdinClassMethod,
+	properties:           []OdinClassProperty,
+	signals:              []OdinClassSignal,
+}
+
+// register_odin_class registers one Odin-backed class and its member metadata.
+// The descriptor is consumed immediately; Godot-facing names, PropertyInfo,
+// ClassMethodInfo, adapters, and callback data must be caller-owned stable
+// storage that remains valid for the registered class.
+register_odin_class :: proc "contextless" (desc: OdinClassDescriptor) {
+	register_editor_visible_class(
+		EditorVisibleClassDescriptor {
+			class_name = desc.class_name,
+			parent_class_name = desc.parent_class_name,
+			create_instance_func = desc.create_instance_func,
+			free_instance_func = desc.free_instance_func,
+			notification_func = desc.notification_func,
+			class_userdata = desc.class_userdata,
+		},
+	)
+
+	for method in desc.methods {
+		register_class_method_with_descriptor(desc.class_name, method.info, method.descriptor)
+	}
+	for property in desc.properties {
+		register_class_property_with_descriptor(
+			desc.class_name,
+			property.info,
+			property.descriptor,
+		)
+	}
+	for signal in desc.signals {
+		register_class_signal_with_descriptor(desc.class_name, signal.descriptor)
+	}
+}
+
+unregister_odin_class :: proc "contextless" (desc: OdinClassDescriptor) {
+	if desc.class_name == nil do _trap_nil_godot_function()
+	unregister_class(desc.class_name)
+}
+
 // init_method_property_info fills caller-owned PropertyInfo storage. Name,
 // class_name, and hint_string must point to storage that remains valid while
 // Godot reads the method metadata. Use process-lifetime StringName storage for

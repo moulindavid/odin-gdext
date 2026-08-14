@@ -274,6 +274,22 @@ registration_facade_compile_smoke :: proc "contextless" () {
 	)
 	_ = gt.register_class_with_defaults
 	gt.unregister_class(facade_class_name)
+
+	methods := [0]gt.OdinClassMethod{}
+	properties := [0]gt.OdinClassProperty{}
+	signals := [0]gt.OdinClassSignal{}
+	class_desc := gt.OdinClassDescriptor {
+		class_name           = facade_class_name,
+		parent_class_name    = facade_parent_name,
+		create_instance_func = facade_create_instance,
+		free_instance_func   = facade_free_instance,
+		notification_func    = facade_notification,
+		methods              = methods[:],
+		properties           = properties[:],
+		signals              = signals[:],
+	}
+	gt.register_odin_class(class_desc)
+	gt.unregister_odin_class(class_desc)
 }
 
 instance_binding_facade_compile_smoke :: proc "contextless" (

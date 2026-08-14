@@ -75,12 +75,12 @@ authoring structured and repeatable without hiding ownership or GDExtension
 lifetime rules.
 
 1. Add a typed class descriptor pattern.
-   - [ ] Provide a small descriptor shape for an Odin-backed class.
-   - [ ] Group class name, parent name, create/free callbacks, notification
+   - [x] Provide a small descriptor shape for an Odin-backed class.
+   - [x] Group class name, parent name, create/free callbacks, notification
      callbacks, methods, properties, and signals.
-   - [ ] Keep registration and unregistration explicit.
-   - [ ] Keep all stable metadata storage owned by the extension code.
-   - [ ] Update `examples/hello` or `examples/game` to use the pattern.
+   - [x] Keep registration and unregistration explicit.
+   - [x] Keep all stable metadata storage owned by the extension code.
+   - [x] Update `examples/hello` or `examples/game` to use the pattern.
 
 2. Add typed property adapter helpers.
    - [ ] Start with primitive properties: `GodotReal`, `int`, and `bool`.

@@ -40,6 +40,10 @@ ClassMemberDefaults :: gcore.ClassMemberDefaults
 ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
 ClassSignalDescriptor :: gcore.ClassSignalDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
+OdinClassMethod :: gcore.OdinClassMethod
+OdinClassProperty :: gcore.OdinClassProperty
+OdinClassSignal :: gcore.OdinClassSignal
+OdinClassDescriptor :: gcore.OdinClassDescriptor
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
 ClassMethodVoid :: gcore.ClassMethodVoid
@@ -129,6 +133,8 @@ init_class_method_info :: gcore.init_class_method_info
 register_class_property_with_descriptor :: gcore.register_class_property_with_descriptor
 register_class_signal_with_descriptor :: gcore.register_class_signal_with_descriptor
 register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
+register_odin_class :: gcore.register_odin_class
+unregister_odin_class :: gcore.unregister_odin_class
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall
