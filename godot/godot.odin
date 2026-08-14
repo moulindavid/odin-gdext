@@ -484,7 +484,7 @@ NodeNotificationHandlers :: struct {
 	physics_process: NodeNotificationHandler,
 }
 
-NodeVirtualCallbacks :: struct {
+NodeLifecycleCallbacks :: struct {
 	enter_tree:       NodeNotificationHandler,
 	exit_tree:        NodeNotificationHandler,
 	ready:            NodeNotificationHandler,
@@ -492,6 +492,8 @@ NodeVirtualCallbacks :: struct {
 	physics_process:  NodeNotificationHandler,
 	raw_notification: NodeRawNotificationHandler,
 }
+
+NodeVirtualCallbacks :: NodeLifecycleCallbacks
 
 // dispatch_node_notification calls a typed handler for common Node lifecycle
 // notifications and returns true when a handler ran. Unknown notifications and
@@ -534,14 +536,15 @@ dispatch_node_notification :: proc(
 	return false
 }
 
-// dispatch_node_virtual_callbacks is the user-facing Node virtual notification
-// descriptor path. The process callbacks are raw notification callbacks and do
-// not synthesize _process(delta) or _physics_process(delta) data.
-dispatch_node_virtual_callbacks :: proc(
+// dispatch_node_lifecycle_callbacks is the compact public callback-table path
+// for common Node lifecycle notifications. Process callbacks are notification
+// callbacks only; they do not synthesize _process(delta) or
+// _physics_process(delta) data.
+dispatch_node_lifecycle_callbacks :: proc(
 	instance: ClassInstancePtr,
 	what: i32,
 	reversed: bool,
-	callbacks: ^NodeVirtualCallbacks,
+	callbacks: ^NodeLifecycleCallbacks,
 ) -> bool {
 	if callbacks == nil do return false
 
@@ -578,6 +581,15 @@ dispatch_node_virtual_callbacks :: proc(
 		return true
 	}
 	return false
+}
+
+dispatch_node_virtual_callbacks :: proc(
+	instance: ClassInstancePtr,
+	what: i32,
+	reversed: bool,
+	callbacks: ^NodeVirtualCallbacks,
+) -> bool {
+	return dispatch_node_lifecycle_callbacks(instance, what, reversed, callbacks)
 }
 
 // --- String ---

@@ -245,7 +245,7 @@ facade_node_notifications := gt.NodeNotificationHandlers {
 	process = facade_process_notification,
 }
 
-facade_node_virtuals := gt.NodeVirtualCallbacks {
+facade_node_lifecycle := gt.NodeLifecycleCallbacks {
 	ready            = facade_ready_notification,
 	process          = facade_process_notification,
 	raw_notification = facade_raw_notification,
@@ -253,7 +253,8 @@ facade_node_virtuals := gt.NodeVirtualCallbacks {
 
 facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
-	if gt.dispatch_node_virtual_callbacks(instance, what, reversed, &facade_node_virtuals) do return
+	if gt.dispatch_node_lifecycle_callbacks(instance, what, reversed, &facade_node_lifecycle) do return
+	_ = gt.dispatch_node_virtual_callbacks(instance, what, reversed, &facade_node_lifecycle)
 	if gt.dispatch_node_notification(instance, what, reversed, &facade_node_notifications) do return
 	if what == gt.node_notification_ready {
 		_ = what

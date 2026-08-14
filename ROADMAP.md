@@ -97,11 +97,11 @@ lifetime rules.
      ownership-sensitive signatures.
 
 4. Improve notification and virtual callback ergonomics.
-   - [ ] Provide a compact callback table for common node lifecycle events.
-   - [ ] Keep raw notification numbers available.
-   - [ ] Verify a safe source for `_process(delta)` and `_physics_process(delta)`
+   - [x] Provide a compact callback table for common node lifecycle events.
+   - [x] Keep raw notification numbers available.
+   - [x] Verify a safe source for `_process(delta)` and `_physics_process(delta)`
      before exposing typed delta callbacks.
-   - [ ] Do not fake delta values.
+   - [x] Do not fake delta values.
 
 5. Add a real usage example that exercises the authoring model.
    - [ ] Add or update an example where Odin controls a `Label` or `Sprite2D`.
