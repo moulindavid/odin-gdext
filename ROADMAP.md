@@ -111,11 +111,11 @@ lifetime rules.
    - [x] Keep the beginner example clean and move broad checks to smoke.
 
 6. Add documentation for the class authoring model.
-   - [ ] Document the recommended layout for a game-specific Odin extension.
-   - [ ] Show how to register and unregister classes.
-   - [ ] Explain instance data ownership.
-   - [ ] Explain method/property/signal metadata lifetime.
-   - [ ] List unsupported signatures clearly.
+   - [x] Document the recommended layout for a game-specific Odin extension.
+   - [x] Show how to register and unregister classes.
+   - [x] Explain instance data ownership.
+   - [x] Explain method/property/signal metadata lifetime.
+   - [x] List unsupported signatures clearly.
 
 ## Validation
 
