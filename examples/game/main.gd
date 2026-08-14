@@ -22,12 +22,11 @@ func _unhandled_input(event: InputEvent) -> void:
         _roll_once()
 
 func _roll_once() -> void:
-    var value: float = brain.call("roll_damage")
-    label.text = "Odin roll %d: %.2f damage at difficulty %.1f" % [roll_count, value, brain.difficulty]
+    brain.call("roll_into_label", label)
 
 func _on_damage_rolled(value: float) -> void:
     roll_count += 1
-    print("Odin damage roll: ", value)
+    print("Odin damage roll %d: %s" % [roll_count, value])
 
 func _exit_tree() -> void:
     if brain != null:

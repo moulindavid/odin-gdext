@@ -104,11 +104,11 @@ lifetime rules.
    - [x] Do not fake delta values.
 
 5. Add a real usage example that exercises the authoring model.
-   - [ ] Add or update an example where Odin controls a `Label` or `Sprite2D`.
-   - [ ] Trigger behavior from Godot input, such as pressing Space.
-   - [ ] Use random numbers, math helpers, a property, a signal, and a generated
+   - [x] Add or update an example where Odin controls a `Label` or `Sprite2D`.
+   - [x] Trigger behavior from Godot input, such as pressing Space.
+   - [x] Use random numbers, math helpers, a property, a signal, and a generated
      class handle.
-   - [ ] Keep the beginner example clean and move broad checks to smoke.
+   - [x] Keep the beginner example clean and move broad checks to smoke.
 
 6. Add documentation for the class authoring model.
    - [ ] Document the recommended layout for a game-specific Odin extension.
