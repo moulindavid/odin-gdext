@@ -60,6 +60,12 @@ ClassMethodGetInt :: gcore.ClassMethodGetInt
 ClassMethodGetIntAdapter :: gcore.ClassMethodGetIntAdapter
 ClassMethodSetInt :: gcore.ClassMethodSetInt
 ClassMethodSetIntAdapter :: gcore.ClassMethodSetIntAdapter
+ClassMethodGetString :: gcore.ClassMethodGetString
+ClassMethodGetStringAdapter :: gcore.ClassMethodGetStringAdapter
+ClassMethodSetString :: gcore.ClassMethodSetString
+ClassMethodSetStringAdapter :: gcore.ClassMethodSetStringAdapter
+ClassMethodSetObjectPtr :: gcore.ClassMethodSetObjectPtr
+ClassMethodSetObjectPtrAdapter :: gcore.ClassMethodSetObjectPtrAdapter
 ClassPrimitivePropertyStorage :: gcore.ClassPrimitivePropertyStorage
 ClassTypedPropertyDescriptor :: gcore.ClassTypedPropertyDescriptor
 ClassTypedProperty :: gcore.ClassTypedProperty
@@ -155,6 +161,12 @@ class_method_get_int_call :: gcore.class_method_get_int_call
 class_method_get_int_ptrcall :: gcore.class_method_get_int_ptrcall
 class_method_set_int_call :: gcore.class_method_set_int_call
 class_method_set_int_ptrcall :: gcore.class_method_set_int_ptrcall
+class_method_get_string_call :: gcore.class_method_get_string_call
+class_method_get_string_ptrcall :: gcore.class_method_get_string_ptrcall
+class_method_set_string_call :: gcore.class_method_set_string_call
+class_method_set_string_ptrcall :: gcore.class_method_set_string_ptrcall
+class_method_set_object_ptr_call :: gcore.class_method_set_object_ptr_call
+class_method_set_object_ptr_ptrcall :: gcore.class_method_set_object_ptr_ptrcall
 class_property_godot_real :: gcore.class_property_godot_real
 class_property_int :: gcore.class_property_int
 class_property_bool :: gcore.class_property_bool
@@ -574,6 +586,8 @@ const_string_ptr :: gcore.const_string_ptr
 uninitialized_string_ptr :: gcore.uninitialized_string_ptr
 string_init_utf8 :: gcore.string_init_utf8
 string_from_utf8 :: gcore.string_from_utf8
+string_init_copy :: gcore.string_init_copy
+string_copy :: gcore.string_copy
 string_utf8_len :: gcore.string_utf8_len
 string_to_utf8 :: gcore.string_to_utf8
 string_free :: gcore.string_free

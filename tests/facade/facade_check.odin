@@ -579,6 +579,62 @@ variant_conversion_proc_group_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.variant_try.object(&v_object)
 }
 
+facade_get_string_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.String,
+	ok: bool,
+) {
+	_ = instance
+	return gt.string_from_utf8("facade"), true
+}
+
+facade_set_string_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: ^gt.String,
+) -> bool {
+	_ = instance
+	copy := gt.string_copy(value)
+	gt.string_free(&copy)
+	return true
+}
+
+facade_set_object_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: gt.ObjectPtr,
+) -> bool {
+	_ = instance
+	_ = value
+	return true
+}
+
+facade_get_string_adapter := gt.ClassMethodGetStringAdapter {
+	method = facade_get_string_method,
+}
+
+facade_set_string_adapter := gt.ClassMethodSetStringAdapter {
+	method = facade_set_string_method,
+}
+
+facade_set_object_adapter := gt.ClassMethodSetObjectPtrAdapter {
+	method = facade_set_object_method,
+}
+
+string_object_method_adapter_facade_compile_smoke :: proc "contextless" () {
+	_ = gt.ClassMethodGetString(facade_get_string_method)
+	_ = gt.ClassMethodSetString(facade_set_string_method)
+	_ = gt.ClassMethodSetObjectPtr(facade_set_object_method)
+	_ = facade_get_string_adapter
+	_ = facade_set_string_adapter
+	_ = facade_set_object_adapter
+	_ = gt.class_method_get_string_call
+	_ = gt.class_method_get_string_ptrcall
+	_ = gt.class_method_set_string_call
+	_ = gt.class_method_set_string_ptrcall
+	_ = gt.class_method_set_object_ptr_call
+	_ = gt.class_method_set_object_ptr_ptrcall
+}
+
 bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.ClassMethodGetBool(facade_get_bool_method)
 	_ = gt.ClassMethodSetBool(facade_set_bool_method)

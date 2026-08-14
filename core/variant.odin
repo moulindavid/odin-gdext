@@ -201,6 +201,18 @@ string_from_utf8 :: proc "contextless" (value: string) -> (result: String) {
 	return
 }
 
+string_init_copy :: proc "contextless" (dest: UninitializedStringPtr, value: ^String) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.String, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_string_ptr(value))
+}
+
+string_copy :: proc "contextless" (value: ^String) -> (result: String) {
+	string_init_copy(uninitialized_string_ptr(&result), value)
+	return
+}
+
 // string_utf8_len returns the number of bytes needed to encode s as UTF-8. The
 // result does not include a null terminator.
 string_utf8_len :: proc "contextless" (s: ^String) -> int {

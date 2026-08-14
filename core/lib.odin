@@ -734,6 +734,35 @@ ClassMethodSetIntAdapter :: struct {
 	method: ClassMethodSetInt,
 }
 
+ClassMethodGetString :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+) -> (
+	value: String,
+	ok: bool,
+)
+
+ClassMethodGetStringAdapter :: struct {
+	method: ClassMethodGetString,
+}
+
+ClassMethodSetString :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	value: ^String,
+) -> bool
+
+ClassMethodSetStringAdapter :: struct {
+	method: ClassMethodSetString,
+}
+
+ClassMethodSetObjectPtr :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	value: ObjectPtr,
+) -> bool
+
+ClassMethodSetObjectPtrAdapter :: struct {
+	method: ClassMethodSetObjectPtr,
+}
+
 ClassPrimitivePropertyStorage :: struct {
 	property_info:      PropertyInfo,
 	getter_return_info: PropertyInfo,
@@ -1435,6 +1464,209 @@ class_method_set_int_ptrcall :: proc "c" (
 	if adapter.method == nil do _trap_nil_godot_function()
 
 	value := (cast(^i64)p_args[0])^
+	if !adapter.method(p_instance, value) do _trap_godot_call_error()
+}
+
+class_method_get_string_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || r_return == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count > 0 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 0)
+		return
+	}
+
+	adapter := cast(^ClassMethodGetStringAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, ok := adapter.method(p_instance)
+	if !ok {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	defer string_free(&value)
+
+	rv := variant_from_string(&value)
+	variant_init_copy(r_return, &rv)
+	variant_free(&rv)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_get_string_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || p_instance == nil || r_ret == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodGetStringAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value, ok := adapter.method(p_instance)
+	if !ok do _trap_godot_call_error()
+	defer string_free(&value)
+	string_init_copy(r_ret, &value)
+}
+
+class_method_set_string_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 1 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 1)
+		return
+	}
+	if p_argument_count > 1 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 1)
+		return
+	}
+	if p_args == nil || p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.String)
+		return
+	}
+
+	adapter := cast(^ClassMethodSetStringAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, value_ok := variant_try_string(cast(^Variant)p_args[0])
+	if !value_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.String)
+		return
+	}
+	defer string_free(&value)
+	if !adapter.method(p_instance, &value) {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if r_return != nil do variant_init_nil(r_return)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_set_string_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = r_ret
+	if method_userdata == nil || p_instance == nil || p_args == nil || p_args[0] == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodSetStringAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value := cast(^String)p_args[0]
+	if !adapter.method(p_instance, value) do _trap_godot_call_error()
+}
+
+class_method_set_object_ptr_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 1 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 1)
+		return
+	}
+	if p_argument_count > 1 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 1)
+		return
+	}
+	if p_args == nil || p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Object)
+		return
+	}
+
+	adapter := cast(^ClassMethodSetObjectPtrAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, value_ok := variant_try_object(cast(^Variant)p_args[0])
+	if !value_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Object)
+		return
+	}
+	if !adapter.method(p_instance, value) {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if r_return != nil do variant_init_nil(r_return)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_set_object_ptr_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = r_ret
+	if method_userdata == nil || p_instance == nil || p_args == nil || p_args[0] == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodSetObjectPtrAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value := (cast(^ObjectPtr)p_args[0])^
 	if !adapter.method(p_instance, value) do _trap_godot_call_error()
 }
 

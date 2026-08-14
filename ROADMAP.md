@@ -90,10 +90,10 @@ lifetime rules.
    - [x] Add facade compile coverage and smoke coverage.
 
 3. Add typed method adapters for common signatures.
-   - [ ] Support `() -> String` and `String -> void` once ownership is clear.
-   - [ ] Support simple object-handle parameters only as borrowed values.
-   - [ ] Add fixed arity helpers for common game code before broad generation.
-   - [ ] Defer varargs, default arguments, `Callable`, `Signal`, and complex
+   - [x] Support `() -> String` and `String -> void` once ownership is clear.
+   - [x] Support simple object-handle parameters only as borrowed values.
+   - [x] Add fixed arity helpers for common game code before broad generation.
+   - [x] Defer varargs, default arguments, `Callable`, `Signal`, and complex
      ownership-sensitive signatures.
 
 4. Improve notification and virtual callback ergonomics.
