@@ -75,47 +75,47 @@ authoring structured and repeatable without hiding ownership or GDExtension
 lifetime rules.
 
 1. Add a typed class descriptor pattern.
-   - [ ] Provide a small descriptor shape for an Odin-backed class.
-   - [ ] Group class name, parent name, create/free callbacks, notification
+   - [x] Provide a small descriptor shape for an Odin-backed class.
+   - [x] Group class name, parent name, create/free callbacks, notification
      callbacks, methods, properties, and signals.
-   - [ ] Keep registration and unregistration explicit.
-   - [ ] Keep all stable metadata storage owned by the extension code.
-   - [ ] Update `examples/hello` or `examples/game` to use the pattern.
+   - [x] Keep registration and unregistration explicit.
+   - [x] Keep all stable metadata storage owned by the extension code.
+   - [x] Update `examples/hello` or `examples/game` to use the pattern.
 
 2. Add typed property adapter helpers.
-   - [ ] Start with primitive properties: `GodotReal`, `int`, and `bool`.
-   - [ ] Add getter and setter adapters that retrieve typed Odin instance data.
-   - [ ] Preserve ptrcall ABI rules.
-   - [ ] Keep temporary `Variant` destruction explicit on call paths.
-   - [ ] Add facade compile coverage and smoke coverage.
+   - [x] Start with primitive properties: `GodotReal`, `int`, and `bool`.
+   - [x] Add getter and setter adapters that retrieve typed Odin instance data.
+   - [x] Preserve ptrcall ABI rules.
+   - [x] Keep temporary `Variant` destruction explicit on call paths.
+   - [x] Add facade compile coverage and smoke coverage.
 
 3. Add typed method adapters for common signatures.
-   - [ ] Support `() -> String` and `String -> void` once ownership is clear.
-   - [ ] Support simple object-handle parameters only as borrowed values.
-   - [ ] Add fixed arity helpers for common game code before broad generation.
-   - [ ] Defer varargs, default arguments, `Callable`, `Signal`, and complex
+   - [x] Support `() -> String` and `String -> void` once ownership is clear.
+   - [x] Support simple object-handle parameters only as borrowed values.
+   - [x] Add fixed arity helpers for common game code before broad generation.
+   - [x] Defer varargs, default arguments, `Callable`, `Signal`, and complex
      ownership-sensitive signatures.
 
 4. Improve notification and virtual callback ergonomics.
-   - [ ] Provide a compact callback table for common node lifecycle events.
-   - [ ] Keep raw notification numbers available.
-   - [ ] Verify a safe source for `_process(delta)` and `_physics_process(delta)`
+   - [x] Provide a compact callback table for common node lifecycle events.
+   - [x] Keep raw notification numbers available.
+   - [x] Verify a safe source for `_process(delta)` and `_physics_process(delta)`
      before exposing typed delta callbacks.
-   - [ ] Do not fake delta values.
+   - [x] Do not fake delta values.
 
 5. Add a real usage example that exercises the authoring model.
-   - [ ] Add or update an example where Odin controls a `Label` or `Sprite2D`.
-   - [ ] Trigger behavior from Godot input, such as pressing Space.
-   - [ ] Use random numbers, math helpers, a property, a signal, and a generated
+   - [x] Add or update an example where Odin controls a `Label` or `Sprite2D`.
+   - [x] Trigger behavior from Godot input, such as pressing Space.
+   - [x] Use random numbers, math helpers, a property, a signal, and a generated
      class handle.
-   - [ ] Keep the beginner example clean and move broad checks to smoke.
+   - [x] Keep the beginner example clean and move broad checks to smoke.
 
 6. Add documentation for the class authoring model.
-   - [ ] Document the recommended layout for a game-specific Odin extension.
-   - [ ] Show how to register and unregister classes.
-   - [ ] Explain instance data ownership.
-   - [ ] Explain method/property/signal metadata lifetime.
-   - [ ] List unsupported signatures clearly.
+   - [x] Document the recommended layout for a game-specific Odin extension.
+   - [x] Show how to register and unregister classes.
+   - [x] Explain instance data ownership.
+   - [x] Explain method/property/signal metadata lifetime.
+   - [x] List unsupported signatures clearly.
 
 ## Validation
 

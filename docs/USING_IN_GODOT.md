@@ -144,6 +144,73 @@ need an owned wrapper before they are safe in normal user code, so the current
 facade and generated class API keep `RefCounted` and `Resource` methods
 borrowed-only and skip public retain/unref helpers.
 
+## Recommended Odin class authoring layout
+
+For a game-specific extension, keep the Odin side explicit and stable:
+
+1. Store class names, method names, property names, signal names, and hint
+   strings in global or otherwise process-lifetime storage.
+2. Allocate extension-owned instance data in the create callback.
+3. Attach that data to the Godot object with `gt.attach_instance`.
+4. Retrieve typed data in callbacks with `gt.class_instance_data`.
+5. Register the class and members through `gt.OdinClassDescriptor`.
+6. Unregister the class during extension deinitialization.
+
+A typical registration shape is:
+
+```odin
+methods := [2]gt.OdinClassMethod{roll_method, set_label_method}
+properties := [1]gt.OdinClassProperty{difficulty_property.property}
+signals := [1]gt.OdinClassSignal{damage_signal}
+
+gt.register_odin_class(
+    gt.OdinClassDescriptor{
+        class_name = game_class_name,
+        parent_class_name = game_parent_name,
+        create_instance_func = create_instance,
+        free_instance_func = free_instance,
+        methods = methods[:],
+        properties = properties[:],
+        signals = signals[:],
+    },
+)
+```
+
+`gt.OdinClassDescriptor` does not own or copy metadata. The arrays,
+`PropertyInfo`, `ClassMethodInfo`, adapter userdata, names, and hint strings must
+remain valid for the registration call and any later Godot reads of that
+metadata. The examples use process-lifetime storage for this reason.
+
+Primitive properties can use typed helpers such as
+`gt.class_property_godot_real`, `gt.class_property_int`, and
+`gt.class_property_bool`. These helpers build the property, getter method, and
+setter method descriptors from caller-owned stable storage while preserving the
+same Variant and ptrcall ABI rules as the underlying method adapters.
+
+Current simple method adapters cover:
+
+- `() -> void`
+- `() -> bool`
+- `() -> int`
+- `() -> GodotReal`
+- `() -> String`, returning owned Godot String storage through the adapter
+- `(bool) -> void`
+- `(int) -> void`
+- `(GodotReal) -> void`
+- `(String) -> void`, receiving borrowed String storage for the callback
+- `(ObjectPtr) -> void`, receiving a borrowed object handle
+- `GodotReal, GodotReal -> GodotReal`
+
+Object handles passed to adapters are borrowed. If you need a specific class,
+use checked helpers such as `gt.object_ptr_try_as_label` before calling generated
+class methods. Do not store the handle unless Godot ownership guarantees it stays
+valid for your whole use window.
+
+Unsupported or deferred signatures include varargs, default arguments,
+`Callable`, `Signal`, owned `RefCounted` or `Resource` transfer, and broad
+object-lifetime-sensitive APIs. For those, keep the raw `Variant` and ptrcall
+callbacks explicit until a safe helper exists.
+
 ## Instantiate an Odin-backed class from GDScript
 
 Once the extension is loaded, GDScript can instantiate the registered class by

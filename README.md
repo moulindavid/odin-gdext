@@ -113,10 +113,12 @@ properties, and signals after registering the class. Optional tool-script style
 workflows and custom editor icons are deferred until their lifetime and reload
 behavior is explicit.
 
-Use `godot.register_editor_visible_class` for normal instantiable classes. The
-class name, parent name, method names, property metadata, signal names, and hint
-strings passed to registration helpers must live at least until the class is
-unregistered during extension deinitialization. Process-lifetime `ClassName` and
+Use `godot.register_editor_visible_class` for the low-level explicit path, or
+`godot.register_odin_class` with `godot.OdinClassDescriptor` when registering an
+Odin-backed class with methods, properties, and signals together. The class name,
+parent name, method names, property metadata, signal names, and hint strings
+passed to registration helpers must live at least until the class is unregistered
+during extension deinitialization. Process-lifetime `ClassName` and
 `StaticStringName` storage is the intended pattern.
 
 ## User class registration notes
@@ -206,12 +208,13 @@ notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reverse
 }
 ```
 
-Method registration helpers use explicit descriptors over caller-owned stable
-metadata storage. For advanced signatures, call and ptrcall callbacks can stay
-fully explicit so Variant construction/destruction and ptrcall ABI casts remain
-under user control. For the first simple case, `GodotReal, GodotReal ->
-GodotReal`, the facade also exposes typed callbacks backed by stable adapter
-userdata:
+Class authoring helpers use explicit descriptors over caller-owned stable
+metadata storage. `godot.OdinClassDescriptor` groups class creation callbacks,
+methods, properties, and signals without taking ownership of the backing storage.
+For advanced signatures, call and ptrcall callbacks can stay fully explicit so
+Variant construction/destruction and ptrcall ABI casts remain under user control.
+For simple signatures, the facade exposes typed callbacks backed by stable
+adapter userdata:
 
 ```odin
 member_defaults := gt.class_member_defaults(empty_name, empty_string)
@@ -241,10 +244,16 @@ metadata arrays and does not change Variant/ptrcall ownership rules. Keep method
 names, argument names, hint strings, `PropertyInfo`, metadata arrays,
 `ClassMethodInfo`, and adapter userdata storage alive for the registration call.
 Available simple typed adapters currently cover `() -> void`, `() -> bool`,
-`() -> int`, `() -> GodotReal`, `(bool) -> void`, `(int) -> void`,
-`(GodotReal) -> void`, and `GodotReal, GodotReal -> GodotReal`. Varargs,
-default arguments, `Callable`, `Signal`, and object-lifetime-sensitive method
-adapters are intentionally deferred until their safety model is explicit.
+`() -> int`, `() -> GodotReal`, `() -> String`, `(bool) -> void`,
+`(int) -> void`, `(GodotReal) -> void`, `(String) -> void`,
+`(ObjectPtr) -> void`, and `GodotReal, GodotReal -> GodotReal`. String-returning
+adapters return owned Godot String storage through the adapter and String
+argument adapters borrow the String only for the callback. Object handle
+arguments are borrowed and should be checked with helpers such as
+`object_ptr_try_as_label` before using a specific generated class API. Varargs,
+default arguments, `Callable`, `Signal`, owned `RefCounted` or `Resource`
+transfer, and broad object-lifetime-sensitive method adapters are intentionally
+deferred until their safety model is explicit.
 
 ## API coverage
 
@@ -262,9 +271,9 @@ subset before broad Godot API coverage. Detailed sequencing lives in
 - Generated APIs: math/simple builtin wrappers, supported non-vararg
   `@GlobalScope` utilities, and selected borrowed class handles for `Object`,
   `RefCounted`, `Resource`, `Node`, `CanvasItem`, `Node2D`, and `Control`.
-- User classes: registration helpers, stable class names, instance binding,
-  method/property/signal descriptors, simple `GodotReal` method adapters, node
-  notification dispatch, and editor-visible metadata.
+- User classes: `OdinClassDescriptor`, stable class names, instance binding,
+  method/property/signal descriptors, primitive property helpers, simple typed
+  method adapters, node lifecycle callback dispatch, and editor-visible metadata.
 - Facade: normal examples can import only `godot:godot`. The smoke example
   covers class creation, methods, property access, signal emission,
   notifications, value conversions, and unregister cleanup.

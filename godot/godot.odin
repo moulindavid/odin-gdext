@@ -40,6 +40,10 @@ ClassMemberDefaults :: gcore.ClassMemberDefaults
 ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
 ClassSignalDescriptor :: gcore.ClassSignalDescriptor
 ClassMethodDescriptor :: gcore.ClassMethodDescriptor
+OdinClassMethod :: gcore.OdinClassMethod
+OdinClassProperty :: gcore.OdinClassProperty
+OdinClassSignal :: gcore.OdinClassSignal
+OdinClassDescriptor :: gcore.OdinClassDescriptor
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
 ClassMethodVoid :: gcore.ClassMethodVoid
@@ -56,6 +60,15 @@ ClassMethodGetInt :: gcore.ClassMethodGetInt
 ClassMethodGetIntAdapter :: gcore.ClassMethodGetIntAdapter
 ClassMethodSetInt :: gcore.ClassMethodSetInt
 ClassMethodSetIntAdapter :: gcore.ClassMethodSetIntAdapter
+ClassMethodGetString :: gcore.ClassMethodGetString
+ClassMethodGetStringAdapter :: gcore.ClassMethodGetStringAdapter
+ClassMethodSetString :: gcore.ClassMethodSetString
+ClassMethodSetStringAdapter :: gcore.ClassMethodSetStringAdapter
+ClassMethodSetObjectPtr :: gcore.ClassMethodSetObjectPtr
+ClassMethodSetObjectPtrAdapter :: gcore.ClassMethodSetObjectPtrAdapter
+ClassPrimitivePropertyStorage :: gcore.ClassPrimitivePropertyStorage
+ClassTypedPropertyDescriptor :: gcore.ClassTypedPropertyDescriptor
+ClassTypedProperty :: gcore.ClassTypedProperty
 InstanceBindingCallbacks :: gcore.InstanceBindingCallbacks
 VariantType :: gcore.VariantType
 VariantStorage :: gcore.VariantStorage
@@ -129,6 +142,8 @@ init_class_method_info :: gcore.init_class_method_info
 register_class_property_with_descriptor :: gcore.register_class_property_with_descriptor
 register_class_signal_with_descriptor :: gcore.register_class_signal_with_descriptor
 register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
+register_odin_class :: gcore.register_odin_class
+unregister_odin_class :: gcore.unregister_odin_class
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall
@@ -146,6 +161,15 @@ class_method_get_int_call :: gcore.class_method_get_int_call
 class_method_get_int_ptrcall :: gcore.class_method_get_int_ptrcall
 class_method_set_int_call :: gcore.class_method_set_int_call
 class_method_set_int_ptrcall :: gcore.class_method_set_int_ptrcall
+class_method_get_string_call :: gcore.class_method_get_string_call
+class_method_get_string_ptrcall :: gcore.class_method_get_string_ptrcall
+class_method_set_string_call :: gcore.class_method_set_string_call
+class_method_set_string_ptrcall :: gcore.class_method_set_string_ptrcall
+class_method_set_object_ptr_call :: gcore.class_method_set_object_ptr_call
+class_method_set_object_ptr_ptrcall :: gcore.class_method_set_object_ptr_ptrcall
+class_property_godot_real :: gcore.class_property_godot_real
+class_property_int :: gcore.class_property_int
+class_property_bool :: gcore.class_property_bool
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
@@ -460,7 +484,7 @@ NodeNotificationHandlers :: struct {
 	physics_process: NodeNotificationHandler,
 }
 
-NodeVirtualCallbacks :: struct {
+NodeLifecycleCallbacks :: struct {
 	enter_tree:       NodeNotificationHandler,
 	exit_tree:        NodeNotificationHandler,
 	ready:            NodeNotificationHandler,
@@ -468,6 +492,8 @@ NodeVirtualCallbacks :: struct {
 	physics_process:  NodeNotificationHandler,
 	raw_notification: NodeRawNotificationHandler,
 }
+
+NodeVirtualCallbacks :: NodeLifecycleCallbacks
 
 // dispatch_node_notification calls a typed handler for common Node lifecycle
 // notifications and returns true when a handler ran. Unknown notifications and
@@ -510,14 +536,15 @@ dispatch_node_notification :: proc(
 	return false
 }
 
-// dispatch_node_virtual_callbacks is the user-facing Node virtual notification
-// descriptor path. The process callbacks are raw notification callbacks and do
-// not synthesize _process(delta) or _physics_process(delta) data.
-dispatch_node_virtual_callbacks :: proc(
+// dispatch_node_lifecycle_callbacks is the compact public callback-table path
+// for common Node lifecycle notifications. Process callbacks are notification
+// callbacks only; they do not synthesize _process(delta) or
+// _physics_process(delta) data.
+dispatch_node_lifecycle_callbacks :: proc(
 	instance: ClassInstancePtr,
 	what: i32,
 	reversed: bool,
-	callbacks: ^NodeVirtualCallbacks,
+	callbacks: ^NodeLifecycleCallbacks,
 ) -> bool {
 	if callbacks == nil do return false
 
@@ -556,12 +583,23 @@ dispatch_node_virtual_callbacks :: proc(
 	return false
 }
 
+dispatch_node_virtual_callbacks :: proc(
+	instance: ClassInstancePtr,
+	what: i32,
+	reversed: bool,
+	callbacks: ^NodeVirtualCallbacks,
+) -> bool {
+	return dispatch_node_lifecycle_callbacks(instance, what, reversed, callbacks)
+}
+
 // --- String ---
 string_ptr :: gcore.string_ptr
 const_string_ptr :: gcore.const_string_ptr
 uninitialized_string_ptr :: gcore.uninitialized_string_ptr
 string_init_utf8 :: gcore.string_init_utf8
 string_from_utf8 :: gcore.string_from_utf8
+string_init_copy :: gcore.string_init_copy
+string_copy :: gcore.string_copy
 string_utf8_len :: gcore.string_utf8_len
 string_to_utf8 :: gcore.string_to_utf8
 string_free :: gcore.string_free

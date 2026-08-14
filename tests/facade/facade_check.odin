@@ -245,7 +245,7 @@ facade_node_notifications := gt.NodeNotificationHandlers {
 	process = facade_process_notification,
 }
 
-facade_node_virtuals := gt.NodeVirtualCallbacks {
+facade_node_lifecycle := gt.NodeLifecycleCallbacks {
 	ready            = facade_ready_notification,
 	process          = facade_process_notification,
 	raw_notification = facade_raw_notification,
@@ -253,7 +253,8 @@ facade_node_virtuals := gt.NodeVirtualCallbacks {
 
 facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
-	if gt.dispatch_node_virtual_callbacks(instance, what, reversed, &facade_node_virtuals) do return
+	if gt.dispatch_node_lifecycle_callbacks(instance, what, reversed, &facade_node_lifecycle) do return
+	_ = gt.dispatch_node_virtual_callbacks(instance, what, reversed, &facade_node_lifecycle)
 	if gt.dispatch_node_notification(instance, what, reversed, &facade_node_notifications) do return
 	if what == gt.node_notification_ready {
 		_ = what
@@ -274,6 +275,22 @@ registration_facade_compile_smoke :: proc "contextless" () {
 	)
 	_ = gt.register_class_with_defaults
 	gt.unregister_class(facade_class_name)
+
+	methods := [0]gt.OdinClassMethod{}
+	properties := [0]gt.OdinClassProperty{}
+	signals := [0]gt.OdinClassSignal{}
+	class_desc := gt.OdinClassDescriptor {
+		class_name           = facade_class_name,
+		parent_class_name    = facade_parent_name,
+		create_instance_func = facade_create_instance,
+		free_instance_func   = facade_free_instance,
+		notification_func    = facade_notification,
+		methods              = methods[:],
+		properties           = properties[:],
+		signals              = signals[:],
+	}
+	gt.register_odin_class(class_desc)
+	gt.unregister_odin_class(class_desc)
 }
 
 instance_binding_facade_compile_smoke :: proc "contextless" (
@@ -459,6 +476,10 @@ facade_set_real_adapter := gt.ClassMethodSetGodotRealAdapter {
 	method = facade_set_real_method,
 }
 
+facade_real_property_storage: gt.ClassPrimitivePropertyStorage
+facade_bool_property_storage: gt.ClassPrimitivePropertyStorage
+facade_int_property_storage: gt.ClassPrimitivePropertyStorage
+
 godot_real_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.ClassMethodGetGodotReal(facade_get_real_method)
 	_ = gt.ClassMethodSetGodotReal(facade_set_real_method)
@@ -468,6 +489,24 @@ godot_real_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.class_method_get_godot_real_ptrcall
 	_ = gt.class_method_set_godot_real_call
 	_ = gt.class_method_set_godot_real_ptrcall
+
+	property := gt.class_property_godot_real(
+		&facade_real_property_storage,
+		gt.ClassTypedPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Float,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			getter_name = facade_property_getter_name,
+			setter_name = facade_property_setter_name,
+		},
+		&facade_get_real_adapter,
+		&facade_set_real_adapter,
+	)
+	_ = property
 }
 
 facade_get_bool_method :: proc "contextless" (
@@ -541,6 +580,62 @@ variant_conversion_proc_group_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.variant_try.object(&v_object)
 }
 
+facade_get_string_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.String,
+	ok: bool,
+) {
+	_ = instance
+	return gt.string_from_utf8("facade"), true
+}
+
+facade_set_string_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: ^gt.String,
+) -> bool {
+	_ = instance
+	copy := gt.string_copy(value)
+	gt.string_free(&copy)
+	return true
+}
+
+facade_set_object_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: gt.ObjectPtr,
+) -> bool {
+	_ = instance
+	_ = value
+	return true
+}
+
+facade_get_string_adapter := gt.ClassMethodGetStringAdapter {
+	method = facade_get_string_method,
+}
+
+facade_set_string_adapter := gt.ClassMethodSetStringAdapter {
+	method = facade_set_string_method,
+}
+
+facade_set_object_adapter := gt.ClassMethodSetObjectPtrAdapter {
+	method = facade_set_object_method,
+}
+
+string_object_method_adapter_facade_compile_smoke :: proc "contextless" () {
+	_ = gt.ClassMethodGetString(facade_get_string_method)
+	_ = gt.ClassMethodSetString(facade_set_string_method)
+	_ = gt.ClassMethodSetObjectPtr(facade_set_object_method)
+	_ = facade_get_string_adapter
+	_ = facade_set_string_adapter
+	_ = facade_set_object_adapter
+	_ = gt.class_method_get_string_call
+	_ = gt.class_method_get_string_ptrcall
+	_ = gt.class_method_set_string_call
+	_ = gt.class_method_set_string_ptrcall
+	_ = gt.class_method_set_object_ptr_call
+	_ = gt.class_method_set_object_ptr_ptrcall
+}
+
 bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.ClassMethodGetBool(facade_get_bool_method)
 	_ = gt.ClassMethodSetBool(facade_set_bool_method)
@@ -551,6 +646,24 @@ bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.class_method_set_bool_call
 	_ = gt.class_method_set_bool_ptrcall
 
+	bool_property := gt.class_property_bool(
+		&facade_bool_property_storage,
+		gt.ClassTypedPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Bool,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			getter_name = facade_property_getter_name,
+			setter_name = facade_property_setter_name,
+		},
+		&facade_get_bool_adapter,
+		&facade_set_bool_adapter,
+	)
+	_ = bool_property
+
 	_ = gt.ClassMethodGetInt(facade_get_int_method)
 	_ = gt.ClassMethodSetInt(facade_set_int_method)
 	_ = facade_get_int_adapter
@@ -559,6 +672,24 @@ bool_int_property_adapter_facade_compile_smoke :: proc "contextless" () {
 	_ = gt.class_method_get_int_ptrcall
 	_ = gt.class_method_set_int_call
 	_ = gt.class_method_set_int_ptrcall
+
+	int_property := gt.class_property_int(
+		&facade_int_property_storage,
+		gt.ClassTypedPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
+				type = .Int,
+				name = facade_property_name,
+				class_name = facade_method_empty_name,
+				hint_string = facade_method_empty_string,
+				usage = gt.PropertyUsageDefault,
+			},
+			getter_name = facade_property_getter_name,
+			setter_name = facade_property_setter_name,
+		},
+		&facade_get_int_adapter,
+		&facade_set_int_adapter,
+	)
+	_ = int_property
 }
 
 facade_signal_name_data: gt.StaticStringName

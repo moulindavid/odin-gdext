@@ -521,6 +521,68 @@ ClassMethodDescriptor :: struct {
 	arguments_metadata:    ^ClassMethodArgumentMetadata,
 }
 
+OdinClassMethod :: struct {
+	info:       ^ClassMethodInfo,
+	descriptor: ClassMethodDescriptor,
+}
+
+OdinClassProperty :: struct {
+	info:       ^PropertyInfo,
+	descriptor: ClassPropertyDescriptor,
+}
+
+OdinClassSignal :: struct {
+	descriptor: ClassSignalDescriptor,
+}
+
+OdinClassDescriptor :: struct {
+	class_name:           ConstStringNamePtr,
+	parent_class_name:    ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func:   ClassFreeInstance,
+	notification_func:    ClassNotification,
+	class_userdata:       rawptr,
+	methods:              []OdinClassMethod,
+	properties:           []OdinClassProperty,
+	signals:              []OdinClassSignal,
+}
+
+// register_odin_class registers one Odin-backed class and its member metadata.
+// The descriptor is consumed immediately; Godot-facing names, PropertyInfo,
+// ClassMethodInfo, adapters, and callback data must be caller-owned stable
+// storage that remains valid for the registered class.
+register_odin_class :: proc "contextless" (desc: OdinClassDescriptor) {
+	register_editor_visible_class(
+		EditorVisibleClassDescriptor {
+			class_name = desc.class_name,
+			parent_class_name = desc.parent_class_name,
+			create_instance_func = desc.create_instance_func,
+			free_instance_func = desc.free_instance_func,
+			notification_func = desc.notification_func,
+			class_userdata = desc.class_userdata,
+		},
+	)
+
+	for method in desc.methods {
+		register_class_method_with_descriptor(desc.class_name, method.info, method.descriptor)
+	}
+	for property in desc.properties {
+		register_class_property_with_descriptor(
+			desc.class_name,
+			property.info,
+			property.descriptor,
+		)
+	}
+	for signal in desc.signals {
+		register_class_signal_with_descriptor(desc.class_name, signal.descriptor)
+	}
+}
+
+unregister_odin_class :: proc "contextless" (desc: OdinClassDescriptor) {
+	if desc.class_name == nil do _trap_nil_godot_function()
+	unregister_class(desc.class_name)
+}
+
 // init_method_property_info fills caller-owned PropertyInfo storage. Name,
 // class_name, and hint_string must point to storage that remains valid while
 // Godot reads the method metadata. Use process-lifetime StringName storage for
@@ -670,6 +732,183 @@ ClassMethodSetInt :: #type proc "contextless" (instance: ClassInstancePtr, value
 
 ClassMethodSetIntAdapter :: struct {
 	method: ClassMethodSetInt,
+}
+
+ClassMethodGetString :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+) -> (
+	value: String,
+	ok: bool,
+)
+
+ClassMethodGetStringAdapter :: struct {
+	method: ClassMethodGetString,
+}
+
+ClassMethodSetString :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	value: ^String,
+) -> bool
+
+ClassMethodSetStringAdapter :: struct {
+	method: ClassMethodSetString,
+}
+
+ClassMethodSetObjectPtr :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	value: ObjectPtr,
+) -> bool
+
+ClassMethodSetObjectPtrAdapter :: struct {
+	method: ClassMethodSetObjectPtr,
+}
+
+ClassPrimitivePropertyStorage :: struct {
+	property_info:      PropertyInfo,
+	getter_return_info: PropertyInfo,
+	setter_arg_info:    PropertyInfo,
+	setter_arg_meta:    [1]ClassMethodArgumentMetadata,
+	getter_method_info: ClassMethodInfo,
+	setter_method_info: ClassMethodInfo,
+}
+
+ClassTypedPropertyDescriptor :: struct {
+	property:    MethodPropertyDescriptor,
+	getter_name: StringNamePtr,
+	setter_name: StringNamePtr,
+}
+
+ClassTypedProperty :: struct {
+	property: OdinClassProperty,
+	getter:   OdinClassMethod,
+	setter:   OdinClassMethod,
+}
+
+class_property_godot_real :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: ^ClassMethodGetGodotRealAdapter,
+	setter_adapter: ^ClassMethodSetGodotRealAdapter,
+) -> ClassTypedProperty {
+	if storage == nil || getter_adapter == nil || setter_adapter == nil {
+		_trap_nil_godot_function()
+	}
+	return class_property_primitive(
+		storage,
+		desc,
+		getter_adapter,
+		setter_adapter,
+		class_method_get_godot_real_call,
+		class_method_get_godot_real_ptrcall,
+		class_method_set_godot_real_call,
+		class_method_set_godot_real_ptrcall,
+	)
+}
+
+class_property_int :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: ^ClassMethodGetIntAdapter,
+	setter_adapter: ^ClassMethodSetIntAdapter,
+) -> ClassTypedProperty {
+	if storage == nil || getter_adapter == nil || setter_adapter == nil {
+		_trap_nil_godot_function()
+	}
+	return class_property_primitive(
+		storage,
+		desc,
+		getter_adapter,
+		setter_adapter,
+		class_method_get_int_call,
+		class_method_get_int_ptrcall,
+		class_method_set_int_call,
+		class_method_set_int_ptrcall,
+	)
+}
+
+class_property_bool :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: ^ClassMethodGetBoolAdapter,
+	setter_adapter: ^ClassMethodSetBoolAdapter,
+) -> ClassTypedProperty {
+	if storage == nil || getter_adapter == nil || setter_adapter == nil {
+		_trap_nil_godot_function()
+	}
+	return class_property_primitive(
+		storage,
+		desc,
+		getter_adapter,
+		setter_adapter,
+		class_method_get_bool_call,
+		class_method_get_bool_ptrcall,
+		class_method_set_bool_call,
+		class_method_set_bool_ptrcall,
+	)
+}
+
+class_property_primitive :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: rawptr,
+	setter_adapter: rawptr,
+	getter_call: ClassMethodCall,
+	getter_ptrcall: ClassMethodPtrCall,
+	setter_call: ClassMethodCall,
+	setter_ptrcall: ClassMethodPtrCall,
+) -> ClassTypedProperty {
+	if storage == nil ||
+	   desc.property.name == nil ||
+	   desc.property.class_name == nil ||
+	   desc.property.hint_string == nil ||
+	   desc.getter_name == nil ||
+	   desc.setter_name == nil ||
+	   getter_adapter == nil ||
+	   setter_adapter == nil ||
+	   getter_call == nil ||
+	   getter_ptrcall == nil ||
+	   setter_call == nil ||
+	   setter_ptrcall == nil {
+		_trap_nil_godot_function()
+	}
+
+	storage.setter_arg_meta[0] = .None
+	init_method_property_info(&storage.getter_return_info, desc.property)
+	init_method_property_info(&storage.setter_arg_info, desc.property)
+
+	return ClassTypedProperty {
+		property = OdinClassProperty {
+			info = &storage.property_info,
+			descriptor = ClassPropertyDescriptor {
+				property = desc.property,
+				setter = desc.setter_name,
+				getter = desc.getter_name,
+			},
+		},
+		getter = OdinClassMethod {
+			info = &storage.getter_method_info,
+			descriptor = ClassMethodDescriptor {
+				name = desc.getter_name,
+				method_userdata = getter_adapter,
+				call_func = getter_call,
+				ptrcall_func = getter_ptrcall,
+				return_value_info = &storage.getter_return_info,
+				return_value_metadata = .None,
+			},
+		},
+		setter = OdinClassMethod {
+			info = &storage.setter_method_info,
+			descriptor = ClassMethodDescriptor {
+				name = desc.setter_name,
+				method_userdata = setter_adapter,
+				call_func = setter_call,
+				ptrcall_func = setter_ptrcall,
+				argument_count = 1,
+				arguments_info = &storage.setter_arg_info,
+				arguments_metadata = &storage.setter_arg_meta[0],
+			},
+		},
+	}
 }
 
 _set_call_error :: proc "contextless" (
@@ -1225,6 +1464,209 @@ class_method_set_int_ptrcall :: proc "c" (
 	if adapter.method == nil do _trap_nil_godot_function()
 
 	value := (cast(^i64)p_args[0])^
+	if !adapter.method(p_instance, value) do _trap_godot_call_error()
+}
+
+class_method_get_string_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || r_return == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count > 0 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 0)
+		return
+	}
+
+	adapter := cast(^ClassMethodGetStringAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, ok := adapter.method(p_instance)
+	if !ok {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	defer string_free(&value)
+
+	rv := variant_from_string(&value)
+	variant_init_copy(r_return, &rv)
+	variant_free(&rv)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_get_string_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = p_args
+	if method_userdata == nil || p_instance == nil || r_ret == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodGetStringAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value, ok := adapter.method(p_instance)
+	if !ok do _trap_godot_call_error()
+	defer string_free(&value)
+	string_init_copy(r_ret, &value)
+}
+
+class_method_set_string_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 1 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 1)
+		return
+	}
+	if p_argument_count > 1 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 1)
+		return
+	}
+	if p_args == nil || p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.String)
+		return
+	}
+
+	adapter := cast(^ClassMethodSetStringAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, value_ok := variant_try_string(cast(^Variant)p_args[0])
+	if !value_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.String)
+		return
+	}
+	defer string_free(&value)
+	if !adapter.method(p_instance, &value) {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if r_return != nil do variant_init_nil(r_return)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_set_string_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = r_ret
+	if method_userdata == nil || p_instance == nil || p_args == nil || p_args[0] == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodSetStringAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value := cast(^String)p_args[0]
+	if !adapter.method(p_instance, value) do _trap_godot_call_error()
+}
+
+class_method_set_object_ptr_call :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstVariantPtr,
+	p_argument_count: i64,
+	r_return: VariantPtr,
+	r_error: ^CallError,
+) {
+	context = godot_context()
+
+	if method_userdata == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+	if p_instance == nil {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if p_argument_count < 1 {
+		_set_call_error(r_error, .Too_Few_Arguments, 0, 1)
+		return
+	}
+	if p_argument_count > 1 {
+		_set_call_error(r_error, .Too_Many_Arguments, 0, 1)
+		return
+	}
+	if p_args == nil || p_args[0] == nil {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Object)
+		return
+	}
+
+	adapter := cast(^ClassMethodSetObjectPtrAdapter)method_userdata
+	if adapter.method == nil {
+		_set_call_error(r_error, .Invalid_Method)
+		return
+	}
+
+	value, value_ok := variant_try_object(cast(^Variant)p_args[0])
+	if !value_ok {
+		_set_call_error(r_error, .Invalid_Argument, 0, cast(i32)VariantType.Object)
+		return
+	}
+	if !adapter.method(p_instance, value) {
+		_set_call_error(r_error, .Instance_Is_Null)
+		return
+	}
+	if r_return != nil do variant_init_nil(r_return)
+	_set_call_error(r_error, .Ok)
+}
+
+class_method_set_object_ptr_ptrcall :: proc "c" (
+	method_userdata: rawptr,
+	p_instance: ClassInstancePtr,
+	p_args: [^]ConstTypePtr,
+	r_ret: TypePtr,
+) {
+	context = godot_context()
+
+	_ = r_ret
+	if method_userdata == nil || p_instance == nil || p_args == nil || p_args[0] == nil {
+		_trap_nil_godot_function()
+	}
+	adapter := cast(^ClassMethodSetObjectPtrAdapter)method_userdata
+	if adapter.method == nil do _trap_nil_godot_function()
+
+	value := (cast(^ObjectPtr)p_args[0])^
 	if !adapter.method(p_instance, value) do _trap_godot_call_error()
 }
 

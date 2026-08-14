@@ -81,6 +81,24 @@ set_difficulty_adapter_method :: proc "contextless" (
 	return true
 }
 
+roll_into_label_adapter_method :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	object: gt.ObjectPtr,
+) -> bool {
+	self, self_ok := gt.class_instance_data(instance, GameBrainData)
+	if !self_ok do return false
+	label, label_ok := gt.object_ptr_try_as_label(object)
+	if !label_ok do return false
+
+	_ = roll_damage(self)
+	text := gt.string_from_utf8(
+		"Odin rolled damage and updated this Label. Press Space to roll again.",
+	)
+	defer gt.string_free(&text)
+	gt.label_set_text(label, &text)
+	return true
+}
+
 roll_damage_method_adapter := gt.ClassMethodGetGodotRealAdapter {
 	method = roll_damage_adapter_method,
 }
@@ -89,6 +107,9 @@ get_difficulty_method_adapter := gt.ClassMethodGetGodotRealAdapter {
 }
 set_difficulty_method_adapter := gt.ClassMethodSetGodotRealAdapter {
 	method = set_difficulty_adapter_method,
+}
+roll_into_label_method_adapter := gt.ClassMethodSetObjectPtrAdapter {
+	method = roll_into_label_adapter_method,
 }
 
 game_name_data: gt.ClassName
@@ -105,6 +126,13 @@ roll_damage_method_name_data: gt.StaticStringName
 roll_damage_method_name := gt.const_static_string_name_ptr(&roll_damage_method_name_data)
 roll_damage_return_info: gt.PropertyInfo
 roll_damage_method_info: gt.ClassMethodInfo
+roll_into_label_method_name_data: gt.StaticStringName
+roll_into_label_arg_name_data: gt.StaticStringName
+roll_into_label_method_name := gt.const_static_string_name_ptr(&roll_into_label_method_name_data)
+roll_into_label_arg_name := gt.const_static_string_name_ptr(&roll_into_label_arg_name_data)
+roll_into_label_arg_info: gt.PropertyInfo
+roll_into_label_arg_meta := [1]gt.ClassMethodArgumentMetadata{.None}
+roll_into_label_method_info: gt.ClassMethodInfo
 
 difficulty_property_name_data: gt.StaticStringName
 difficulty_setter_name_data: gt.StaticStringName
@@ -131,6 +159,14 @@ register_methods :: proc() {
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&roll_damage_method_name_data),
 		cstring("roll_damage"),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&roll_into_label_method_name_data),
+		cstring("roll_into_label"),
+	)
+	gt.static_string_name_init_latin1_cstring(
+		gt.uninitialized_static_string_name_ptr(&roll_into_label_arg_name_data),
+		cstring("label"),
 	)
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&empty_name_data),
@@ -169,6 +205,29 @@ register_methods :: proc() {
 			ptrcall_func = gt.class_method_get_godot_real_ptrcall,
 			return_value_info = &roll_damage_return_info,
 			return_value_metadata = .None,
+		},
+	)
+
+	gt.init_method_property_info(
+		&roll_into_label_arg_info,
+		gt.MethodPropertyDescriptor {
+			type = .Object,
+			name = roll_into_label_arg_name,
+			class_name = empty_name,
+			hint_string = empty_str,
+		},
+	)
+	gt.register_class_method_with_descriptor(
+		game_class_name,
+		&roll_into_label_method_info,
+		gt.ClassMethodDescriptor {
+			name = roll_into_label_method_name,
+			method_userdata = &roll_into_label_method_adapter,
+			call_func = gt.class_method_set_object_ptr_call,
+			ptrcall_func = gt.class_method_set_object_ptr_ptrcall,
+			argument_count = 1,
+			arguments_info = &roll_into_label_arg_info,
+			arguments_metadata = &roll_into_label_arg_meta[0],
 		},
 	)
 
