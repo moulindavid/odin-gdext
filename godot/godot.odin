@@ -113,6 +113,22 @@ Vector2 :: gcore.Vector2
 Vector3 :: gcore.Vector3
 Vector4 :: gcore.Vector4
 Color :: gcore.Color
+Vector2i :: gbind_builtin.Vector2i
+Rect2 :: gbind_builtin.Rect2
+Rect2i :: gbind_builtin.Rect2i
+Vector3i :: gbind_builtin.Vector3i
+Transform2D :: gbind_builtin.Transform2D
+Vector4i :: gbind_builtin.Vector4i
+Plane :: gbind_builtin.Plane
+Quaternion :: gbind_builtin.Quaternion
+AABB :: gbind_builtin.AABB
+Basis :: gbind_builtin.Basis
+Transform3D :: gbind_builtin.Transform3D
+Projection :: gbind_builtin.Projection
+Error :: gclass.Error
+Side :: gclass.Side
+HorizontalAlignment :: gclass.HorizontalAlignment
+VerticalAlignment :: gclass.VerticalAlignment
 Resource :: gclass.Resource
 Node :: gclass.Node
 CanvasItem :: gclass.CanvasItem
@@ -191,14 +207,59 @@ resource_set_local_to_scene :: gclass.resource_set_local_to_scene
 resource_is_local_to_scene :: gclass.resource_is_local_to_scene
 node_as_object :: gclass.node_as_object
 node_get_parent :: gclass.node_get_parent
+node_set_name :: gclass.node_set_name
+node_get_name :: gclass.node_get_name
+node_has_node :: gclass.node_has_node
+node_get_node_or_null :: gclass.node_get_node_or_null
+node_get_child_count :: gclass.node_get_child_count
+node_get_child :: gclass.node_get_child
+node_is_inside_tree :: gclass.node_is_inside_tree
+node_get_path :: gclass.node_get_path
 node_is_ancestor_of :: gclass.node_is_ancestor_of
 node_get_path_to :: gclass.node_get_path_to
+node_remove_from_group :: gclass.node_remove_from_group
+node_is_in_group :: gclass.node_is_in_group
+node_set_process :: gclass.node_set_process
+node_is_processing :: gclass.node_is_processing
+node_get_process_delta_time :: gclass.node_get_process_delta_time
+node_set_physics_process :: gclass.node_set_physics_process
+node_is_physics_processing :: gclass.node_is_physics_processing
+node_get_physics_process_delta_time :: gclass.node_get_physics_process_delta_time
 canvas_item_set_visible :: gclass.canvas_item_set_visible
 canvas_item_is_visible :: gclass.canvas_item_is_visible
+canvas_item_is_visible_in_tree :: gclass.canvas_item_is_visible_in_tree
 canvas_item_show :: gclass.canvas_item_show
 canvas_item_hide :: gclass.canvas_item_hide
 canvas_item_queue_redraw :: gclass.canvas_item_queue_redraw
+canvas_item_move_to_front :: gclass.canvas_item_move_to_front
+canvas_item_set_as_top_level :: gclass.canvas_item_set_as_top_level
+canvas_item_is_set_as_top_level :: gclass.canvas_item_is_set_as_top_level
+canvas_item_set_light_mask :: gclass.canvas_item_set_light_mask
+canvas_item_get_light_mask :: gclass.canvas_item_get_light_mask
+canvas_item_set_modulate :: gclass.canvas_item_set_modulate
+canvas_item_get_modulate :: gclass.canvas_item_get_modulate
+canvas_item_set_self_modulate :: gclass.canvas_item_set_self_modulate
+canvas_item_get_self_modulate :: gclass.canvas_item_get_self_modulate
+canvas_item_set_z_index :: gclass.canvas_item_set_z_index
+canvas_item_get_z_index :: gclass.canvas_item_get_z_index
+canvas_item_set_z_as_relative :: gclass.canvas_item_set_z_as_relative
+canvas_item_is_z_relative :: gclass.canvas_item_is_z_relative
+canvas_item_set_y_sort_enabled :: gclass.canvas_item_set_y_sort_enabled
+canvas_item_is_y_sort_enabled :: gclass.canvas_item_is_y_sort_enabled
+canvas_item_set_draw_behind_parent :: gclass.canvas_item_set_draw_behind_parent
+canvas_item_is_draw_behind_parent_enabled :: gclass.canvas_item_is_draw_behind_parent_enabled
 canvas_item_get_canvas :: gclass.canvas_item_get_canvas
+canvas_item_get_canvas_item :: gclass.canvas_item_get_canvas_item
+canvas_item_draw_set_transform_matrix :: gclass.canvas_item_draw_set_transform_matrix
+canvas_item_get_transform :: gclass.canvas_item_get_transform
+canvas_item_get_global_transform :: gclass.canvas_item_get_global_transform
+canvas_item_get_global_transform_with_canvas :: gclass.canvas_item_get_global_transform_with_canvas
+canvas_item_get_viewport_transform :: gclass.canvas_item_get_viewport_transform
+canvas_item_get_viewport_rect :: gclass.canvas_item_get_viewport_rect
+canvas_item_get_canvas_transform :: gclass.canvas_item_get_canvas_transform
+canvas_item_get_screen_transform :: gclass.canvas_item_get_screen_transform
+canvas_item_get_local_mouse_position :: gclass.canvas_item_get_local_mouse_position
+canvas_item_get_global_mouse_position :: gclass.canvas_item_get_global_mouse_position
 canvas_item_as_node :: gclass.canvas_item_as_node
 canvas_item_as_object :: gclass.canvas_item_as_object
 node2d_as_canvas_item :: gclass.node2d_as_canvas_item
@@ -212,8 +273,67 @@ node2d_set_position :: gclass.node2d_set_position
 node2d_get_position :: gclass.node2d_get_position
 node2d_set_rotation :: gclass.node2d_set_rotation
 node2d_get_rotation :: gclass.node2d_get_rotation
+node2d_set_rotation_degrees :: gclass.node2d_set_rotation_degrees
+node2d_get_rotation_degrees :: gclass.node2d_get_rotation_degrees
+node2d_set_skew :: gclass.node2d_set_skew
+node2d_get_skew :: gclass.node2d_get_skew
+node2d_set_scale :: gclass.node2d_set_scale
+node2d_get_scale :: gclass.node2d_get_scale
+node2d_rotate :: gclass.node2d_rotate
+node2d_translate :: gclass.node2d_translate
+node2d_global_translate :: gclass.node2d_global_translate
+node2d_apply_scale :: gclass.node2d_apply_scale
+node2d_set_global_position :: gclass.node2d_set_global_position
+node2d_get_global_position :: gclass.node2d_get_global_position
+node2d_set_global_rotation :: gclass.node2d_set_global_rotation
+node2d_get_global_rotation :: gclass.node2d_get_global_rotation
+node2d_set_global_scale :: gclass.node2d_set_global_scale
+node2d_get_global_scale :: gclass.node2d_get_global_scale
+node2d_set_transform :: gclass.node2d_set_transform
+node2d_set_global_transform :: gclass.node2d_set_global_transform
+node2d_look_at :: gclass.node2d_look_at
+node2d_get_angle_to :: gclass.node2d_get_angle_to
+node2d_to_local :: gclass.node2d_to_local
+node2d_to_global :: gclass.node2d_to_global
+node2d_get_relative_transform_to_parent :: gclass.node2d_get_relative_transform_to_parent
+control_accept_event :: gclass.control_accept_event
 control_set_custom_minimum_size :: gclass.control_set_custom_minimum_size
 control_get_custom_minimum_size :: gclass.control_get_custom_minimum_size
+control_get_maximum_size :: gclass.control_get_maximum_size
+control_get_combined_maximum_size :: gclass.control_get_combined_maximum_size
+control_get_minimum_size :: gclass.control_get_minimum_size
+control_get_combined_minimum_size :: gclass.control_get_combined_minimum_size
+control_set_propagate_maximum_size :: gclass.control_set_propagate_maximum_size
+control_is_propagating_maximum_size :: gclass.control_is_propagating_maximum_size
+control_get_bound_minimum_size :: gclass.control_get_bound_minimum_size
+control_get_anchor :: gclass.control_get_anchor
+control_set_offset :: gclass.control_set_offset
+control_get_offset :: gclass.control_get_offset
+control_set_begin :: gclass.control_set_begin
+control_set_end :: gclass.control_set_end
+control_set_position :: gclass.control_set_position
+control_set_size :: gclass.control_set_size
+control_reset_size :: gclass.control_reset_size
+control_set_custom_maximum_size :: gclass.control_set_custom_maximum_size
+control_set_global_position :: gclass.control_set_global_position
+control_set_rotation :: gclass.control_set_rotation
+control_set_rotation_degrees :: gclass.control_set_rotation_degrees
+control_set_scale :: gclass.control_set_scale
+control_set_pivot_offset :: gclass.control_set_pivot_offset
+control_get_begin :: gclass.control_get_begin
+control_get_end :: gclass.control_get_end
+control_get_position :: gclass.control_get_position
+control_get_size :: gclass.control_get_size
+control_get_rotation :: gclass.control_get_rotation
+control_get_rotation_degrees :: gclass.control_get_rotation_degrees
+control_get_scale :: gclass.control_get_scale
+control_get_pivot_offset :: gclass.control_get_pivot_offset
+control_get_custom_maximum_size :: gclass.control_get_custom_maximum_size
+control_get_parent_area_size :: gclass.control_get_parent_area_size
+control_get_global_position :: gclass.control_get_global_position
+control_get_screen_position :: gclass.control_get_screen_position
+control_get_rect :: gclass.control_get_rect
+control_get_global_rect :: gclass.control_get_global_rect
 control_set_focus_mode :: gclass.control_set_focus_mode
 control_get_focus_mode :: gclass.control_get_focus_mode
 control_has_focus :: gclass.control_has_focus
@@ -231,6 +351,10 @@ sprite2d_set_flip_v :: gclass.sprite2d_set_flip_v
 sprite2d_is_flipped_v :: gclass.sprite2d_is_flipped_v
 sprite2d_set_region_enabled :: gclass.sprite2d_set_region_enabled
 sprite2d_is_region_enabled :: gclass.sprite2d_is_region_enabled
+sprite2d_set_region_rect :: gclass.sprite2d_set_region_rect
+sprite2d_get_region_rect :: gclass.sprite2d_get_region_rect
+sprite2d_set_region_filter_clip_enabled :: gclass.sprite2d_set_region_filter_clip_enabled
+sprite2d_is_region_filter_clip_enabled :: gclass.sprite2d_is_region_filter_clip_enabled
 sprite2d_is_pixel_opaque :: gclass.sprite2d_is_pixel_opaque
 sprite2d_set_frame :: gclass.sprite2d_set_frame
 sprite2d_get_frame :: gclass.sprite2d_get_frame
@@ -238,10 +362,27 @@ sprite2d_set_vframes :: gclass.sprite2d_set_vframes
 sprite2d_get_vframes :: gclass.sprite2d_get_vframes
 sprite2d_set_hframes :: gclass.sprite2d_set_hframes
 sprite2d_get_hframes :: gclass.sprite2d_get_hframes
+sprite2d_set_frame_coords :: gclass.sprite2d_set_frame_coords
+sprite2d_get_frame_coords :: gclass.sprite2d_get_frame_coords
+sprite2d_get_rect :: gclass.sprite2d_get_rect
 label_set_text :: gclass.label_set_text
 label_get_text :: gclass.label_get_text
 label_set_clip_text :: gclass.label_set_clip_text
 label_is_clipping_text :: gclass.label_is_clipping_text
+label_set_horizontal_alignment :: gclass.label_set_horizontal_alignment
+label_get_horizontal_alignment :: gclass.label_get_horizontal_alignment
+label_set_vertical_alignment :: gclass.label_set_vertical_alignment
+label_get_vertical_alignment :: gclass.label_get_vertical_alignment
+label_set_text_direction :: gclass.label_set_text_direction
+label_get_text_direction :: gclass.label_get_text_direction
+label_set_language :: gclass.label_set_language
+label_get_language :: gclass.label_get_language
+label_set_paragraph_separator :: gclass.label_set_paragraph_separator
+label_get_paragraph_separator :: gclass.label_get_paragraph_separator
+label_set_tab_stops :: gclass.label_set_tab_stops
+label_get_tab_stops :: gclass.label_get_tab_stops
+label_set_ellipsis_char :: gclass.label_set_ellipsis_char
+label_get_ellipsis_char :: gclass.label_get_ellipsis_char
 label_set_uppercase :: gclass.label_set_uppercase
 label_is_uppercase :: gclass.label_is_uppercase
 label_get_line_count :: gclass.label_get_line_count
@@ -255,6 +396,11 @@ label_set_lines_skipped :: gclass.label_set_lines_skipped
 label_get_lines_skipped :: gclass.label_get_lines_skipped
 label_set_max_lines_visible :: gclass.label_set_max_lines_visible
 label_get_max_lines_visible :: gclass.label_get_max_lines_visible
+label_set_structured_text_bidi_override_options ::
+	gclass.label_set_structured_text_bidi_override_options
+label_get_structured_text_bidi_override_options ::
+	gclass.label_get_structured_text_bidi_override_options
+label_get_character_bounds :: gclass.label_get_character_bounds
 control_as_canvas_item :: gclass.control_as_canvas_item
 control_as_node :: gclass.control_as_node
 control_as_object :: gclass.control_as_object
@@ -346,6 +492,80 @@ sprite2d_is_nil :: proc "contextless" (self: Sprite2D) -> bool {
 
 label_is_nil :: proc "contextless" (self: Label) -> bool {
 	return ObjectPtr(self) == nil
+}
+
+node_get_node_checked :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Node,
+	ok: bool,
+) {
+	if node_is_nil(self) || path == nil do return Node(nil), false
+
+	value = node_get_node_or_null(self, path)
+	if node_is_nil(value) do return Node(nil), false
+	return value, true
+}
+
+node_get_node_as_canvas_item :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: CanvasItem,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return CanvasItem(nil), false
+	return node_try_as_canvas_item(node)
+}
+
+node_get_node_as_node2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Node2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Node2D(nil), false
+	return node_try_as_node2d(node)
+}
+
+node_get_node_as_control :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Control,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Control(nil), false
+	return node_try_as_control(node)
+}
+
+node_get_node_as_sprite2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Sprite2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Sprite2D(nil), false
+	return node_try_as_sprite2d(node)
+}
+
+node_get_node_as_label :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Label,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Label(nil), false
+	return node_try_as_label(node)
 }
 
 object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {

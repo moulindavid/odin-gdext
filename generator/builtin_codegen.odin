@@ -13,6 +13,7 @@ ExtensionApiRoot :: struct {
 	classes:                      []ExtensionApiClass `json:"classes"`,
 	singletons:                   []ExtensionApiSingleton `json:"singletons"`,
 	utility_functions:            []ExtensionApiUtilityFunction `json:"utility_functions"`,
+	global_enums:                 []ExtensionApiEnum `json:"global_enums"`,
 	builtin_class_member_offsets: []ExtensionApiMemberOffsets `json:"builtin_class_member_offsets"`,
 }
 
@@ -50,8 +51,9 @@ ExtensionApiMethod :: struct {
 }
 
 ExtensionApiMethodArg :: struct {
-	name: string `json:"name"`,
-	type: string `json:"type"`,
+	name:          string `json:"name"`,
+	type:          string `json:"type"`,
+	default_value: string `json:"default_value,omitempty"`,
 }
 
 ExtensionApiEnum :: struct {
@@ -431,6 +433,15 @@ class_constant_name :: proc(class_name, constant_name: string) -> string {
 
 class_enum_value_name :: proc(value_name: string) -> string {
 	return odin_safe_snake_identifier(value_name)
+}
+
+global_enum_type_map: map[string]string
+
+init_global_enum_type_map :: proc(root: ^ExtensionApiRoot) {
+	global_enum_type_map = make(map[string]string, len(root.global_enums))
+	for enum_ in root.global_enums {
+		global_enum_type_map[enum_.name] = odin_safe_pascal_identifier(enum_.name)
+	}
 }
 
 // Variant enum names differ from JSON names, for example AABB -> .Aabb.
@@ -987,6 +998,8 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
+Max_Selected_Class_Count :: 16
+
 selected_class_names := []string {
 	"Object",
 	"RefCounted",
@@ -1015,20 +1028,124 @@ selected_class_methods := []Selected_Class_Method {
 	{"Resource", "set_local_to_scene"},
 	{"Resource", "is_local_to_scene"},
 	{"Node", "get_parent"},
+	{"Node", "set_name"},
+	{"Node", "get_name"},
+	{"Node", "has_node"},
+	{"Node", "get_node_or_null"},
+	{"Node", "get_child_count"},
+	{"Node", "get_child"},
+	{"Node", "is_inside_tree"},
+	{"Node", "get_path"},
 	{"Node", "is_ancestor_of"},
 	{"Node", "get_path_to"},
+	{"Node", "remove_from_group"},
+	{"Node", "is_in_group"},
+	{"Node", "set_process"},
+	{"Node", "is_processing"},
+	{"Node", "get_process_delta_time"},
+	{"Node", "set_physics_process"},
+	{"Node", "is_physics_processing"},
+	{"Node", "get_physics_process_delta_time"},
 	{"CanvasItem", "set_visible"},
 	{"CanvasItem", "is_visible"},
+	{"CanvasItem", "is_visible_in_tree"},
 	{"CanvasItem", "show"},
 	{"CanvasItem", "hide"},
 	{"CanvasItem", "queue_redraw"},
+	{"CanvasItem", "move_to_front"},
+	{"CanvasItem", "set_as_top_level"},
+	{"CanvasItem", "is_set_as_top_level"},
+	{"CanvasItem", "set_light_mask"},
+	{"CanvasItem", "get_light_mask"},
+	{"CanvasItem", "set_modulate"},
+	{"CanvasItem", "get_modulate"},
+	{"CanvasItem", "set_self_modulate"},
+	{"CanvasItem", "get_self_modulate"},
+	{"CanvasItem", "set_z_index"},
+	{"CanvasItem", "get_z_index"},
+	{"CanvasItem", "set_z_as_relative"},
+	{"CanvasItem", "is_z_relative"},
+	{"CanvasItem", "set_y_sort_enabled"},
+	{"CanvasItem", "is_y_sort_enabled"},
+	{"CanvasItem", "set_draw_behind_parent"},
+	{"CanvasItem", "is_draw_behind_parent_enabled"},
 	{"CanvasItem", "get_canvas"},
+	{"CanvasItem", "get_canvas_item"},
+	{"CanvasItem", "draw_set_transform_matrix"},
+	{"CanvasItem", "get_transform"},
+	{"CanvasItem", "get_global_transform"},
+	{"CanvasItem", "get_global_transform_with_canvas"},
+	{"CanvasItem", "get_viewport_transform"},
+	{"CanvasItem", "get_viewport_rect"},
+	{"CanvasItem", "get_canvas_transform"},
+	{"CanvasItem", "get_screen_transform"},
+	{"CanvasItem", "get_local_mouse_position"},
+	{"CanvasItem", "get_global_mouse_position"},
 	{"Node2D", "set_position"},
 	{"Node2D", "get_position"},
 	{"Node2D", "set_rotation"},
 	{"Node2D", "get_rotation"},
+	{"Node2D", "set_rotation_degrees"},
+	{"Node2D", "get_rotation_degrees"},
+	{"Node2D", "set_skew"},
+	{"Node2D", "get_skew"},
+	{"Node2D", "set_scale"},
+	{"Node2D", "get_scale"},
+	{"Node2D", "rotate"},
+	{"Node2D", "translate"},
+	{"Node2D", "global_translate"},
+	{"Node2D", "apply_scale"},
+	{"Node2D", "set_global_position"},
+	{"Node2D", "get_global_position"},
+	{"Node2D", "set_global_rotation"},
+	{"Node2D", "get_global_rotation"},
+	{"Node2D", "set_global_scale"},
+	{"Node2D", "get_global_scale"},
+	{"Node2D", "set_transform"},
+	{"Node2D", "set_global_transform"},
+	{"Node2D", "look_at"},
+	{"Node2D", "get_angle_to"},
+	{"Node2D", "to_local"},
+	{"Node2D", "to_global"},
+	{"Node2D", "get_relative_transform_to_parent"},
+	{"Control", "accept_event"},
 	{"Control", "set_custom_minimum_size"},
 	{"Control", "get_custom_minimum_size"},
+	{"Control", "get_maximum_size"},
+	{"Control", "get_combined_maximum_size"},
+	{"Control", "get_minimum_size"},
+	{"Control", "get_combined_minimum_size"},
+	{"Control", "set_propagate_maximum_size"},
+	{"Control", "is_propagating_maximum_size"},
+	{"Control", "get_bound_minimum_size"},
+	{"Control", "get_anchor"},
+	{"Control", "set_offset"},
+	{"Control", "get_offset"},
+	{"Control", "set_begin"},
+	{"Control", "set_end"},
+	{"Control", "set_position"},
+	{"Control", "set_size"},
+	{"Control", "reset_size"},
+	{"Control", "set_custom_maximum_size"},
+	{"Control", "set_global_position"},
+	{"Control", "set_rotation"},
+	{"Control", "set_rotation_degrees"},
+	{"Control", "set_scale"},
+	{"Control", "set_pivot_offset"},
+	{"Control", "get_begin"},
+	{"Control", "get_end"},
+	{"Control", "get_position"},
+	{"Control", "get_size"},
+	{"Control", "get_rotation"},
+	{"Control", "get_rotation_degrees"},
+	{"Control", "get_scale"},
+	{"Control", "get_pivot_offset"},
+	{"Control", "get_custom_maximum_size"},
+	{"Control", "get_parent_area_size"},
+	{"Control", "get_global_position"},
+	{"Control", "get_screen_position"},
+	{"Control", "get_rect"},
+	{"Control", "get_global_rect"},
 	{"Control", "set_focus_mode"},
 	{"Control", "get_focus_mode"},
 	{"Control", "has_focus"},
@@ -1046,6 +1163,10 @@ selected_class_methods := []Selected_Class_Method {
 	{"Sprite2D", "is_flipped_v"},
 	{"Sprite2D", "set_region_enabled"},
 	{"Sprite2D", "is_region_enabled"},
+	{"Sprite2D", "set_region_rect"},
+	{"Sprite2D", "get_region_rect"},
+	{"Sprite2D", "set_region_filter_clip_enabled"},
+	{"Sprite2D", "is_region_filter_clip_enabled"},
 	{"Sprite2D", "is_pixel_opaque"},
 	{"Sprite2D", "set_frame"},
 	{"Sprite2D", "get_frame"},
@@ -1053,10 +1174,27 @@ selected_class_methods := []Selected_Class_Method {
 	{"Sprite2D", "get_vframes"},
 	{"Sprite2D", "set_hframes"},
 	{"Sprite2D", "get_hframes"},
+	{"Sprite2D", "set_frame_coords"},
+	{"Sprite2D", "get_frame_coords"},
+	{"Sprite2D", "get_rect"},
 	{"Label", "set_text"},
 	{"Label", "get_text"},
 	{"Label", "set_clip_text"},
 	{"Label", "is_clipping_text"},
+	{"Label", "set_horizontal_alignment"},
+	{"Label", "get_horizontal_alignment"},
+	{"Label", "set_vertical_alignment"},
+	{"Label", "get_vertical_alignment"},
+	{"Label", "set_text_direction"},
+	{"Label", "get_text_direction"},
+	{"Label", "set_language"},
+	{"Label", "get_language"},
+	{"Label", "set_paragraph_separator"},
+	{"Label", "get_paragraph_separator"},
+	{"Label", "set_tab_stops"},
+	{"Label", "get_tab_stops"},
+	{"Label", "set_ellipsis_char"},
+	{"Label", "get_ellipsis_char"},
 	{"Label", "set_uppercase"},
 	{"Label", "is_uppercase"},
 	{"Label", "get_line_count"},
@@ -1070,6 +1208,9 @@ selected_class_methods := []Selected_Class_Method {
 	{"Label", "get_lines_skipped"},
 	{"Label", "set_max_lines_visible"},
 	{"Label", "get_max_lines_visible"},
+	{"Label", "set_structured_text_bidi_override_options"},
+	{"Label", "get_structured_text_bidi_override_options"},
+	{"Label", "get_character_bounds"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
@@ -1099,6 +1240,87 @@ find_class_method :: proc(
 	return {}, false
 }
 
+validate_selected_class_api :: proc(root: ^ExtensionApiRoot) -> bool {
+	if len(selected_class_names) > Max_Selected_Class_Count {
+		fmt.eprintfln(
+			"ERROR: selected class batch has %d classes; keep batches at or below %d before broad generation",
+			len(selected_class_names),
+			Max_Selected_Class_Count,
+		)
+		return false
+	}
+
+	seen_classes := make(map[string]bool, len(selected_class_names))
+	defer delete(seen_classes)
+	for class_name in selected_class_names {
+		if seen_classes[class_name] {
+			fmt.eprintfln("ERROR: duplicate selected class %q", class_name)
+			return false
+		}
+		seen_classes[class_name] = true
+		if _, class_ok := find_class(root, class_name); !class_ok {
+			fmt.eprintfln("ERROR: selected class %q missing from extension_api.json", class_name)
+			return false
+		}
+	}
+
+	seen_methods := make(map[string]bool, len(selected_class_methods))
+	defer delete(seen_methods)
+	seen_proc_names := make(map[string]bool, len(selected_class_methods))
+	defer delete(seen_proc_names)
+	for entry in selected_class_methods {
+		if !seen_classes[entry.class_name] {
+			fmt.eprintfln(
+				"ERROR: selected method %s.%s uses a class outside selected_class_names",
+				entry.class_name,
+				entry.method_name,
+			)
+			return false
+		}
+
+		method_key := fmt.aprintf("%s.%s", entry.class_name, entry.method_name)
+		if seen_methods[method_key] {
+			fmt.eprintfln("ERROR: duplicate selected class method %s", method_key)
+			return false
+		}
+		seen_methods[method_key] = true
+
+		proc_name := fmt.aprintf(
+			"%s_%s",
+			class_proc_prefix(entry.class_name),
+			class_proc_prefix(entry.method_name),
+		)
+		if seen_proc_names[proc_name] {
+			fmt.eprintfln("ERROR: generated class method proc name collision: %s", proc_name)
+			return false
+		}
+		seen_proc_names[proc_name] = true
+
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok {
+			fmt.eprintfln(
+				"ERROR: selected class method %s.%s missing from extension_api.json",
+				entry.class_name,
+				entry.method_name,
+			)
+			return false
+		}
+		if !class_method_supported(entry.class_name, method) {
+			fmt.eprintfln(
+				"ERROR: unsupported selected class method %s.%s: %s",
+				entry.class_name,
+				entry.method_name,
+				class_method_skip_reason(entry.class_name, method),
+			)
+			return false
+		}
+	}
+
+	return true
+}
+
 class_type_expr :: proc(class_name: string) -> string {
 	if class_name == "Object" do return "core.Object"
 	if class_name == "RefCounted" do return "core.RefCounted"
@@ -1115,6 +1337,7 @@ class_handle_expr :: proc(class_name: string) -> string {
 class_enum_type_from_godot :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
 	if !strings.has_prefix(godot_name, "enum::") do return "", false
 	rest := strings.trim_prefix(godot_name, "enum::")
+	if enum_type, enum_ok := global_enum_type_map[rest]; enum_ok do return enum_type, true
 	parts := strings.split(rest, ".", context.temp_allocator)
 	if len(parts) != 2 do return "", false
 	if !is_selected_class(parts[0]) do return "", false
@@ -1122,17 +1345,29 @@ class_enum_type_from_godot :: proc(godot_name: string) -> (odin_type: string, ok
 }
 
 class_abi_type_map := map[string]string {
-	"Nil"     = "rawptr",
-	"bool"    = "bool",
-	"int"     = "i64",
-	"int32"   = "i32",
-	"int64"   = "i64",
-	"float"   = "core.GodotReal",
-	"double"  = "f64",
-	"Vector2" = "core.Vector2",
-	"Vector3" = "core.Vector3",
-	"Vector4" = "core.Vector4",
-	"Color"   = "core.Color",
+	"Nil"         = "rawptr",
+	"bool"        = "bool",
+	"int"         = "i64",
+	"int32"       = "i32",
+	"int64"       = "i64",
+	"float"       = "core.GodotReal",
+	"double"      = "f64",
+	"Vector2"     = "core.Vector2",
+	"Vector3"     = "core.Vector3",
+	"Vector4"     = "core.Vector4",
+	"Color"       = "core.Color",
+	"Vector2i"    = "builtin.Vector2i",
+	"Rect2"       = "builtin.Rect2",
+	"Rect2i"      = "builtin.Rect2i",
+	"Vector3i"    = "builtin.Vector3i",
+	"Transform2D" = "builtin.Transform2D",
+	"Vector4i"    = "builtin.Vector4i",
+	"Plane"       = "builtin.Plane",
+	"Quaternion"  = "builtin.Quaternion",
+	"AABB"        = "builtin.AABB",
+	"Basis"       = "builtin.Basis",
+	"Transform3D" = "builtin.Transform3D",
+	"Projection"  = "builtin.Projection",
 }
 
 // Class method mapping rules:
@@ -1175,19 +1410,73 @@ class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
 	return false
 }
 
-class_method_deferred_until_safety_model :: proc(class_name, method_name: string) -> bool {
-	if class_name == "Control" && method_name == "force_drag" do return true
-	if class_name == "Resource" && method_name == "duplicate" do return true
+class_method_deferred_reason :: proc(class_name, method_name: string) -> string {
+	if class_name == "Control" && method_name == "force_drag" do return "object lifetime"
+	if class_name == "Resource" && method_name == "duplicate" do return "object lifetime"
 	// Public RefCounted/Resource handles are borrowed-only until retain/unref
 	// ownership rules are explicit.
 	if class_name == "RefCounted" &&
 	   (method_name == "init_ref" || method_name == "reference" || method_name == "unreference") {
-		return true
+		return "refcount ownership"
 	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
-		return true
+		return "object lifetime"
+	}
+	return ""
+}
+
+class_method_deferred_until_safety_model :: proc(class_name, method_name: string) -> bool {
+	return len(class_method_deferred_reason(class_name, method_name)) > 0
+}
+
+class_type_deferred_reason :: proc(godot_name: string) -> string {
+	if godot_name == "Callable" do return "Callable"
+	if godot_name == "Signal" do return "Signal"
+	if strings.has_prefix(godot_name, "typedarray::") do return "typed array"
+	if strings.has_prefix(godot_name, "TypedArray") do return "typed array"
+	if strings.has_prefix(godot_name, "bitfield::") do return "bitfield"
+	return ""
+}
+
+class_method_selected :: proc(class_name, method_name: string) -> bool {
+	for entry in selected_class_methods {
+		if entry.class_name == class_name && entry.method_name == method_name do return true
 	}
 	return false
+}
+
+class_method_has_default_arguments :: proc(method: ExtensionApiClassMethod) -> bool {
+	for arg in method.arguments {
+		if len(arg.default_value) > 0 do return true
+	}
+	return false
+}
+
+class_method_skip_reason :: proc(class_name: string, method: ExtensionApiClassMethod) -> string {
+	if method.is_vararg do return "vararg"
+	if method.is_virtual do return "virtual"
+	if reason := class_method_deferred_reason(class_name, method.name); len(reason) > 0 {
+		return reason
+	}
+	if reason := class_type_deferred_reason(method.return_value.type); len(reason) > 0 {
+		return fmt.aprintf("return type %s deferred: %s", method.return_value.type, reason)
+	}
+	if _, ok := resolve_class_return_type(method.return_value.type); !ok {
+		return fmt.aprintf("unsupported return type %s", method.return_value.type)
+	}
+	for arg in method.arguments {
+		if reason := class_type_deferred_reason(arg.type); len(reason) > 0 {
+			return fmt.aprintf("argument %s type %s deferred: %s", arg.name, arg.type, reason)
+		}
+		if _, ok := resolve_class_param_type(arg.type); !ok {
+			return fmt.aprintf("unsupported argument %s type %s", arg.name, arg.type)
+		}
+	}
+	if !class_method_selected(class_name, method.name) {
+		if class_method_has_default_arguments(method) do return "default argument"
+		return "not selected for current coverage slice"
+	}
+	return ""
 }
 
 class_method_supported :: proc(class_name: string, method: ExtensionApiClassMethod) -> bool {
@@ -1236,6 +1525,56 @@ class_proc_prefix :: proc(class_name: string) -> string {
 	return strings.to_string(b)
 }
 
+
+emit_global_enums :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) {
+	if len(root.global_enums) == 0 do return
+
+	strings.write_string(b, "// ---- Global enums ----\n\n")
+	strings.write_string(
+		b,
+		"// Global enum type names are Odin-safe versions of extension_api.json names.\n\n",
+	)
+
+	used_types := make(map[string]bool, len(root.global_enums))
+	defer delete(used_types)
+	for enum_ in root.global_enums {
+		enum_type := odin_safe_pascal_identifier(enum_.name)
+		if used_types[enum_type] do continue
+		used_types[enum_type] = true
+
+		fmt.sbprintf(b, "%s :: enum i64 {{\n", enum_type)
+		used_values := make(map[string]bool, len(enum_.values))
+		for value in enum_.values {
+			value_name := class_enum_value_name(value.name)
+			if used_values[value_name] {
+				value_name = fmt.aprintf("%s_%d", value_name, value.value)
+			}
+			used_values[value_name] = true
+			fmt.sbprintf(b, "\t%s = %d,\n", value_name, value.value)
+		}
+		delete(used_values)
+		strings.write_string(b, "}\n\n")
+	}
+}
+
+class_method_needs_builtin_import :: proc(root: ^ExtensionApiRoot) -> bool {
+	for entry in selected_class_methods {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do continue
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok do continue
+
+		if ret_type, ret_ok := resolve_class_return_type(method.return_value.type); ret_ok {
+			if strings.has_prefix(ret_type, "builtin.") do return true
+		}
+		for arg in method.arguments {
+			if param_type, param_ok := resolve_class_param_type(arg.type); param_ok {
+				if strings.has_prefix(param_type, "builtin.") do return true
+			}
+		}
+	}
+	return false
+}
 
 emit_class_constants_and_enums :: proc(
 	b: ^strings.Builder,
@@ -1471,6 +1810,87 @@ emit_class_binding_init :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) ->
 	return true
 }
 
+emit_class_method_report_signature :: proc(
+	b: ^strings.Builder,
+	class_name: string,
+	method: ExtensionApiClassMethod,
+) {
+	fmt.sbprintf(b, "`%s.%s(", class_name, method.name)
+	for arg, index in method.arguments {
+		if index > 0 do strings.write_string(b, ", ")
+		fmt.sbprintf(b, "%s: %s", arg.name, arg.type)
+		if len(arg.default_value) > 0 {
+			fmt.sbprintf(b, " = %s", arg.default_value)
+		}
+	}
+	return_type := method.return_value.type
+	if len(return_type) == 0 do return_type = "void"
+	fmt.sbprintf(b, ") -> %s`", return_type)
+}
+
+generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
+	path := "bindings/classes/api_report.md"
+
+	generated := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&generated)
+	skipped := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&skipped)
+
+	generated_count := 0
+	skipped_count := 0
+
+	for class_name in selected_class_names {
+		class, class_ok := find_class(root, class_name)
+		if !class_ok {
+			fmt.eprintfln("ERROR: class %q missing from extension_api.json", class_name)
+			return false
+		}
+
+		for method in class.methods {
+			reason := class_method_skip_reason(class.name, method)
+			if len(reason) == 0 {
+				strings.write_string(&generated, "- ")
+				emit_class_method_report_signature(&generated, class.name, method)
+				strings.write_byte(&generated, '\n')
+				generated_count += 1
+			} else {
+				strings.write_string(&skipped, "- ")
+				emit_class_method_report_signature(&skipped, class.name, method)
+				fmt.sbprintf(&skipped, ": %s\n", reason)
+				skipped_count += 1
+			}
+		}
+	}
+
+	b := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&b)
+
+	strings.write_string(&b, "# Generated class API support report\n\n")
+	strings.write_string(&b, "Generated from `extension_api.json`. DO NOT EDIT.\n\n")
+	strings.write_string(&b, "This report only covers the selected generated class slice.\n\n")
+	strings.write_string(&b, "## Summary\n\n")
+	fmt.sbprintf(&b, "- Selected classes: %d\n", len(selected_class_names))
+	fmt.sbprintf(&b, "- Generated methods: %d\n", generated_count)
+	fmt.sbprintf(&b, "- Skipped methods: %d\n\n", skipped_count)
+	strings.write_string(&b, "## Generated methods\n\n")
+	strings.write_string(&b, strings.to_string(generated))
+	strings.write_string(&b, "\n## Skipped methods\n\n")
+	strings.write_string(&b, strings.to_string(skipped))
+
+	err := os.write_entire_file(path, transmute([]byte)strings.to_string(b))
+	if err != nil {
+		fmt.eprintfln("ERROR: %v", err)
+		return false
+	}
+	fmt.printfln(
+		"  %s  (%d generated, %d skipped class methods)",
+		path,
+		generated_count,
+		skipped_count,
+	)
+	return true
+}
+
 emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(b, "// ---- Selected class methods ----\n\n")
 
@@ -1579,6 +1999,9 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	)
 	strings.write_string(&b, "// Auto-generated from extension_api.json. DO NOT EDIT.\n\n")
 	strings.write_string(&b, "package godot_bindings_classes\n\n")
+	if class_method_needs_builtin_import(root) {
+		strings.write_string(&b, "import builtin \"godot:bindings/builtin\"\n")
+	}
 	strings.write_string(&b, "import core \"godot:core\"\n\n")
 	strings.write_string(
 		&b,
@@ -1635,6 +2058,7 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	}
 
 	emit_class_downcasts(&b, root, selected)
+	emit_global_enums(&b, root)
 	emit_class_constants_and_enums(&b, selected)
 
 	strings.write_string(
@@ -1670,6 +2094,8 @@ generate_builtin_bindings :: proc(json_path: string) -> bool {
 		fmt.eprintfln("ERROR: failed to parse extension_api.json: %v", uerr)
 		return false
 	}
+	init_global_enum_type_map(&root)
+	if !validate_selected_class_api(&root) {return false}
 
 	// Use member offsets from the first build configuration, matching the running Godot build.
 	real_members := make(map[string][]ExtensionApiMemberOffsetEntry, 32)
@@ -1684,6 +2110,7 @@ generate_builtin_bindings :: proc(json_path: string) -> bool {
 	}
 
 	if !generate_utility_bindings(&root) {return false}
+	if !generate_class_api_report(&root) {return false}
 	if !generate_class_bindings(&root) {return false}
 
 	return true

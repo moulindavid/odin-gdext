@@ -164,7 +164,7 @@ clean:
 	rm -f examples/game/*.uid
 	rm -f core/interface_defs.odin core/interface.odin
 	rm -f bindings/builtin/*.odin bindings/utilities.odin
-	rm -f bindings/classes/*.odin
+	rm -f bindings/classes/*.odin bindings/classes/*.md
 	rm -f bindings/builtin/.stamp bindings/classes/.stamp
 	rm -f extension_api.json
 	rm -f bin/godot-codegen
