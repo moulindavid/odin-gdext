@@ -50,8 +50,9 @@ ExtensionApiMethod :: struct {
 }
 
 ExtensionApiMethodArg :: struct {
-	name: string `json:"name"`,
-	type: string `json:"type"`,
+	name:          string `json:"name"`,
+	type:          string `json:"type"`,
+	default_value: string `json:"default_value,omitempty"`,
 }
 
 ExtensionApiEnum :: struct {
@@ -1175,19 +1176,73 @@ class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
 	return false
 }
 
-class_method_deferred_until_safety_model :: proc(class_name, method_name: string) -> bool {
-	if class_name == "Control" && method_name == "force_drag" do return true
-	if class_name == "Resource" && method_name == "duplicate" do return true
+class_method_deferred_reason :: proc(class_name, method_name: string) -> string {
+	if class_name == "Control" && method_name == "force_drag" do return "object lifetime"
+	if class_name == "Resource" && method_name == "duplicate" do return "object lifetime"
 	// Public RefCounted/Resource handles are borrowed-only until retain/unref
 	// ownership rules are explicit.
 	if class_name == "RefCounted" &&
 	   (method_name == "init_ref" || method_name == "reference" || method_name == "unreference") {
-		return true
+		return "refcount ownership"
 	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
-		return true
+		return "object lifetime"
+	}
+	return ""
+}
+
+class_method_deferred_until_safety_model :: proc(class_name, method_name: string) -> bool {
+	return len(class_method_deferred_reason(class_name, method_name)) > 0
+}
+
+class_type_deferred_reason :: proc(godot_name: string) -> string {
+	if godot_name == "Callable" do return "Callable"
+	if godot_name == "Signal" do return "Signal"
+	if strings.has_prefix(godot_name, "typedarray::") do return "typed array"
+	if strings.has_prefix(godot_name, "TypedArray") do return "typed array"
+	if strings.has_prefix(godot_name, "bitfield::") do return "bitfield"
+	return ""
+}
+
+class_method_selected :: proc(class_name, method_name: string) -> bool {
+	for entry in selected_class_methods {
+		if entry.class_name == class_name && entry.method_name == method_name do return true
 	}
 	return false
+}
+
+class_method_has_default_arguments :: proc(method: ExtensionApiClassMethod) -> bool {
+	for arg in method.arguments {
+		if len(arg.default_value) > 0 do return true
+	}
+	return false
+}
+
+class_method_skip_reason :: proc(class_name: string, method: ExtensionApiClassMethod) -> string {
+	if method.is_vararg do return "vararg"
+	if method.is_virtual do return "virtual"
+	if reason := class_method_deferred_reason(class_name, method.name); len(reason) > 0 {
+		return reason
+	}
+	if reason := class_type_deferred_reason(method.return_value.type); len(reason) > 0 {
+		return fmt.aprintf("return type %s deferred: %s", method.return_value.type, reason)
+	}
+	if _, ok := resolve_class_return_type(method.return_value.type); !ok {
+		return fmt.aprintf("unsupported return type %s", method.return_value.type)
+	}
+	for arg in method.arguments {
+		if reason := class_type_deferred_reason(arg.type); len(reason) > 0 {
+			return fmt.aprintf("argument %s type %s deferred: %s", arg.name, arg.type, reason)
+		}
+		if _, ok := resolve_class_param_type(arg.type); !ok {
+			return fmt.aprintf("unsupported argument %s type %s", arg.name, arg.type)
+		}
+	}
+	if !class_method_selected(class_name, method.name) {
+		if class_method_has_default_arguments(method) do return "default argument"
+		return "not selected for current coverage slice"
+	}
+	return ""
 }
 
 class_method_supported :: proc(class_name: string, method: ExtensionApiClassMethod) -> bool {
@@ -1471,6 +1526,87 @@ emit_class_binding_init :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) ->
 	return true
 }
 
+emit_class_method_report_signature :: proc(
+	b: ^strings.Builder,
+	class_name: string,
+	method: ExtensionApiClassMethod,
+) {
+	fmt.sbprintf(b, "`%s.%s(", class_name, method.name)
+	for arg, index in method.arguments {
+		if index > 0 do strings.write_string(b, ", ")
+		fmt.sbprintf(b, "%s: %s", arg.name, arg.type)
+		if len(arg.default_value) > 0 {
+			fmt.sbprintf(b, " = %s", arg.default_value)
+		}
+	}
+	return_type := method.return_value.type
+	if len(return_type) == 0 do return_type = "void"
+	fmt.sbprintf(b, ") -> %s`", return_type)
+}
+
+generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
+	path := "bindings/classes/api_report.md"
+
+	generated := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&generated)
+	skipped := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&skipped)
+
+	generated_count := 0
+	skipped_count := 0
+
+	for class_name in selected_class_names {
+		class, class_ok := find_class(root, class_name)
+		if !class_ok {
+			fmt.eprintfln("ERROR: class %q missing from extension_api.json", class_name)
+			return false
+		}
+
+		for method in class.methods {
+			reason := class_method_skip_reason(class.name, method)
+			if len(reason) == 0 {
+				strings.write_string(&generated, "- ")
+				emit_class_method_report_signature(&generated, class.name, method)
+				strings.write_byte(&generated, '\n')
+				generated_count += 1
+			} else {
+				strings.write_string(&skipped, "- ")
+				emit_class_method_report_signature(&skipped, class.name, method)
+				fmt.sbprintf(&skipped, ": %s\n", reason)
+				skipped_count += 1
+			}
+		}
+	}
+
+	b := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&b)
+
+	strings.write_string(&b, "# Generated class API support report\n\n")
+	strings.write_string(&b, "Generated from `extension_api.json`. DO NOT EDIT.\n\n")
+	strings.write_string(&b, "This report only covers the selected generated class slice.\n\n")
+	strings.write_string(&b, "## Summary\n\n")
+	fmt.sbprintf(&b, "- Selected classes: %d\n", len(selected_class_names))
+	fmt.sbprintf(&b, "- Generated methods: %d\n", generated_count)
+	fmt.sbprintf(&b, "- Skipped methods: %d\n\n", skipped_count)
+	strings.write_string(&b, "## Generated methods\n\n")
+	strings.write_string(&b, strings.to_string(generated))
+	strings.write_string(&b, "\n## Skipped methods\n\n")
+	strings.write_string(&b, strings.to_string(skipped))
+
+	err := os.write_entire_file(path, transmute([]byte)strings.to_string(b))
+	if err != nil {
+		fmt.eprintfln("ERROR: %v", err)
+		return false
+	}
+	fmt.printfln(
+		"  %s  (%d generated, %d skipped class methods)",
+		path,
+		generated_count,
+		skipped_count,
+	)
+	return true
+}
+
 emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(b, "// ---- Selected class methods ----\n\n")
 
@@ -1684,6 +1820,7 @@ generate_builtin_bindings :: proc(json_path: string) -> bool {
 	}
 
 	if !generate_utility_bindings(&root) {return false}
+	if !generate_class_api_report(&root) {return false}
 	if !generate_class_bindings(&root) {return false}
 
 	return true

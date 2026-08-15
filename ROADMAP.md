@@ -58,11 +58,11 @@ Classes may be added or deferred based on type-mapping safety. Do not expose API
 that require ownership rules the project does not have yet.
 
 1. Add generated API support reporting.
-   - [ ] Emit a deterministic report of generated class methods.
-   - [ ] Emit a deterministic report of skipped class methods.
-   - [ ] Include skip reasons such as unsupported type, vararg, default argument,
+   - [x] Emit a deterministic report of generated class methods.
+   - [x] Emit a deterministic report of skipped class methods.
+   - [x] Include skip reasons such as unsupported type, vararg, default argument,
      object lifetime, typed array, `Callable`, or `Signal`.
-   - [ ] Make the report useful for choosing the next class or type-mapping
+   - [x] Make the report useful for choosing the next class or type-mapping
      slice.
 
 2. Expand safe class method type mapping.
