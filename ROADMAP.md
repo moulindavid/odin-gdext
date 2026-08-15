@@ -21,8 +21,8 @@ Keep these rules intact while adding features:
   matching destruction paths.
 - Object and class handles are borrowed unless a helper explicitly documents a
   retain/reference rule.
-- `RefCounted` and `Resource` remain borrowed-only until an owned reference model
-  is designed and tested.
+- `RefCounted` and `Resource` remain borrowed by default. Owned references must
+  use the explicit `OwnedRefCounted` or `OwnedResource` wrappers.
 - No raw offset poking in examples, generated code, or public helpers.
 - Resolved GDExtension function pointers and method binds must be checked or
   trapped before use.
@@ -40,67 +40,93 @@ practical scene/UI APIs, checked `NodePath` lookup helpers, public facade export
 runtime example coverage, and generator guardrails for deterministic small-batch
 class expansion.
 
-## Current goal: Resource and RefCounted ownership model
+## Completed: Resource and RefCounted ownership model
 
-The next deferred feature from generated class expansion is an explicit owned
-reference model for `RefCounted` and `Resource`. The goal is to keep borrowed
-object handles as the default while adding a small, auditable owned-reference
-path for APIs that return or store refcounted Godot objects.
+`RefCounted` and `Resource` now have an explicit owned-reference path while
+normal object/class handles remain borrowed by default. The completed slice
+added documentation, low-level retain/unreference helpers, `OwnedRefCounted`,
+`OwnedResource`, generator reporting for owned-wrapper-only methods, runtime
+smoke coverage, and full `make ci` validation.
 
-This goal should unlock safer future work around `Resource`, `PackedScene`,
-textures, themes, and other object-lifetime-sensitive generated APIs. Do not
-broaden generated `Resource` or `RefCounted` APIs until the ownership rules are
-implemented and smoke-tested.
+## Current goal: generated gameplay class API expansion
 
-1. Define the owned reference design.
-   - [x] Document the distinction between borrowed object handles, borrowed
-     `RefCounted`/`Resource` handles, and owned references.
-   - [x] Decide the public wrapper shape for an owned refcounted handle.
-   - [x] Specify copy, move-like handoff, release, and nil behavior in Odin
-     terms.
-   - [x] Keep normal generated object/class returns borrowed unless a wrapper
-     explicitly documents ownership transfer.
+Continue the generated class API roadmap with a small gameplay-focused batch.
+The target is enough selected class coverage to build common 2D gameplay systems
+from Odin without opening broad unsafe Godot APIs.
 
-2. Add low-level retain and release helpers.
-   - [x] Wrap Godot 4.7 `RefCounted` reference and unreference calls safely.
-   - [x] Trap or return `ok = false` for nil handles.
-   - [x] Preserve borrowed-only behavior for existing typed class handles.
-   - [x] Add focused unit or compile checks for helper signatures.
+Initial class targets from `ROADMAP_GENERATED_CLASSES.md`:
 
-3. Add an owned `RefCounted` wrapper.
-   - [x] Store a typed borrowed handle plus ownership state explicitly.
-   - [x] Provide init, retain, release, and destroy helpers.
-   - [x] Make double-release and nil-release behavior explicit.
-   - [x] Avoid hidden destructor behavior that would surprise Odin users.
+- `Timer`
+- `CollisionObject2D`
+- `Area2D`
+- cautious `Resource` and `PackedScene` evaluation using the new owned-reference
+  model
 
-4. Add an owned `Resource` wrapper on top of the `RefCounted` model.
-   - [x] Support checked creation from a borrowed `Resource` handle.
-   - [x] Support explicit release through the same refcount path.
-   - [x] Keep generated `Resource` method wrappers borrowed by default.
-   - [x] Do not expose broad resource-loading APIs until ownership is verified.
+Keep the generator selective. Do not enable the full Godot class API, varargs,
+default arguments, `Callable`, broad `Signal`, or object-lifetime-sensitive
+methods until their safety rules are explicit.
 
-5. Update generated class skip rules.
-   - [x] Reclassify deferred `Resource` and `RefCounted` APIs based on the new
-     ownership model.
-   - [x] Keep APIs such as `duplicate`, texture setters/getters, and scene
-     resource APIs skipped until their exact return ownership is known.
-   - [x] Make the generated API report distinguish borrowed-safe APIs from APIs
-     requiring an owned reference wrapper.
+1. Refresh the generated class API support baseline.
+   - [ ] Include `Timer`, `CollisionObject2D`, `Area2D`, `Resource`, and
+     `PackedScene` in the selected class report candidate analysis.
+   - [ ] Keep unsupported methods skipped with deterministic reasons.
+   - [ ] Separate borrowed-safe methods from methods requiring owned wrappers or
+     object-lifetime review.
+   - [ ] Use the report to choose the smallest safe generated method batch.
 
-6. Add a minimal runtime smoke path.
-   - [x] Exercise one owned `Resource` or `RefCounted` retain/release path in a
-     Godot headless example.
-   - [x] Prove existing borrowed handle usage still works.
-   - [x] Ensure every owned reference acquired in the smoke path is released.
+2. Generate borrowed-safe `Timer` APIs.
+   - [ ] Add the `Timer` handle, upcasts, downcasts, constants, and enums where
+     applicable.
+   - [ ] Generate primitive and `GodotReal` timer configuration methods such as
+     wait time, one shot, autostart, paused, start, and stop where signatures are
+     safe.
+   - [ ] Re-export selected `Timer` APIs through `godot:godot`.
+   - [ ] Add facade compile coverage and a small runtime use in an example or
+     smoke path.
 
-7. Validate the model before expanding resource-heavy APIs.
-   - [x] Run `make ci`.
-   - [x] Keep normal examples importing only `godot:godot`.
-   - [x] Do not enable broad `Resource`, `PackedScene`, texture, theme, or asset
-     APIs until this goal is complete.
+3. Generate borrowed-safe `CollisionObject2D` APIs.
+   - [ ] Add the `CollisionObject2D` handle and inheritance helpers.
+   - [ ] Generate safe collision layer, mask, disable mode, input pickable, and
+     RID access methods where return ownership is clear.
+   - [ ] Keep shape owner APIs skipped until object lifetime and container rules
+     are explicit.
+   - [ ] Re-export selected APIs through the facade and add compile coverage.
+
+4. Generate borrowed-safe `Area2D` APIs.
+   - [ ] Add the `Area2D` handle and checked downcast helpers.
+   - [ ] Generate monitoring, monitorable, priority, gravity, damping, and audio
+     bus methods where signatures are safe.
+   - [ ] Keep body/area collection APIs, signal-heavy APIs, and callback-heavy
+     paths skipped until `Array`, `Signal`, and object-lifetime rules are ready.
+   - [ ] Exercise at least one `Area2D` method path in smoke coverage if it can
+     run headless deterministically.
+
+5. Evaluate `Resource` and `PackedScene` with the owned-reference model.
+   - [ ] Reclassify report entries that can now use `OwnedRefCounted` or
+     `OwnedResource` safely.
+   - [ ] Keep `Resource.duplicate`, texture setters/getters, scene instantiation,
+     and broad resource-loading APIs skipped until exact ownership transfer is
+     verified.
+   - [ ] If a minimal safe `PackedScene` method exists, generate only that method
+     and document whether its result is borrowed or owned.
+   - [ ] Prefer no generated API over an unclear ownership transfer.
+
+6. Prove normal usage through the public facade.
+   - [ ] Keep normal examples importing only `godot:godot`.
+   - [ ] Add facade compile checks for every newly exposed class handle and
+     method group.
+   - [ ] Add or extend a Godot headless smoke path showing one realistic 2D
+     gameplay use of the new generated APIs.
+
+7. Validate before moving to the next feature roadmap.
+   - [ ] Run `make ci`.
+   - [ ] Confirm the generated API report is deterministic and useful.
+   - [ ] Confirm no generated wrapper violates borrowed-object or owned-value
+     destruction rules.
 
 Deferred until after this goal:
 
+- broad `Resource`, `PackedScene`, texture, theme, and asset APIs
 - `Callable` wrappers
 - full `Signal` wrappers
 - vararg methods
