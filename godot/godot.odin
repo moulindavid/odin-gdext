@@ -141,6 +141,7 @@ Control :: gclass.Control
 Sprite2D :: gclass.Sprite2D
 Label :: gclass.Label
 Timer :: gclass.Timer
+CollisionObject2D :: gclass.CollisionObject2D
 
 // --- Core functions ---
 init :: gcore.init
@@ -446,6 +447,8 @@ object_is_label :: gclass.object_is_label
 object_try_as_label :: gclass.object_try_as_label
 object_is_timer :: gclass.object_is_timer
 object_try_as_timer :: gclass.object_try_as_timer
+object_is_collision_object2d :: gclass.object_is_collision_object2d
+object_try_as_collision_object2d :: gclass.object_try_as_collision_object2d
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 node_is_canvas_item :: gclass.node_is_canvas_item
@@ -460,6 +463,8 @@ node_is_label :: gclass.node_is_label
 node_try_as_label :: gclass.node_try_as_label
 node_is_timer :: gclass.node_is_timer
 node_try_as_timer :: gclass.node_try_as_timer
+node_is_collision_object2d :: gclass.node_is_collision_object2d
+node_try_as_collision_object2d :: gclass.node_try_as_collision_object2d
 canvas_item_is_node2d :: gclass.canvas_item_is_node2d
 canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
@@ -468,8 +473,12 @@ canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
 canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
 canvas_item_is_label :: gclass.canvas_item_is_label
 canvas_item_try_as_label :: gclass.canvas_item_try_as_label
+canvas_item_is_collision_object2d :: gclass.canvas_item_is_collision_object2d
+canvas_item_try_as_collision_object2d :: gclass.canvas_item_try_as_collision_object2d
 node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
+node2d_is_collision_object2d :: gclass.node2d_is_collision_object2d
+node2d_try_as_collision_object2d :: gclass.node2d_try_as_collision_object2d
 control_is_label :: gclass.control_is_label
 control_try_as_label :: gclass.control_try_as_label
 timer_as_node :: gclass.timer_as_node
@@ -488,6 +497,25 @@ timer_set_ignore_time_scale :: gclass.timer_set_ignore_time_scale
 timer_is_ignoring_time_scale :: gclass.timer_is_ignoring_time_scale
 timer_is_stopped :: gclass.timer_is_stopped
 timer_get_time_left :: gclass.timer_get_time_left
+collision_object2d_as_node2d :: gclass.collision_object2d_as_node2d
+collision_object2d_as_canvas_item :: gclass.collision_object2d_as_canvas_item
+collision_object2d_as_node :: gclass.collision_object2d_as_node
+collision_object2d_as_object :: gclass.collision_object2d_as_object
+collision_object2d_get_rid :: gclass.collision_object2d_get_rid
+collision_object2d_set_collision_layer :: gclass.collision_object2d_set_collision_layer
+collision_object2d_get_collision_layer :: gclass.collision_object2d_get_collision_layer
+collision_object2d_set_collision_mask :: gclass.collision_object2d_set_collision_mask
+collision_object2d_get_collision_mask :: gclass.collision_object2d_get_collision_mask
+collision_object2d_set_collision_layer_value :: gclass.collision_object2d_set_collision_layer_value
+collision_object2d_get_collision_layer_value :: gclass.collision_object2d_get_collision_layer_value
+collision_object2d_set_collision_mask_value :: gclass.collision_object2d_set_collision_mask_value
+collision_object2d_get_collision_mask_value :: gclass.collision_object2d_get_collision_mask_value
+collision_object2d_set_collision_priority :: gclass.collision_object2d_set_collision_priority
+collision_object2d_get_collision_priority :: gclass.collision_object2d_get_collision_priority
+collision_object2d_set_disable_mode :: gclass.collision_object2d_set_disable_mode
+collision_object2d_get_disable_mode :: gclass.collision_object2d_get_disable_mode
+collision_object2d_set_pickable :: gclass.collision_object2d_set_pickable
+collision_object2d_is_pickable :: gclass.collision_object2d_is_pickable
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -531,6 +559,10 @@ label_is_nil :: proc "contextless" (self: Label) -> bool {
 }
 
 timer_is_nil :: proc "contextless" (self: Timer) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+collision_object2d_is_nil :: proc "contextless" (self: CollisionObject2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -618,6 +650,18 @@ node_get_node_as_timer :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Timer(nil), false
 	return node_try_as_timer(node)
+}
+
+node_get_node_as_collision_object2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: CollisionObject2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return CollisionObject2D(nil), false
+	return node_try_as_collision_object2d(node)
 }
 
 object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {
@@ -718,6 +762,10 @@ timer_object_ptr :: proc "contextless" (self: Timer) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+collision_object2d_object_ptr :: proc "contextless" (self: CollisionObject2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 object_ptr_try_as_ref_counted :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -771,6 +819,16 @@ object_ptr_try_as_label :: proc "contextless" (self: ObjectPtr) -> (value: Label
 object_ptr_try_as_timer :: proc "contextless" (self: ObjectPtr) -> (value: Timer, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_timer(Object(self))
+}
+
+object_ptr_try_as_collision_object2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CollisionObject2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_collision_object2d(Object(self))
 }
 
 // --- Class enums and constants ---

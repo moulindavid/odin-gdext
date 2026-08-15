@@ -1011,9 +1011,10 @@ selected_class_names := []string {
 	"Sprite2D",
 	"Label",
 	"Timer",
+	"CollisionObject2D",
 }
 
-candidate_class_names := []string{"CollisionObject2D", "Area2D", "Resource", "PackedScene"}
+candidate_class_names := []string{"Area2D", "Resource", "PackedScene"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1228,6 +1229,21 @@ selected_class_methods := []Selected_Class_Method {
 	{"Timer", "is_ignoring_time_scale"},
 	{"Timer", "is_stopped"},
 	{"Timer", "get_time_left"},
+	{"CollisionObject2D", "get_rid"},
+	{"CollisionObject2D", "set_collision_layer"},
+	{"CollisionObject2D", "get_collision_layer"},
+	{"CollisionObject2D", "set_collision_mask"},
+	{"CollisionObject2D", "get_collision_mask"},
+	{"CollisionObject2D", "set_collision_layer_value"},
+	{"CollisionObject2D", "get_collision_layer_value"},
+	{"CollisionObject2D", "set_collision_mask_value"},
+	{"CollisionObject2D", "get_collision_mask_value"},
+	{"CollisionObject2D", "set_collision_priority"},
+	{"CollisionObject2D", "get_collision_priority"},
+	{"CollisionObject2D", "set_disable_mode"},
+	{"CollisionObject2D", "get_disable_mode"},
+	{"CollisionObject2D", "set_pickable"},
+	{"CollisionObject2D", "is_pickable"},
 }
 
 is_selected_class :: proc(name: string) -> bool {

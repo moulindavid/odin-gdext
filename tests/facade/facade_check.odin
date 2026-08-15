@@ -11,6 +11,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	sprite2d: gt.Sprite2D,
 	label: gt.Label,
 	timer: gt.Timer,
+	collision_object2d: gt.CollisionObject2D,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
@@ -61,6 +62,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node_get_node_as_sprite2d(node, &path_from_node)
 	_, _ = gt.node_get_node_as_label(node, &path_from_node)
 	_, _ = gt.node_get_node_as_timer(node, &path_from_node)
+	_, _ = gt.node_get_node_as_collision_object2d(node, &path_from_node)
 	_ = gt.node_get_node_or_null(node, &path_from_node)
 	gt.node_path_free(&path_from_node)
 	_ = gt.node_get_child_count(node, false)
@@ -265,6 +267,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.sprite2d_object_ptr(sprite2d)
 	_ = gt.label_object_ptr(label)
 	_ = gt.timer_object_ptr(timer)
+	_ = gt.collision_object2d_object_ptr(collision_object2d)
 	_, _ = gt.object_ptr_try_as_ref_counted(gt.ref_counted_object_ptr(ref_counted))
 	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
 	_, _ = gt.object_ptr_try_as_node(gt.node_object_ptr(node))
@@ -274,6 +277,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_sprite2d(gt.sprite2d_object_ptr(sprite2d))
 	_, _ = gt.object_ptr_try_as_label(gt.label_object_ptr(label))
 	_, _ = gt.object_ptr_try_as_timer(gt.timer_object_ptr(timer))
+	_, _ = gt.object_ptr_try_as_collision_object2d(
+		gt.collision_object2d_object_ptr(collision_object2d),
+	)
 
 	_ = gt.sprite2d_as_node2d(sprite2d)
 	_ = gt.sprite2d_as_canvas_item(sprite2d)
@@ -287,6 +293,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.timer_as_object(timer)
 
 	_ = gt.timer_is_nil(timer)
+	_ = gt.collision_object2d_is_nil(collision_object2d)
 	gt.timer_set_wait_time(timer, 0.5)
 	_ = gt.timer_get_wait_time(timer)
 	gt.timer_set_one_shot(timer, true)
@@ -302,12 +309,35 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.timer_is_stopped(timer)
 	_ = gt.timer_get_time_left(timer)
 
+	_ = gt.collision_object2d_as_node2d(collision_object2d)
+	_ = gt.collision_object2d_as_canvas_item(collision_object2d)
+	_ = gt.collision_object2d_as_node(collision_object2d)
+	_ = gt.collision_object2d_as_object(collision_object2d)
+	collision_rid := gt.collision_object2d_get_rid(collision_object2d)
+	gt.rid_free(&collision_rid)
+	gt.collision_object2d_set_collision_layer(collision_object2d, 1)
+	_ = gt.collision_object2d_get_collision_layer(collision_object2d)
+	gt.collision_object2d_set_collision_mask(collision_object2d, 1)
+	_ = gt.collision_object2d_get_collision_mask(collision_object2d)
+	gt.collision_object2d_set_collision_layer_value(collision_object2d, 1, true)
+	_ = gt.collision_object2d_get_collision_layer_value(collision_object2d, 1)
+	gt.collision_object2d_set_collision_mask_value(collision_object2d, 1, true)
+	_ = gt.collision_object2d_get_collision_mask_value(collision_object2d, 1)
+	gt.collision_object2d_set_collision_priority(collision_object2d, 1)
+	_ = gt.collision_object2d_get_collision_priority(collision_object2d)
+	gt.collision_object2d_set_disable_mode(collision_object2d, .disable_mode_remove)
+	_ = gt.collision_object2d_get_disable_mode(collision_object2d)
+	gt.collision_object2d_set_pickable(collision_object2d, true)
+	_ = gt.collision_object2d_is_pickable(collision_object2d)
+
 	_ = gt.object_is_sprite2d(object)
 	_, _ = gt.object_try_as_sprite2d(object)
 	_ = gt.object_is_label(object)
 	_, _ = gt.object_try_as_label(object)
 	_ = gt.object_is_timer(object)
 	_, _ = gt.object_try_as_timer(object)
+	_ = gt.object_is_collision_object2d(object)
+	_, _ = gt.object_try_as_collision_object2d(object)
 	_ = gt.node_is_sprite2d(node)
 	_, _ = gt.node_try_as_sprite2d(node)
 	_ = gt.node_is_label(node)
@@ -318,8 +348,12 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.canvas_item_try_as_sprite2d(canvas_item)
 	_ = gt.canvas_item_is_label(canvas_item)
 	_, _ = gt.canvas_item_try_as_label(canvas_item)
+	_ = gt.canvas_item_is_collision_object2d(canvas_item)
+	_, _ = gt.canvas_item_try_as_collision_object2d(canvas_item)
 	_ = gt.node2d_is_sprite2d(node2d)
 	_, _ = gt.node2d_try_as_sprite2d(node2d)
+	_ = gt.node2d_is_collision_object2d(node2d)
+	_, _ = gt.node2d_try_as_collision_object2d(node2d)
 	_ = gt.control_is_label(control)
 	_, _ = gt.control_try_as_label(control)
 

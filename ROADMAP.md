@@ -85,12 +85,12 @@ methods until their safety rules are explicit.
      smoke path.
 
 3. Generate borrowed-safe `CollisionObject2D` APIs.
-   - [ ] Add the `CollisionObject2D` handle and inheritance helpers.
-   - [ ] Generate safe collision layer, mask, disable mode, input pickable, and
+   - [x] Add the `CollisionObject2D` handle and inheritance helpers.
+   - [x] Generate safe collision layer, mask, disable mode, input pickable, and
      RID access methods where return ownership is clear.
-   - [ ] Keep shape owner APIs skipped until object lifetime and container rules
+   - [x] Keep shape owner APIs skipped until object lifetime and container rules
      are explicit.
-   - [ ] Re-export selected APIs through the facade and add compile coverage.
+   - [x] Re-export selected APIs through the facade and add compile coverage.
 
 4. Generate borrowed-safe `Area2D` APIs.
    - [ ] Add the `Area2D` handle and checked downcast helpers.
