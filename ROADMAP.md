@@ -77,15 +77,15 @@ that require ownership rules the project does not have yet.
      are owned and require `core.variant_free`.
 
 3. Generate practical scene and UI APIs.
-   - [ ] Expand `Node` wrappers for safe name, tree, child, parent, and path
+   - [x] Expand `Node` wrappers for safe name, tree, child, parent, and path
      operations where ownership is clear.
-   - [ ] Expand `CanvasItem` wrappers for visibility and common drawing-related
+   - [x] Expand `CanvasItem` wrappers for visibility and common drawing-related
      state where signatures are safe.
-   - [ ] Expand `Node2D` wrappers for position, rotation, scale, transform, and
+   - [x] Expand `Node2D` wrappers for position, rotation, scale, transform, and
      common movement helpers.
-   - [ ] Expand `Control` wrappers for common UI state where signatures are safe.
-   - [ ] Expand `Label` wrappers for text and basic display options.
-   - [ ] Expand `Sprite2D` wrappers for transform and simple display state;
+   - [x] Expand `Control` wrappers for common UI state where signatures are safe.
+   - [x] Expand `Label` wrappers for text and basic display options.
+   - [x] Expand `Sprite2D` wrappers for transform and simple display state;
      defer texture/resource ownership until the reference model is explicit.
 
 4. Add selected node lookup helpers.
