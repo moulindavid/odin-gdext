@@ -62,10 +62,10 @@ implemented and smoke-tested.
      explicitly documents ownership transfer.
 
 2. Add low-level retain and release helpers.
-   - [ ] Wrap Godot 4.7 `RefCounted` reference and unreference calls safely.
-   - [ ] Trap or return `ok = false` for nil handles.
-   - [ ] Preserve borrowed-only behavior for existing typed class handles.
-   - [ ] Add focused unit or compile checks for helper signatures.
+   - [x] Wrap Godot 4.7 `RefCounted` reference and unreference calls safely.
+   - [x] Trap or return `ok = false` for nil handles.
+   - [x] Preserve borrowed-only behavior for existing typed class handles.
+   - [x] Add focused unit or compile checks for helper signatures.
 
 3. Add an owned `RefCounted` wrapper.
    - [ ] Store a typed borrowed handle plus ownership state explicitly.

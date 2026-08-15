@@ -47,6 +47,70 @@ variant_try_object :: proc "contextless" (v: ^Variant) -> (value: ObjectPtr, ok:
 	return object_from_variant(v), true
 }
 
+// RefCounted ownership primitives.
+
+ref_counted_class_name_data: StaticStringName
+ref_counted_reference_method_name_data: StaticStringName
+ref_counted_unreference_method_name_data: StaticStringName
+ref_counted_reference_method_bind: MethodBindPtr
+ref_counted_unreference_method_bind: MethodBindPtr
+ref_counted_reference_initialized: bool
+
+init_ref_counted_reference :: proc "contextless" () {
+	if ref_counted_reference_initialized do return
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&ref_counted_class_name_data),
+		cstring("RefCounted"),
+	)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&ref_counted_reference_method_name_data),
+		cstring("reference"),
+	)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&ref_counted_unreference_method_name_data),
+		cstring("unreference"),
+	)
+	ref_counted_reference_method_bind = require_classdb_method_bind(
+		const_static_string_name_ptr(&ref_counted_class_name_data),
+		const_static_string_name_ptr(&ref_counted_reference_method_name_data),
+		2240911060,
+	)
+	ref_counted_unreference_method_bind = require_classdb_method_bind(
+		const_static_string_name_ptr(&ref_counted_class_name_data),
+		const_static_string_name_ptr(&ref_counted_unreference_method_name_data),
+		2240911060,
+	)
+	ref_counted_reference_initialized = true
+}
+
+// ref_counted_retain increments the reference count for a borrowed RefCounted
+// handle. Nil handles return false instead of trapping.
+ref_counted_retain :: proc "contextless" (self: RefCounted) -> (ok: bool) {
+	if ObjectPtr(self) == nil do return false
+	init_ref_counted_reference()
+	return call_method_ptr_ret(ref_counted_reference_method_bind, bool, ObjectPtr(self))
+}
+
+// ref_counted_unreference decrements one owned reference. The return value is
+// Godot's unreference result; callers that own final destruction must handle it.
+ref_counted_unreference :: proc "contextless" (
+	self: RefCounted,
+) -> (
+	reached_zero: bool,
+	ok: bool,
+) {
+	if ObjectPtr(self) == nil do return false, false
+	init_ref_counted_reference()
+	return call_method_ptr_ret(ref_counted_unreference_method_bind, bool, ObjectPtr(self)), true
+}
+
+object_destroy_checked :: proc "contextless" (object: ObjectPtr) -> (ok: bool) {
+	if object == nil do return false
+	if object_destroy == nil do _trap_nil_godot_function()
+	object_destroy(object)
+	return true
+}
+
 // Signal emission.
 
 emit_signal_method_name_data: StaticStringName

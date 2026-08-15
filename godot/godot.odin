@@ -189,6 +189,9 @@ class_property_bool :: gcore.class_property_bool
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
+ref_counted_retain :: gcore.ref_counted_retain
+ref_counted_unreference :: gcore.ref_counted_unreference
+object_destroy_checked :: gcore.object_destroy_checked
 variant_from_string_name_ptr :: gcore.variant_from_string_name_ptr
 init_signal_emission :: gcore.init_signal_emission
 object_emit_signal_0_checked :: gcore.object_emit_signal_0_checked
