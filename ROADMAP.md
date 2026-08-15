@@ -88,10 +88,10 @@ implemented and smoke-tested.
      requiring an owned reference wrapper.
 
 6. Add a minimal runtime smoke path.
-   - [ ] Exercise one owned `Resource` or `RefCounted` retain/release path in a
+   - [x] Exercise one owned `Resource` or `RefCounted` retain/release path in a
      Godot headless example.
-   - [ ] Prove existing borrowed handle usage still works.
-   - [ ] Ensure every owned reference acquired in the smoke path is released.
+   - [x] Prove existing borrowed handle usage still works.
+   - [x] Ensure every owned reference acquired in the smoke path is released.
 
 7. Validate the model before expanding resource-heavy APIs.
    - [ ] Run `make ci`.
