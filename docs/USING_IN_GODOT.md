@@ -144,6 +144,30 @@ need an owned wrapper before they are safe in normal user code, so the current
 facade and generated class API keep `RefCounted` and `Resource` methods
 borrowed-only and skip public retain/unref helpers.
 
+The planned owned reference model uses two separate concepts:
+
+- Borrowed handles: `gt.RefCounted` and `gt.Resource` are lightweight views over
+  Godot-owned objects. Passing, returning, or storing them does not change the
+  reference count.
+- Owned handles: `gt.OwnedRefCounted` and `gt.OwnedResource` will represent one
+  Odin-owned reference acquired through an explicit retain operation or through
+  an API that documents ownership transfer.
+
+The intended Odin rules are:
+
+1. Retain borrowed `RefCounted` or `Resource` handles explicitly before storing
+   them beyond the current callback or generated wrapper call.
+2. Release owned handles explicitly with a release or destroy helper. There is
+   no hidden destructor behavior.
+3. Copying an owned wrapper value does not duplicate the Godot reference. Use an
+   explicit retain helper to create a second owned reference.
+4. Move-like handoff is represented by passing the wrapper by pointer and
+   clearing the source to nil after transfer.
+5. Nil retain returns `ok = false`. Nil release is a no-op. Releasing an already
+   released wrapper is also a no-op so cleanup paths can be simple.
+6. Generated class methods continue to return borrowed object handles unless the
+   wrapper name or documentation explicitly says the returned value is owned.
+
 ## Recommended Odin class authoring layout
 
 For a game-specific extension, keep the Odin side explicit and stable:

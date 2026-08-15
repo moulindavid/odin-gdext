@@ -88,6 +88,31 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 		),
 	)
 
+	ref_object := gt.construct_object(ref_counted_class_name)
+	owned_ref_ok := false
+	owned_ref_release_ok := false
+	owned_ref_destroyed := false
+	owned_ref_count: i64 = -1
+	if ref_object != nil {
+		ref_counted := gt.RefCounted(ref_object)
+		owned_ref_count = gt.ref_counted_get_reference_count(ref_counted)
+		owned_ref, init_ok := gt.owned_ref_counted_init_owned(ref_counted)
+		owned_ref_ok = init_ok
+		if init_ok {
+			owned_ref_destroyed, owned_ref_release_ok = gt.owned_ref_counted_release(&owned_ref)
+		}
+	}
+	gt.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"owned RefCounted smoke: count=%v init=%v release=%v destroyed=%v (expect 1,true,true,true)",
+			owned_ref_count,
+			owned_ref_ok,
+			owned_ref_release_ok,
+			owned_ref_destroyed,
+		),
+	)
+
 	canvas_item := gt.node2d_as_canvas_item(node2d)
 	gt.canvas_item_hide(canvas_item)
 	hidden := gt.canvas_item_is_visible(canvas_item)
@@ -526,6 +551,8 @@ node_class_name_data: gt.ClassName
 node_class_name := gt.class_name_ptr(&node_class_name_data)
 node2d_class_name_data: gt.ClassName
 node2d_class_name := gt.class_name_ptr(&node2d_class_name_data)
+ref_counted_class_name_data: gt.ClassName
+ref_counted_class_name := gt.class_name_ptr(&ref_counted_class_name_data)
 
 hello_instance_binding_callbacks := gt.InstanceBindingCallbacks {
 	create_callback    = nil,
@@ -541,6 +568,7 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&parent_name_data, cstring("Node2D"))
 	gt.class_name_init_latin1_cstring(&node_class_name_data, cstring("Node"))
 	gt.class_name_init_latin1_cstring(&node2d_class_name_data, cstring("Node2D"))
+	gt.class_name_init_latin1_cstring(&ref_counted_class_name_data, cstring("RefCounted"))
 	gt.init_class_bindings()
 
 	gt.register_editor_visible_class(

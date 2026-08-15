@@ -53,50 +53,50 @@ broaden generated `Resource` or `RefCounted` APIs until the ownership rules are
 implemented and smoke-tested.
 
 1. Define the owned reference design.
-   - [ ] Document the distinction between borrowed object handles, borrowed
+   - [x] Document the distinction between borrowed object handles, borrowed
      `RefCounted`/`Resource` handles, and owned references.
-   - [ ] Decide the public wrapper shape for an owned refcounted handle.
-   - [ ] Specify copy, move-like handoff, release, and nil behavior in Odin
+   - [x] Decide the public wrapper shape for an owned refcounted handle.
+   - [x] Specify copy, move-like handoff, release, and nil behavior in Odin
      terms.
-   - [ ] Keep normal generated object/class returns borrowed unless a wrapper
+   - [x] Keep normal generated object/class returns borrowed unless a wrapper
      explicitly documents ownership transfer.
 
 2. Add low-level retain and release helpers.
-   - [ ] Wrap Godot 4.7 `RefCounted` reference and unreference calls safely.
-   - [ ] Trap or return `ok = false` for nil handles.
-   - [ ] Preserve borrowed-only behavior for existing typed class handles.
-   - [ ] Add focused unit or compile checks for helper signatures.
+   - [x] Wrap Godot 4.7 `RefCounted` reference and unreference calls safely.
+   - [x] Trap or return `ok = false` for nil handles.
+   - [x] Preserve borrowed-only behavior for existing typed class handles.
+   - [x] Add focused unit or compile checks for helper signatures.
 
 3. Add an owned `RefCounted` wrapper.
-   - [ ] Store a typed borrowed handle plus ownership state explicitly.
-   - [ ] Provide init, retain, release, and destroy helpers.
-   - [ ] Make double-release and nil-release behavior explicit.
-   - [ ] Avoid hidden destructor behavior that would surprise Odin users.
+   - [x] Store a typed borrowed handle plus ownership state explicitly.
+   - [x] Provide init, retain, release, and destroy helpers.
+   - [x] Make double-release and nil-release behavior explicit.
+   - [x] Avoid hidden destructor behavior that would surprise Odin users.
 
 4. Add an owned `Resource` wrapper on top of the `RefCounted` model.
-   - [ ] Support checked creation from a borrowed `Resource` handle.
-   - [ ] Support explicit release through the same refcount path.
-   - [ ] Keep generated `Resource` method wrappers borrowed by default.
-   - [ ] Do not expose broad resource-loading APIs until ownership is verified.
+   - [x] Support checked creation from a borrowed `Resource` handle.
+   - [x] Support explicit release through the same refcount path.
+   - [x] Keep generated `Resource` method wrappers borrowed by default.
+   - [x] Do not expose broad resource-loading APIs until ownership is verified.
 
 5. Update generated class skip rules.
-   - [ ] Reclassify deferred `Resource` and `RefCounted` APIs based on the new
+   - [x] Reclassify deferred `Resource` and `RefCounted` APIs based on the new
      ownership model.
-   - [ ] Keep APIs such as `duplicate`, texture setters/getters, and scene
+   - [x] Keep APIs such as `duplicate`, texture setters/getters, and scene
      resource APIs skipped until their exact return ownership is known.
-   - [ ] Make the generated API report distinguish borrowed-safe APIs from APIs
+   - [x] Make the generated API report distinguish borrowed-safe APIs from APIs
      requiring an owned reference wrapper.
 
 6. Add a minimal runtime smoke path.
-   - [ ] Exercise one owned `Resource` or `RefCounted` retain/release path in a
+   - [x] Exercise one owned `Resource` or `RefCounted` retain/release path in a
      Godot headless example.
-   - [ ] Prove existing borrowed handle usage still works.
-   - [ ] Ensure every owned reference acquired in the smoke path is released.
+   - [x] Prove existing borrowed handle usage still works.
+   - [x] Ensure every owned reference acquired in the smoke path is released.
 
 7. Validate the model before expanding resource-heavy APIs.
-   - [ ] Run `make ci`.
-   - [ ] Keep normal examples importing only `godot:godot`.
-   - [ ] Do not enable broad `Resource`, `PackedScene`, texture, theme, or asset
+   - [x] Run `make ci`.
+   - [x] Keep normal examples importing only `godot:godot`.
+   - [x] Do not enable broad `Resource`, `PackedScene`, texture, theme, or asset
      APIs until this goal is complete.
 
 Deferred until after this goal:
