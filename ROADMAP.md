@@ -95,9 +95,9 @@ that require ownership rules the project does not have yet.
    - [x] Keep returned handles borrowed.
 
 5. Expose selected generated APIs through the public facade.
-   - [ ] Re-export only the stable selected class handles and wrappers.
-   - [ ] Keep normal examples importing only `godot:godot`.
-   - [ ] Keep internal generated packages available for advanced users without
+   - [x] Re-export only the stable selected class handles and wrappers.
+   - [x] Keep normal examples importing only `godot:godot`.
+   - [x] Keep internal generated packages available for advanced users without
      making them the beginner path.
 
 6. Exercise expanded generated APIs in a real example.
