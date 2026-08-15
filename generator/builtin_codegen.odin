@@ -1013,9 +1013,10 @@ selected_class_names := []string {
 	"Timer",
 	"CollisionObject2D",
 	"Area2D",
+	"PackedScene",
 }
 
-candidate_class_names := []string{"Resource", "PackedScene"}
+candidate_class_names := []string{"Resource"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1277,6 +1278,8 @@ selected_class_methods := []Selected_Class_Method {
 	{"Area2D", "get_audio_bus_name"},
 	{"Area2D", "set_audio_bus_override"},
 	{"Area2D", "is_overriding_audio_bus"},
+	{"PackedScene", "pack"},
+	{"PackedScene", "can_instantiate"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
@@ -1489,7 +1492,14 @@ class_method_deferred_reason :: proc(class_name, method_name: string) -> string 
 		return reason
 	}
 	if class_name == "Control" && method_name == "force_drag" do return "object lifetime"
-	if class_name == "Resource" && method_name == "duplicate" do return "object lifetime"
+	if class_name == "Resource" &&
+	   (method_name == "duplicate" || method_name == "duplicate_deep") {
+		return "object lifetime"
+	}
+	if class_name == "PackedScene" &&
+	   (method_name == "instantiate" || method_name == "get_state") {
+		return "object lifetime"
+	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
 		return "object lifetime"
 	}

@@ -102,14 +102,14 @@ methods until their safety rules are explicit.
      run headless deterministically.
 
 5. Evaluate `Resource` and `PackedScene` with the owned-reference model.
-   - [ ] Reclassify report entries that can now use `OwnedRefCounted` or
+   - [x] Reclassify report entries that can now use `OwnedRefCounted` or
      `OwnedResource` safely.
-   - [ ] Keep `Resource.duplicate`, texture setters/getters, scene instantiation,
+   - [x] Keep `Resource.duplicate`, texture setters/getters, scene instantiation,
      and broad resource-loading APIs skipped until exact ownership transfer is
      verified.
-   - [ ] If a minimal safe `PackedScene` method exists, generate only that method
+   - [x] If a minimal safe `PackedScene` method exists, generate only that method
      and document whether its result is borrowed or owned.
-   - [ ] Prefer no generated API over an unclear ownership transfer.
+   - [x] Prefer no generated API over an unclear ownership transfer.
 
 6. Prove normal usage through the public facade.
    - [ ] Keep normal examples importing only `godot:godot`.

@@ -143,6 +143,7 @@ Label :: gclass.Label
 Timer :: gclass.Timer
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
+PackedScene :: gclass.PackedScene
 
 // --- Core functions ---
 init :: gcore.init
@@ -452,8 +453,14 @@ object_is_collision_object2d :: gclass.object_is_collision_object2d
 object_try_as_collision_object2d :: gclass.object_try_as_collision_object2d
 object_is_area2d :: gclass.object_is_area2d
 object_try_as_area2d :: gclass.object_try_as_area2d
+object_is_packed_scene :: gclass.object_is_packed_scene
+object_try_as_packed_scene :: gclass.object_try_as_packed_scene
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
+ref_counted_is_packed_scene :: gclass.ref_counted_is_packed_scene
+ref_counted_try_as_packed_scene :: gclass.ref_counted_try_as_packed_scene
+resource_is_packed_scene :: gclass.resource_is_packed_scene
+resource_try_as_packed_scene :: gclass.resource_try_as_packed_scene
 node_is_canvas_item :: gclass.node_is_canvas_item
 node_try_as_canvas_item :: gclass.node_try_as_canvas_item
 node_is_node2d :: gclass.node_is_node2d
@@ -564,6 +571,11 @@ area2d_set_audio_bus_name :: gclass.area2d_set_audio_bus_name
 area2d_get_audio_bus_name :: gclass.area2d_get_audio_bus_name
 area2d_set_audio_bus_override :: gclass.area2d_set_audio_bus_override
 area2d_is_overriding_audio_bus :: gclass.area2d_is_overriding_audio_bus
+packed_scene_as_resource :: gclass.packed_scene_as_resource
+packed_scene_as_ref_counted :: gclass.packed_scene_as_ref_counted
+packed_scene_as_object :: gclass.packed_scene_as_object
+packed_scene_pack :: gclass.packed_scene_pack
+packed_scene_can_instantiate :: gclass.packed_scene_can_instantiate
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -615,6 +627,10 @@ collision_object2d_is_nil :: proc "contextless" (self: CollisionObject2D) -> boo
 }
 
 area2d_is_nil :: proc "contextless" (self: Area2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+packed_scene_is_nil :: proc "contextless" (self: PackedScene) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -834,6 +850,10 @@ area2d_object_ptr :: proc "contextless" (self: Area2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 object_ptr_try_as_ref_counted :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -902,6 +922,16 @@ object_ptr_try_as_collision_object2d :: proc "contextless" (
 object_ptr_try_as_area2d :: proc "contextless" (self: ObjectPtr) -> (value: Area2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_area2d(Object(self))
+}
+
+object_ptr_try_as_packed_scene :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: PackedScene,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_packed_scene(Object(self))
 }
 
 // --- Class enums and constants ---

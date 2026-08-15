@@ -13,6 +13,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	timer: gt.Timer,
 	collision_object2d: gt.CollisionObject2D,
 	area2d: gt.Area2D,
+	packed_scene: gt.PackedScene,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
@@ -271,6 +272,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.timer_object_ptr(timer)
 	_ = gt.collision_object2d_object_ptr(collision_object2d)
 	_ = gt.area2d_object_ptr(area2d)
+	_ = gt.packed_scene_object_ptr(packed_scene)
 	_, _ = gt.object_ptr_try_as_ref_counted(gt.ref_counted_object_ptr(ref_counted))
 	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
 	_, _ = gt.object_ptr_try_as_node(gt.node_object_ptr(node))
@@ -298,6 +300,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.timer_is_nil(timer)
 	_ = gt.collision_object2d_is_nil(collision_object2d)
 	_ = gt.area2d_is_nil(area2d)
+	_ = gt.packed_scene_is_nil(packed_scene)
 	gt.timer_set_wait_time(timer, 0.5)
 	_ = gt.timer_get_wait_time(timer)
 	gt.timer_set_one_shot(timer, true)
@@ -373,6 +376,12 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.area2d_set_audio_bus_override(area2d, false)
 	_ = gt.area2d_is_overriding_audio_bus(area2d)
 
+	_ = gt.packed_scene_as_resource(packed_scene)
+	_ = gt.packed_scene_as_ref_counted(packed_scene)
+	_ = gt.packed_scene_as_object(packed_scene)
+	_ = gt.packed_scene_pack(packed_scene, node)
+	_ = gt.packed_scene_can_instantiate(packed_scene)
+
 	_ = gt.object_is_sprite2d(object)
 	_, _ = gt.object_try_as_sprite2d(object)
 	_ = gt.object_is_label(object)
@@ -383,6 +392,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_collision_object2d(object)
 	_ = gt.object_is_area2d(object)
 	_, _ = gt.object_try_as_area2d(object)
+	_ = gt.object_is_packed_scene(object)
+	_, _ = gt.object_try_as_packed_scene(object)
 	_ = gt.node_is_sprite2d(node)
 	_, _ = gt.node_try_as_sprite2d(node)
 	_ = gt.node_is_label(node)
@@ -601,6 +612,10 @@ ref_counted_resource_borrowed_policy_compile_smoke :: proc "contextless" (
 	_, _ = gt.owned_resource_release(&moved_resource)
 	_ = gt.owned_resource_destroy(&owned_resource)
 	_, _ = gt.ref_counted_try_as_resource(ref_counted)
+	_ = gt.ref_counted_is_packed_scene(ref_counted)
+	_, _ = gt.ref_counted_try_as_packed_scene(ref_counted)
+	_ = gt.resource_is_packed_scene(resource)
+	_, _ = gt.resource_try_as_packed_scene(resource)
 	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
 }
 
