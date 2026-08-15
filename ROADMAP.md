@@ -101,10 +101,10 @@ that require ownership rules the project does not have yet.
      making them the beginner path.
 
 6. Exercise expanded generated APIs in a real example.
-   - [ ] Use Odin to control a Godot scene object through generated APIs.
-   - [ ] Include at least one `Label` update and one `Node2D` or `CanvasItem`
+   - [x] Use Odin to control a Godot scene object through generated APIs.
+   - [x] Include at least one `Label` update and one `Node2D` or `CanvasItem`
      state change.
-   - [ ] Keep the beginner example readable and move broad coverage to smoke
+   - [x] Keep the beginner example readable and move broad coverage to smoke
      checks when needed.
 
 7. Stabilize generator behavior before broad coverage.

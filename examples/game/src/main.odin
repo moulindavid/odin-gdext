@@ -90,12 +90,25 @@ roll_into_label_adapter_method :: proc "contextless" (
 	label, label_ok := gt.object_ptr_try_as_label(object)
 	if !label_ok do return false
 
-	_ = roll_damage(self)
+	damage := roll_damage(self)
 	text := gt.string_from_utf8(
-		"Odin rolled damage and updated this Label. Press Space to roll again.",
+		"Odin rolled damage, updated this Label, and changed its CanvasItem state.",
 	)
 	defer gt.string_free(&text)
 	gt.label_set_text(label, &text)
+	gt.label_set_horizontal_alignment(label, .horizontal_alignment_center)
+	gt.label_set_visible_ratio(label, 1)
+
+	control := gt.label_as_control(label)
+	gt.control_set_position(control, gt.Vector2{24, 24}, false)
+	gt.control_set_size(control, gt.Vector2{720, 64}, false)
+
+	canvas_item := gt.label_as_canvas_item(label)
+	red := f32(0.35 + gt.sin(damage) * 0.15)
+	green := f32(0.55 + gt.cos(damage * 0.5) * 0.20)
+	gt.canvas_item_set_modulate(canvas_item, gt.Color{red, green, 1.0, 1.0})
+	gt.canvas_item_set_z_index(canvas_item, 1)
+	gt.canvas_item_queue_redraw(canvas_item)
 	return true
 }
 
