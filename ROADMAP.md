@@ -114,11 +114,11 @@ temporary `Variant` cleanup are proven.
    - [x] Defer broad vararg emission helpers.
 
 6. Teach the generator to report signal and callable blockers.
-   - [ ] Extend generated API reporting to separate skipped `Callable` and
+   - [x] Extend generated API reporting to separate skipped `Callable` and
      `Signal` methods from other unsupported signatures.
-   - [ ] Identify a small set of generated APIs that become safe once the minimal
+   - [x] Identify a small set of generated APIs that become safe once the minimal
      helpers exist.
-   - [ ] Keep generated wrappers disabled for APIs whose object lifetime or
+   - [x] Keep generated wrappers disabled for APIs whose object lifetime or
      argument ownership remains unclear.
 
 7. Exercise the minimal model in examples.

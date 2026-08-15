@@ -1519,6 +1519,15 @@ class_type_deferred_reason :: proc(godot_name: string) -> string {
 	return ""
 }
 
+
+class_method_uses_callable_or_signal :: proc(method: ExtensionApiClassMethod) -> bool {
+	if method.return_value.type == "Callable" || method.return_value.type == "Signal" do return true
+	for arg in method.arguments {
+		if arg.type == "Callable" || arg.type == "Signal" do return true
+	}
+	return false
+}
+
 class_method_selected :: proc(class_name, method_name: string) -> bool {
 	for entry in selected_class_methods {
 		if entry.class_name == class_name && entry.method_name == method_name do return true
@@ -1971,12 +1980,15 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&owned_wrapper)
 	skipped := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&skipped)
+	signal_callable_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&signal_callable_blockers)
 	candidate_analysis := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&candidate_analysis)
 
 	generated_count := 0
 	owned_wrapper_count := 0
 	skipped_count := 0
+	signal_callable_blocker_count := 0
 	candidate_safe_count := 0
 	candidate_owned_wrapper_count := 0
 	candidate_skipped_count := 0
@@ -2005,6 +2017,16 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				emit_class_method_report_signature(&skipped, class.name, method)
 				fmt.sbprintf(&skipped, ": %s\n", reason)
 				skipped_count += 1
+				if class_method_uses_callable_or_signal(method) {
+					strings.write_string(&signal_callable_blockers, "- ")
+					emit_class_method_report_signature(
+						&signal_callable_blockers,
+						class.name,
+						method,
+					)
+					fmt.sbprintf(&signal_callable_blockers, ": %s\n", reason)
+					signal_callable_blocker_count += 1
+				}
 			}
 		}
 	}
@@ -2037,6 +2059,16 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 			} else {
 				fmt.sbprintf(&candidate_analysis, ": skipped, %s\n", reason)
 				candidate_skipped_count += 1
+				if class_method_uses_callable_or_signal(method) {
+					strings.write_string(&signal_callable_blockers, "- candidate ")
+					emit_class_method_report_signature(
+						&signal_callable_blockers,
+						class.name,
+						method,
+					)
+					fmt.sbprintf(&signal_callable_blockers, ": %s\n", reason)
+					signal_callable_blocker_count += 1
+				}
 			}
 		}
 		strings.write_byte(&candidate_analysis, '\n')
@@ -2061,6 +2093,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Borrowed-safe generated methods: %d\n", generated_count)
 	fmt.sbprintf(&b, "- Owned-wrapper methods: %d\n", owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped selected-class methods: %d\n", skipped_count)
+	fmt.sbprintf(&b, "- Callable/Signal blockers: %d\n", signal_callable_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -2070,6 +2103,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(owned_wrapper))
 	strings.write_string(&b, "\n## Skipped selected-class methods\n\n")
 	strings.write_string(&b, strings.to_string(skipped))
+	strings.write_string(&b, "\n## Callable and Signal blockers\n\n")
+	strings.write_string(&b, strings.to_string(signal_callable_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 
