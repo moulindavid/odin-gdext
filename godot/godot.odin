@@ -82,6 +82,8 @@ StaticStringName :: gcore.StaticStringName
 ClassName :: gcore.ClassName
 NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
+CallableStorage :: gcore.CallableStorage
+Callable :: gcore.Callable
 RIDStorage :: gcore.RIDStorage
 RID :: gcore.RID
 ArrayStorage :: gcore.ArrayStorage
@@ -1140,6 +1142,18 @@ node_path_from_utf8 :: gcore.node_path_from_utf8
 node_path_init_copy :: gcore.node_path_init_copy
 node_path_copy :: gcore.node_path_copy
 node_path_free :: gcore.node_path_free
+callable_ptr :: gcore.callable_ptr
+const_callable_ptr :: gcore.const_callable_ptr
+uninitialized_callable_ptr :: gcore.uninitialized_callable_ptr
+callable_init_nil :: gcore.callable_init_nil
+callable_nil :: gcore.callable_nil
+callable_init_copy :: gcore.callable_init_copy
+callable_copy :: gcore.callable_copy
+callable_init_object_method :: gcore.callable_init_object_method
+callable_from_object_method :: gcore.callable_from_object_method
+callable_free :: gcore.callable_free
+callable_is_null :: gcore.callable_is_null
+callable_is_valid :: gcore.callable_is_valid
 node_path_is_absolute :: gcore.node_path_is_absolute
 node_path_get_name :: gcore.node_path_get_name
 node_path_get_subname :: gcore.node_path_get_subname

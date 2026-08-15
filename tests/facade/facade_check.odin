@@ -18,6 +18,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
 	meta_value: ^gt.Variant,
+	callable: ^gt.Callable,
 ) {
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
@@ -78,6 +79,11 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.node_set_physics_process(node, true)
 	_ = gt.node_is_physics_processing(node)
 	_ = gt.node_get_physics_process_delta_time(node)
+	callable_copy := gt.callable_copy(callable)
+	_ = gt.callable_is_null(&callable_copy)
+	_ = gt.callable_is_valid(&callable_copy)
+	gt.callable_free(&callable_copy)
+
 
 	gt.canvas_item_set_visible(canvas_item, true)
 	_ = gt.canvas_item_is_visible(canvas_item)

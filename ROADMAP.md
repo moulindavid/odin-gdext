@@ -78,13 +78,13 @@ temporary `Variant` cleanup are proven.
      generated reports.
 
 2. Add minimal `Callable` storage helpers.
-   - [ ] Add `Callable` storage, pointer helpers, copy/init helpers, and a
+   - [x] Add `Callable` storage, pointer helpers, copy/init helpers, and a
      destructor if the Godot ABI exposes them through builtin APIs.
-   - [ ] Add nil/trap checks for any constructor, destructor, or method bind used
+   - [x] Add nil/trap checks for any constructor, destructor, or method bind used
      by the wrappers.
-   - [ ] Add a compile or smoke check proving owned `Callable` values are
+   - [x] Add a compile or smoke check proving owned `Callable` values are
      destroyed on every path.
-   - [ ] Do not expose arbitrary lambda/object binding helpers until the object
+   - [x] Do not expose arbitrary lambda/object binding helpers until the object
      lifetime model is explicit.
 
 3. Add minimal `Signal` storage helpers.

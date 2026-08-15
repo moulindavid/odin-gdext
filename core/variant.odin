@@ -14,6 +14,8 @@ NODE_PATH_IS_ABSOLUTE_HASH :: 3918633141
 NODE_PATH_GET_NAME_HASH :: 2948586938
 NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
 NODE_PATH_GET_CONCATENATED_NAMES_HASH :: 1825232092
+CALLABLE_IS_NULL_HASH :: 3918633141
+CALLABLE_IS_VALID_HASH :: 3918633141
 ARRAY_SIZE_HASH :: 3173160232
 ARRAY_IS_EMPTY_HASH :: 3918633141
 ARRAY_CLEAR_HASH :: 3218959716
@@ -94,6 +96,7 @@ GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
 GDExtensionStringName_Size :: 8
 GDExtensionNodePath_Size :: 8
+GDExtensionCallable_Size :: 16
 GDExtensionRID_Size :: 8
 GDExtensionArray_Size :: 8
 GDExtensionDictionary_Size :: 8
@@ -673,6 +676,107 @@ node_path_hash :: proc "contextless" (p: ^NodePath) -> i64 {
 	return call_builtin_method_ptr_ret(node_path_hash_method.method, const_node_path_ptr(p), i64)
 }
 
+
+CallableStorage :: [GDExtensionCallable_Size]u8
+
+// Callable is owned initialized Godot Callable storage. Values returned by
+// callable_* constructors must be destroyed with callable_free. Helpers taking
+// ^Callable borrow that storage for the call only and never retain captured
+// Object handles.
+Callable :: distinct CallableStorage
+
+callable_ptr :: proc "contextless" (c: ^Callable) -> TypePtr {
+	if c == nil do _trap_nil_godot_function()
+	return cast(TypePtr)c
+}
+
+const_callable_ptr :: proc "contextless" (c: ^Callable) -> ConstTypePtr {
+	if c == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)c
+}
+
+uninitialized_callable_ptr :: proc "contextless" (c: ^Callable) -> UninitializedTypePtr {
+	if c == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)c
+}
+
+callable_init_nil :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	if !construct_builtin(.Callable, dest) do _trap_nil_godot_function()
+}
+
+callable_nil :: proc "contextless" () -> (result: Callable) {
+	callable_init_nil(uninitialized_callable_ptr(&result))
+	return
+}
+
+callable_init_copy :: proc "contextless" (dest: UninitializedTypePtr, value: ^Callable) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Callable, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_callable_ptr(value))
+}
+
+callable_copy :: proc "contextless" (value: ^Callable) -> (result: Callable) {
+	callable_init_copy(uninitialized_callable_ptr(&result), value)
+	return
+}
+
+callable_init_object_method :: proc "contextless" (
+	dest: UninitializedTypePtr,
+	object: ObjectPtr,
+	method: ^StringName,
+) {
+	if dest == nil || object == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Callable, 2)
+	if ctor == nil do _trap_nil_godot_function()
+	object_arg := object
+	call_builtin_constructor(ctor, dest, cast(TypePtr)&object_arg, const_string_name_ptr(method))
+}
+
+// callable_from_object_method returns an initialized Callable; call
+// callable_free when done. The ObjectPtr is captured as a borrowed Godot object
+// handle, not retained by this Odin wrapper.
+callable_from_object_method :: proc "contextless" (
+	object: ObjectPtr,
+	method: ^StringName,
+) -> (
+	result: Callable,
+) {
+	callable_init_object_method(uninitialized_callable_ptr(&result), object, method)
+	return
+}
+
+callable_free :: proc "contextless" (c: ^Callable) {
+	destroy_builtin(.Callable, callable_ptr(c))
+}
+
+callable_is_null_method: BuiltinMethod
+callable_is_valid_method: BuiltinMethod
+
+callable_is_null :: proc "contextless" (c: ^Callable) -> bool {
+	ensure_builtin_method(
+		&callable_is_null_method,
+		.Callable,
+		cstring("is_null"),
+		CALLABLE_IS_NULL_HASH,
+	)
+	return call_builtin_method_ptr_ret(callable_is_null_method.method, const_callable_ptr(c), bool)
+}
+
+callable_is_valid :: proc "contextless" (c: ^Callable) -> bool {
+	ensure_builtin_method(
+		&callable_is_valid_method,
+		.Callable,
+		cstring("is_valid"),
+		CALLABLE_IS_VALID_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		callable_is_valid_method.method,
+		const_callable_ptr(c),
+		bool,
+	)
+}
 
 // RIDStorage is raw storage large enough for Godot's ABI RID handle. Treat it
 // as uninitialized until a rid_init_* helper or Godot API has constructed it.
