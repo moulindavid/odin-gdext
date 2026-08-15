@@ -13,6 +13,7 @@ ExtensionApiRoot :: struct {
 	classes:                      []ExtensionApiClass `json:"classes"`,
 	singletons:                   []ExtensionApiSingleton `json:"singletons"`,
 	utility_functions:            []ExtensionApiUtilityFunction `json:"utility_functions"`,
+	global_enums:                 []ExtensionApiEnum `json:"global_enums"`,
 	builtin_class_member_offsets: []ExtensionApiMemberOffsets `json:"builtin_class_member_offsets"`,
 }
 
@@ -432,6 +433,15 @@ class_constant_name :: proc(class_name, constant_name: string) -> string {
 
 class_enum_value_name :: proc(value_name: string) -> string {
 	return odin_safe_snake_identifier(value_name)
+}
+
+global_enum_type_map: map[string]string
+
+init_global_enum_type_map :: proc(root: ^ExtensionApiRoot) {
+	global_enum_type_map = make(map[string]string, len(root.global_enums))
+	for enum_ in root.global_enums {
+		global_enum_type_map[enum_.name] = odin_safe_pascal_identifier(enum_.name)
+	}
 }
 
 // Variant enum names differ from JSON names, for example AABB -> .Aabb.
@@ -1116,6 +1126,7 @@ class_handle_expr :: proc(class_name: string) -> string {
 class_enum_type_from_godot :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
 	if !strings.has_prefix(godot_name, "enum::") do return "", false
 	rest := strings.trim_prefix(godot_name, "enum::")
+	if enum_type, enum_ok := global_enum_type_map[rest]; enum_ok do return enum_type, true
 	parts := strings.split(rest, ".", context.temp_allocator)
 	if len(parts) != 2 do return "", false
 	if !is_selected_class(parts[0]) do return "", false
@@ -1123,17 +1134,29 @@ class_enum_type_from_godot :: proc(godot_name: string) -> (odin_type: string, ok
 }
 
 class_abi_type_map := map[string]string {
-	"Nil"     = "rawptr",
-	"bool"    = "bool",
-	"int"     = "i64",
-	"int32"   = "i32",
-	"int64"   = "i64",
-	"float"   = "core.GodotReal",
-	"double"  = "f64",
-	"Vector2" = "core.Vector2",
-	"Vector3" = "core.Vector3",
-	"Vector4" = "core.Vector4",
-	"Color"   = "core.Color",
+	"Nil"         = "rawptr",
+	"bool"        = "bool",
+	"int"         = "i64",
+	"int32"       = "i32",
+	"int64"       = "i64",
+	"float"       = "core.GodotReal",
+	"double"      = "f64",
+	"Vector2"     = "core.Vector2",
+	"Vector3"     = "core.Vector3",
+	"Vector4"     = "core.Vector4",
+	"Color"       = "core.Color",
+	"Vector2i"    = "builtin.Vector2i",
+	"Rect2"       = "builtin.Rect2",
+	"Rect2i"      = "builtin.Rect2i",
+	"Vector3i"    = "builtin.Vector3i",
+	"Transform2D" = "builtin.Transform2D",
+	"Vector4i"    = "builtin.Vector4i",
+	"Plane"       = "builtin.Plane",
+	"Quaternion"  = "builtin.Quaternion",
+	"AABB"        = "builtin.AABB",
+	"Basis"       = "builtin.Basis",
+	"Transform3D" = "builtin.Transform3D",
+	"Projection"  = "builtin.Projection",
 }
 
 // Class method mapping rules:
@@ -1291,6 +1314,56 @@ class_proc_prefix :: proc(class_name: string) -> string {
 	return strings.to_string(b)
 }
 
+
+emit_global_enums :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) {
+	if len(root.global_enums) == 0 do return
+
+	strings.write_string(b, "// ---- Global enums ----\n\n")
+	strings.write_string(
+		b,
+		"// Global enum type names are Odin-safe versions of extension_api.json names.\n\n",
+	)
+
+	used_types := make(map[string]bool, len(root.global_enums))
+	defer delete(used_types)
+	for enum_ in root.global_enums {
+		enum_type := odin_safe_pascal_identifier(enum_.name)
+		if used_types[enum_type] do continue
+		used_types[enum_type] = true
+
+		fmt.sbprintf(b, "%s :: enum i64 {{\n", enum_type)
+		used_values := make(map[string]bool, len(enum_.values))
+		for value in enum_.values {
+			value_name := class_enum_value_name(value.name)
+			if used_values[value_name] {
+				value_name = fmt.aprintf("%s_%d", value_name, value.value)
+			}
+			used_values[value_name] = true
+			fmt.sbprintf(b, "\t%s = %d,\n", value_name, value.value)
+		}
+		delete(used_values)
+		strings.write_string(b, "}\n\n")
+	}
+}
+
+class_method_needs_builtin_import :: proc(root: ^ExtensionApiRoot) -> bool {
+	for entry in selected_class_methods {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do continue
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok do continue
+
+		if ret_type, ret_ok := resolve_class_return_type(method.return_value.type); ret_ok {
+			if strings.has_prefix(ret_type, "builtin.") do return true
+		}
+		for arg in method.arguments {
+			if param_type, param_ok := resolve_class_param_type(arg.type); param_ok {
+				if strings.has_prefix(param_type, "builtin.") do return true
+			}
+		}
+	}
+	return false
+}
 
 emit_class_constants_and_enums :: proc(
 	b: ^strings.Builder,
@@ -1771,6 +1844,7 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	}
 
 	emit_class_downcasts(&b, root, selected)
+	emit_global_enums(&b, root)
 	emit_class_constants_and_enums(&b, selected)
 
 	strings.write_string(
@@ -1806,6 +1880,7 @@ generate_builtin_bindings :: proc(json_path: string) -> bool {
 		fmt.eprintfln("ERROR: failed to parse extension_api.json: %v", uerr)
 		return false
 	}
+	init_global_enum_type_map(&root)
 
 	// Use member offsets from the first build configuration, matching the running Godot build.
 	real_members := make(map[string][]ExtensionApiMemberOffsetEntry, 32)

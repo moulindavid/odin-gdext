@@ -66,14 +66,14 @@ that require ownership rules the project does not have yet.
      slice.
 
 2. Expand safe class method type mapping.
-   - [ ] Support primitive parameters and returns: `bool`, integer types, and
+   - [x] Support primitive parameters and returns: `bool`, integer types, and
      `GodotReal`.
-   - [ ] Support common math builtins by value where storage and ABI rules are
+   - [x] Support common math builtins by value where storage and ABI rules are
      already covered.
-   - [ ] Support borrowed object/class handles by value.
-   - [ ] Support `String`, `StringName`, and `NodePath` only through the existing
+   - [x] Support borrowed object/class handles by value.
+   - [x] Support `String`, `StringName`, and `NodePath` only through the existing
      owned-storage and borrowed-pointer rules.
-   - [ ] Keep `Variant` parameters borrowed as `^core.Variant`; `Variant` returns
+   - [x] Keep `Variant` parameters borrowed as `^core.Variant`; `Variant` returns
      are owned and require `core.variant_free`.
 
 3. Generate practical scene and UI APIs.
