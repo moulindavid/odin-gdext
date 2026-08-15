@@ -84,6 +84,8 @@ NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
 CallableStorage :: gcore.CallableStorage
 Callable :: gcore.Callable
+SignalStorage :: gcore.SignalStorage
+Signal :: gcore.Signal
 RIDStorage :: gcore.RIDStorage
 RID :: gcore.RID
 ArrayStorage :: gcore.ArrayStorage
@@ -1154,6 +1156,18 @@ callable_from_object_method :: gcore.callable_from_object_method
 callable_free :: gcore.callable_free
 callable_is_null :: gcore.callable_is_null
 callable_is_valid :: gcore.callable_is_valid
+signal_ptr :: gcore.signal_ptr
+const_signal_ptr :: gcore.const_signal_ptr
+uninitialized_signal_ptr :: gcore.uninitialized_signal_ptr
+signal_init_nil :: gcore.signal_init_nil
+signal_nil :: gcore.signal_nil
+signal_init_copy :: gcore.signal_init_copy
+signal_copy :: gcore.signal_copy
+signal_init_object_signal :: gcore.signal_init_object_signal
+signal_from_object_signal :: gcore.signal_from_object_signal
+signal_free :: gcore.signal_free
+signal_is_null :: gcore.signal_is_null
+signal_get_name :: gcore.signal_get_name
 node_path_is_absolute :: gcore.node_path_is_absolute
 node_path_get_name :: gcore.node_path_get_name
 node_path_get_subname :: gcore.node_path_get_subname

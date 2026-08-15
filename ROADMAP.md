@@ -88,12 +88,12 @@ temporary `Variant` cleanup are proven.
      lifetime model is explicit.
 
 3. Add minimal `Signal` storage helpers.
-   - [ ] Add `Signal` storage, pointer helpers, copy/init helpers, and a
+   - [x] Add `Signal` storage, pointer helpers, copy/init helpers, and a
      destructor if needed by the Godot ABI.
-   - [ ] Support constructing or retrieving a signal only through safe selected
+   - [x] Support constructing or retrieving a signal only through safe selected
      paths.
-   - [ ] Keep signal values owned or borrowed according to explicit helper names.
-   - [ ] Add focused tests for destruction and type checks where practical.
+   - [x] Keep signal values owned or borrowed according to explicit helper names.
+   - [x] Add focused tests for destruction and type checks where practical.
 
 4. Add safe object signal connection helpers.
    - [ ] Wrap selected Godot object signal connection APIs behind helpers with

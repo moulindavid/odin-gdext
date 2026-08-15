@@ -19,6 +19,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	meta_name: ^gt.StringName,
 	meta_value: ^gt.Variant,
 	callable: ^gt.Callable,
+	signal: ^gt.Signal,
 ) {
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
@@ -83,6 +84,12 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.callable_is_null(&callable_copy)
 	_ = gt.callable_is_valid(&callable_copy)
 	gt.callable_free(&callable_copy)
+
+	signal_copy := gt.signal_copy(signal)
+	_ = gt.signal_is_null(&signal_copy)
+	signal_name_copy := gt.signal_get_name(&signal_copy)
+	gt.string_name_free(&signal_name_copy)
+	gt.signal_free(&signal_copy)
 
 
 	gt.canvas_item_set_visible(canvas_item, true)

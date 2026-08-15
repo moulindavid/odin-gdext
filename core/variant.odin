@@ -16,6 +16,8 @@ NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
 NODE_PATH_GET_CONCATENATED_NAMES_HASH :: 1825232092
 CALLABLE_IS_NULL_HASH :: 3918633141
 CALLABLE_IS_VALID_HASH :: 3918633141
+SIGNAL_IS_NULL_HASH :: 3918633141
+SIGNAL_GET_NAME_HASH :: 1825232092
 ARRAY_SIZE_HASH :: 3173160232
 ARRAY_IS_EMPTY_HASH :: 3918633141
 ARRAY_CLEAR_HASH :: 3218959716
@@ -97,6 +99,7 @@ GDExtensionString_Size :: 8
 GDExtensionStringName_Size :: 8
 GDExtensionNodePath_Size :: 8
 GDExtensionCallable_Size :: 16
+GDExtensionSignal_Size :: 16
 GDExtensionRID_Size :: 8
 GDExtensionArray_Size :: 8
 GDExtensionDictionary_Size :: 8
@@ -776,6 +779,108 @@ callable_is_valid :: proc "contextless" (c: ^Callable) -> bool {
 		const_callable_ptr(c),
 		bool,
 	)
+}
+
+
+SignalStorage :: [GDExtensionSignal_Size]u8
+
+// Signal is owned initialized Godot Signal storage. Values returned by signal_*
+// constructors must be destroyed with signal_free. The referenced Object handle
+// is borrowed; this wrapper does not retain or extend the object lifetime.
+Signal :: distinct SignalStorage
+
+signal_ptr :: proc "contextless" (s: ^Signal) -> TypePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(TypePtr)s
+}
+
+const_signal_ptr :: proc "contextless" (s: ^Signal) -> ConstTypePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)s
+}
+
+uninitialized_signal_ptr :: proc "contextless" (s: ^Signal) -> UninitializedTypePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)s
+}
+
+signal_init_nil :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	if !construct_builtin(.Signal, dest) do _trap_nil_godot_function()
+}
+
+signal_nil :: proc "contextless" () -> (result: Signal) {
+	signal_init_nil(uninitialized_signal_ptr(&result))
+	return
+}
+
+signal_init_copy :: proc "contextless" (dest: UninitializedTypePtr, value: ^Signal) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Signal, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_signal_ptr(value))
+}
+
+signal_copy :: proc "contextless" (value: ^Signal) -> (result: Signal) {
+	signal_init_copy(uninitialized_signal_ptr(&result), value)
+	return
+}
+
+signal_init_object_signal :: proc "contextless" (
+	dest: UninitializedTypePtr,
+	object: ObjectPtr,
+	signal_name: ^StringName,
+) {
+	if dest == nil || object == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Signal, 2)
+	if ctor == nil do _trap_nil_godot_function()
+	object_arg := object
+	call_builtin_constructor(
+		ctor,
+		dest,
+		cast(TypePtr)&object_arg,
+		const_string_name_ptr(signal_name),
+	)
+}
+
+// signal_from_object_signal returns an initialized Signal; call signal_free
+// when done. The object handle and signal name storage are borrowed inputs.
+signal_from_object_signal :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ^StringName,
+) -> (
+	result: Signal,
+) {
+	signal_init_object_signal(uninitialized_signal_ptr(&result), object, signal_name)
+	return
+}
+
+signal_free :: proc "contextless" (s: ^Signal) {
+	destroy_builtin(.Signal, signal_ptr(s))
+}
+
+signal_is_null_method: BuiltinMethod
+signal_get_name_method: BuiltinMethod
+
+signal_is_null :: proc "contextless" (s: ^Signal) -> bool {
+	ensure_builtin_method(&signal_is_null_method, .Signal, cstring("is_null"), SIGNAL_IS_NULL_HASH)
+	return call_builtin_method_ptr_ret(signal_is_null_method.method, const_signal_ptr(s), bool)
+}
+
+// signal_get_name returns an owned StringName; call string_name_free when done.
+signal_get_name :: proc "contextless" (s: ^Signal) -> (result: StringName) {
+	ensure_builtin_method(
+		&signal_get_name_method,
+		.Signal,
+		cstring("get_name"),
+		SIGNAL_GET_NAME_HASH,
+	)
+	call_builtin_method_ptr_ret_into(
+		signal_get_name_method.method,
+		const_signal_ptr(s),
+		uninitialized_string_name_ptr(&result),
+	)
+	return
 }
 
 // RIDStorage is raw storage large enough for Godot's ABI RID handle. Treat it
