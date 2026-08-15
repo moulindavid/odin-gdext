@@ -131,6 +131,9 @@ Side :: gclass.Side
 HorizontalAlignment :: gclass.HorizontalAlignment
 VerticalAlignment :: gclass.VerticalAlignment
 Resource :: gclass.Resource
+OwnedResource :: struct {
+	ref: OwnedRefCounted,
+}
 Node :: gclass.Node
 CanvasItem :: gclass.CanvasItem
 Node2D :: gclass.Node2D
@@ -590,6 +593,64 @@ ref_counted_object_ptr :: proc "contextless" (self: RefCounted) -> ObjectPtr {
 
 resource_object_ptr :: proc "contextless" (self: Resource) -> ObjectPtr {
 	return ObjectPtr(self)
+}
+
+owned_resource_nil :: proc "contextless" () -> OwnedResource {
+	return {}
+}
+
+owned_resource_is_nil :: proc "contextless" (self: OwnedResource) -> bool {
+	return owned_ref_counted_is_nil(self.ref)
+}
+
+owned_resource_handle :: proc "contextless" (self: OwnedResource) -> Resource {
+	return Resource(ObjectPtr(owned_ref_counted_handle(self.ref)))
+}
+
+owned_resource_init_owned :: proc "contextless" (
+	handle: Resource,
+) -> (
+	owned: OwnedResource,
+	ok: bool,
+) {
+	if resource_is_nil(handle) do return {}, false
+	ref, ref_ok := owned_ref_counted_init_owned(resource_as_ref_counted(handle))
+	if !ref_ok do return {}, false
+	return OwnedResource{ref = ref}, true
+}
+
+owned_resource_retain :: proc "contextless" (
+	handle: Resource,
+) -> (
+	owned: OwnedResource,
+	ok: bool,
+) {
+	if resource_is_nil(handle) do return {}, false
+	ref, ref_ok := owned_ref_counted_retain(resource_as_ref_counted(handle))
+	if !ref_ok do return {}, false
+	return OwnedResource{ref = ref}, true
+}
+
+owned_resource_take :: proc "contextless" (src: ^OwnedResource) -> OwnedResource {
+	if src == nil do return {}
+	dst := src^
+	src^ = {}
+	return dst
+}
+
+owned_resource_release :: proc "contextless" (
+	self: ^OwnedResource,
+) -> (
+	destroyed: bool,
+	ok: bool,
+) {
+	if self == nil do return false, false
+	return owned_ref_counted_release(&self.ref)
+}
+
+owned_resource_destroy :: proc "contextless" (self: ^OwnedResource) -> (ok: bool) {
+	_, release_ok := owned_resource_release(self)
+	return release_ok
 }
 
 node_object_ptr :: proc "contextless" (self: Node) -> ObjectPtr {

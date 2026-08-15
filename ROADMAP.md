@@ -74,10 +74,10 @@ implemented and smoke-tested.
    - [x] Avoid hidden destructor behavior that would surprise Odin users.
 
 4. Add an owned `Resource` wrapper on top of the `RefCounted` model.
-   - [ ] Support checked creation from a borrowed `Resource` handle.
-   - [ ] Support explicit release through the same refcount path.
-   - [ ] Keep generated `Resource` method wrappers borrowed by default.
-   - [ ] Do not expose broad resource-loading APIs until ownership is verified.
+   - [x] Support checked creation from a borrowed `Resource` handle.
+   - [x] Support explicit release through the same refcount path.
+   - [x] Keep generated `Resource` method wrappers borrowed by default.
+   - [x] Do not expose broad resource-loading APIs until ownership is verified.
 
 5. Update generated class skip rules.
    - [ ] Reclassify deferred `Resource` and `RefCounted` APIs based on the new
