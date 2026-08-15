@@ -998,6 +998,8 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
+Max_Selected_Class_Count :: 16
+
 selected_class_names := []string {
 	"Object",
 	"RefCounted",
@@ -1236,6 +1238,87 @@ find_class_method :: proc(
 		if m.name == name do return m, true
 	}
 	return {}, false
+}
+
+validate_selected_class_api :: proc(root: ^ExtensionApiRoot) -> bool {
+	if len(selected_class_names) > Max_Selected_Class_Count {
+		fmt.eprintfln(
+			"ERROR: selected class batch has %d classes; keep batches at or below %d before broad generation",
+			len(selected_class_names),
+			Max_Selected_Class_Count,
+		)
+		return false
+	}
+
+	seen_classes := make(map[string]bool, len(selected_class_names))
+	defer delete(seen_classes)
+	for class_name in selected_class_names {
+		if seen_classes[class_name] {
+			fmt.eprintfln("ERROR: duplicate selected class %q", class_name)
+			return false
+		}
+		seen_classes[class_name] = true
+		if _, class_ok := find_class(root, class_name); !class_ok {
+			fmt.eprintfln("ERROR: selected class %q missing from extension_api.json", class_name)
+			return false
+		}
+	}
+
+	seen_methods := make(map[string]bool, len(selected_class_methods))
+	defer delete(seen_methods)
+	seen_proc_names := make(map[string]bool, len(selected_class_methods))
+	defer delete(seen_proc_names)
+	for entry in selected_class_methods {
+		if !seen_classes[entry.class_name] {
+			fmt.eprintfln(
+				"ERROR: selected method %s.%s uses a class outside selected_class_names",
+				entry.class_name,
+				entry.method_name,
+			)
+			return false
+		}
+
+		method_key := fmt.aprintf("%s.%s", entry.class_name, entry.method_name)
+		if seen_methods[method_key] {
+			fmt.eprintfln("ERROR: duplicate selected class method %s", method_key)
+			return false
+		}
+		seen_methods[method_key] = true
+
+		proc_name := fmt.aprintf(
+			"%s_%s",
+			class_proc_prefix(entry.class_name),
+			class_proc_prefix(entry.method_name),
+		)
+		if seen_proc_names[proc_name] {
+			fmt.eprintfln("ERROR: generated class method proc name collision: %s", proc_name)
+			return false
+		}
+		seen_proc_names[proc_name] = true
+
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		method, method_ok := find_class_method(class, entry.method_name)
+		if !method_ok {
+			fmt.eprintfln(
+				"ERROR: selected class method %s.%s missing from extension_api.json",
+				entry.class_name,
+				entry.method_name,
+			)
+			return false
+		}
+		if !class_method_supported(entry.class_name, method) {
+			fmt.eprintfln(
+				"ERROR: unsupported selected class method %s.%s: %s",
+				entry.class_name,
+				entry.method_name,
+				class_method_skip_reason(entry.class_name, method),
+			)
+			return false
+		}
+	}
+
+	return true
 }
 
 class_type_expr :: proc(class_name: string) -> string {
@@ -2012,6 +2095,7 @@ generate_builtin_bindings :: proc(json_path: string) -> bool {
 		return false
 	}
 	init_global_enum_type_map(&root)
+	if !validate_selected_class_api(&root) {return false}
 
 	// Use member offsets from the first build configuration, matching the running Godot build.
 	real_members := make(map[string][]ExtensionApiMemberOffsetEntry, 32)

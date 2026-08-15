@@ -108,10 +108,10 @@ that require ownership rules the project does not have yet.
      checks when needed.
 
 7. Stabilize generator behavior before broad coverage.
-   - [ ] Keep output deterministic.
-   - [ ] Avoid name collisions with methods, constants, enums, and helpers.
-   - [ ] Prefer small class batches over enabling the full 1000+ class API.
-   - [ ] Do not start full `Resource` or `RefCounted` ownership support in this
+   - [x] Keep output deterministic.
+   - [x] Avoid name collisions with methods, constants, enums, and helpers.
+   - [x] Prefer small class batches over enabling the full 1000+ class API.
+   - [x] Do not start full `Resource` or `RefCounted` ownership support in this
      roadmap.
 
 Deferred until their safety model is explicit:
