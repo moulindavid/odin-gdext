@@ -10,6 +10,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	control: gt.Control,
 	sprite2d: gt.Sprite2D,
 	label: gt.Label,
+	timer: gt.Timer,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
@@ -59,6 +60,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node_get_node_as_control(node, &path_from_node)
 	_, _ = gt.node_get_node_as_sprite2d(node, &path_from_node)
 	_, _ = gt.node_get_node_as_label(node, &path_from_node)
+	_, _ = gt.node_get_node_as_timer(node, &path_from_node)
 	_ = gt.node_get_node_or_null(node, &path_from_node)
 	gt.node_path_free(&path_from_node)
 	_ = gt.node_get_child_count(node, false)
@@ -262,6 +264,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.control_object_ptr(control)
 	_ = gt.sprite2d_object_ptr(sprite2d)
 	_ = gt.label_object_ptr(label)
+	_ = gt.timer_object_ptr(timer)
 	_, _ = gt.object_ptr_try_as_ref_counted(gt.ref_counted_object_ptr(ref_counted))
 	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
 	_, _ = gt.object_ptr_try_as_node(gt.node_object_ptr(node))
@@ -270,6 +273,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_control(gt.control_object_ptr(control))
 	_, _ = gt.object_ptr_try_as_sprite2d(gt.sprite2d_object_ptr(sprite2d))
 	_, _ = gt.object_ptr_try_as_label(gt.label_object_ptr(label))
+	_, _ = gt.object_ptr_try_as_timer(gt.timer_object_ptr(timer))
 
 	_ = gt.sprite2d_as_node2d(sprite2d)
 	_ = gt.sprite2d_as_canvas_item(sprite2d)
@@ -279,15 +283,37 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.label_as_canvas_item(label)
 	_ = gt.label_as_node(label)
 	_ = gt.label_as_object(label)
+	_ = gt.timer_as_node(timer)
+	_ = gt.timer_as_object(timer)
+
+	_ = gt.timer_is_nil(timer)
+	gt.timer_set_wait_time(timer, 0.5)
+	_ = gt.timer_get_wait_time(timer)
+	gt.timer_set_one_shot(timer, true)
+	_ = gt.timer_is_one_shot(timer)
+	gt.timer_set_autostart(timer, false)
+	_ = gt.timer_has_autostart(timer)
+	gt.timer_start(timer, 0.25)
+	gt.timer_stop(timer)
+	gt.timer_set_paused(timer, false)
+	_ = gt.timer_is_paused(timer)
+	gt.timer_set_ignore_time_scale(timer, true)
+	_ = gt.timer_is_ignoring_time_scale(timer)
+	_ = gt.timer_is_stopped(timer)
+	_ = gt.timer_get_time_left(timer)
 
 	_ = gt.object_is_sprite2d(object)
 	_, _ = gt.object_try_as_sprite2d(object)
 	_ = gt.object_is_label(object)
 	_, _ = gt.object_try_as_label(object)
+	_ = gt.object_is_timer(object)
+	_, _ = gt.object_try_as_timer(object)
 	_ = gt.node_is_sprite2d(node)
 	_, _ = gt.node_try_as_sprite2d(node)
 	_ = gt.node_is_label(node)
 	_, _ = gt.node_try_as_label(node)
+	_ = gt.node_is_timer(node)
+	_, _ = gt.node_try_as_timer(node)
 	_ = gt.canvas_item_is_sprite2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_sprite2d(canvas_item)
 	_ = gt.canvas_item_is_label(canvas_item)

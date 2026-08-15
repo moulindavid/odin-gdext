@@ -1010,15 +1010,10 @@ selected_class_names := []string {
 	"Control",
 	"Sprite2D",
 	"Label",
+	"Timer",
 }
 
-candidate_class_names := []string {
-	"Timer",
-	"CollisionObject2D",
-	"Area2D",
-	"Resource",
-	"PackedScene",
-}
+candidate_class_names := []string{"CollisionObject2D", "Area2D", "Resource", "PackedScene"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1219,6 +1214,20 @@ selected_class_methods := []Selected_Class_Method {
 	{"Label", "set_structured_text_bidi_override_options"},
 	{"Label", "get_structured_text_bidi_override_options"},
 	{"Label", "get_character_bounds"},
+	{"Timer", "set_wait_time"},
+	{"Timer", "get_wait_time"},
+	{"Timer", "set_one_shot"},
+	{"Timer", "is_one_shot"},
+	{"Timer", "set_autostart"},
+	{"Timer", "has_autostart"},
+	{"Timer", "start"},
+	{"Timer", "stop"},
+	{"Timer", "set_paused"},
+	{"Timer", "is_paused"},
+	{"Timer", "set_ignore_time_scale"},
+	{"Timer", "is_ignoring_time_scale"},
+	{"Timer", "is_stopped"},
+	{"Timer", "get_time_left"},
 }
 
 is_selected_class :: proc(name: string) -> bool {

@@ -75,13 +75,13 @@ methods until their safety rules are explicit.
    - [x] Use the report to choose the smallest safe generated method batch.
 
 2. Generate borrowed-safe `Timer` APIs.
-   - [ ] Add the `Timer` handle, upcasts, downcasts, constants, and enums where
+   - [x] Add the `Timer` handle, upcasts, downcasts, constants, and enums where
      applicable.
-   - [ ] Generate primitive and `GodotReal` timer configuration methods such as
+   - [x] Generate primitive and `GodotReal` timer configuration methods such as
      wait time, one shot, autostart, paused, start, and stop where signatures are
      safe.
-   - [ ] Re-export selected `Timer` APIs through `godot:godot`.
-   - [ ] Add facade compile coverage and a small runtime use in an example or
+   - [x] Re-export selected `Timer` APIs through `godot:godot`.
+   - [x] Add facade compile coverage and a small runtime use in an example or
      smoke path.
 
 3. Generate borrowed-safe `CollisionObject2D` APIs.

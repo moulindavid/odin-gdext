@@ -140,6 +140,7 @@ Node2D :: gclass.Node2D
 Control :: gclass.Control
 Sprite2D :: gclass.Sprite2D
 Label :: gclass.Label
+Timer :: gclass.Timer
 
 // --- Core functions ---
 init :: gcore.init
@@ -443,6 +444,8 @@ object_is_sprite2d :: gclass.object_is_sprite2d
 object_try_as_sprite2d :: gclass.object_try_as_sprite2d
 object_is_label :: gclass.object_is_label
 object_try_as_label :: gclass.object_try_as_label
+object_is_timer :: gclass.object_is_timer
+object_try_as_timer :: gclass.object_try_as_timer
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 node_is_canvas_item :: gclass.node_is_canvas_item
@@ -455,6 +458,8 @@ node_is_sprite2d :: gclass.node_is_sprite2d
 node_try_as_sprite2d :: gclass.node_try_as_sprite2d
 node_is_label :: gclass.node_is_label
 node_try_as_label :: gclass.node_try_as_label
+node_is_timer :: gclass.node_is_timer
+node_try_as_timer :: gclass.node_try_as_timer
 canvas_item_is_node2d :: gclass.canvas_item_is_node2d
 canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
@@ -467,6 +472,22 @@ node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
 control_is_label :: gclass.control_is_label
 control_try_as_label :: gclass.control_try_as_label
+timer_as_node :: gclass.timer_as_node
+timer_as_object :: gclass.timer_as_object
+timer_set_wait_time :: gclass.timer_set_wait_time
+timer_get_wait_time :: gclass.timer_get_wait_time
+timer_set_one_shot :: gclass.timer_set_one_shot
+timer_is_one_shot :: gclass.timer_is_one_shot
+timer_set_autostart :: gclass.timer_set_autostart
+timer_has_autostart :: gclass.timer_has_autostart
+timer_start :: gclass.timer_start
+timer_stop :: gclass.timer_stop
+timer_set_paused :: gclass.timer_set_paused
+timer_is_paused :: gclass.timer_is_paused
+timer_set_ignore_time_scale :: gclass.timer_set_ignore_time_scale
+timer_is_ignoring_time_scale :: gclass.timer_is_ignoring_time_scale
+timer_is_stopped :: gclass.timer_is_stopped
+timer_get_time_left :: gclass.timer_get_time_left
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -506,6 +527,10 @@ sprite2d_is_nil :: proc "contextless" (self: Sprite2D) -> bool {
 }
 
 label_is_nil :: proc "contextless" (self: Label) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+timer_is_nil :: proc "contextless" (self: Timer) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -581,6 +606,18 @@ node_get_node_as_label :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Label(nil), false
 	return node_try_as_label(node)
+}
+
+node_get_node_as_timer :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Timer,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Timer(nil), false
+	return node_try_as_timer(node)
 }
 
 object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {
@@ -677,6 +714,10 @@ label_object_ptr :: proc "contextless" (self: Label) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+timer_object_ptr :: proc "contextless" (self: Timer) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 object_ptr_try_as_ref_counted :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -727,6 +768,11 @@ object_ptr_try_as_label :: proc "contextless" (self: ObjectPtr) -> (value: Label
 	return object_try_as_label(Object(self))
 }
 
+object_ptr_try_as_timer :: proc "contextless" (self: ObjectPtr) -> (value: Timer, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_timer(Object(self))
+}
+
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
 ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
@@ -742,6 +788,7 @@ CanvasItemTextureRepeat :: gclass.CanvasItemTextureRepeat
 CanvasItemClipChildrenMode :: gclass.CanvasItemClipChildrenMode
 CanvasItemOversamplingWithScale :: gclass.CanvasItemOversamplingWithScale
 ControlFocusMode :: gclass.ControlFocusMode
+TimerTimerProcessCallback :: gclass.TimerTimerProcessCallback
 ControlFocusBehaviorRecursive :: gclass.ControlFocusBehaviorRecursive
 ControlMouseBehaviorRecursive :: gclass.ControlMouseBehaviorRecursive
 ControlCursorShape :: gclass.ControlCursorShape
