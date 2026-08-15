@@ -111,6 +111,85 @@ object_destroy_checked :: proc "contextless" (object: ObjectPtr) -> (ok: bool) {
 	return true
 }
 
+OwnedRefCounted :: struct {
+	handle: RefCounted,
+	owns:   bool,
+}
+
+owned_ref_counted_nil :: proc "contextless" () -> OwnedRefCounted {
+	return {}
+}
+
+owned_ref_counted_is_nil :: proc "contextless" (self: OwnedRefCounted) -> bool {
+	return !self.owns || ObjectPtr(self.handle) == nil
+}
+
+owned_ref_counted_handle :: proc "contextless" (self: OwnedRefCounted) -> RefCounted {
+	return self.handle
+}
+
+// owned_ref_counted_init_owned wraps a RefCounted handle whose reference is
+// already owned by Odin, such as a future construct-object helper result.
+owned_ref_counted_init_owned :: proc "contextless" (
+	handle: RefCounted,
+) -> (
+	owned: OwnedRefCounted,
+	ok: bool,
+) {
+	if ObjectPtr(handle) == nil do return {}, false
+	return OwnedRefCounted{handle = handle, owns = true}, true
+}
+
+// owned_ref_counted_retain creates one Odin-owned reference from a borrowed
+// RefCounted handle. The caller must release or destroy the returned wrapper.
+owned_ref_counted_retain :: proc "contextless" (
+	handle: RefCounted,
+) -> (
+	owned: OwnedRefCounted,
+	ok: bool,
+) {
+	if !ref_counted_retain(handle) do return {}, false
+	return OwnedRefCounted{handle = handle, owns = true}, true
+}
+
+// owned_ref_counted_take moves ownership out of src by clearing src.
+owned_ref_counted_take :: proc "contextless" (src: ^OwnedRefCounted) -> OwnedRefCounted {
+	if src == nil do return {}
+	dst := src^
+	src^ = {}
+	return dst
+}
+
+// owned_ref_counted_release releases one owned reference and clears the wrapper.
+// Nil, already released, or non-owning wrappers are no-ops with ok=true.
+owned_ref_counted_release :: proc "contextless" (
+	self: ^OwnedRefCounted,
+) -> (
+	destroyed: bool,
+	ok: bool,
+) {
+	if self == nil do return false, false
+	if !self.owns || ObjectPtr(self.handle) == nil {
+		self^ = {}
+		return false, true
+	}
+
+	handle := self.handle
+	self^ = {}
+
+	reached_zero, unref_ok := ref_counted_unreference(handle)
+	if !unref_ok do return false, false
+	if reached_zero {
+		return object_destroy_checked(ObjectPtr(handle)), true
+	}
+	return false, true
+}
+
+owned_ref_counted_destroy :: proc "contextless" (self: ^OwnedRefCounted) -> (ok: bool) {
+	_, release_ok := owned_ref_counted_release(self)
+	return release_ok
+}
+
 // Signal emission.
 
 emit_signal_method_name_data: StaticStringName

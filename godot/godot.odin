@@ -10,6 +10,7 @@ import gcore "godot:core"
 // --- Core types ---
 Object :: gcore.Object
 RefCounted :: gcore.RefCounted
+OwnedRefCounted :: gcore.OwnedRefCounted
 ObjectPtr :: gcore.ObjectPtr
 ClassInstancePtr :: gcore.ClassInstancePtr
 ClassLibraryPtr :: gcore.ClassLibraryPtr
@@ -192,6 +193,14 @@ variant_try_object :: gcore.variant_try_object
 ref_counted_retain :: gcore.ref_counted_retain
 ref_counted_unreference :: gcore.ref_counted_unreference
 object_destroy_checked :: gcore.object_destroy_checked
+owned_ref_counted_nil :: gcore.owned_ref_counted_nil
+owned_ref_counted_is_nil :: gcore.owned_ref_counted_is_nil
+owned_ref_counted_handle :: gcore.owned_ref_counted_handle
+owned_ref_counted_init_owned :: gcore.owned_ref_counted_init_owned
+owned_ref_counted_retain :: gcore.owned_ref_counted_retain
+owned_ref_counted_take :: gcore.owned_ref_counted_take
+owned_ref_counted_release :: gcore.owned_ref_counted_release
+owned_ref_counted_destroy :: gcore.owned_ref_counted_destroy
 variant_from_string_name_ptr :: gcore.variant_from_string_name_ptr
 init_signal_emission :: gcore.init_signal_emission
 object_emit_signal_0_checked :: gcore.object_emit_signal_0_checked

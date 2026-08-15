@@ -68,10 +68,10 @@ implemented and smoke-tested.
    - [x] Add focused unit or compile checks for helper signatures.
 
 3. Add an owned `RefCounted` wrapper.
-   - [ ] Store a typed borrowed handle plus ownership state explicitly.
-   - [ ] Provide init, retain, release, and destroy helpers.
-   - [ ] Make double-release and nil-release behavior explicit.
-   - [ ] Avoid hidden destructor behavior that would surprise Odin users.
+   - [x] Store a typed borrowed handle plus ownership state explicitly.
+   - [x] Provide init, retain, release, and destroy helpers.
+   - [x] Make double-release and nil-release behavior explicit.
+   - [x] Avoid hidden destructor behavior that would surprise Odin users.
 
 4. Add an owned `Resource` wrapper on top of the `RefCounted` model.
    - [ ] Support checked creation from a borrowed `Resource` handle.
