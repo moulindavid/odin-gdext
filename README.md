@@ -183,6 +183,12 @@ but constructing a refcounted object gives the caller a reference that must be
 released later. odin-gdext intentionally defers public retain/unref helpers until
 there is an owned wrapper that can make that balance explicit.
 
+The planned owned-reference wrappers are `OwnedRefCounted` and `OwnedResource`.
+Retain creates one Odin-owned reference, release or destroy gives it back, and
+copying the wrapper does not retain another Godot reference. Generated class
+methods continue to return borrowed handles unless they explicitly document an
+ownership transfer.
+
 Notification helpers provide a small dispatch pattern for common `Node`
 lifecycle notifications while keeping raw notification numbers available for
 advanced handling:

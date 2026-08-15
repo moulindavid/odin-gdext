@@ -53,12 +53,12 @@ broaden generated `Resource` or `RefCounted` APIs until the ownership rules are
 implemented and smoke-tested.
 
 1. Define the owned reference design.
-   - [ ] Document the distinction between borrowed object handles, borrowed
+   - [x] Document the distinction between borrowed object handles, borrowed
      `RefCounted`/`Resource` handles, and owned references.
-   - [ ] Decide the public wrapper shape for an owned refcounted handle.
-   - [ ] Specify copy, move-like handoff, release, and nil behavior in Odin
+   - [x] Decide the public wrapper shape for an owned refcounted handle.
+   - [x] Specify copy, move-like handoff, release, and nil behavior in Odin
      terms.
-   - [ ] Keep normal generated object/class returns borrowed unless a wrapper
+   - [x] Keep normal generated object/class returns borrowed unless a wrapper
      explicitly documents ownership transfer.
 
 2. Add low-level retain and release helpers.
