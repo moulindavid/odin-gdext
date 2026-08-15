@@ -1012,6 +1012,14 @@ selected_class_names := []string {
 	"Label",
 }
 
+candidate_class_names := []string {
+	"Timer",
+	"CollisionObject2D",
+	"Area2D",
+	"Resource",
+	"PackedScene",
+}
+
 Selected_Class_Method :: struct {
 	class_name:  string,
 	method_name: string,
@@ -1450,6 +1458,59 @@ class_method_selected :: proc(class_name, method_name: string) -> bool {
 	return false
 }
 
+is_candidate_class :: proc(class_name: string) -> bool {
+	for name in candidate_class_names {
+		if name == class_name do return true
+	}
+	return false
+}
+
+resolve_candidate_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "" || godot_name == "void" do return "", true
+	if enum_type, enum_ok := class_enum_type_from_godot(godot_name); enum_ok do return enum_type, true
+	if godot_name == "Variant" do return "core.Variant", true
+	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok do return entry.odin, true
+	if is_selected_class(godot_name) || is_candidate_class(godot_name) {
+		return class_handle_expr(godot_name), true
+	}
+	if t, map_ok := class_abi_type_map[godot_name]; map_ok do return t, true
+	return "", false
+}
+
+resolve_candidate_class_param_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "Variant" do return "^core.Variant", true
+	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok {
+		return fmt.aprintf("^%s", entry.odin), true
+	}
+	return resolve_candidate_class_return_type(godot_name)
+}
+
+class_method_candidate_skip_reason :: proc(
+	class_name: string,
+	method: ExtensionApiClassMethod,
+) -> string {
+	if method.is_vararg do return "vararg"
+	if method.is_virtual do return "virtual"
+	if reason := class_method_deferred_reason(class_name, method.name); len(reason) > 0 {
+		return reason
+	}
+	if reason := class_type_deferred_reason(method.return_value.type); len(reason) > 0 {
+		return fmt.aprintf("return type %s deferred: %s", method.return_value.type, reason)
+	}
+	if _, ok := resolve_candidate_class_return_type(method.return_value.type); !ok {
+		return fmt.aprintf("unsupported return type %s", method.return_value.type)
+	}
+	for arg in method.arguments {
+		if reason := class_type_deferred_reason(arg.type); len(reason) > 0 {
+			return fmt.aprintf("argument %s type %s deferred: %s", arg.name, arg.type, reason)
+		}
+		if _, ok := resolve_candidate_class_param_type(arg.type); !ok {
+			return fmt.aprintf("unsupported argument %s type %s", arg.name, arg.type)
+		}
+	}
+	return ""
+}
+
 class_method_has_default_arguments :: proc(method: ExtensionApiClassMethod) -> bool {
 	for arg in method.arguments {
 		if len(arg.default_value) > 0 do return true
@@ -1842,10 +1903,15 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&owned_wrapper)
 	skipped := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&skipped)
+	candidate_analysis := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&candidate_analysis)
 
 	generated_count := 0
 	owned_wrapper_count := 0
 	skipped_count := 0
+	candidate_safe_count := 0
+	candidate_owned_wrapper_count := 0
+	candidate_skipped_count := 0
 
 	for class_name in selected_class_names {
 		class, class_ok := find_class(root, class_name)
@@ -1875,27 +1941,69 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		}
 	}
 
+	for class_name in candidate_class_names {
+		class, class_ok := find_class(root, class_name)
+		if !class_ok {
+			fmt.eprintfln("ERROR: candidate class %q missing from extension_api.json", class_name)
+			return false
+		}
+
+		fmt.sbprintf(&candidate_analysis, "### %s\n\n", class.name)
+		for method in class.methods {
+			reason := class_method_candidate_skip_reason(class.name, method)
+			strings.write_string(&candidate_analysis, "- ")
+			emit_class_method_report_signature(&candidate_analysis, class.name, method)
+			if len(reason) == 0 {
+				if class_method_has_default_arguments(method) {
+					strings.write_string(
+						&candidate_analysis,
+						": borrowed-safe candidate, explicit default arguments required\n",
+					)
+				} else {
+					strings.write_string(&candidate_analysis, ": borrowed-safe candidate\n")
+				}
+				candidate_safe_count += 1
+			} else if reason == class_method_owned_wrapper_reason(class.name, method.name) {
+				fmt.sbprintf(&candidate_analysis, ": owned-wrapper method, %s\n", reason)
+				candidate_owned_wrapper_count += 1
+			} else {
+				fmt.sbprintf(&candidate_analysis, ": skipped, %s\n", reason)
+				candidate_skipped_count += 1
+			}
+		}
+		strings.write_byte(&candidate_analysis, '\n')
+	}
+
 	b := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&b)
 
 	strings.write_string(&b, "# Generated class API support report\n\n")
 	strings.write_string(&b, "Generated from `extension_api.json`. DO NOT EDIT.\n\n")
-	strings.write_string(&b, "This report only covers the selected generated class slice.\n\n")
 	strings.write_string(
 		&b,
-		"Borrowed-safe methods are generated as class wrappers. Owned-wrapper methods are intentionally routed through explicit facade helpers instead.\n\n",
+		"This report covers the selected generated class slice and the next candidate gameplay classes.\n\n",
+	)
+	strings.write_string(
+		&b,
+		"Borrowed-safe methods are generated as class wrappers. Owned-wrapper methods are intentionally routed through explicit facade helpers instead. Candidate borrowed-safe methods are not generated until they are added to the selected class batch.\n\n",
 	)
 	strings.write_string(&b, "## Summary\n\n")
 	fmt.sbprintf(&b, "- Selected classes: %d\n", len(selected_class_names))
+	fmt.sbprintf(&b, "- Candidate classes: %d\n", len(candidate_class_names))
 	fmt.sbprintf(&b, "- Borrowed-safe generated methods: %d\n", generated_count)
 	fmt.sbprintf(&b, "- Owned-wrapper methods: %d\n", owned_wrapper_count)
-	fmt.sbprintf(&b, "- Skipped methods: %d\n\n", skipped_count)
+	fmt.sbprintf(&b, "- Skipped selected-class methods: %d\n", skipped_count)
+	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
+	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
+	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
 	strings.write_string(&b, "## Borrowed-safe generated methods\n\n")
 	strings.write_string(&b, strings.to_string(generated))
 	strings.write_string(&b, "\n## Owned-wrapper methods\n\n")
 	strings.write_string(&b, strings.to_string(owned_wrapper))
-	strings.write_string(&b, "\n## Skipped methods\n\n")
+	strings.write_string(&b, "\n## Skipped selected-class methods\n\n")
 	strings.write_string(&b, strings.to_string(skipped))
+	strings.write_string(&b, "\n## Candidate class analysis\n\n")
+	strings.write_string(&b, strings.to_string(candidate_analysis))
 
 	err := os.write_entire_file(path, transmute([]byte)strings.to_string(b))
 	if err != nil {
@@ -1903,11 +2011,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		return false
 	}
 	fmt.printfln(
-		"  %s  (%d generated, %d owned-wrapper, %d skipped class methods)",
+		"  %s  (%d generated, %d owned-wrapper, %d skipped, %d candidate-safe class methods)",
 		path,
 		generated_count,
 		owned_wrapper_count,
 		skipped_count,
+		candidate_safe_count,
 	)
 	return true
 }

@@ -67,12 +67,12 @@ default arguments, `Callable`, broad `Signal`, or object-lifetime-sensitive
 methods until their safety rules are explicit.
 
 1. Refresh the generated class API support baseline.
-   - [ ] Include `Timer`, `CollisionObject2D`, `Area2D`, `Resource`, and
+   - [x] Include `Timer`, `CollisionObject2D`, `Area2D`, `Resource`, and
      `PackedScene` in the selected class report candidate analysis.
-   - [ ] Keep unsupported methods skipped with deterministic reasons.
-   - [ ] Separate borrowed-safe methods from methods requiring owned wrappers or
+   - [x] Keep unsupported methods skipped with deterministic reasons.
+   - [x] Separate borrowed-safe methods from methods requiring owned wrappers or
      object-lifetime review.
-   - [ ] Use the report to choose the smallest safe generated method batch.
+   - [x] Use the report to choose the smallest safe generated method batch.
 
 2. Generate borrowed-safe `Timer` APIs.
    - [ ] Add the `Timer` handle, upcasts, downcasts, constants, and enums where
