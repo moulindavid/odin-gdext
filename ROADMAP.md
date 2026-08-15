@@ -112,10 +112,10 @@ methods until their safety rules are explicit.
    - [x] Prefer no generated API over an unclear ownership transfer.
 
 6. Prove normal usage through the public facade.
-   - [ ] Keep normal examples importing only `godot:godot`.
-   - [ ] Add facade compile checks for every newly exposed class handle and
+   - [x] Keep normal examples importing only `godot:godot`.
+   - [x] Add facade compile checks for every newly exposed class handle and
      method group.
-   - [ ] Add or extend a Godot headless smoke path showing one realistic 2D
+   - [x] Add or extend a Godot headless smoke path showing one realistic 2D
      gameplay use of the new generated APIs.
 
 7. Validate before moving to the next feature roadmap.
