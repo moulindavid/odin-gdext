@@ -11,3 +11,10 @@ offset_top = 24.0
 offset_right = 760.0
 offset_bottom = 80.0
 text = "Press Space to roll damage in Odin"
+
+[node name="RollTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="DamageArea" type="Area2D" parent="."]
+monitoring = false
+monitorable = true

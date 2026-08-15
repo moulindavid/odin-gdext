@@ -67,61 +67,61 @@ default arguments, `Callable`, broad `Signal`, or object-lifetime-sensitive
 methods until their safety rules are explicit.
 
 1. Refresh the generated class API support baseline.
-   - [ ] Include `Timer`, `CollisionObject2D`, `Area2D`, `Resource`, and
+   - [x] Include `Timer`, `CollisionObject2D`, `Area2D`, `Resource`, and
      `PackedScene` in the selected class report candidate analysis.
-   - [ ] Keep unsupported methods skipped with deterministic reasons.
-   - [ ] Separate borrowed-safe methods from methods requiring owned wrappers or
+   - [x] Keep unsupported methods skipped with deterministic reasons.
+   - [x] Separate borrowed-safe methods from methods requiring owned wrappers or
      object-lifetime review.
-   - [ ] Use the report to choose the smallest safe generated method batch.
+   - [x] Use the report to choose the smallest safe generated method batch.
 
 2. Generate borrowed-safe `Timer` APIs.
-   - [ ] Add the `Timer` handle, upcasts, downcasts, constants, and enums where
+   - [x] Add the `Timer` handle, upcasts, downcasts, constants, and enums where
      applicable.
-   - [ ] Generate primitive and `GodotReal` timer configuration methods such as
+   - [x] Generate primitive and `GodotReal` timer configuration methods such as
      wait time, one shot, autostart, paused, start, and stop where signatures are
      safe.
-   - [ ] Re-export selected `Timer` APIs through `godot:godot`.
-   - [ ] Add facade compile coverage and a small runtime use in an example or
+   - [x] Re-export selected `Timer` APIs through `godot:godot`.
+   - [x] Add facade compile coverage and a small runtime use in an example or
      smoke path.
 
 3. Generate borrowed-safe `CollisionObject2D` APIs.
-   - [ ] Add the `CollisionObject2D` handle and inheritance helpers.
-   - [ ] Generate safe collision layer, mask, disable mode, input pickable, and
+   - [x] Add the `CollisionObject2D` handle and inheritance helpers.
+   - [x] Generate safe collision layer, mask, disable mode, input pickable, and
      RID access methods where return ownership is clear.
-   - [ ] Keep shape owner APIs skipped until object lifetime and container rules
+   - [x] Keep shape owner APIs skipped until object lifetime and container rules
      are explicit.
-   - [ ] Re-export selected APIs through the facade and add compile coverage.
+   - [x] Re-export selected APIs through the facade and add compile coverage.
 
 4. Generate borrowed-safe `Area2D` APIs.
-   - [ ] Add the `Area2D` handle and checked downcast helpers.
-   - [ ] Generate monitoring, monitorable, priority, gravity, damping, and audio
+   - [x] Add the `Area2D` handle and checked downcast helpers.
+   - [x] Generate monitoring, monitorable, priority, gravity, damping, and audio
      bus methods where signatures are safe.
-   - [ ] Keep body/area collection APIs, signal-heavy APIs, and callback-heavy
+   - [x] Keep body/area collection APIs, signal-heavy APIs, and callback-heavy
      paths skipped until `Array`, `Signal`, and object-lifetime rules are ready.
-   - [ ] Exercise at least one `Area2D` method path in smoke coverage if it can
+   - [x] Exercise at least one `Area2D` method path in smoke coverage if it can
      run headless deterministically.
 
 5. Evaluate `Resource` and `PackedScene` with the owned-reference model.
-   - [ ] Reclassify report entries that can now use `OwnedRefCounted` or
+   - [x] Reclassify report entries that can now use `OwnedRefCounted` or
      `OwnedResource` safely.
-   - [ ] Keep `Resource.duplicate`, texture setters/getters, scene instantiation,
+   - [x] Keep `Resource.duplicate`, texture setters/getters, scene instantiation,
      and broad resource-loading APIs skipped until exact ownership transfer is
      verified.
-   - [ ] If a minimal safe `PackedScene` method exists, generate only that method
+   - [x] If a minimal safe `PackedScene` method exists, generate only that method
      and document whether its result is borrowed or owned.
-   - [ ] Prefer no generated API over an unclear ownership transfer.
+   - [x] Prefer no generated API over an unclear ownership transfer.
 
 6. Prove normal usage through the public facade.
-   - [ ] Keep normal examples importing only `godot:godot`.
-   - [ ] Add facade compile checks for every newly exposed class handle and
+   - [x] Keep normal examples importing only `godot:godot`.
+   - [x] Add facade compile checks for every newly exposed class handle and
      method group.
-   - [ ] Add or extend a Godot headless smoke path showing one realistic 2D
+   - [x] Add or extend a Godot headless smoke path showing one realistic 2D
      gameplay use of the new generated APIs.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm the generated API report is deterministic and useful.
-   - [ ] Confirm no generated wrapper violates borrowed-object or owned-value
+   - [x] Run `make ci`.
+   - [x] Confirm the generated API report is deterministic and useful.
+   - [x] Confirm no generated wrapper violates borrowed-object or owned-value
      destruction rules.
 
 Deferred until after this goal:

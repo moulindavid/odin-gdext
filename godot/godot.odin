@@ -140,6 +140,10 @@ Node2D :: gclass.Node2D
 Control :: gclass.Control
 Sprite2D :: gclass.Sprite2D
 Label :: gclass.Label
+Timer :: gclass.Timer
+CollisionObject2D :: gclass.CollisionObject2D
+Area2D :: gclass.Area2D
+PackedScene :: gclass.PackedScene
 
 // --- Core functions ---
 init :: gcore.init
@@ -443,8 +447,20 @@ object_is_sprite2d :: gclass.object_is_sprite2d
 object_try_as_sprite2d :: gclass.object_try_as_sprite2d
 object_is_label :: gclass.object_is_label
 object_try_as_label :: gclass.object_try_as_label
+object_is_timer :: gclass.object_is_timer
+object_try_as_timer :: gclass.object_try_as_timer
+object_is_collision_object2d :: gclass.object_is_collision_object2d
+object_try_as_collision_object2d :: gclass.object_try_as_collision_object2d
+object_is_area2d :: gclass.object_is_area2d
+object_try_as_area2d :: gclass.object_try_as_area2d
+object_is_packed_scene :: gclass.object_is_packed_scene
+object_try_as_packed_scene :: gclass.object_try_as_packed_scene
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
+ref_counted_is_packed_scene :: gclass.ref_counted_is_packed_scene
+ref_counted_try_as_packed_scene :: gclass.ref_counted_try_as_packed_scene
+resource_is_packed_scene :: gclass.resource_is_packed_scene
+resource_try_as_packed_scene :: gclass.resource_try_as_packed_scene
 node_is_canvas_item :: gclass.node_is_canvas_item
 node_try_as_canvas_item :: gclass.node_try_as_canvas_item
 node_is_node2d :: gclass.node_is_node2d
@@ -455,6 +471,12 @@ node_is_sprite2d :: gclass.node_is_sprite2d
 node_try_as_sprite2d :: gclass.node_try_as_sprite2d
 node_is_label :: gclass.node_is_label
 node_try_as_label :: gclass.node_try_as_label
+node_is_timer :: gclass.node_is_timer
+node_try_as_timer :: gclass.node_try_as_timer
+node_is_collision_object2d :: gclass.node_is_collision_object2d
+node_try_as_collision_object2d :: gclass.node_try_as_collision_object2d
+node_is_area2d :: gclass.node_is_area2d
+node_try_as_area2d :: gclass.node_try_as_area2d
 canvas_item_is_node2d :: gclass.canvas_item_is_node2d
 canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
@@ -463,10 +485,97 @@ canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
 canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
 canvas_item_is_label :: gclass.canvas_item_is_label
 canvas_item_try_as_label :: gclass.canvas_item_try_as_label
+canvas_item_is_collision_object2d :: gclass.canvas_item_is_collision_object2d
+canvas_item_try_as_collision_object2d :: gclass.canvas_item_try_as_collision_object2d
+canvas_item_is_area2d :: gclass.canvas_item_is_area2d
+canvas_item_try_as_area2d :: gclass.canvas_item_try_as_area2d
 node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
+node2d_is_collision_object2d :: gclass.node2d_is_collision_object2d
+node2d_try_as_collision_object2d :: gclass.node2d_try_as_collision_object2d
+node2d_is_area2d :: gclass.node2d_is_area2d
+node2d_try_as_area2d :: gclass.node2d_try_as_area2d
+collision_object2d_is_area2d :: gclass.collision_object2d_is_area2d
+collision_object2d_try_as_area2d :: gclass.collision_object2d_try_as_area2d
 control_is_label :: gclass.control_is_label
 control_try_as_label :: gclass.control_try_as_label
+timer_as_node :: gclass.timer_as_node
+timer_as_object :: gclass.timer_as_object
+timer_set_wait_time :: gclass.timer_set_wait_time
+timer_get_wait_time :: gclass.timer_get_wait_time
+timer_set_one_shot :: gclass.timer_set_one_shot
+timer_is_one_shot :: gclass.timer_is_one_shot
+timer_set_autostart :: gclass.timer_set_autostart
+timer_has_autostart :: gclass.timer_has_autostart
+timer_start :: gclass.timer_start
+timer_stop :: gclass.timer_stop
+timer_set_paused :: gclass.timer_set_paused
+timer_is_paused :: gclass.timer_is_paused
+timer_set_ignore_time_scale :: gclass.timer_set_ignore_time_scale
+timer_is_ignoring_time_scale :: gclass.timer_is_ignoring_time_scale
+timer_is_stopped :: gclass.timer_is_stopped
+timer_get_time_left :: gclass.timer_get_time_left
+collision_object2d_as_node2d :: gclass.collision_object2d_as_node2d
+collision_object2d_as_canvas_item :: gclass.collision_object2d_as_canvas_item
+collision_object2d_as_node :: gclass.collision_object2d_as_node
+collision_object2d_as_object :: gclass.collision_object2d_as_object
+collision_object2d_get_rid :: gclass.collision_object2d_get_rid
+collision_object2d_set_collision_layer :: gclass.collision_object2d_set_collision_layer
+collision_object2d_get_collision_layer :: gclass.collision_object2d_get_collision_layer
+collision_object2d_set_collision_mask :: gclass.collision_object2d_set_collision_mask
+collision_object2d_get_collision_mask :: gclass.collision_object2d_get_collision_mask
+collision_object2d_set_collision_layer_value :: gclass.collision_object2d_set_collision_layer_value
+collision_object2d_get_collision_layer_value :: gclass.collision_object2d_get_collision_layer_value
+collision_object2d_set_collision_mask_value :: gclass.collision_object2d_set_collision_mask_value
+collision_object2d_get_collision_mask_value :: gclass.collision_object2d_get_collision_mask_value
+collision_object2d_set_collision_priority :: gclass.collision_object2d_set_collision_priority
+collision_object2d_get_collision_priority :: gclass.collision_object2d_get_collision_priority
+collision_object2d_set_disable_mode :: gclass.collision_object2d_set_disable_mode
+collision_object2d_get_disable_mode :: gclass.collision_object2d_get_disable_mode
+collision_object2d_set_pickable :: gclass.collision_object2d_set_pickable
+collision_object2d_is_pickable :: gclass.collision_object2d_is_pickable
+area2d_as_collision_object2d :: gclass.area2d_as_collision_object2d
+area2d_as_node2d :: gclass.area2d_as_node2d
+area2d_as_canvas_item :: gclass.area2d_as_canvas_item
+area2d_as_node :: gclass.area2d_as_node
+area2d_as_object :: gclass.area2d_as_object
+area2d_set_gravity_space_override_mode :: gclass.area2d_set_gravity_space_override_mode
+area2d_get_gravity_space_override_mode :: gclass.area2d_get_gravity_space_override_mode
+area2d_set_gravity_is_point :: gclass.area2d_set_gravity_is_point
+area2d_is_gravity_a_point :: gclass.area2d_is_gravity_a_point
+area2d_set_gravity_point_unit_distance :: gclass.area2d_set_gravity_point_unit_distance
+area2d_get_gravity_point_unit_distance :: gclass.area2d_get_gravity_point_unit_distance
+area2d_set_gravity_point_center :: gclass.area2d_set_gravity_point_center
+area2d_get_gravity_point_center :: gclass.area2d_get_gravity_point_center
+area2d_set_gravity_direction :: gclass.area2d_set_gravity_direction
+area2d_get_gravity_direction :: gclass.area2d_get_gravity_direction
+area2d_set_gravity :: gclass.area2d_set_gravity
+area2d_get_gravity :: gclass.area2d_get_gravity
+area2d_set_linear_damp_space_override_mode :: gclass.area2d_set_linear_damp_space_override_mode
+area2d_get_linear_damp_space_override_mode :: gclass.area2d_get_linear_damp_space_override_mode
+area2d_set_angular_damp_space_override_mode :: gclass.area2d_set_angular_damp_space_override_mode
+area2d_get_angular_damp_space_override_mode :: gclass.area2d_get_angular_damp_space_override_mode
+area2d_set_linear_damp :: gclass.area2d_set_linear_damp
+area2d_get_linear_damp :: gclass.area2d_get_linear_damp
+area2d_set_angular_damp :: gclass.area2d_set_angular_damp
+area2d_get_angular_damp :: gclass.area2d_get_angular_damp
+area2d_set_priority :: gclass.area2d_set_priority
+area2d_get_priority :: gclass.area2d_get_priority
+area2d_set_monitoring :: gclass.area2d_set_monitoring
+area2d_is_monitoring :: gclass.area2d_is_monitoring
+area2d_set_monitorable :: gclass.area2d_set_monitorable
+area2d_is_monitorable :: gclass.area2d_is_monitorable
+area2d_has_overlapping_bodies :: gclass.area2d_has_overlapping_bodies
+area2d_has_overlapping_areas :: gclass.area2d_has_overlapping_areas
+area2d_set_audio_bus_name :: gclass.area2d_set_audio_bus_name
+area2d_get_audio_bus_name :: gclass.area2d_get_audio_bus_name
+area2d_set_audio_bus_override :: gclass.area2d_set_audio_bus_override
+area2d_is_overriding_audio_bus :: gclass.area2d_is_overriding_audio_bus
+packed_scene_as_resource :: gclass.packed_scene_as_resource
+packed_scene_as_ref_counted :: gclass.packed_scene_as_ref_counted
+packed_scene_as_object :: gclass.packed_scene_as_object
+packed_scene_pack :: gclass.packed_scene_pack
+packed_scene_can_instantiate :: gclass.packed_scene_can_instantiate
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -506,6 +615,22 @@ sprite2d_is_nil :: proc "contextless" (self: Sprite2D) -> bool {
 }
 
 label_is_nil :: proc "contextless" (self: Label) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+timer_is_nil :: proc "contextless" (self: Timer) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+collision_object2d_is_nil :: proc "contextless" (self: CollisionObject2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+area2d_is_nil :: proc "contextless" (self: Area2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+packed_scene_is_nil :: proc "contextless" (self: PackedScene) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -581,6 +706,42 @@ node_get_node_as_label :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Label(nil), false
 	return node_try_as_label(node)
+}
+
+node_get_node_as_timer :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Timer,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Timer(nil), false
+	return node_try_as_timer(node)
+}
+
+node_get_node_as_collision_object2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: CollisionObject2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return CollisionObject2D(nil), false
+	return node_try_as_collision_object2d(node)
+}
+
+node_get_node_as_area2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Area2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Area2D(nil), false
+	return node_try_as_area2d(node)
 }
 
 object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {
@@ -677,6 +838,22 @@ label_object_ptr :: proc "contextless" (self: Label) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+timer_object_ptr :: proc "contextless" (self: Timer) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+collision_object2d_object_ptr :: proc "contextless" (self: CollisionObject2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+area2d_object_ptr :: proc "contextless" (self: Area2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 object_ptr_try_as_ref_counted :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -727,6 +904,36 @@ object_ptr_try_as_label :: proc "contextless" (self: ObjectPtr) -> (value: Label
 	return object_try_as_label(Object(self))
 }
 
+object_ptr_try_as_timer :: proc "contextless" (self: ObjectPtr) -> (value: Timer, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_timer(Object(self))
+}
+
+object_ptr_try_as_collision_object2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CollisionObject2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_collision_object2d(Object(self))
+}
+
+object_ptr_try_as_area2d :: proc "contextless" (self: ObjectPtr) -> (value: Area2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_area2d(Object(self))
+}
+
+object_ptr_try_as_packed_scene :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: PackedScene,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_packed_scene(Object(self))
+}
+
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
 ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
@@ -742,6 +949,7 @@ CanvasItemTextureRepeat :: gclass.CanvasItemTextureRepeat
 CanvasItemClipChildrenMode :: gclass.CanvasItemClipChildrenMode
 CanvasItemOversamplingWithScale :: gclass.CanvasItemOversamplingWithScale
 ControlFocusMode :: gclass.ControlFocusMode
+TimerTimerProcessCallback :: gclass.TimerTimerProcessCallback
 ControlFocusBehaviorRecursive :: gclass.ControlFocusBehaviorRecursive
 ControlMouseBehaviorRecursive :: gclass.ControlMouseBehaviorRecursive
 ControlCursorShape :: gclass.ControlCursorShape

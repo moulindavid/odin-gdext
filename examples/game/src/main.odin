@@ -91,8 +91,32 @@ roll_into_label_adapter_method :: proc "contextless" (
 	if !label_ok do return false
 
 	damage := roll_damage(self)
+	label_node := gt.label_as_node(label)
+	parent := gt.node_get_parent(label_node)
+
+	if !gt.node_is_nil(parent) {
+		timer_path := gt.node_path_from_utf8("RollTimer")
+		timer, timer_ok := gt.node_get_node_as_timer(parent, &timer_path)
+		gt.node_path_free(&timer_path)
+		if timer_ok {
+			gt.timer_set_wait_time(timer, 0.5)
+			gt.timer_set_one_shot(timer, true)
+			gt.timer_start(timer, 0.5)
+		}
+
+		area_path := gt.node_path_from_utf8("DamageArea")
+		area, area_ok := gt.node_get_node_as_area2d(parent, &area_path)
+		gt.node_path_free(&area_path)
+		if area_ok {
+			gt.area2d_set_monitoring(area, true)
+			gt.area2d_set_monitorable(area, true)
+			gt.area2d_set_gravity(area, damage)
+			gt.area2d_set_priority(area, 1)
+		}
+	}
+
 	text := gt.string_from_utf8(
-		"Odin rolled damage, updated this Label, and changed its CanvasItem state.",
+		"Odin rolled damage, updated this Label, armed a Timer, and configured an Area2D.",
 	)
 	defer gt.string_free(&text)
 	gt.label_set_text(label, &text)

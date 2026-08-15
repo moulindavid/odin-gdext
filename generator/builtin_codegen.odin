@@ -1010,7 +1010,13 @@ selected_class_names := []string {
 	"Control",
 	"Sprite2D",
 	"Label",
+	"Timer",
+	"CollisionObject2D",
+	"Area2D",
+	"PackedScene",
 }
+
+candidate_class_names := []string{"Resource"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1211,6 +1217,69 @@ selected_class_methods := []Selected_Class_Method {
 	{"Label", "set_structured_text_bidi_override_options"},
 	{"Label", "get_structured_text_bidi_override_options"},
 	{"Label", "get_character_bounds"},
+	{"Timer", "set_wait_time"},
+	{"Timer", "get_wait_time"},
+	{"Timer", "set_one_shot"},
+	{"Timer", "is_one_shot"},
+	{"Timer", "set_autostart"},
+	{"Timer", "has_autostart"},
+	{"Timer", "start"},
+	{"Timer", "stop"},
+	{"Timer", "set_paused"},
+	{"Timer", "is_paused"},
+	{"Timer", "set_ignore_time_scale"},
+	{"Timer", "is_ignoring_time_scale"},
+	{"Timer", "is_stopped"},
+	{"Timer", "get_time_left"},
+	{"CollisionObject2D", "get_rid"},
+	{"CollisionObject2D", "set_collision_layer"},
+	{"CollisionObject2D", "get_collision_layer"},
+	{"CollisionObject2D", "set_collision_mask"},
+	{"CollisionObject2D", "get_collision_mask"},
+	{"CollisionObject2D", "set_collision_layer_value"},
+	{"CollisionObject2D", "get_collision_layer_value"},
+	{"CollisionObject2D", "set_collision_mask_value"},
+	{"CollisionObject2D", "get_collision_mask_value"},
+	{"CollisionObject2D", "set_collision_priority"},
+	{"CollisionObject2D", "get_collision_priority"},
+	{"CollisionObject2D", "set_disable_mode"},
+	{"CollisionObject2D", "get_disable_mode"},
+	{"CollisionObject2D", "set_pickable"},
+	{"CollisionObject2D", "is_pickable"},
+	{"Area2D", "set_gravity_space_override_mode"},
+	{"Area2D", "get_gravity_space_override_mode"},
+	{"Area2D", "set_gravity_is_point"},
+	{"Area2D", "is_gravity_a_point"},
+	{"Area2D", "set_gravity_point_unit_distance"},
+	{"Area2D", "get_gravity_point_unit_distance"},
+	{"Area2D", "set_gravity_point_center"},
+	{"Area2D", "get_gravity_point_center"},
+	{"Area2D", "set_gravity_direction"},
+	{"Area2D", "get_gravity_direction"},
+	{"Area2D", "set_gravity"},
+	{"Area2D", "get_gravity"},
+	{"Area2D", "set_linear_damp_space_override_mode"},
+	{"Area2D", "get_linear_damp_space_override_mode"},
+	{"Area2D", "set_angular_damp_space_override_mode"},
+	{"Area2D", "get_angular_damp_space_override_mode"},
+	{"Area2D", "set_linear_damp"},
+	{"Area2D", "get_linear_damp"},
+	{"Area2D", "set_angular_damp"},
+	{"Area2D", "get_angular_damp"},
+	{"Area2D", "set_priority"},
+	{"Area2D", "get_priority"},
+	{"Area2D", "set_monitoring"},
+	{"Area2D", "is_monitoring"},
+	{"Area2D", "set_monitorable"},
+	{"Area2D", "is_monitorable"},
+	{"Area2D", "has_overlapping_bodies"},
+	{"Area2D", "has_overlapping_areas"},
+	{"Area2D", "set_audio_bus_name"},
+	{"Area2D", "get_audio_bus_name"},
+	{"Area2D", "set_audio_bus_override"},
+	{"Area2D", "is_overriding_audio_bus"},
+	{"PackedScene", "pack"},
+	{"PackedScene", "can_instantiate"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
@@ -1423,7 +1492,14 @@ class_method_deferred_reason :: proc(class_name, method_name: string) -> string 
 		return reason
 	}
 	if class_name == "Control" && method_name == "force_drag" do return "object lifetime"
-	if class_name == "Resource" && method_name == "duplicate" do return "object lifetime"
+	if class_name == "Resource" &&
+	   (method_name == "duplicate" || method_name == "duplicate_deep") {
+		return "object lifetime"
+	}
+	if class_name == "PackedScene" &&
+	   (method_name == "instantiate" || method_name == "get_state") {
+		return "object lifetime"
+	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
 		return "object lifetime"
 	}
@@ -1448,6 +1524,59 @@ class_method_selected :: proc(class_name, method_name: string) -> bool {
 		if entry.class_name == class_name && entry.method_name == method_name do return true
 	}
 	return false
+}
+
+is_candidate_class :: proc(class_name: string) -> bool {
+	for name in candidate_class_names {
+		if name == class_name do return true
+	}
+	return false
+}
+
+resolve_candidate_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "" || godot_name == "void" do return "", true
+	if enum_type, enum_ok := class_enum_type_from_godot(godot_name); enum_ok do return enum_type, true
+	if godot_name == "Variant" do return "core.Variant", true
+	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok do return entry.odin, true
+	if is_selected_class(godot_name) || is_candidate_class(godot_name) {
+		return class_handle_expr(godot_name), true
+	}
+	if t, map_ok := class_abi_type_map[godot_name]; map_ok do return t, true
+	return "", false
+}
+
+resolve_candidate_class_param_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "Variant" do return "^core.Variant", true
+	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok {
+		return fmt.aprintf("^%s", entry.odin), true
+	}
+	return resolve_candidate_class_return_type(godot_name)
+}
+
+class_method_candidate_skip_reason :: proc(
+	class_name: string,
+	method: ExtensionApiClassMethod,
+) -> string {
+	if method.is_vararg do return "vararg"
+	if method.is_virtual do return "virtual"
+	if reason := class_method_deferred_reason(class_name, method.name); len(reason) > 0 {
+		return reason
+	}
+	if reason := class_type_deferred_reason(method.return_value.type); len(reason) > 0 {
+		return fmt.aprintf("return type %s deferred: %s", method.return_value.type, reason)
+	}
+	if _, ok := resolve_candidate_class_return_type(method.return_value.type); !ok {
+		return fmt.aprintf("unsupported return type %s", method.return_value.type)
+	}
+	for arg in method.arguments {
+		if reason := class_type_deferred_reason(arg.type); len(reason) > 0 {
+			return fmt.aprintf("argument %s type %s deferred: %s", arg.name, arg.type, reason)
+		}
+		if _, ok := resolve_candidate_class_param_type(arg.type); !ok {
+			return fmt.aprintf("unsupported argument %s type %s", arg.name, arg.type)
+		}
+	}
+	return ""
 }
 
 class_method_has_default_arguments :: proc(method: ExtensionApiClassMethod) -> bool {
@@ -1842,10 +1971,15 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&owned_wrapper)
 	skipped := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&skipped)
+	candidate_analysis := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&candidate_analysis)
 
 	generated_count := 0
 	owned_wrapper_count := 0
 	skipped_count := 0
+	candidate_safe_count := 0
+	candidate_owned_wrapper_count := 0
+	candidate_skipped_count := 0
 
 	for class_name in selected_class_names {
 		class, class_ok := find_class(root, class_name)
@@ -1875,27 +2009,69 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		}
 	}
 
+	for class_name in candidate_class_names {
+		class, class_ok := find_class(root, class_name)
+		if !class_ok {
+			fmt.eprintfln("ERROR: candidate class %q missing from extension_api.json", class_name)
+			return false
+		}
+
+		fmt.sbprintf(&candidate_analysis, "### %s\n\n", class.name)
+		for method in class.methods {
+			reason := class_method_candidate_skip_reason(class.name, method)
+			strings.write_string(&candidate_analysis, "- ")
+			emit_class_method_report_signature(&candidate_analysis, class.name, method)
+			if len(reason) == 0 {
+				if class_method_has_default_arguments(method) {
+					strings.write_string(
+						&candidate_analysis,
+						": borrowed-safe candidate, explicit default arguments required\n",
+					)
+				} else {
+					strings.write_string(&candidate_analysis, ": borrowed-safe candidate\n")
+				}
+				candidate_safe_count += 1
+			} else if reason == class_method_owned_wrapper_reason(class.name, method.name) {
+				fmt.sbprintf(&candidate_analysis, ": owned-wrapper method, %s\n", reason)
+				candidate_owned_wrapper_count += 1
+			} else {
+				fmt.sbprintf(&candidate_analysis, ": skipped, %s\n", reason)
+				candidate_skipped_count += 1
+			}
+		}
+		strings.write_byte(&candidate_analysis, '\n')
+	}
+
 	b := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&b)
 
 	strings.write_string(&b, "# Generated class API support report\n\n")
 	strings.write_string(&b, "Generated from `extension_api.json`. DO NOT EDIT.\n\n")
-	strings.write_string(&b, "This report only covers the selected generated class slice.\n\n")
 	strings.write_string(
 		&b,
-		"Borrowed-safe methods are generated as class wrappers. Owned-wrapper methods are intentionally routed through explicit facade helpers instead.\n\n",
+		"This report covers the selected generated class slice and the next candidate gameplay classes.\n\n",
+	)
+	strings.write_string(
+		&b,
+		"Borrowed-safe methods are generated as class wrappers. Owned-wrapper methods are intentionally routed through explicit facade helpers instead. Candidate borrowed-safe methods are not generated until they are added to the selected class batch.\n\n",
 	)
 	strings.write_string(&b, "## Summary\n\n")
 	fmt.sbprintf(&b, "- Selected classes: %d\n", len(selected_class_names))
+	fmt.sbprintf(&b, "- Candidate classes: %d\n", len(candidate_class_names))
 	fmt.sbprintf(&b, "- Borrowed-safe generated methods: %d\n", generated_count)
 	fmt.sbprintf(&b, "- Owned-wrapper methods: %d\n", owned_wrapper_count)
-	fmt.sbprintf(&b, "- Skipped methods: %d\n\n", skipped_count)
+	fmt.sbprintf(&b, "- Skipped selected-class methods: %d\n", skipped_count)
+	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
+	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
+	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
 	strings.write_string(&b, "## Borrowed-safe generated methods\n\n")
 	strings.write_string(&b, strings.to_string(generated))
 	strings.write_string(&b, "\n## Owned-wrapper methods\n\n")
 	strings.write_string(&b, strings.to_string(owned_wrapper))
-	strings.write_string(&b, "\n## Skipped methods\n\n")
+	strings.write_string(&b, "\n## Skipped selected-class methods\n\n")
 	strings.write_string(&b, strings.to_string(skipped))
+	strings.write_string(&b, "\n## Candidate class analysis\n\n")
+	strings.write_string(&b, strings.to_string(candidate_analysis))
 
 	err := os.write_entire_file(path, transmute([]byte)strings.to_string(b))
 	if err != nil {
@@ -1903,11 +2079,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		return false
 	}
 	fmt.printfln(
-		"  %s  (%d generated, %d owned-wrapper, %d skipped class methods)",
+		"  %s  (%d generated, %d owned-wrapper, %d skipped, %d candidate-safe class methods)",
 		path,
 		generated_count,
 		owned_wrapper_count,
 		skipped_count,
+		candidate_safe_count,
 	)
 	return true
 }
