@@ -142,6 +142,7 @@ Sprite2D :: gclass.Sprite2D
 Label :: gclass.Label
 Timer :: gclass.Timer
 CollisionObject2D :: gclass.CollisionObject2D
+Area2D :: gclass.Area2D
 
 // --- Core functions ---
 init :: gcore.init
@@ -449,6 +450,8 @@ object_is_timer :: gclass.object_is_timer
 object_try_as_timer :: gclass.object_try_as_timer
 object_is_collision_object2d :: gclass.object_is_collision_object2d
 object_try_as_collision_object2d :: gclass.object_try_as_collision_object2d
+object_is_area2d :: gclass.object_is_area2d
+object_try_as_area2d :: gclass.object_try_as_area2d
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 node_is_canvas_item :: gclass.node_is_canvas_item
@@ -465,6 +468,8 @@ node_is_timer :: gclass.node_is_timer
 node_try_as_timer :: gclass.node_try_as_timer
 node_is_collision_object2d :: gclass.node_is_collision_object2d
 node_try_as_collision_object2d :: gclass.node_try_as_collision_object2d
+node_is_area2d :: gclass.node_is_area2d
+node_try_as_area2d :: gclass.node_try_as_area2d
 canvas_item_is_node2d :: gclass.canvas_item_is_node2d
 canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
@@ -475,10 +480,16 @@ canvas_item_is_label :: gclass.canvas_item_is_label
 canvas_item_try_as_label :: gclass.canvas_item_try_as_label
 canvas_item_is_collision_object2d :: gclass.canvas_item_is_collision_object2d
 canvas_item_try_as_collision_object2d :: gclass.canvas_item_try_as_collision_object2d
+canvas_item_is_area2d :: gclass.canvas_item_is_area2d
+canvas_item_try_as_area2d :: gclass.canvas_item_try_as_area2d
 node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
 node2d_is_collision_object2d :: gclass.node2d_is_collision_object2d
 node2d_try_as_collision_object2d :: gclass.node2d_try_as_collision_object2d
+node2d_is_area2d :: gclass.node2d_is_area2d
+node2d_try_as_area2d :: gclass.node2d_try_as_area2d
+collision_object2d_is_area2d :: gclass.collision_object2d_is_area2d
+collision_object2d_try_as_area2d :: gclass.collision_object2d_try_as_area2d
 control_is_label :: gclass.control_is_label
 control_try_as_label :: gclass.control_try_as_label
 timer_as_node :: gclass.timer_as_node
@@ -516,6 +527,43 @@ collision_object2d_set_disable_mode :: gclass.collision_object2d_set_disable_mod
 collision_object2d_get_disable_mode :: gclass.collision_object2d_get_disable_mode
 collision_object2d_set_pickable :: gclass.collision_object2d_set_pickable
 collision_object2d_is_pickable :: gclass.collision_object2d_is_pickable
+area2d_as_collision_object2d :: gclass.area2d_as_collision_object2d
+area2d_as_node2d :: gclass.area2d_as_node2d
+area2d_as_canvas_item :: gclass.area2d_as_canvas_item
+area2d_as_node :: gclass.area2d_as_node
+area2d_as_object :: gclass.area2d_as_object
+area2d_set_gravity_space_override_mode :: gclass.area2d_set_gravity_space_override_mode
+area2d_get_gravity_space_override_mode :: gclass.area2d_get_gravity_space_override_mode
+area2d_set_gravity_is_point :: gclass.area2d_set_gravity_is_point
+area2d_is_gravity_a_point :: gclass.area2d_is_gravity_a_point
+area2d_set_gravity_point_unit_distance :: gclass.area2d_set_gravity_point_unit_distance
+area2d_get_gravity_point_unit_distance :: gclass.area2d_get_gravity_point_unit_distance
+area2d_set_gravity_point_center :: gclass.area2d_set_gravity_point_center
+area2d_get_gravity_point_center :: gclass.area2d_get_gravity_point_center
+area2d_set_gravity_direction :: gclass.area2d_set_gravity_direction
+area2d_get_gravity_direction :: gclass.area2d_get_gravity_direction
+area2d_set_gravity :: gclass.area2d_set_gravity
+area2d_get_gravity :: gclass.area2d_get_gravity
+area2d_set_linear_damp_space_override_mode :: gclass.area2d_set_linear_damp_space_override_mode
+area2d_get_linear_damp_space_override_mode :: gclass.area2d_get_linear_damp_space_override_mode
+area2d_set_angular_damp_space_override_mode :: gclass.area2d_set_angular_damp_space_override_mode
+area2d_get_angular_damp_space_override_mode :: gclass.area2d_get_angular_damp_space_override_mode
+area2d_set_linear_damp :: gclass.area2d_set_linear_damp
+area2d_get_linear_damp :: gclass.area2d_get_linear_damp
+area2d_set_angular_damp :: gclass.area2d_set_angular_damp
+area2d_get_angular_damp :: gclass.area2d_get_angular_damp
+area2d_set_priority :: gclass.area2d_set_priority
+area2d_get_priority :: gclass.area2d_get_priority
+area2d_set_monitoring :: gclass.area2d_set_monitoring
+area2d_is_monitoring :: gclass.area2d_is_monitoring
+area2d_set_monitorable :: gclass.area2d_set_monitorable
+area2d_is_monitorable :: gclass.area2d_is_monitorable
+area2d_has_overlapping_bodies :: gclass.area2d_has_overlapping_bodies
+area2d_has_overlapping_areas :: gclass.area2d_has_overlapping_areas
+area2d_set_audio_bus_name :: gclass.area2d_set_audio_bus_name
+area2d_get_audio_bus_name :: gclass.area2d_get_audio_bus_name
+area2d_set_audio_bus_override :: gclass.area2d_set_audio_bus_override
+area2d_is_overriding_audio_bus :: gclass.area2d_is_overriding_audio_bus
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -563,6 +611,10 @@ timer_is_nil :: proc "contextless" (self: Timer) -> bool {
 }
 
 collision_object2d_is_nil :: proc "contextless" (self: CollisionObject2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+area2d_is_nil :: proc "contextless" (self: Area2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -662,6 +714,18 @@ node_get_node_as_collision_object2d :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return CollisionObject2D(nil), false
 	return node_try_as_collision_object2d(node)
+}
+
+node_get_node_as_area2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Area2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Area2D(nil), false
+	return node_try_as_area2d(node)
 }
 
 object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {
@@ -766,6 +830,10 @@ collision_object2d_object_ptr :: proc "contextless" (self: CollisionObject2D) ->
 	return ObjectPtr(self)
 }
 
+area2d_object_ptr :: proc "contextless" (self: Area2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 object_ptr_try_as_ref_counted :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -829,6 +897,11 @@ object_ptr_try_as_collision_object2d :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_collision_object2d(Object(self))
+}
+
+object_ptr_try_as_area2d :: proc "contextless" (self: ObjectPtr) -> (value: Area2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_area2d(Object(self))
 }
 
 // --- Class enums and constants ---

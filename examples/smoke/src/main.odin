@@ -140,6 +140,30 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 		),
 	)
 
+	area_object := gt.construct_object(area2d_class_name)
+	area_gravity: gt.GodotReal = -1
+	area_monitoring := false
+	area_destroyed := false
+	if area_object != nil {
+		area := gt.Area2D(area_object)
+		gt.area2d_set_gravity(area, 12.5)
+		gt.area2d_set_monitoring(area, true)
+		gt.area2d_set_monitorable(area, true)
+		gt.area2d_set_priority(area, 3)
+		area_gravity = gt.area2d_get_gravity(area)
+		area_monitoring = gt.area2d_is_monitoring(area)
+		area_destroyed = gt.object_destroy_checked(area_object)
+	}
+	gt.debug_print(
+		fmt.bprintf(
+			buf[:],
+			"generated Area2D mapping: gravity=%.1f monitoring=%v destroyed=%v (expect 12.5,true,true)",
+			area_gravity,
+			area_monitoring,
+			area_destroyed,
+		),
+	)
+
 	canvas_item := gt.node2d_as_canvas_item(node2d)
 	gt.canvas_item_hide(canvas_item)
 	hidden := gt.canvas_item_is_visible(canvas_item)
@@ -582,6 +606,8 @@ ref_counted_class_name_data: gt.ClassName
 ref_counted_class_name := gt.class_name_ptr(&ref_counted_class_name_data)
 timer_class_name_data: gt.ClassName
 timer_class_name := gt.class_name_ptr(&timer_class_name_data)
+area2d_class_name_data: gt.ClassName
+area2d_class_name := gt.class_name_ptr(&area2d_class_name_data)
 
 hello_instance_binding_callbacks := gt.InstanceBindingCallbacks {
 	create_callback    = nil,
@@ -599,6 +625,7 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&node2d_class_name_data, cstring("Node2D"))
 	gt.class_name_init_latin1_cstring(&ref_counted_class_name_data, cstring("RefCounted"))
 	gt.class_name_init_latin1_cstring(&timer_class_name_data, cstring("Timer"))
+	gt.class_name_init_latin1_cstring(&area2d_class_name_data, cstring("Area2D"))
 	gt.init_class_bindings()
 
 	gt.register_editor_visible_class(

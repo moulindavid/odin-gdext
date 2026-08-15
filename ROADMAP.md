@@ -93,12 +93,12 @@ methods until their safety rules are explicit.
    - [x] Re-export selected APIs through the facade and add compile coverage.
 
 4. Generate borrowed-safe `Area2D` APIs.
-   - [ ] Add the `Area2D` handle and checked downcast helpers.
-   - [ ] Generate monitoring, monitorable, priority, gravity, damping, and audio
+   - [x] Add the `Area2D` handle and checked downcast helpers.
+   - [x] Generate monitoring, monitorable, priority, gravity, damping, and audio
      bus methods where signatures are safe.
-   - [ ] Keep body/area collection APIs, signal-heavy APIs, and callback-heavy
+   - [x] Keep body/area collection APIs, signal-heavy APIs, and callback-heavy
      paths skipped until `Array`, `Signal`, and object-lifetime rules are ready.
-   - [ ] Exercise at least one `Area2D` method path in smoke coverage if it can
+   - [x] Exercise at least one `Area2D` method path in smoke coverage if it can
      run headless deterministically.
 
 5. Evaluate `Resource` and `PackedScene` with the owned-reference model.

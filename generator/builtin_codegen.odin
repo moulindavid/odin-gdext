@@ -1012,9 +1012,10 @@ selected_class_names := []string {
 	"Label",
 	"Timer",
 	"CollisionObject2D",
+	"Area2D",
 }
 
-candidate_class_names := []string{"Area2D", "Resource", "PackedScene"}
+candidate_class_names := []string{"Resource", "PackedScene"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1244,6 +1245,38 @@ selected_class_methods := []Selected_Class_Method {
 	{"CollisionObject2D", "get_disable_mode"},
 	{"CollisionObject2D", "set_pickable"},
 	{"CollisionObject2D", "is_pickable"},
+	{"Area2D", "set_gravity_space_override_mode"},
+	{"Area2D", "get_gravity_space_override_mode"},
+	{"Area2D", "set_gravity_is_point"},
+	{"Area2D", "is_gravity_a_point"},
+	{"Area2D", "set_gravity_point_unit_distance"},
+	{"Area2D", "get_gravity_point_unit_distance"},
+	{"Area2D", "set_gravity_point_center"},
+	{"Area2D", "get_gravity_point_center"},
+	{"Area2D", "set_gravity_direction"},
+	{"Area2D", "get_gravity_direction"},
+	{"Area2D", "set_gravity"},
+	{"Area2D", "get_gravity"},
+	{"Area2D", "set_linear_damp_space_override_mode"},
+	{"Area2D", "get_linear_damp_space_override_mode"},
+	{"Area2D", "set_angular_damp_space_override_mode"},
+	{"Area2D", "get_angular_damp_space_override_mode"},
+	{"Area2D", "set_linear_damp"},
+	{"Area2D", "get_linear_damp"},
+	{"Area2D", "set_angular_damp"},
+	{"Area2D", "get_angular_damp"},
+	{"Area2D", "set_priority"},
+	{"Area2D", "get_priority"},
+	{"Area2D", "set_monitoring"},
+	{"Area2D", "is_monitoring"},
+	{"Area2D", "set_monitorable"},
+	{"Area2D", "is_monitorable"},
+	{"Area2D", "has_overlapping_bodies"},
+	{"Area2D", "has_overlapping_areas"},
+	{"Area2D", "set_audio_bus_name"},
+	{"Area2D", "get_audio_bus_name"},
+	{"Area2D", "set_audio_bus_override"},
+	{"Area2D", "is_overriding_audio_bus"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
