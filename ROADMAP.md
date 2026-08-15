@@ -31,91 +31,99 @@ Keep these rules intact while adding features:
 - Extension classes must unregister during deinitialization.
 - Normal examples should import only `godot:godot`.
 
-## Completed baseline
+## Current goal: generated class API expansion
 
-The project is currently usable for hybrid Godot plus Odin features:
+Make selected generated Godot class APIs useful for real Odin gameplay code
+without weakening the borrowed-object and explicit-owned-value safety model.
+This goal is feature-focused: docs and tests are acceptance checks, not the main
+objective.
 
-- Priority 0 safety baseline for allocators, Variant/String cleanup, function
-  pointer checks, and registration cleanup.
-- Priority 0.5 CI baseline with generated binding checks, unit tests, facade
-  checks, and Godot headless smoke coverage.
-- Priority 1 core value ownership and conversion helpers for `Variant`,
-  strings, names, paths, RID, containers, packed arrays, and generated math
-  builtins.
-- Priority 2 selected generated class handles, constants, enums, downcasts, and
-  public facade exports.
-- Priority 3 user class registration helpers for class creation, instance
-  binding, method metadata, simple typed adapters, and notifications.
-- Priority 4 early properties, signals, notification dispatch, and virtual-style
-  helpers.
-- Real usage layer: `docs/USING_IN_GODOT.md`, a beginner game example,
-  split hello/smoke examples, `make example-game`, and documented limitations.
+Start with selected high-value scene and UI classes instead of generating the
+full Godot class API at once:
 
-## Completed: safe object and user-class model
+- `Object`
+- `Node`
+- `CanvasItem`
+- `Node2D`
+- `Control`
+- `Label`
+- `Sprite2D`
+- `Timer`
+- `Area2D`
+- `CollisionObject2D`
+- `Resource`
+- `PackedScene`
 
-The object/reference model is explicit enough to support real project usage:
+Classes may be added or deferred based on type-mapping safety. Do not expose APIs
+that require ownership rules the project does not have yet.
 
-- Object and class handles are borrowed by default.
-- `RefCounted` and `Resource` remain borrowed-only until an owned reference model
-  is designed.
-- Selected typed class handles have nil, upcast, downcast, and object pointer
-  helpers.
-- User class descriptors reduce registration boilerplate while keeping creation,
-  freeing, metadata lifetime, and unregistering explicit.
-- Public `Variant` conversion helpers follow a consistent construction and
-  checked extraction pattern.
-- Selected generated classes include common scene/UI handles such as `Sprite2D`
-  and `Label`.
-- `make ci` validates the current model.
+1. Add generated API support reporting.
+   - [ ] Emit a deterministic report of generated class methods.
+   - [ ] Emit a deterministic report of skipped class methods.
+   - [ ] Include skip reasons such as unsupported type, vararg, default argument,
+     object lifetime, typed array, `Callable`, or `Signal`.
+   - [ ] Make the report useful for choosing the next class or type-mapping
+     slice.
 
-## Current goal: ergonomic user class authoring
+2. Expand safe class method type mapping.
+   - [ ] Support primitive parameters and returns: `bool`, integer types, and
+     `GodotReal`.
+   - [ ] Support common math builtins by value where storage and ABI rules are
+     already covered.
+   - [ ] Support borrowed object/class handles by value.
+   - [ ] Support `String`, `StringName`, and `NodePath` only through the existing
+     owned-storage and borrowed-pointer rules.
+   - [ ] Keep `Variant` parameters borrowed as `^core.Variant`; `Variant` returns
+     are owned and require `core.variant_free`.
 
-The next step toward a rust-gdext-like library is to make normal Odin class
-authoring structured and repeatable without hiding ownership or GDExtension
-lifetime rules.
+3. Generate practical scene and UI APIs.
+   - [ ] Expand `Node` wrappers for safe name, tree, child, parent, and path
+     operations where ownership is clear.
+   - [ ] Expand `CanvasItem` wrappers for visibility and common drawing-related
+     state where signatures are safe.
+   - [ ] Expand `Node2D` wrappers for position, rotation, scale, transform, and
+     common movement helpers.
+   - [ ] Expand `Control` wrappers for common UI state where signatures are safe.
+   - [ ] Expand `Label` wrappers for text and basic display options.
+   - [ ] Expand `Sprite2D` wrappers for transform and simple display state;
+     defer texture/resource ownership until the reference model is explicit.
 
-1. Add a typed class descriptor pattern.
-   - [x] Provide a small descriptor shape for an Odin-backed class.
-   - [x] Group class name, parent name, create/free callbacks, notification
-     callbacks, methods, properties, and signals.
-   - [x] Keep registration and unregistration explicit.
-   - [x] Keep all stable metadata storage owned by the extension code.
-   - [x] Update `examples/hello` or `examples/game` to use the pattern.
+4. Add selected node lookup helpers.
+   - [ ] Provide safe `NodePath`-based lookup wrappers for selected classes.
+   - [ ] Return `(value, ok)` for checked lookup and typed downcast helpers.
+   - [ ] Treat nil results and failed class checks as `ok = false`.
+   - [ ] Keep returned handles borrowed.
 
-2. Add typed property adapter helpers.
-   - [x] Start with primitive properties: `GodotReal`, `int`, and `bool`.
-   - [x] Add getter and setter adapters that retrieve typed Odin instance data.
-   - [x] Preserve ptrcall ABI rules.
-   - [x] Keep temporary `Variant` destruction explicit on call paths.
-   - [x] Add facade compile coverage and smoke coverage.
+5. Expose selected generated APIs through the public facade.
+   - [ ] Re-export only the stable selected class handles and wrappers.
+   - [ ] Keep normal examples importing only `godot:godot`.
+   - [ ] Keep internal generated packages available for advanced users without
+     making them the beginner path.
 
-3. Add typed method adapters for common signatures.
-   - [x] Support `() -> String` and `String -> void` once ownership is clear.
-   - [x] Support simple object-handle parameters only as borrowed values.
-   - [x] Add fixed arity helpers for common game code before broad generation.
-   - [x] Defer varargs, default arguments, `Callable`, `Signal`, and complex
-     ownership-sensitive signatures.
+6. Exercise expanded generated APIs in a real example.
+   - [ ] Use Odin to control a Godot scene object through generated APIs.
+   - [ ] Include at least one `Label` update and one `Node2D` or `CanvasItem`
+     state change.
+   - [ ] Keep the beginner example readable and move broad coverage to smoke
+     checks when needed.
 
-4. Improve notification and virtual callback ergonomics.
-   - [x] Provide a compact callback table for common node lifecycle events.
-   - [x] Keep raw notification numbers available.
-   - [x] Verify a safe source for `_process(delta)` and `_physics_process(delta)`
-     before exposing typed delta callbacks.
-   - [x] Do not fake delta values.
+7. Stabilize generator behavior before broad coverage.
+   - [ ] Keep output deterministic.
+   - [ ] Avoid name collisions with methods, constants, enums, and helpers.
+   - [ ] Prefer small class batches over enabling the full 1000+ class API.
+   - [ ] Do not start full `Resource` or `RefCounted` ownership support in this
+     roadmap.
 
-5. Add a real usage example that exercises the authoring model.
-   - [x] Add or update an example where Odin controls a `Label` or `Sprite2D`.
-   - [x] Trigger behavior from Godot input, such as pressing Space.
-   - [x] Use random numbers, math helpers, a property, a signal, and a generated
-     class handle.
-   - [x] Keep the beginner example clean and move broad checks to smoke.
+Deferred until their safety model is explicit:
 
-6. Add documentation for the class authoring model.
-   - [x] Document the recommended layout for a game-specific Odin extension.
-   - [x] Show how to register and unregister classes.
-   - [x] Explain instance data ownership.
-   - [x] Explain method/property/signal metadata lifetime.
-   - [x] List unsupported signatures clearly.
+- owned `RefCounted` and `Resource` wrappers
+- `Callable` wrappers
+- full `Signal` wrappers
+- vararg methods
+- default arguments
+- broad typed arrays and dictionaries
+- full virtual method generation
+- full 1000+ class API generation
 
 ## Validation
 

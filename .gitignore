@@ -30,3 +30,5 @@
 /extension_api.json
 /thirdparty/extension_api.json
 /bindings/utilities.odin
+# local roadmap drafts
+/ROADMAP_GENERATED_CLASSES.md
