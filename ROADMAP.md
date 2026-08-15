@@ -89,10 +89,10 @@ that require ownership rules the project does not have yet.
      defer texture/resource ownership until the reference model is explicit.
 
 4. Add selected node lookup helpers.
-   - [ ] Provide safe `NodePath`-based lookup wrappers for selected classes.
-   - [ ] Return `(value, ok)` for checked lookup and typed downcast helpers.
-   - [ ] Treat nil results and failed class checks as `ok = false`.
-   - [ ] Keep returned handles borrowed.
+   - [x] Provide safe `NodePath`-based lookup wrappers for selected classes.
+   - [x] Return `(value, ok)` for checked lookup and typed downcast helpers.
+   - [x] Treat nil results and failed class checks as `ok = false`.
+   - [x] Keep returned handles borrowed.
 
 5. Expose selected generated APIs through the public facade.
    - [ ] Re-export only the stable selected class handles and wrappers.

@@ -494,6 +494,80 @@ label_is_nil :: proc "contextless" (self: Label) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+node_get_node_checked :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Node,
+	ok: bool,
+) {
+	if node_is_nil(self) || path == nil do return Node(nil), false
+
+	value = node_get_node_or_null(self, path)
+	if node_is_nil(value) do return Node(nil), false
+	return value, true
+}
+
+node_get_node_as_canvas_item :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: CanvasItem,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return CanvasItem(nil), false
+	return node_try_as_canvas_item(node)
+}
+
+node_get_node_as_node2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Node2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Node2D(nil), false
+	return node_try_as_node2d(node)
+}
+
+node_get_node_as_control :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Control,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Control(nil), false
+	return node_try_as_control(node)
+}
+
+node_get_node_as_sprite2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Sprite2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Sprite2D(nil), false
+	return node_try_as_sprite2d(node)
+}
+
+node_get_node_as_label :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Label,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Label(nil), false
+	return node_try_as_label(node)
+}
+
 object_ptr_as_object :: proc "contextless" (self: ObjectPtr) -> Object {
 	return Object(self)
 }
