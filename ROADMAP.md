@@ -94,9 +94,9 @@ implemented and smoke-tested.
    - [x] Ensure every owned reference acquired in the smoke path is released.
 
 7. Validate the model before expanding resource-heavy APIs.
-   - [ ] Run `make ci`.
-   - [ ] Keep normal examples importing only `godot:godot`.
-   - [ ] Do not enable broad `Resource`, `PackedScene`, texture, theme, or asset
+   - [x] Run `make ci`.
+   - [x] Keep normal examples importing only `godot:godot`.
+   - [x] Do not enable broad `Resource`, `PackedScene`, texture, theme, or asset
      APIs until this goal is complete.
 
 Deferred until after this goal:
