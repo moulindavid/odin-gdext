@@ -1410,15 +1410,20 @@ class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
 	return false
 }
 
-class_method_deferred_reason :: proc(class_name, method_name: string) -> string {
-	if class_name == "Control" && method_name == "force_drag" do return "object lifetime"
-	if class_name == "Resource" && method_name == "duplicate" do return "object lifetime"
-	// Public RefCounted/Resource handles are borrowed-only until retain/unref
-	// ownership rules are explicit.
+class_method_owned_wrapper_reason :: proc(class_name, method_name: string) -> string {
 	if class_name == "RefCounted" &&
 	   (method_name == "init_ref" || method_name == "reference" || method_name == "unreference") {
-		return "refcount ownership"
+		return "owned RefCounted wrapper"
 	}
+	return ""
+}
+
+class_method_deferred_reason :: proc(class_name, method_name: string) -> string {
+	if reason := class_method_owned_wrapper_reason(class_name, method_name); len(reason) > 0 {
+		return reason
+	}
+	if class_name == "Control" && method_name == "force_drag" do return "object lifetime"
+	if class_name == "Resource" && method_name == "duplicate" do return "object lifetime"
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
 		return "object lifetime"
 	}
@@ -1833,10 +1838,13 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 
 	generated := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&generated)
+	owned_wrapper := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&owned_wrapper)
 	skipped := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&skipped)
 
 	generated_count := 0
+	owned_wrapper_count := 0
 	skipped_count := 0
 
 	for class_name in selected_class_names {
@@ -1853,6 +1861,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				emit_class_method_report_signature(&generated, class.name, method)
 				strings.write_byte(&generated, '\n')
 				generated_count += 1
+			} else if reason == class_method_owned_wrapper_reason(class.name, method.name) {
+				strings.write_string(&owned_wrapper, "- ")
+				emit_class_method_report_signature(&owned_wrapper, class.name, method)
+				fmt.sbprintf(&owned_wrapper, ": %s\n", reason)
+				owned_wrapper_count += 1
 			} else {
 				strings.write_string(&skipped, "- ")
 				emit_class_method_report_signature(&skipped, class.name, method)
@@ -1868,12 +1881,19 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, "# Generated class API support report\n\n")
 	strings.write_string(&b, "Generated from `extension_api.json`. DO NOT EDIT.\n\n")
 	strings.write_string(&b, "This report only covers the selected generated class slice.\n\n")
+	strings.write_string(
+		&b,
+		"Borrowed-safe methods are generated as class wrappers. Owned-wrapper methods are intentionally routed through explicit facade helpers instead.\n\n",
+	)
 	strings.write_string(&b, "## Summary\n\n")
 	fmt.sbprintf(&b, "- Selected classes: %d\n", len(selected_class_names))
-	fmt.sbprintf(&b, "- Generated methods: %d\n", generated_count)
+	fmt.sbprintf(&b, "- Borrowed-safe generated methods: %d\n", generated_count)
+	fmt.sbprintf(&b, "- Owned-wrapper methods: %d\n", owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped methods: %d\n\n", skipped_count)
-	strings.write_string(&b, "## Generated methods\n\n")
+	strings.write_string(&b, "## Borrowed-safe generated methods\n\n")
 	strings.write_string(&b, strings.to_string(generated))
+	strings.write_string(&b, "\n## Owned-wrapper methods\n\n")
+	strings.write_string(&b, strings.to_string(owned_wrapper))
 	strings.write_string(&b, "\n## Skipped methods\n\n")
 	strings.write_string(&b, strings.to_string(skipped))
 
@@ -1883,9 +1903,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		return false
 	}
 	fmt.printfln(
-		"  %s  (%d generated, %d skipped class methods)",
+		"  %s  (%d generated, %d owned-wrapper, %d skipped class methods)",
 		path,
 		generated_count,
+		owned_wrapper_count,
 		skipped_count,
 	)
 	return true
@@ -2063,7 +2084,7 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 	strings.write_string(
 		&b,
-		"// Callable, Signal, varargs, typed arrays, and lifetime-sensitive APIs are not generated yet.\n\n",
+		"// Callable, Signal, varargs, typed arrays, owned-wrapper-only methods, and lifetime-sensitive APIs are not generated here.\n\n",
 	)
 
 	if !emit_class_method_wrappers(&b, root) {return false}

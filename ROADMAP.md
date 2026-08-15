@@ -80,11 +80,11 @@ implemented and smoke-tested.
    - [x] Do not expose broad resource-loading APIs until ownership is verified.
 
 5. Update generated class skip rules.
-   - [ ] Reclassify deferred `Resource` and `RefCounted` APIs based on the new
+   - [x] Reclassify deferred `Resource` and `RefCounted` APIs based on the new
      ownership model.
-   - [ ] Keep APIs such as `duplicate`, texture setters/getters, and scene
+   - [x] Keep APIs such as `duplicate`, texture setters/getters, and scene
      resource APIs skipped until their exact return ownership is known.
-   - [ ] Make the generated API report distinguish borrowed-safe APIs from APIs
+   - [x] Make the generated API report distinguish borrowed-safe APIs from APIs
      requiring an owned reference wrapper.
 
 6. Add a minimal runtime smoke path.
