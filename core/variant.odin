@@ -729,13 +729,13 @@ callable_copy :: proc "contextless" (value: ^Callable) -> (result: Callable) {
 callable_init_object_method :: proc "contextless" (
 	dest: UninitializedTypePtr,
 	object: ObjectPtr,
-	method: ^StringName,
+	method: ConstStringNamePtr,
 ) {
-	if dest == nil || object == nil do _trap_nil_godot_function()
+	if dest == nil || object == nil || method == nil do _trap_nil_godot_function()
 	ctor := get_builtin_constructor_by_index(.Callable, 2)
 	if ctor == nil do _trap_nil_godot_function()
 	object_arg := object
-	call_builtin_constructor(ctor, dest, cast(TypePtr)&object_arg, const_string_name_ptr(method))
+	call_builtin_constructor(ctor, dest, cast(TypePtr)&object_arg, method)
 }
 
 // callable_from_object_method returns an initialized Callable; call
@@ -743,7 +743,7 @@ callable_init_object_method :: proc "contextless" (
 // handle, not retained by this Odin wrapper.
 callable_from_object_method :: proc "contextless" (
 	object: ObjectPtr,
-	method: ^StringName,
+	method: ConstStringNamePtr,
 ) -> (
 	result: Callable,
 ) {
@@ -830,25 +830,20 @@ signal_copy :: proc "contextless" (value: ^Signal) -> (result: Signal) {
 signal_init_object_signal :: proc "contextless" (
 	dest: UninitializedTypePtr,
 	object: ObjectPtr,
-	signal_name: ^StringName,
+	signal_name: ConstStringNamePtr,
 ) {
-	if dest == nil || object == nil do _trap_nil_godot_function()
+	if dest == nil || object == nil || signal_name == nil do _trap_nil_godot_function()
 	ctor := get_builtin_constructor_by_index(.Signal, 2)
 	if ctor == nil do _trap_nil_godot_function()
 	object_arg := object
-	call_builtin_constructor(
-		ctor,
-		dest,
-		cast(TypePtr)&object_arg,
-		const_string_name_ptr(signal_name),
-	)
+	call_builtin_constructor(ctor, dest, cast(TypePtr)&object_arg, signal_name)
 }
 
 // signal_from_object_signal returns an initialized Signal; call signal_free
 // when done. The object handle and signal name storage are borrowed inputs.
 signal_from_object_signal :: proc "contextless" (
 	object: ObjectPtr,
-	signal_name: ^StringName,
+	signal_name: ConstStringNamePtr,
 ) -> (
 	result: Signal,
 ) {
@@ -900,7 +895,7 @@ signal_connect :: proc "contextless" (signal: ^Signal, callable: ^Callable, flag
 // returns Godot's Error code.
 object_signal_connect_checked :: proc "contextless" (
 	object: ObjectPtr,
-	signal_name: ^StringName,
+	signal_name: ConstStringNamePtr,
 	callable: ^Callable,
 	flags: i64 = 0,
 ) -> i64 {
@@ -911,7 +906,7 @@ object_signal_connect_checked :: proc "contextless" (
 
 object_signal_connect :: proc "contextless" (
 	object: ObjectPtr,
-	signal_name: ^StringName,
+	signal_name: ConstStringNamePtr,
 	callable: ^Callable,
 	flags: i64 = 0,
 ) {

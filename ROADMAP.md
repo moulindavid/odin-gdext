@@ -122,12 +122,12 @@ temporary `Variant` cleanup are proven.
      argument ownership remains unclear.
 
 7. Exercise the minimal model in examples.
-   - [ ] Use normal `godot:godot` imports only.
-   - [ ] Add or update a real example where Odin registers or emits a signal in a
+   - [x] Use normal `godot:godot` imports only.
+   - [x] Add or update a real example where Odin registers or emits a signal in a
      way visible from the Godot project.
-   - [ ] If safe connection is ready, connect a selected Godot signal to an Odin
+   - [x] If safe connection is ready, connect a selected Godot signal to an Odin
      method or callable path.
-   - [ ] Keep broad smoke coverage separate from the beginner example.
+   - [x] Keep broad smoke coverage separate from the beginner example.
 
 8. Validate before moving to the next feature roadmap.
    - [ ] Run `make ci`.
