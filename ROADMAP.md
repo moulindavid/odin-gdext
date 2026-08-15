@@ -105,13 +105,13 @@ temporary `Variant` cleanup are proven.
      minimal path is proven.
 
 5. Add safe signal emission helpers.
-   - [ ] Keep the existing no-argument emission path working through the public
+   - [x] Keep the existing no-argument emission path working through the public
      facade.
-   - [ ] Add fixed-arity primitive emission helpers, starting with one and two
+   - [x] Add fixed-arity primitive emission helpers, starting with one and two
      primitive arguments.
-   - [ ] Destroy every temporary `Variant` on success and failure paths.
-   - [ ] Return or trap on `GDExtensionCallError` consistently.
-   - [ ] Defer broad vararg emission helpers.
+   - [x] Destroy every temporary `Variant` on success and failure paths.
+   - [x] Return or trap on `GDExtensionCallError` consistently.
+   - [x] Defer broad vararg emission helpers.
 
 6. Teach the generator to report signal and callable blockers.
    - [ ] Extend generated API reporting to separate skipped `Callable` and
