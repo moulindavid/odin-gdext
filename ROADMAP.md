@@ -96,12 +96,12 @@ temporary `Variant` cleanup are proven.
    - [x] Add focused tests for destruction and type checks where practical.
 
 4. Add safe object signal connection helpers.
-   - [ ] Wrap selected Godot object signal connection APIs behind helpers with
+   - [x] Wrap selected Godot object signal connection APIs behind helpers with
      explicit object-handle borrowing rules.
-   - [ ] Start with connecting an object signal to an existing `Callable`.
-   - [ ] Return checked errors or trap consistently based on the existing call
+   - [x] Start with connecting an object signal to an existing `Callable`.
+   - [x] Return checked errors or trap consistently based on the existing call
      error pattern.
-   - [ ] Defer flags-heavy or bind-argument-heavy connection helpers until the
+   - [x] Defer flags-heavy or bind-argument-heavy connection helpers until the
      minimal path is proven.
 
 5. Add safe signal emission helpers.

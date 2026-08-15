@@ -1167,6 +1167,10 @@ signal_init_object_signal :: gcore.signal_init_object_signal
 signal_from_object_signal :: gcore.signal_from_object_signal
 signal_free :: gcore.signal_free
 signal_is_null :: gcore.signal_is_null
+signal_connect_checked :: gcore.signal_connect_checked
+signal_connect :: gcore.signal_connect
+object_signal_connect_checked :: gcore.object_signal_connect_checked
+object_signal_connect :: gcore.object_signal_connect
 signal_get_name :: gcore.signal_get_name
 node_path_is_absolute :: gcore.node_path_is_absolute
 node_path_get_name :: gcore.node_path_get_name

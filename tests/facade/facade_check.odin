@@ -91,6 +91,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.string_name_free(&signal_name_copy)
 	gt.signal_free(&signal_copy)
 
+	_ = gt.signal_connect_checked(signal, callable, 0)
+	_ = gt.object_signal_connect_checked(gt.Node2D(node2d), meta_name, callable, 0)
+
 
 	gt.canvas_item_set_visible(canvas_item, true)
 	_ = gt.canvas_item_is_visible(canvas_item)

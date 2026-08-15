@@ -18,6 +18,7 @@ CALLABLE_IS_NULL_HASH :: 3918633141
 CALLABLE_IS_VALID_HASH :: 3918633141
 SIGNAL_IS_NULL_HASH :: 3918633141
 SIGNAL_GET_NAME_HASH :: 1825232092
+SIGNAL_CONNECT_HASH :: 979702392
 ARRAY_SIZE_HASH :: 3173160232
 ARRAY_IS_EMPTY_HASH :: 3918633141
 ARRAY_CLEAR_HASH :: 3218959716
@@ -865,6 +866,57 @@ signal_get_name_method: BuiltinMethod
 signal_is_null :: proc "contextless" (s: ^Signal) -> bool {
 	ensure_builtin_method(&signal_is_null_method, .Signal, cstring("is_null"), SIGNAL_IS_NULL_HASH)
 	return call_builtin_method_ptr_ret(signal_is_null_method.method, const_signal_ptr(s), bool)
+}
+
+
+signal_connect_method: BuiltinMethod
+
+// signal_connect_checked connects an owned Signal wrapper to an existing
+// Callable. Both values are borrowed for the call; this helper does not retain
+// the target ObjectPtr stored in either value. It returns Godot's Error code.
+signal_connect_checked :: proc "contextless" (
+	signal: ^Signal,
+	callable: ^Callable,
+	flags: i64 = 0,
+) -> i64 {
+	ensure_builtin_method(&signal_connect_method, .Signal, cstring("connect"), SIGNAL_CONNECT_HASH)
+	flags_arg := flags
+	return call_builtin_method_ptr_ret(
+		signal_connect_method.method,
+		signal_ptr(signal),
+		i64,
+		const_callable_ptr(callable),
+		cast(TypePtr)&flags_arg,
+	)
+}
+
+signal_connect :: proc "contextless" (signal: ^Signal, callable: ^Callable, flags: i64 = 0) {
+	err := signal_connect_checked(signal, callable, flags)
+	if err != 0 do _trap_godot_call_error()
+}
+
+// object_signal_connect_checked constructs a temporary Signal for `object` and
+// `signal_name`, connects it to `callable`, destroys the Signal storage, and
+// returns Godot's Error code.
+object_signal_connect_checked :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ^StringName,
+	callable: ^Callable,
+	flags: i64 = 0,
+) -> i64 {
+	signal := signal_from_object_signal(object, signal_name)
+	defer signal_free(&signal)
+	return signal_connect_checked(&signal, callable, flags)
+}
+
+object_signal_connect :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ^StringName,
+	callable: ^Callable,
+	flags: i64 = 0,
+) {
+	err := object_signal_connect_checked(object, signal_name, callable, flags)
+	if err != 0 do _trap_godot_call_error()
 }
 
 // signal_get_name returns an owned StringName; call string_name_free when done.
