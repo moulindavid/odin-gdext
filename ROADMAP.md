@@ -119,9 +119,9 @@ methods until their safety rules are explicit.
      gameplay use of the new generated APIs.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm the generated API report is deterministic and useful.
-   - [ ] Confirm no generated wrapper violates borrowed-object or owned-value
+   - [x] Run `make ci`.
+   - [x] Confirm the generated API report is deterministic and useful.
+   - [x] Confirm no generated wrapper violates borrowed-object or owned-value
      destruction rules.
 
 Deferred until after this goal:
