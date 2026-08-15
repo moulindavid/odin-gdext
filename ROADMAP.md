@@ -130,11 +130,11 @@ temporary `Variant` cleanup are proven.
    - [x] Keep broad smoke coverage separate from the beginner example.
 
 8. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm every temporary `Variant`, owned `Callable`, and owned `Signal`
+   - [x] Run `make ci`.
+   - [x] Confirm every temporary `Variant`, owned `Callable`, and owned `Signal`
      has an explicit destruction path.
-   - [ ] Confirm generated reports explain remaining signal/callable skips.
-   - [ ] Confirm normal examples still import only `godot:godot`.
+   - [x] Confirm generated reports explain remaining signal/callable skips.
+   - [x] Confirm normal examples still import only `godot:godot`.
 
 ## Deferred until after this goal
 
