@@ -50,6 +50,17 @@ ClassCreationInfo :: GDExtensionClassCreationInfo6
 InstanceBindingCallbacks :: GDExtensionInstanceBindingCallbacks
 CallableCustomInfo :: GDExtensionCallableCustomInfo2
 
+// Callable and Signal ownership rules:
+// - Raw ObjectPtr/class handles captured by signal or callable helpers remain borrowed.
+// - Helpers returning Callable or Signal storage own an initialized Godot value and
+//   must name the matching destruction helper.
+// - Helpers taking ^Callable, ^Signal, ^Variant, or ConstStringNamePtr borrow the
+//   pointed-to storage for the duration of the call only.
+// - Temporary Variant arguments created for signal emission must be destroyed on
+//   every success and failure path.
+// - Generated APIs keep Callable, Signal, varargs, and unclear object-lifetime
+//   signatures skipped until a focused wrapper documents their ownership.
+
 // Callback proc types used by class registration.
 ClassMethodCall :: GDExtensionClassMethodCall
 ClassMethodPtrCall :: GDExtensionClassMethodPtrCall
@@ -502,6 +513,8 @@ ClassPropertyDescriptor :: struct {
 	getter:   ConstStringNamePtr,
 }
 
+// ClassSignalDescriptor borrows stable StringName and PropertyInfo storage. The
+// caller must keep that metadata alive for the registered class lifetime.
 ClassSignalDescriptor :: struct {
 	name:           ConstStringNamePtr,
 	argument_info:  ^PropertyInfo,

@@ -69,12 +69,12 @@ support reporting. Do not enable broad vararg signal emission, arbitrary
 temporary `Variant` cleanup are proven.
 
 1. Define signal and callable ownership rules.
-   - [ ] Document borrowed versus owned `Callable` and `Signal` storage rules in
+   - [x] Document borrowed versus owned `Callable` and `Signal` storage rules in
      code comments near the wrappers.
-   - [ ] Decide which helpers return owned initialized values and which only
+   - [x] Decide which helpers return owned initialized values and which only
      borrow existing Godot storage.
-   - [ ] Document temporary `Variant` cleanup rules for signal arguments.
-   - [ ] Keep unsupported callable/signal forms skipped with stable reasons in
+   - [x] Document temporary `Variant` cleanup rules for signal arguments.
+   - [x] Keep unsupported callable/signal forms skipped with stable reasons in
      generated reports.
 
 2. Add minimal `Callable` storage helpers.

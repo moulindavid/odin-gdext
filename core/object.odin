@@ -190,7 +190,9 @@ owned_ref_counted_destroy :: proc "contextless" (self: ^OwnedRefCounted) -> (ok:
 	return release_ok
 }
 
-// Signal emission.
+// Signal emission. These helpers call Object.emit_signal through Variant call
+// storage. The signal name is borrowed, and each temporary Variant is destroyed
+// before returning, including checked error paths.
 
 emit_signal_method_name_data: StaticStringName
 signal_emission_object_class_name_data: StaticStringName
