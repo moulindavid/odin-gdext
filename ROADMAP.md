@@ -31,92 +31,76 @@ Keep these rules intact while adding features:
 - Extension classes must unregister during deinitialization.
 - Normal examples should import only `godot:godot`.
 
-## Current goal: generated class API expansion
+## Completed: generated class API expansion
 
-Make selected generated Godot class APIs useful for real Odin gameplay code
-without weakening the borrowed-object and explicit-owned-value safety model.
-This goal is feature-focused: docs and tests are acceptance checks, not the main
-objective.
+Selected generated Godot class APIs are now useful for focused Odin gameplay
+code while preserving the borrowed-object and explicit-owned-value safety model.
+The generated class slice includes support reporting, safer method type mapping,
+practical scene/UI APIs, checked `NodePath` lookup helpers, public facade exports,
+runtime example coverage, and generator guardrails for deterministic small-batch
+class expansion.
 
-Start with selected high-value scene and UI classes instead of generating the
-full Godot class API at once:
+## Current goal: Resource and RefCounted ownership model
 
-- `Object`
-- `Node`
-- `CanvasItem`
-- `Node2D`
-- `Control`
-- `Label`
-- `Sprite2D`
-- `Timer`
-- `Area2D`
-- `CollisionObject2D`
-- `Resource`
-- `PackedScene`
+The next deferred feature from generated class expansion is an explicit owned
+reference model for `RefCounted` and `Resource`. The goal is to keep borrowed
+object handles as the default while adding a small, auditable owned-reference
+path for APIs that return or store refcounted Godot objects.
 
-Classes may be added or deferred based on type-mapping safety. Do not expose APIs
-that require ownership rules the project does not have yet.
+This goal should unlock safer future work around `Resource`, `PackedScene`,
+textures, themes, and other object-lifetime-sensitive generated APIs. Do not
+broaden generated `Resource` or `RefCounted` APIs until the ownership rules are
+implemented and smoke-tested.
 
-1. Add generated API support reporting.
-   - [x] Emit a deterministic report of generated class methods.
-   - [x] Emit a deterministic report of skipped class methods.
-   - [x] Include skip reasons such as unsupported type, vararg, default argument,
-     object lifetime, typed array, `Callable`, or `Signal`.
-   - [x] Make the report useful for choosing the next class or type-mapping
-     slice.
+1. Define the owned reference design.
+   - [ ] Document the distinction between borrowed object handles, borrowed
+     `RefCounted`/`Resource` handles, and owned references.
+   - [ ] Decide the public wrapper shape for an owned refcounted handle.
+   - [ ] Specify copy, move-like handoff, release, and nil behavior in Odin
+     terms.
+   - [ ] Keep normal generated object/class returns borrowed unless a wrapper
+     explicitly documents ownership transfer.
 
-2. Expand safe class method type mapping.
-   - [x] Support primitive parameters and returns: `bool`, integer types, and
-     `GodotReal`.
-   - [x] Support common math builtins by value where storage and ABI rules are
-     already covered.
-   - [x] Support borrowed object/class handles by value.
-   - [x] Support `String`, `StringName`, and `NodePath` only through the existing
-     owned-storage and borrowed-pointer rules.
-   - [x] Keep `Variant` parameters borrowed as `^core.Variant`; `Variant` returns
-     are owned and require `core.variant_free`.
+2. Add low-level retain and release helpers.
+   - [ ] Wrap Godot 4.7 `RefCounted` reference and unreference calls safely.
+   - [ ] Trap or return `ok = false` for nil handles.
+   - [ ] Preserve borrowed-only behavior for existing typed class handles.
+   - [ ] Add focused unit or compile checks for helper signatures.
 
-3. Generate practical scene and UI APIs.
-   - [x] Expand `Node` wrappers for safe name, tree, child, parent, and path
-     operations where ownership is clear.
-   - [x] Expand `CanvasItem` wrappers for visibility and common drawing-related
-     state where signatures are safe.
-   - [x] Expand `Node2D` wrappers for position, rotation, scale, transform, and
-     common movement helpers.
-   - [x] Expand `Control` wrappers for common UI state where signatures are safe.
-   - [x] Expand `Label` wrappers for text and basic display options.
-   - [x] Expand `Sprite2D` wrappers for transform and simple display state;
-     defer texture/resource ownership until the reference model is explicit.
+3. Add an owned `RefCounted` wrapper.
+   - [ ] Store a typed borrowed handle plus ownership state explicitly.
+   - [ ] Provide init, retain, release, and destroy helpers.
+   - [ ] Make double-release and nil-release behavior explicit.
+   - [ ] Avoid hidden destructor behavior that would surprise Odin users.
 
-4. Add selected node lookup helpers.
-   - [x] Provide safe `NodePath`-based lookup wrappers for selected classes.
-   - [x] Return `(value, ok)` for checked lookup and typed downcast helpers.
-   - [x] Treat nil results and failed class checks as `ok = false`.
-   - [x] Keep returned handles borrowed.
+4. Add an owned `Resource` wrapper on top of the `RefCounted` model.
+   - [ ] Support checked creation from a borrowed `Resource` handle.
+   - [ ] Support explicit release through the same refcount path.
+   - [ ] Keep generated `Resource` method wrappers borrowed by default.
+   - [ ] Do not expose broad resource-loading APIs until ownership is verified.
 
-5. Expose selected generated APIs through the public facade.
-   - [x] Re-export only the stable selected class handles and wrappers.
-   - [x] Keep normal examples importing only `godot:godot`.
-   - [x] Keep internal generated packages available for advanced users without
-     making them the beginner path.
+5. Update generated class skip rules.
+   - [ ] Reclassify deferred `Resource` and `RefCounted` APIs based on the new
+     ownership model.
+   - [ ] Keep APIs such as `duplicate`, texture setters/getters, and scene
+     resource APIs skipped until their exact return ownership is known.
+   - [ ] Make the generated API report distinguish borrowed-safe APIs from APIs
+     requiring an owned reference wrapper.
 
-6. Exercise expanded generated APIs in a real example.
-   - [x] Use Odin to control a Godot scene object through generated APIs.
-   - [x] Include at least one `Label` update and one `Node2D` or `CanvasItem`
-     state change.
-   - [x] Keep the beginner example readable and move broad coverage to smoke
-     checks when needed.
+6. Add a minimal runtime smoke path.
+   - [ ] Exercise one owned `Resource` or `RefCounted` retain/release path in a
+     Godot headless example.
+   - [ ] Prove existing borrowed handle usage still works.
+   - [ ] Ensure every owned reference acquired in the smoke path is released.
 
-7. Stabilize generator behavior before broad coverage.
-   - [x] Keep output deterministic.
-   - [x] Avoid name collisions with methods, constants, enums, and helpers.
-   - [x] Prefer small class batches over enabling the full 1000+ class API.
-   - [x] Do not start full `Resource` or `RefCounted` ownership support in this
-     roadmap.
+7. Validate the model before expanding resource-heavy APIs.
+   - [ ] Run `make ci`.
+   - [ ] Keep normal examples importing only `godot:godot`.
+   - [ ] Do not enable broad `Resource`, `PackedScene`, texture, theme, or asset
+     APIs until this goal is complete.
 
-Deferred until their safety model is explicit:
+Deferred until after this goal:
 
-- owned `RefCounted` and `Resource` wrappers
 - `Callable` wrappers
 - full `Signal` wrappers
 - vararg methods
