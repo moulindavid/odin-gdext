@@ -1009,9 +1009,71 @@ rid_get_id :: proc "contextless" (r: ^RID) -> i64 {
 // an Array in it.
 ArrayStorage :: [GDExtensionArray_Size]u8
 
+// TypedArray values in Godot use Array-compatible storage plus runtime element
+// metadata. This package keeps the same ownership model for typed containers:
+// owning a container only owns the container storage, not any Object handles
+// referenced by its elements. Object/class handles read from a container are
+// borrowed by value and must be nil/class checked before use. Helpers must copy
+// values out through Godot APIs and must not return slices or pointers into
+// temporary Godot storage.
+
 // Array is initialized Godot Array storage. Every proc returning an Array
 // transfers ownership to the caller; destroy it with array_free when finished.
 Array :: distinct ArrayStorage
+
+TypedArrayStorage :: ArrayStorage
+
+// TypedArray is initialized Godot Array-compatible storage with runtime element
+// metadata. It owns only the container storage; elements that are Object handles
+// remain borrowed Godot objects.
+TypedArray :: distinct TypedArrayStorage
+
+// typed_array_ptr returns a mutable GDExtension pointer to initialized TypedArray storage.
+typed_array_ptr :: proc "contextless" (a: ^TypedArray) -> TypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(TypePtr)a
+}
+
+// const_typed_array_ptr returns a read-only GDExtension pointer to initialized TypedArray storage.
+const_typed_array_ptr :: proc "contextless" (a: ^TypedArray) -> ConstTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)a
+}
+
+// uninitialized_typed_array_ptr returns storage Godot is about to initialize.
+uninitialized_typed_array_ptr :: proc "contextless" (a: ^TypedArray) -> UninitializedTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)a
+}
+
+typed_array_free :: proc "contextless" (a: ^TypedArray) {
+	destroy_builtin(.Array, typed_array_ptr(a))
+}
+
+typed_array_size :: proc "contextless" (a: ^TypedArray) -> i64 {
+	return array_size(cast(^Array)a)
+}
+
+// typed_array_get_variant returns an initialized Variant; call variant_free when done.
+typed_array_get_variant :: proc "contextless" (a: ^TypedArray, index: i64) -> (result: Variant) {
+	return array_get(cast(^Array)a, index)
+}
+
+// typed_array_get_object reads one element as a borrowed ObjectPtr. The returned
+// object is not retained and must be nil/class checked by callers before use.
+typed_array_get_object :: proc "contextless" (
+	a: ^TypedArray,
+	index: i64,
+) -> (
+	value: ObjectPtr,
+	ok: bool,
+) {
+	v := typed_array_get_variant(a, index)
+	defer variant_free(&v)
+	value, ok = variant_try_object(&v)
+	if !ok || value == nil do return nil, false
+	return value, true
+}
 
 // array_ptr returns a mutable GDExtension pointer to initialized Array storage.
 array_ptr :: proc "contextless" (a: ^Array) -> TypePtr {

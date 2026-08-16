@@ -90,6 +90,8 @@ RIDStorage :: gcore.RIDStorage
 RID :: gcore.RID
 ArrayStorage :: gcore.ArrayStorage
 Array :: gcore.Array
+TypedArrayStorage :: gcore.TypedArrayStorage
+TypedArray :: gcore.TypedArray
 DictionaryStorage :: gcore.DictionaryStorage
 Dictionary :: gcore.Dictionary
 PackedByteArrayStorage :: gcore.PackedByteArrayStorage
@@ -573,6 +575,8 @@ area2d_set_monitorable :: gclass.area2d_set_monitorable
 area2d_is_monitorable :: gclass.area2d_is_monitorable
 area2d_has_overlapping_bodies :: gclass.area2d_has_overlapping_bodies
 area2d_has_overlapping_areas :: gclass.area2d_has_overlapping_areas
+area2d_get_overlapping_bodies :: gclass.area2d_get_overlapping_bodies
+area2d_get_overlapping_areas :: gclass.area2d_get_overlapping_areas
 area2d_set_audio_bus_name :: gclass.area2d_set_audio_bus_name
 area2d_get_audio_bus_name :: gclass.area2d_get_audio_bus_name
 area2d_set_audio_bus_override :: gclass.area2d_set_audio_bus_override
@@ -930,6 +934,54 @@ object_ptr_try_as_area2d :: proc "contextless" (self: ObjectPtr) -> (value: Area
 	return object_try_as_area2d(Object(self))
 }
 
+typed_array_get_node :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: Node,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_node(object)
+}
+
+typed_array_get_node2d :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: Node2D,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_node2d(object)
+}
+
+typed_array_get_area2d :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: Area2D,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_area2d(object)
+}
+
+typed_array_get_collision_object2d :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: CollisionObject2D,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_collision_object2d(object)
+}
+
 object_ptr_try_as_packed_scene :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -1204,6 +1256,13 @@ array_new :: gcore.array_new
 array_init_copy :: gcore.array_init_copy
 array_copy :: gcore.array_copy
 array_free :: gcore.array_free
+typed_array_ptr :: gcore.typed_array_ptr
+const_typed_array_ptr :: gcore.const_typed_array_ptr
+uninitialized_typed_array_ptr :: gcore.uninitialized_typed_array_ptr
+typed_array_free :: gcore.typed_array_free
+typed_array_size :: gcore.typed_array_size
+typed_array_get_variant :: gcore.typed_array_get_variant
+typed_array_get_object :: gcore.typed_array_get_object
 array_push :: gcore.array_push
 array_size :: gcore.array_size
 array_is_empty :: gcore.array_is_empty

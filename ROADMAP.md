@@ -78,63 +78,63 @@ borrowed slices into Godot storage, or typed arrays of lifetime-sensitive object
 until the contained-handle rules are explicit and tested.
 
 1. Define typed container ownership rules.
-   - [ ] Document that typed array and dictionary wrapper values own only the
+   - [x] Document that typed array and dictionary wrapper values own only the
      container storage, not the Godot objects referenced inside it.
-   - [ ] Document that object/class handles read from containers are borrowed by
+   - [x] Document that object/class handles read from containers are borrowed by
      value and must be checked for nil/class identity before use.
-   - [ ] Document that helpers must not return Odin slices into temporary Godot
+   - [x] Document that helpers must not return Odin slices into temporary Godot
      storage.
-   - [ ] Keep typed container helpers explicit about whether they copy, borrow,
+   - [x] Keep typed container helpers explicit about whether they copy, borrow,
      or destroy storage.
 
 2. Improve generated reporting for typed containers.
-   - [ ] Split typed array, typed dictionary, and untyped container skips into
+   - [x] Split typed array, typed dictionary, and untyped container skips into
      separate report buckets.
-   - [ ] Include the element type in skip reasons where `extension_api.json`
+   - [x] Include the element type in skip reasons where `extension_api.json`
      exposes it.
-   - [ ] Identify the smallest selected APIs unblocked by safe typed container
+   - [x] Identify the smallest selected APIs unblocked by safe typed container
      reads.
-   - [ ] Keep generated wrappers disabled until their container and element
+   - [x] Keep generated wrappers disabled until their container and element
      ownership rules are implemented.
 
 3. Add typed array storage aliases and pointer helpers where needed.
-   - [ ] Reuse existing `Array` storage for Godot typed arrays when the ABI uses
+   - [x] Reuse existing `Array` storage for Godot typed arrays when the ABI uses
      normal `Array` storage with type metadata.
-   - [ ] Add named typed-array wrapper aliases only if they improve type safety
+   - [x] Add named typed-array wrapper aliases only if they improve type safety
      for generated APIs.
-   - [ ] Preserve existing `Array` construction, copy, and destruction rules.
-   - [ ] Add facade exports only for helpers intended for normal users.
+   - [x] Preserve existing `Array` construction, copy, and destruction rules.
+   - [x] Add facade exports only for helpers intended for normal users.
 
 4. Add safe typed array read helpers for borrowed object handles.
-   - [ ] Start with arrays of selected classes such as `Node`, `Node2D`,
+   - [x] Start with arrays of selected classes such as `Node`, `Node2D`,
      `Area2D`, and `CollisionObject2D`.
-   - [ ] Provide checked `get_as_*` helpers returning `(value, ok)`.
-   - [ ] Treat nil elements and failed class checks as `ok = false`.
-   - [ ] Keep returned handles borrowed and avoid retaining or freeing objects.
+   - [x] Provide checked `get_as_*` helpers returning `(value, ok)`.
+   - [x] Treat nil elements and failed class checks as `ok = false`.
+   - [x] Keep returned handles borrowed and avoid retaining or freeing objects.
 
 5. Enable one small generated typed-array API batch.
-   - [ ] Prefer `Area2D` overlap query methods if their return ownership is a
+   - [x] Prefer `Area2D` overlap query methods if their return ownership is a
      normal owned `Array` value.
-   - [ ] Generate wrappers only when the return container is owned and has an
+   - [x] Generate wrappers only when the return container is owned and has an
      explicit destruction path.
-   - [ ] Keep mutation-heavy or lifetime-sensitive container APIs skipped.
-   - [ ] Re-export the selected wrappers through `godot:godot`.
+   - [x] Keep mutation-heavy or lifetime-sensitive container APIs skipped.
+   - [x] Re-export the selected wrappers through `godot:godot`.
 
 6. Add smoke and facade coverage.
-   - [ ] Add facade compile checks for typed container helpers and selected
+   - [x] Add facade compile checks for typed container helpers and selected
      generated methods.
-   - [ ] Add a smoke path that constructs or receives a typed container and reads
+   - [x] Add a smoke path that constructs or receives a typed container and reads
      borrowed handles safely.
-   - [ ] Keep beginner examples readable and avoid making typed containers the
+   - [x] Keep beginner examples readable and avoid making typed containers the
      first concept users see.
-   - [ ] Confirm normal examples still import only `godot:godot`.
+   - [x] Confirm normal examples still import only `godot:godot`.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm generated reports explain remaining typed container skips.
-   - [ ] Confirm no helper returns slices or pointers into temporary Godot
+   - [x] Run `make ci`.
+   - [x] Confirm generated reports explain remaining typed container skips.
+   - [x] Confirm no helper returns slices or pointers into temporary Godot
      storage.
-   - [ ] Confirm owned container values have matching destruction paths.
+   - [x] Confirm owned container values have matching destruction paths.
 
 ## Deferred until after this goal
 

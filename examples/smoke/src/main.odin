@@ -152,6 +152,18 @@ create_instance :: proc "c" (class_userdata: rawptr, notify_postinitialize: bool
 		gt.area2d_set_priority(area, 3)
 		area_gravity = gt.area2d_get_gravity(area)
 		area_monitoring = gt.area2d_is_monitoring(area)
+		bodies := gt.area2d_get_overlapping_bodies(area)
+		bodies_size := gt.typed_array_size(&bodies)
+		if bodies_size > 0 {
+			_, _ = gt.typed_array_get_node2d(&bodies, 0)
+		}
+		gt.typed_array_free(&bodies)
+		areas := gt.area2d_get_overlapping_areas(area)
+		areas_size := gt.typed_array_size(&areas)
+		if areas_size > 0 {
+			_, _ = gt.typed_array_get_area2d(&areas, 0)
+		}
+		gt.typed_array_free(&areas)
 		area_destroyed = gt.object_destroy_checked(area_object)
 	}
 	gt.debug_print(
