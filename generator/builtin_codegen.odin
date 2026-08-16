@@ -2422,6 +2422,60 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 }
 
 
+emit_class_method_default_wrapper :: proc(
+	b: ^strings.Builder,
+	method: ExtensionApiClassMethod,
+	proc_name: string,
+	self_type: string,
+	ret_type: string,
+	returns_void: bool,
+) -> bool {
+	default_ok, _ := class_method_default_wrapper_supported(method)
+	if !default_ok do return true
+
+	default_count := class_method_trailing_default_count(method)
+	explicit_count := len(method.arguments) - default_count
+	wrapper_name := fmt.aprintf("%s_default", proc_name)
+
+	strings.write_string(
+		b,
+		"// Convenience wrapper using supported trailing defaults; full-arity wrapper remains canonical.\n",
+	)
+	if !returns_void {
+		fmt.sbprintf(b, "// %s returns the same ownership as %s.\n", wrapper_name, proc_name)
+	}
+	fmt.sbprintf(b, "%s :: proc \"contextless\" (self: %s", wrapper_name, self_type)
+	for arg in method.arguments[:explicit_count] {
+		param_type, param_ok := resolve_class_param_type(arg.type)
+		if !param_ok do return false
+		fmt.sbprintf(b, ", %s: %s", arg.name, param_type)
+	}
+	if returns_void {
+		strings.write_string(b, ") {\n")
+	} else {
+		fmt.sbprintf(b, ") -> %s {{\n", ret_type)
+	}
+
+	for arg in method.arguments[explicit_count:] {
+		if !emit_class_default_argument_local(b, arg) do return false
+	}
+
+	if returns_void {
+		fmt.sbprintf(b, "\t%s(self", proc_name)
+	} else {
+		fmt.sbprintf(b, "\treturn %s(self", proc_name)
+	}
+	for arg in method.arguments[:explicit_count] {
+		fmt.sbprintf(b, ", %s", arg.name)
+	}
+	for arg in method.arguments[explicit_count:] {
+		fmt.sbprintf(b, ", %s", class_default_arg_value_expr(arg))
+	}
+	strings.write_string(b, ")\n")
+	strings.write_string(b, "}\n\n")
+	return true
+}
+
 emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(b, "// ---- Selected class methods ----\n\n")
 
@@ -2520,6 +2574,17 @@ emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 		}
 		strings.write_string(b, ")\n")
 		strings.write_string(b, "}\n\n")
+
+		if !emit_class_method_default_wrapper(
+			b,
+			method,
+			proc_name,
+			self_type,
+			ret_type,
+			returns_void,
+		) {
+			return false
+		}
 	}
 
 	return true
