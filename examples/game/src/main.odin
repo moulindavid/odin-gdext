@@ -101,7 +101,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 		if timer_ok {
 			gt.timer_set_wait_time(timer, 0.5)
 			gt.timer_set_one_shot(timer, true)
-			gt.timer_start(timer, 0.5)
+			gt.timer_start_default(timer)
 		}
 
 		area_path := gt.node_path_from_utf8("DamageArea")
@@ -124,8 +124,8 @@ roll_into_label_adapter_method :: proc "contextless" (
 	gt.label_set_visible_ratio(label, 1)
 
 	control := gt.label_as_control(label)
-	gt.control_set_position(control, gt.Vector2{24, 24}, false)
-	gt.control_set_size(control, gt.Vector2{720, 64}, false)
+	gt.control_set_position_default(control, gt.Vector2{24, 24})
+	gt.control_set_size_default(control, gt.Vector2{720, 64})
 
 	canvas_item := gt.label_as_canvas_item(label)
 	red := f32(0.35 + gt.sin(damage) * 0.15)

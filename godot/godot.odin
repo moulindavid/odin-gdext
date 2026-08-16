@@ -239,11 +239,14 @@ node_get_name :: gclass.node_get_name
 node_has_node :: gclass.node_has_node
 node_get_node_or_null :: gclass.node_get_node_or_null
 node_get_child_count :: gclass.node_get_child_count
+node_get_child_count_default :: gclass.node_get_child_count_default
 node_get_child :: gclass.node_get_child
+node_get_child_default :: gclass.node_get_child_default
 node_is_inside_tree :: gclass.node_is_inside_tree
 node_get_path :: gclass.node_get_path
 node_is_ancestor_of :: gclass.node_is_ancestor_of
 node_get_path_to :: gclass.node_get_path_to
+node_get_path_to_default :: gclass.node_get_path_to_default
 node_remove_from_group :: gclass.node_remove_from_group
 node_is_in_group :: gclass.node_is_in_group
 node_set_process :: gclass.node_set_process
@@ -339,10 +342,13 @@ control_get_offset :: gclass.control_get_offset
 control_set_begin :: gclass.control_set_begin
 control_set_end :: gclass.control_set_end
 control_set_position :: gclass.control_set_position
+control_set_position_default :: gclass.control_set_position_default
 control_set_size :: gclass.control_set_size
+control_set_size_default :: gclass.control_set_size_default
 control_reset_size :: gclass.control_reset_size
 control_set_custom_maximum_size :: gclass.control_set_custom_maximum_size
 control_set_global_position :: gclass.control_set_global_position
+control_set_global_position_default :: gclass.control_set_global_position_default
 control_set_rotation :: gclass.control_set_rotation
 control_set_rotation_degrees :: gclass.control_set_rotation_degrees
 control_set_scale :: gclass.control_set_scale
@@ -364,7 +370,9 @@ control_get_global_rect :: gclass.control_get_global_rect
 control_set_focus_mode :: gclass.control_set_focus_mode
 control_get_focus_mode :: gclass.control_get_focus_mode
 control_has_focus :: gclass.control_has_focus
+control_has_focus_default :: gclass.control_has_focus_default
 control_grab_focus :: gclass.control_grab_focus
+control_grab_focus_default :: gclass.control_grab_focus_default
 control_release_focus :: gclass.control_release_focus
 control_set_mouse_filter :: gclass.control_set_mouse_filter
 control_get_mouse_filter :: gclass.control_get_mouse_filter
@@ -516,6 +524,7 @@ timer_is_one_shot :: gclass.timer_is_one_shot
 timer_set_autostart :: gclass.timer_set_autostart
 timer_has_autostart :: gclass.timer_has_autostart
 timer_start :: gclass.timer_start
+timer_start_default :: gclass.timer_start_default
 timer_stop :: gclass.timer_stop
 timer_set_paused :: gclass.timer_set_paused
 timer_is_paused :: gclass.timer_is_paused

@@ -1654,6 +1654,150 @@ class_method_has_default_arguments :: proc(method: ExtensionApiClassMethod) -> b
 	return false
 }
 
+
+class_method_trailing_default_count :: proc(method: ExtensionApiClassMethod) -> int {
+	count := 0
+	for i := len(method.arguments) - 1; i >= 0; i -= 1 {
+		if len(method.arguments[i].default_value) == 0 do break
+		count += 1
+	}
+	return count
+}
+
+class_method_has_non_trailing_default :: proc(method: ExtensionApiClassMethod) -> bool {
+	seen_default := false
+	for arg in method.arguments {
+		has_default := len(arg.default_value) > 0
+		if has_default {
+			seen_default = true
+		} else if seen_default {
+			return true
+		}
+	}
+	return false
+}
+
+is_integer_default_literal :: proc(value: string) -> bool {
+	if len(value) == 0 do return false
+	start := 0
+	if value[0] == '-' || value[0] == '+' {
+		if len(value) == 1 do return false
+		start = 1
+	}
+	for ch in transmute([]u8)value[start:] {
+		if ch < '0' || ch > '9' do return false
+	}
+	return true
+}
+
+is_real_default_literal :: proc(value: string) -> bool {
+	if is_integer_default_literal(value) do return true
+	if len(value) == 0 do return false
+	start := 0
+	if value[0] == '-' || value[0] == '+' {
+		if len(value) == 1 do return false
+		start = 1
+	}
+	digit_count := 0
+	dot_count := 0
+	for ch in transmute([]u8)value[start:] {
+		if ch >= '0' && ch <= '9' {
+			digit_count += 1
+		} else if ch == '.' {
+			dot_count += 1
+			if dot_count > 1 do return false
+		} else {
+			return false
+		}
+	}
+	return digit_count > 0
+}
+
+class_default_argument_supported :: proc(
+	arg: ExtensionApiMethodArg,
+) -> (
+	ok: bool,
+	reason: string,
+) {
+	value := arg.default_value
+	if arg.type == "bool" {
+		if value == "true" || value == "false" do return true, ""
+		return false, "unsupported bool default"
+	}
+	if arg.type == "int" || arg.type == "int32" || arg.type == "int64" {
+		if is_integer_default_literal(value) do return true, ""
+		return false, "unsupported integer default"
+	}
+	if arg.type == "float" || arg.type == "double" {
+		if is_real_default_literal(value) do return true, ""
+		return false, "unsupported real default"
+	}
+	if arg.type == "String" && value == "\"\"" do return true, ""
+	if is_selected_class(arg.type) && (value == "null" || value == "nil") do return true, ""
+	return false, fmt.aprintf("unsupported default for %s", arg.type)
+}
+
+class_method_default_wrapper_supported :: proc(
+	method: ExtensionApiClassMethod,
+) -> (
+	ok: bool,
+	reason: string,
+) {
+	if !class_method_has_default_arguments(method) do return false, "no default arguments"
+	if class_method_has_non_trailing_default(method) do return false, "non-trailing default argument"
+	trailing_count := class_method_trailing_default_count(method)
+	if trailing_count == 0 do return false, "no trailing default arguments"
+	start := len(method.arguments) - trailing_count
+	for arg in method.arguments[start:] {
+		if arg_ok, arg_reason := class_default_argument_supported(arg); !arg_ok {
+			return false, fmt.aprintf("%s %q", arg_reason, arg.default_value)
+		}
+	}
+	return true, ""
+}
+
+class_method_default_report :: proc(method: ExtensionApiClassMethod) -> string {
+	b := strings.builder_make(context.temp_allocator)
+	first := true
+	for arg in method.arguments {
+		if len(arg.default_value) == 0 do continue
+		if !first do strings.write_string(&b, ", ")
+		fmt.sbprintf(&b, "%s: %s = %s", arg.name, arg.type, arg.default_value)
+		first = false
+	}
+	return strings.to_string(b)
+}
+
+class_default_arg_ptr_expr :: proc(arg: ExtensionApiMethodArg) -> string {
+	if arg.type == "String" do return fmt.aprintf("core.const_string_ptr(&_%s_default)", arg.name)
+	return fmt.aprintf("cast(core.TypePtr)&_%s", arg.name)
+}
+
+class_default_arg_value_expr :: proc(arg: ExtensionApiMethodArg) -> string {
+	if arg.type == "String" do return fmt.aprintf("&_%s_default", arg.name)
+	return fmt.aprintf("_%s", arg.name)
+}
+
+emit_class_default_argument_local :: proc(
+	b: ^strings.Builder,
+	arg: ExtensionApiMethodArg,
+) -> bool {
+	value := arg.default_value
+	if arg.type == "String" && value == "\"\"" {
+		fmt.sbprintf(b, "\t_%s_default := core.string_from_utf8(\"\")\n", arg.name)
+		fmt.sbprintf(b, "\tdefer core.string_free(&_%s_default)\n", arg.name)
+		return true
+	}
+	param_type, param_ok := resolve_class_param_type(arg.type)
+	if !param_ok do return false
+	if is_selected_class(arg.type) && (value == "null" || value == "nil") {
+		fmt.sbprintf(b, "\t_%s: %s\n", arg.name, param_type)
+		return true
+	}
+	fmt.sbprintf(b, "\t_%s := %s(%s)\n", arg.name, param_type, value)
+	return true
+}
+
 class_method_skip_reason :: proc(class_name: string, method: ExtensionApiClassMethod) -> string {
 	if method.is_vararg do return "vararg"
 	if method.is_virtual do return "virtual"
@@ -2047,6 +2191,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&typed_dictionary_blockers)
 	untyped_container_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&untyped_container_blockers)
+	default_argument_wrappers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&default_argument_wrappers)
+	default_argument_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&default_argument_blockers)
 	candidate_analysis := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&candidate_analysis)
 
@@ -2057,6 +2205,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	typed_array_blocker_count := 0
 	typed_dictionary_blocker_count := 0
 	untyped_container_blocker_count := 0
+	default_argument_wrapper_count := 0
+	default_argument_blocker_count := 0
 	candidate_safe_count := 0
 	candidate_owned_wrapper_count := 0
 	candidate_skipped_count := 0
@@ -2075,6 +2225,38 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				emit_class_method_report_signature(&generated, class.name, method)
 				strings.write_byte(&generated, '\n')
 				generated_count += 1
+				if class_method_has_default_arguments(method) {
+					if default_ok, default_reason := class_method_default_wrapper_supported(
+						method,
+					); default_ok {
+						strings.write_string(&default_argument_wrappers, "- ")
+						emit_class_method_report_signature(
+							&default_argument_wrappers,
+							class.name,
+							method,
+						)
+						fmt.sbprintf(
+							&default_argument_wrappers,
+							": convenience wrapper for %s\n",
+							class_method_default_report(method),
+						)
+						default_argument_wrapper_count += 1
+					} else {
+						strings.write_string(&default_argument_blockers, "- ")
+						emit_class_method_report_signature(
+							&default_argument_blockers,
+							class.name,
+							method,
+						)
+						fmt.sbprintf(
+							&default_argument_blockers,
+							": selected explicit wrapper only, %s, defaults: %s\n",
+							default_reason,
+							class_method_default_report(method),
+						)
+						default_argument_blocker_count += 1
+					}
+				}
 			} else if reason == class_method_owned_wrapper_reason(class.name, method.name) {
 				strings.write_string(&owned_wrapper, "- ")
 				emit_class_method_report_signature(&owned_wrapper, class.name, method)
@@ -2085,6 +2267,21 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				emit_class_method_report_signature(&skipped, class.name, method)
 				fmt.sbprintf(&skipped, ": %s\n", reason)
 				skipped_count += 1
+				if class_method_has_default_arguments(method) {
+					strings.write_string(&default_argument_blockers, "- ")
+					emit_class_method_report_signature(
+						&default_argument_blockers,
+						class.name,
+						method,
+					)
+					fmt.sbprintf(
+						&default_argument_blockers,
+						": %s, defaults: %s\n",
+						reason,
+						class_method_default_report(method),
+					)
+					default_argument_blocker_count += 1
+				}
 				if class_method_uses_callable_or_signal(method) {
 					strings.write_string(&signal_callable_blockers, "- ")
 					emit_class_method_report_signature(
@@ -2117,6 +2314,18 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 						&candidate_analysis,
 						": borrowed-safe candidate, explicit default arguments required\n",
 					)
+					strings.write_string(&default_argument_blockers, "- candidate ")
+					emit_class_method_report_signature(
+						&default_argument_blockers,
+						class.name,
+						method,
+					)
+					fmt.sbprintf(
+						&default_argument_blockers,
+						": candidate not selected, defaults: %s\n",
+						class_method_default_report(method),
+					)
+					default_argument_blocker_count += 1
 				} else {
 					strings.write_string(&candidate_analysis, ": borrowed-safe candidate\n")
 				}
@@ -2165,6 +2374,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Typed array blockers: %d\n", typed_array_blocker_count)
 	fmt.sbprintf(&b, "- Typed dictionary blockers: %d\n", typed_dictionary_blocker_count)
 	fmt.sbprintf(&b, "- Untyped container blockers: %d\n", untyped_container_blocker_count)
+	fmt.sbprintf(
+		&b,
+		"- Default-argument convenience wrappers: %d\n",
+		default_argument_wrapper_count,
+	)
+	fmt.sbprintf(&b, "- Default-argument blockers: %d\n", default_argument_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -2182,6 +2397,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(typed_dictionary_blockers))
 	strings.write_string(&b, "\n## Untyped container blockers\n\n")
 	strings.write_string(&b, strings.to_string(untyped_container_blockers))
+	strings.write_string(&b, "\n## Default-argument convenience wrappers\n\n")
+	strings.write_string(&b, strings.to_string(default_argument_wrappers))
+	strings.write_string(&b, "\n## Default-argument blockers\n\n")
+	strings.write_string(&b, strings.to_string(default_argument_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 
@@ -2191,13 +2410,69 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		return false
 	}
 	fmt.printfln(
-		"  %s  (%d generated, %d owned-wrapper, %d skipped, %d candidate-safe class methods)",
+		"  %s  (%d generated, %d default wrappers, %d owned-wrapper, %d skipped, %d candidate-safe class methods)",
 		path,
 		generated_count,
+		default_argument_wrapper_count,
 		owned_wrapper_count,
 		skipped_count,
 		candidate_safe_count,
 	)
+	return true
+}
+
+
+emit_class_method_default_wrapper :: proc(
+	b: ^strings.Builder,
+	method: ExtensionApiClassMethod,
+	proc_name: string,
+	self_type: string,
+	ret_type: string,
+	returns_void: bool,
+) -> bool {
+	default_ok, _ := class_method_default_wrapper_supported(method)
+	if !default_ok do return true
+
+	default_count := class_method_trailing_default_count(method)
+	explicit_count := len(method.arguments) - default_count
+	wrapper_name := fmt.aprintf("%s_default", proc_name)
+
+	strings.write_string(
+		b,
+		"// Convenience wrapper using supported trailing defaults; full-arity wrapper remains canonical.\n",
+	)
+	if !returns_void {
+		fmt.sbprintf(b, "// %s returns the same ownership as %s.\n", wrapper_name, proc_name)
+	}
+	fmt.sbprintf(b, "%s :: proc \"contextless\" (self: %s", wrapper_name, self_type)
+	for arg in method.arguments[:explicit_count] {
+		param_type, param_ok := resolve_class_param_type(arg.type)
+		if !param_ok do return false
+		fmt.sbprintf(b, ", %s: %s", arg.name, param_type)
+	}
+	if returns_void {
+		strings.write_string(b, ") {\n")
+	} else {
+		fmt.sbprintf(b, ") -> %s {{\n", ret_type)
+	}
+
+	for arg in method.arguments[explicit_count:] {
+		if !emit_class_default_argument_local(b, arg) do return false
+	}
+
+	if returns_void {
+		fmt.sbprintf(b, "\t%s(self", proc_name)
+	} else {
+		fmt.sbprintf(b, "\treturn %s(self", proc_name)
+	}
+	for arg in method.arguments[:explicit_count] {
+		fmt.sbprintf(b, ", %s", arg.name)
+	}
+	for arg in method.arguments[explicit_count:] {
+		fmt.sbprintf(b, ", %s", class_default_arg_value_expr(arg))
+	}
+	strings.write_string(b, ")\n")
+	strings.write_string(b, "}\n\n")
 	return true
 }
 
@@ -2299,6 +2574,17 @@ emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 		}
 		strings.write_string(b, ")\n")
 		strings.write_string(b, "}\n\n")
+
+		if !emit_class_method_default_wrapper(
+			b,
+			method,
+			proc_name,
+			self_type,
+			ret_type,
+			returns_void,
+		) {
+			return false
+		}
 	}
 
 	return true

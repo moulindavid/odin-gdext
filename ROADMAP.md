@@ -88,56 +88,56 @@ emit wrappers that collide with existing generated names.
 
 1. Define default-argument wrapper policy.
    - [ ] Document that full-arity wrappers remain the canonical generated API.
-   - [ ] Generate shorter convenience wrappers only when omitted arguments have
+   - [x] Generate shorter convenience wrappers only when omitted arguments have
      stable `extension_api.json` defaults and supported types.
-   - [ ] Keep wrapper names deterministic and collision-free.
-   - [ ] Do not support varargs as part of this roadmap.
+   - [x] Keep wrapper names deterministic and collision-free.
+   - [x] Do not support varargs as part of this roadmap.
 
 2. Improve reporting for default arguments.
-   - [ ] Split default-argument skips from unsupported type and lifetime skips.
-   - [ ] Report which arguments have defaults and their raw Godot default value.
-   - [ ] Identify the smallest safe selected method batch that becomes useful
+   - [x] Split default-argument skips from unsupported type and lifetime skips.
+   - [x] Report which arguments have defaults and their raw Godot default value.
+   - [x] Identify the smallest safe selected method batch that becomes useful
      with convenience wrappers.
-   - [ ] Keep methods with unsupported default values skipped with explicit
+   - [x] Keep methods with unsupported default values skipped with explicit
      reasons.
 
 3. Add default value parsing for primitive and simple value types.
-   - [ ] Start with `bool`, integer values, `GodotReal`, empty `String`, and nil
+   - [x] Start with `bool`, integer values, `GodotReal`, empty `String`, and nil
      object defaults where ownership is clear.
-   - [ ] Convert parsed defaults into local Odin temporaries before ptrcall.
-   - [ ] Reuse existing owned value construction and destruction helpers for any
+   - [x] Convert parsed defaults into local Odin temporaries before ptrcall.
+   - [x] Reuse existing owned value construction and destruction helpers for any
      default that needs Godot storage.
-   - [ ] Defer complex expressions, enum aliases, objects needing construction,
+   - [x] Defer complex expressions, enum aliases, objects needing construction,
      arrays, dictionaries, `Callable`, `Signal`, and resource defaults.
 
 4. Generate deterministic convenience wrappers for selected methods.
-   - [ ] Keep the full explicit wrapper unchanged.
-   - [ ] Emit suffix-based or arity-based wrapper names that cannot collide with
+   - [x] Keep the full explicit wrapper unchanged.
+   - [x] Emit suffix-based or arity-based wrapper names that cannot collide with
      selected explicit methods.
-   - [ ] Ensure temporary defaults are destroyed on every path.
-   - [ ] Validate generated output remains stable.
+   - [x] Ensure temporary defaults are destroyed on every path.
+   - [x] Validate generated output remains stable.
 
 5. Enable one small generated default-argument batch.
-   - [ ] Prefer selected `Node`, `Control`, `Timer`, or `Area2D` methods already
+   - [x] Prefer selected `Node`, `Control`, `Timer`, or `Area2D` methods already
      generated with explicit arguments.
-   - [ ] Add only wrappers whose omitted arguments are primitive or simple owned
+   - [x] Add only wrappers whose omitted arguments are primitive or simple owned
      values.
-   - [ ] Re-export selected convenience wrappers through `godot:godot`.
-   - [ ] Keep broad overload coverage deferred.
+   - [x] Re-export selected convenience wrappers through `godot:godot`.
+   - [x] Keep broad overload coverage deferred.
 
 6. Add facade and smoke coverage.
-   - [ ] Add facade compile checks for generated convenience wrappers.
-   - [ ] Add or extend smoke/example usage where defaulted wrappers improve
+   - [x] Add facade compile checks for generated convenience wrappers.
+   - [x] Add or extend smoke/example usage where defaulted wrappers improve
      readability.
-   - [ ] Keep beginner examples readable and still importing only `godot:godot`.
-   - [ ] Confirm existing explicit wrappers still compile.
+   - [x] Keep beginner examples readable and still importing only `godot:godot`.
+   - [x] Confirm existing explicit wrappers still compile.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm generated reports explain remaining default-argument skips.
-   - [ ] Confirm no generated wrapper violates borrowed-object or owned-value
+   - [x] Run `make ci`.
+   - [x] Confirm generated reports explain remaining default-argument skips.
+   - [x] Confirm no generated wrapper violates borrowed-object or owned-value
      destruction rules.
-   - [ ] Confirm generated output is deterministic.
+   - [x] Confirm generated output is deterministic.
 
 ## Deferred until after this goal
 
