@@ -1050,6 +1050,31 @@ typed_array_free :: proc "contextless" (a: ^TypedArray) {
 	destroy_builtin(.Array, typed_array_ptr(a))
 }
 
+typed_array_size :: proc "contextless" (a: ^TypedArray) -> i64 {
+	return array_size(cast(^Array)a)
+}
+
+// typed_array_get_variant returns an initialized Variant; call variant_free when done.
+typed_array_get_variant :: proc "contextless" (a: ^TypedArray, index: i64) -> (result: Variant) {
+	return array_get(cast(^Array)a, index)
+}
+
+// typed_array_get_object reads one element as a borrowed ObjectPtr. The returned
+// object is not retained and must be nil/class checked by callers before use.
+typed_array_get_object :: proc "contextless" (
+	a: ^TypedArray,
+	index: i64,
+) -> (
+	value: ObjectPtr,
+	ok: bool,
+) {
+	v := typed_array_get_variant(a, index)
+	defer variant_free(&v)
+	value, ok = variant_try_object(&v)
+	if !ok || value == nil do return nil, false
+	return value, true
+}
+
 // array_ptr returns a mutable GDExtension pointer to initialized Array storage.
 array_ptr :: proc "contextless" (a: ^Array) -> TypePtr {
 	if a == nil do _trap_nil_godot_function()

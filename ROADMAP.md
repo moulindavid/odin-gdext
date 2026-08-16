@@ -106,11 +106,11 @@ until the contained-handle rules are explicit and tested.
    - [x] Add facade exports only for helpers intended for normal users.
 
 4. Add safe typed array read helpers for borrowed object handles.
-   - [ ] Start with arrays of selected classes such as `Node`, `Node2D`,
+   - [x] Start with arrays of selected classes such as `Node`, `Node2D`,
      `Area2D`, and `CollisionObject2D`.
-   - [ ] Provide checked `get_as_*` helpers returning `(value, ok)`.
-   - [ ] Treat nil elements and failed class checks as `ok = false`.
-   - [ ] Keep returned handles borrowed and avoid retaining or freeing objects.
+   - [x] Provide checked `get_as_*` helpers returning `(value, ok)`.
+   - [x] Treat nil elements and failed class checks as `ok = false`.
+   - [x] Keep returned handles borrowed and avoid retaining or freeing objects.
 
 5. Enable one small generated typed-array API batch.
    - [ ] Prefer `Area2D` overlap query methods if their return ownership is a

@@ -932,6 +932,54 @@ object_ptr_try_as_area2d :: proc "contextless" (self: ObjectPtr) -> (value: Area
 	return object_try_as_area2d(Object(self))
 }
 
+typed_array_get_node :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: Node,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_node(object)
+}
+
+typed_array_get_node2d :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: Node2D,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_node2d(object)
+}
+
+typed_array_get_area2d :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: Area2D,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_area2d(object)
+}
+
+typed_array_get_collision_object2d :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: CollisionObject2D,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_collision_object2d(object)
+}
+
 object_ptr_try_as_packed_scene :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -1210,6 +1258,9 @@ typed_array_ptr :: gcore.typed_array_ptr
 const_typed_array_ptr :: gcore.const_typed_array_ptr
 uninitialized_typed_array_ptr :: gcore.uninitialized_typed_array_ptr
 typed_array_free :: gcore.typed_array_free
+typed_array_size :: gcore.typed_array_size
+typed_array_get_variant :: gcore.typed_array_get_variant
+typed_array_get_object :: gcore.typed_array_get_object
 array_push :: gcore.array_push
 array_size :: gcore.array_size
 array_is_empty :: gcore.array_is_empty
