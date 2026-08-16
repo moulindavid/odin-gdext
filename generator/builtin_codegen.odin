@@ -1471,10 +1471,24 @@ class_param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
 	return fmt.aprintf("cast(core.TypePtr)&_%s", arg_name)
 }
 
+typed_array_element_type :: proc(godot_name: string) -> (element_type: string, ok: bool) {
+	prefix := "typedarray::"
+	if strings.has_prefix(godot_name, prefix) do return godot_name[len(prefix):], true
+	if strings.has_prefix(godot_name, "TypedArray") do return "unknown", true
+	return "", false
+}
+
+typed_dictionary_element_type :: proc(godot_name: string) -> (element_type: string, ok: bool) {
+	prefix := "typeddictionary::"
+	if strings.has_prefix(godot_name, prefix) do return godot_name[len(prefix):], true
+	if strings.has_prefix(godot_name, "TypedDictionary") do return "unknown", true
+	return "", false
+}
+
 class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
 	if godot_name == "Callable" || godot_name == "Signal" do return true
-	if strings.has_prefix(godot_name, "typedarray::") do return true
-	if strings.has_prefix(godot_name, "TypedArray") do return true
+	if _, ok := typed_array_element_type(godot_name); ok do return true
+	if _, ok := typed_dictionary_element_type(godot_name); ok do return true
 	if strings.has_prefix(godot_name, "bitfield::") do return true
 	return false
 }
@@ -1513,12 +1527,40 @@ class_method_deferred_until_safety_model :: proc(class_name, method_name: string
 class_type_deferred_reason :: proc(godot_name: string) -> string {
 	if godot_name == "Callable" do return "Callable"
 	if godot_name == "Signal" do return "Signal"
-	if strings.has_prefix(godot_name, "typedarray::") do return "typed array"
-	if strings.has_prefix(godot_name, "TypedArray") do return "typed array"
+	if element_type, ok := typed_array_element_type(godot_name); ok {
+		return fmt.aprintf("typed array<%s>", element_type)
+	}
+	if element_type, ok := typed_dictionary_element_type(godot_name); ok {
+		return fmt.aprintf("typed dictionary<%s>", element_type)
+	}
 	if strings.has_prefix(godot_name, "bitfield::") do return "bitfield"
 	return ""
 }
 
+
+class_method_uses_typed_array :: proc(method: ExtensionApiClassMethod) -> bool {
+	if _, ok := typed_array_element_type(method.return_value.type); ok do return true
+	for arg in method.arguments {
+		if _, ok := typed_array_element_type(arg.type); ok do return true
+	}
+	return false
+}
+
+class_method_uses_typed_dictionary :: proc(method: ExtensionApiClassMethod) -> bool {
+	if _, ok := typed_dictionary_element_type(method.return_value.type); ok do return true
+	for arg in method.arguments {
+		if _, ok := typed_dictionary_element_type(arg.type); ok do return true
+	}
+	return false
+}
+
+class_method_uses_untyped_container :: proc(method: ExtensionApiClassMethod) -> bool {
+	if method.return_value.type == "Array" || method.return_value.type == "Dictionary" do return true
+	for arg in method.arguments {
+		if arg.type == "Array" || arg.type == "Dictionary" do return true
+	}
+	return false
+}
 
 class_method_uses_callable_or_signal :: proc(method: ExtensionApiClassMethod) -> bool {
 	if method.return_value.type == "Callable" || method.return_value.type == "Signal" do return true
@@ -1982,6 +2024,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&skipped)
 	signal_callable_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&signal_callable_blockers)
+	typed_array_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&typed_array_blockers)
+	typed_dictionary_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&typed_dictionary_blockers)
+	untyped_container_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&untyped_container_blockers)
 	candidate_analysis := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&candidate_analysis)
 
@@ -1989,6 +2037,9 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	owned_wrapper_count := 0
 	skipped_count := 0
 	signal_callable_blocker_count := 0
+	typed_array_blocker_count := 0
+	typed_dictionary_blocker_count := 0
+	untyped_container_blocker_count := 0
 	candidate_safe_count := 0
 	candidate_owned_wrapper_count := 0
 	candidate_skipped_count := 0
@@ -2094,6 +2145,9 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Owned-wrapper methods: %d\n", owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped selected-class methods: %d\n", skipped_count)
 	fmt.sbprintf(&b, "- Callable/Signal blockers: %d\n", signal_callable_blocker_count)
+	fmt.sbprintf(&b, "- Typed array blockers: %d\n", typed_array_blocker_count)
+	fmt.sbprintf(&b, "- Typed dictionary blockers: %d\n", typed_dictionary_blocker_count)
+	fmt.sbprintf(&b, "- Untyped container blockers: %d\n", untyped_container_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -2105,6 +2159,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(skipped))
 	strings.write_string(&b, "\n## Callable and Signal blockers\n\n")
 	strings.write_string(&b, strings.to_string(signal_callable_blockers))
+	strings.write_string(&b, "\n## Typed array blockers\n\n")
+	strings.write_string(&b, strings.to_string(typed_array_blockers))
+	strings.write_string(&b, "\n## Typed dictionary blockers\n\n")
+	strings.write_string(&b, strings.to_string(typed_dictionary_blockers))
+	strings.write_string(&b, "\n## Untyped container blockers\n\n")
+	strings.write_string(&b, strings.to_string(untyped_container_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 

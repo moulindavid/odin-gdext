@@ -88,13 +88,13 @@ until the contained-handle rules are explicit and tested.
      or destroy storage.
 
 2. Improve generated reporting for typed containers.
-   - [ ] Split typed array, typed dictionary, and untyped container skips into
+   - [x] Split typed array, typed dictionary, and untyped container skips into
      separate report buckets.
-   - [ ] Include the element type in skip reasons where `extension_api.json`
+   - [x] Include the element type in skip reasons where `extension_api.json`
      exposes it.
-   - [ ] Identify the smallest selected APIs unblocked by safe typed container
+   - [x] Identify the smallest selected APIs unblocked by safe typed container
      reads.
-   - [ ] Keep generated wrappers disabled until their container and element
+   - [x] Keep generated wrappers disabled until their container and element
      ownership rules are implemented.
 
 3. Add typed array storage aliases and pointer helpers where needed.
