@@ -65,82 +65,86 @@ object signal connection helpers, fixed-arity signal emission helpers, generated
 blocker reporting, facade compile coverage, smoke/example coverage, and full
 `make ci` validation.
 
-## Current goal: typed arrays and typed dictionaries
+## Completed: typed arrays and typed dictionaries
 
-Add a small, safe model for Godot typed containers so generated gameplay APIs can
-return or consume collections without exposing raw temporary storage. This is the
-next practical blocker for methods such as overlap queries, scene-tree queries,
-and APIs that return collections of borrowed object/class handles.
+The typed container slice added a first safe model for typed arrays returned by
+selected generated APIs. Completed coverage includes typed container ownership
+rules, typed array and typed dictionary blocker reporting, `TypedArray` storage
+aliases over `Array` storage, checked read helpers for borrowed object handles,
+selected generated `Area2D` overlap methods, facade exports, smoke/facade
+coverage, and full `make ci` validation.
 
-Keep this roadmap narrow. Start with reporting, ownership rules, and selected
-read-only or copy-out helpers. Do not expose broad typed container mutation,
-borrowed slices into Godot storage, or typed arrays of lifetime-sensitive objects
-until the contained-handle rules are explicit and tested.
+## Current goal: default arguments and overload ergonomics
 
-1. Define typed container ownership rules.
-   - [x] Document that typed array and dictionary wrapper values own only the
-     container storage, not the Godot objects referenced inside it.
-   - [x] Document that object/class handles read from containers are borrowed by
-     value and must be checked for nil/class identity before use.
-   - [x] Document that helpers must not return Odin slices into temporary Godot
-     storage.
-   - [x] Keep typed container helpers explicit about whether they copy, borrow,
-     or destroy storage.
+Add a small generated wrapper strategy for Godot methods that are otherwise safe
+but currently skipped or awkward because they expose default arguments. This
+should improve real usability without expanding into varargs, broad overload
+sets, or lifetime-sensitive APIs.
 
-2. Improve generated reporting for typed containers.
-   - [x] Split typed array, typed dictionary, and untyped container skips into
-     separate report buckets.
-   - [x] Include the element type in skip reasons where `extension_api.json`
-     exposes it.
-   - [x] Identify the smallest selected APIs unblocked by safe typed container
-     reads.
-   - [x] Keep generated wrappers disabled until their container and element
-     ownership rules are implemented.
+Keep this roadmap narrow. Start with reporting and deterministic naming, then
+enable only a selected method batch where all explicit argument types already
+satisfy the ownership model. Do not infer unsafe defaults, hide ownership, or
+emit wrappers that collide with existing generated names.
 
-3. Add typed array storage aliases and pointer helpers where needed.
-   - [x] Reuse existing `Array` storage for Godot typed arrays when the ABI uses
-     normal `Array` storage with type metadata.
-   - [x] Add named typed-array wrapper aliases only if they improve type safety
-     for generated APIs.
-   - [x] Preserve existing `Array` construction, copy, and destruction rules.
-   - [x] Add facade exports only for helpers intended for normal users.
+1. Define default-argument wrapper policy.
+   - [ ] Document that full-arity wrappers remain the canonical generated API.
+   - [ ] Generate shorter convenience wrappers only when omitted arguments have
+     stable `extension_api.json` defaults and supported types.
+   - [ ] Keep wrapper names deterministic and collision-free.
+   - [ ] Do not support varargs as part of this roadmap.
 
-4. Add safe typed array read helpers for borrowed object handles.
-   - [x] Start with arrays of selected classes such as `Node`, `Node2D`,
-     `Area2D`, and `CollisionObject2D`.
-   - [x] Provide checked `get_as_*` helpers returning `(value, ok)`.
-   - [x] Treat nil elements and failed class checks as `ok = false`.
-   - [x] Keep returned handles borrowed and avoid retaining or freeing objects.
+2. Improve reporting for default arguments.
+   - [ ] Split default-argument skips from unsupported type and lifetime skips.
+   - [ ] Report which arguments have defaults and their raw Godot default value.
+   - [ ] Identify the smallest safe selected method batch that becomes useful
+     with convenience wrappers.
+   - [ ] Keep methods with unsupported default values skipped with explicit
+     reasons.
 
-5. Enable one small generated typed-array API batch.
-   - [x] Prefer `Area2D` overlap query methods if their return ownership is a
-     normal owned `Array` value.
-   - [x] Generate wrappers only when the return container is owned and has an
-     explicit destruction path.
-   - [x] Keep mutation-heavy or lifetime-sensitive container APIs skipped.
-   - [x] Re-export the selected wrappers through `godot:godot`.
+3. Add default value parsing for primitive and simple value types.
+   - [ ] Start with `bool`, integer values, `GodotReal`, empty `String`, and nil
+     object defaults where ownership is clear.
+   - [ ] Convert parsed defaults into local Odin temporaries before ptrcall.
+   - [ ] Reuse existing owned value construction and destruction helpers for any
+     default that needs Godot storage.
+   - [ ] Defer complex expressions, enum aliases, objects needing construction,
+     arrays, dictionaries, `Callable`, `Signal`, and resource defaults.
 
-6. Add smoke and facade coverage.
-   - [x] Add facade compile checks for typed container helpers and selected
-     generated methods.
-   - [x] Add a smoke path that constructs or receives a typed container and reads
-     borrowed handles safely.
-   - [x] Keep beginner examples readable and avoid making typed containers the
-     first concept users see.
-   - [x] Confirm normal examples still import only `godot:godot`.
+4. Generate deterministic convenience wrappers for selected methods.
+   - [ ] Keep the full explicit wrapper unchanged.
+   - [ ] Emit suffix-based or arity-based wrapper names that cannot collide with
+     selected explicit methods.
+   - [ ] Ensure temporary defaults are destroyed on every path.
+   - [ ] Validate generated output remains stable.
+
+5. Enable one small generated default-argument batch.
+   - [ ] Prefer selected `Node`, `Control`, `Timer`, or `Area2D` methods already
+     generated with explicit arguments.
+   - [ ] Add only wrappers whose omitted arguments are primitive or simple owned
+     values.
+   - [ ] Re-export selected convenience wrappers through `godot:godot`.
+   - [ ] Keep broad overload coverage deferred.
+
+6. Add facade and smoke coverage.
+   - [ ] Add facade compile checks for generated convenience wrappers.
+   - [ ] Add or extend smoke/example usage where defaulted wrappers improve
+     readability.
+   - [ ] Keep beginner examples readable and still importing only `godot:godot`.
+   - [ ] Confirm existing explicit wrappers still compile.
 
 7. Validate before moving to the next feature roadmap.
-   - [x] Run `make ci`.
-   - [x] Confirm generated reports explain remaining typed container skips.
-   - [x] Confirm no helper returns slices or pointers into temporary Godot
-     storage.
-   - [x] Confirm owned container values have matching destruction paths.
+   - [ ] Run `make ci`.
+   - [ ] Confirm generated reports explain remaining default-argument skips.
+   - [ ] Confirm no generated wrapper violates borrowed-object or owned-value
+     destruction rules.
+   - [ ] Confirm generated output is deterministic.
 
 ## Deferred until after this goal
 
+- broad overload coverage
+- vararg methods
+- complex default value expressions
 - broad typed container mutation APIs
-- default arguments and overload ergonomics
-- broad vararg signal emission
 - arbitrary callable binding helpers
 - generated signal wrappers beyond selected safe paths
 - broad `Resource`, `PackedScene`, texture, theme, and asset APIs
