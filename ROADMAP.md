@@ -78,13 +78,13 @@ borrowed slices into Godot storage, or typed arrays of lifetime-sensitive object
 until the contained-handle rules are explicit and tested.
 
 1. Define typed container ownership rules.
-   - [ ] Document that typed array and dictionary wrapper values own only the
+   - [x] Document that typed array and dictionary wrapper values own only the
      container storage, not the Godot objects referenced inside it.
-   - [ ] Document that object/class handles read from containers are borrowed by
+   - [x] Document that object/class handles read from containers are borrowed by
      value and must be checked for nil/class identity before use.
-   - [ ] Document that helpers must not return Odin slices into temporary Godot
+   - [x] Document that helpers must not return Odin slices into temporary Godot
      storage.
-   - [ ] Keep typed container helpers explicit about whether they copy, borrow,
+   - [x] Keep typed container helpers explicit about whether they copy, borrow,
      or destroy storage.
 
 2. Improve generated reporting for typed containers.

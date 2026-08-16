@@ -1009,6 +1009,14 @@ rid_get_id :: proc "contextless" (r: ^RID) -> i64 {
 // an Array in it.
 ArrayStorage :: [GDExtensionArray_Size]u8
 
+// TypedArray values in Godot use Array-compatible storage plus runtime element
+// metadata. This package keeps the same ownership model for typed containers:
+// owning a container only owns the container storage, not any Object handles
+// referenced by its elements. Object/class handles read from a container are
+// borrowed by value and must be nil/class checked before use. Helpers must copy
+// values out through Godot APIs and must not return slices or pointers into
+// temporary Godot storage.
+
 // Array is initialized Godot Array storage. Every proc returning an Array
 // transfers ownership to the caller; destroy it with array_free when finished.
 Array :: distinct ArrayStorage
