@@ -575,6 +575,8 @@ area2d_set_monitorable :: gclass.area2d_set_monitorable
 area2d_is_monitorable :: gclass.area2d_is_monitorable
 area2d_has_overlapping_bodies :: gclass.area2d_has_overlapping_bodies
 area2d_has_overlapping_areas :: gclass.area2d_has_overlapping_areas
+area2d_get_overlapping_bodies :: gclass.area2d_get_overlapping_bodies
+area2d_get_overlapping_areas :: gclass.area2d_get_overlapping_areas
 area2d_set_audio_bus_name :: gclass.area2d_set_audio_bus_name
 area2d_get_audio_bus_name :: gclass.area2d_get_audio_bus_name
 area2d_set_audio_bus_override :: gclass.area2d_set_audio_bus_override

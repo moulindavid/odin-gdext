@@ -281,6 +281,9 @@ resolve_param_type :: proc(godot_name: string) -> string {
 
 param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
 	if godot_type == "Variant" do return fmt.aprintf("core.variant_ptr(%s)", arg_name)
+	if _, typed_array_ok := typed_array_element_type(godot_type); typed_array_ok {
+		return fmt.aprintf("core.const_typed_array_ptr(%s)", arg_name)
+	}
 	if entry, ok := completed_core_value_entry(godot_type); ok {
 		return fmt.aprintf("%s(%s)", entry.ptr, arg_name)
 	}
@@ -1274,6 +1277,8 @@ selected_class_methods := []Selected_Class_Method {
 	{"Area2D", "is_monitorable"},
 	{"Area2D", "has_overlapping_bodies"},
 	{"Area2D", "has_overlapping_areas"},
+	{"Area2D", "get_overlapping_bodies"},
+	{"Area2D", "get_overlapping_areas"},
 	{"Area2D", "set_audio_bus_name"},
 	{"Area2D", "get_audio_bus_name"},
 	{"Area2D", "set_audio_bus_override"},
@@ -1444,11 +1449,15 @@ class_abi_type_map := map[string]string {
 // - Completed owned value params are borrowed pointers; returns are owned storage.
 // - Variant params are borrowed pointers; Variant returns are owned storage.
 // - Primitive and memory-compatible builtin values are passed by value.
-// - Callable, Signal, varargs, typed arrays, and lifetime-sensitive APIs are deferred.
+// - Typed array returns use owned core.TypedArray storage and explicit destruction.
+// - Callable, Signal, varargs, typed dictionaries, and lifetime-sensitive APIs are deferred.
 resolve_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
 	if godot_name == "" || godot_name == "void" do return "", true
 	if enum_type, enum_ok := class_enum_type_from_godot(godot_name); enum_ok do return enum_type, true
 	if godot_name == "Variant" do return "core.Variant", true
+	if _, typed_array_ok := typed_array_element_type(godot_name); typed_array_ok {
+		return "core.TypedArray", true
+	}
 	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok do return entry.odin, true
 	if is_selected_class(godot_name) do return class_handle_expr(godot_name), true
 	if t, map_ok := class_abi_type_map[godot_name]; map_ok do return t, true
@@ -1457,6 +1466,9 @@ resolve_class_return_type :: proc(godot_name: string) -> (odin_type: string, ok:
 
 resolve_class_param_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
 	if godot_name == "Variant" do return "^core.Variant", true
+	if _, typed_array_ok := typed_array_element_type(godot_name); typed_array_ok {
+		return "^core.TypedArray", true
+	}
 	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok {
 		return fmt.aprintf("^%s", entry.odin), true
 	}
@@ -1465,6 +1477,9 @@ resolve_class_param_type :: proc(godot_name: string) -> (odin_type: string, ok: 
 
 class_param_ptr_expr :: proc(arg_name, godot_type: string) -> string {
 	if godot_type == "Variant" do return fmt.aprintf("core.variant_ptr(%s)", arg_name)
+	if _, typed_array_ok := typed_array_element_type(godot_type); typed_array_ok {
+		return fmt.aprintf("core.const_typed_array_ptr(%s)", arg_name)
+	}
 	if entry, ok := completed_core_value_entry(godot_type); ok {
 		return fmt.aprintf("%s(%s)", entry.ptr, arg_name)
 	}
@@ -1487,7 +1502,6 @@ typed_dictionary_element_type :: proc(godot_name: string) -> (element_type: stri
 
 class_type_deferred_until_safety_model :: proc(godot_name: string) -> bool {
 	if godot_name == "Callable" || godot_name == "Signal" do return true
-	if _, ok := typed_array_element_type(godot_name); ok do return true
 	if _, ok := typed_dictionary_element_type(godot_name); ok do return true
 	if strings.has_prefix(godot_name, "bitfield::") do return true
 	return false
@@ -1527,9 +1541,6 @@ class_method_deferred_until_safety_model :: proc(class_name, method_name: string
 class_type_deferred_reason :: proc(godot_name: string) -> string {
 	if godot_name == "Callable" do return "Callable"
 	if godot_name == "Signal" do return "Signal"
-	if element_type, ok := typed_array_element_type(godot_name); ok {
-		return fmt.aprintf("typed array<%s>", element_type)
-	}
 	if element_type, ok := typed_dictionary_element_type(godot_name); ok {
 		return fmt.aprintf("typed dictionary<%s>", element_type)
 	}
@@ -1588,6 +1599,9 @@ resolve_candidate_class_return_type :: proc(godot_name: string) -> (odin_type: s
 	if godot_name == "" || godot_name == "void" do return "", true
 	if enum_type, enum_ok := class_enum_type_from_godot(godot_name); enum_ok do return enum_type, true
 	if godot_name == "Variant" do return "core.Variant", true
+	if _, typed_array_ok := typed_array_element_type(godot_name); typed_array_ok {
+		return "core.TypedArray", true
+	}
 	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok do return entry.odin, true
 	if is_selected_class(godot_name) || is_candidate_class(godot_name) {
 		return class_handle_expr(godot_name), true
@@ -1598,6 +1612,9 @@ resolve_candidate_class_return_type :: proc(godot_name: string) -> (odin_type: s
 
 resolve_candidate_class_param_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
 	if godot_name == "Variant" do return "^core.Variant", true
+	if _, typed_array_ok := typed_array_element_type(godot_name); typed_array_ok {
+		return "^core.TypedArray", true
+	}
 	if entry, entry_ok := completed_core_value_entry(godot_name); entry_ok {
 		return fmt.aprintf("^%s", entry.odin), true
 	}
@@ -2216,6 +2233,13 @@ emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 				fmt.sbprintf(
 					b,
 					"// %s returns an initialized Variant; call core.variant_free when done.\n",
+					proc_name,
+				)
+			} else if _, typed_array_ok := typed_array_element_type(method.return_value.type);
+			   typed_array_ok {
+				fmt.sbprintf(
+					b,
+					"// %s returns initialized TypedArray storage; call core.typed_array_free when done.\n",
 					proc_name,
 				)
 			} else if entry_value, entry_ok := completed_core_value_entry(

@@ -113,12 +113,12 @@ until the contained-handle rules are explicit and tested.
    - [x] Keep returned handles borrowed and avoid retaining or freeing objects.
 
 5. Enable one small generated typed-array API batch.
-   - [ ] Prefer `Area2D` overlap query methods if their return ownership is a
+   - [x] Prefer `Area2D` overlap query methods if their return ownership is a
      normal owned `Array` value.
-   - [ ] Generate wrappers only when the return container is owned and has an
+   - [x] Generate wrappers only when the return container is owned and has an
      explicit destruction path.
-   - [ ] Keep mutation-heavy or lifetime-sensitive container APIs skipped.
-   - [ ] Re-export the selected wrappers through `godot:godot`.
+   - [x] Keep mutation-heavy or lifetime-sensitive container APIs skipped.
+   - [x] Re-export the selected wrappers through `godot:godot`.
 
 6. Add smoke and facade coverage.
    - [ ] Add facade compile checks for typed container helpers and selected
