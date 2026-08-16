@@ -121,13 +121,13 @@ until the contained-handle rules are explicit and tested.
    - [x] Re-export the selected wrappers through `godot:godot`.
 
 6. Add smoke and facade coverage.
-   - [ ] Add facade compile checks for typed container helpers and selected
+   - [x] Add facade compile checks for typed container helpers and selected
      generated methods.
-   - [ ] Add a smoke path that constructs or receives a typed container and reads
+   - [x] Add a smoke path that constructs or receives a typed container and reads
      borrowed handles safely.
-   - [ ] Keep beginner examples readable and avoid making typed containers the
+   - [x] Keep beginner examples readable and avoid making typed containers the
      first concept users see.
-   - [ ] Confirm normal examples still import only `godot:godot`.
+   - [x] Confirm normal examples still import only `godot:godot`.
 
 7. Validate before moving to the next feature roadmap.
    - [ ] Run `make ci`.
