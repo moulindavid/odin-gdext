@@ -130,11 +130,11 @@ until the contained-handle rules are explicit and tested.
    - [x] Confirm normal examples still import only `godot:godot`.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm generated reports explain remaining typed container skips.
-   - [ ] Confirm no helper returns slices or pointers into temporary Godot
+   - [x] Run `make ci`.
+   - [x] Confirm generated reports explain remaining typed container skips.
+   - [x] Confirm no helper returns slices or pointers into temporary Godot
      storage.
-   - [ ] Confirm owned container values have matching destruction paths.
+   - [x] Confirm owned container values have matching destruction paths.
 
 ## Deferred until after this goal
 
