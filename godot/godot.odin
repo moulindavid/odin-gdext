@@ -90,6 +90,8 @@ RIDStorage :: gcore.RIDStorage
 RID :: gcore.RID
 ArrayStorage :: gcore.ArrayStorage
 Array :: gcore.Array
+TypedArrayStorage :: gcore.TypedArrayStorage
+TypedArray :: gcore.TypedArray
 DictionaryStorage :: gcore.DictionaryStorage
 Dictionary :: gcore.Dictionary
 PackedByteArrayStorage :: gcore.PackedByteArrayStorage
@@ -1204,6 +1206,10 @@ array_new :: gcore.array_new
 array_init_copy :: gcore.array_init_copy
 array_copy :: gcore.array_copy
 array_free :: gcore.array_free
+typed_array_ptr :: gcore.typed_array_ptr
+const_typed_array_ptr :: gcore.const_typed_array_ptr
+uninitialized_typed_array_ptr :: gcore.uninitialized_typed_array_ptr
+typed_array_free :: gcore.typed_array_free
 array_push :: gcore.array_push
 array_size :: gcore.array_size
 array_is_empty :: gcore.array_is_empty

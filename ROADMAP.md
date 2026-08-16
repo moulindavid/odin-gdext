@@ -98,12 +98,12 @@ until the contained-handle rules are explicit and tested.
      ownership rules are implemented.
 
 3. Add typed array storage aliases and pointer helpers where needed.
-   - [ ] Reuse existing `Array` storage for Godot typed arrays when the ABI uses
+   - [x] Reuse existing `Array` storage for Godot typed arrays when the ABI uses
      normal `Array` storage with type metadata.
-   - [ ] Add named typed-array wrapper aliases only if they improve type safety
+   - [x] Add named typed-array wrapper aliases only if they improve type safety
      for generated APIs.
-   - [ ] Preserve existing `Array` construction, copy, and destruction rules.
-   - [ ] Add facade exports only for helpers intended for normal users.
+   - [x] Preserve existing `Array` construction, copy, and destruction rules.
+   - [x] Add facade exports only for helpers intended for normal users.
 
 4. Add safe typed array read helpers for borrowed object handles.
    - [ ] Start with arrays of selected classes such as `Node`, `Node2D`,

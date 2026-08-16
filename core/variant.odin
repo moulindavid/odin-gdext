@@ -1021,6 +1021,35 @@ ArrayStorage :: [GDExtensionArray_Size]u8
 // transfers ownership to the caller; destroy it with array_free when finished.
 Array :: distinct ArrayStorage
 
+TypedArrayStorage :: ArrayStorage
+
+// TypedArray is initialized Godot Array-compatible storage with runtime element
+// metadata. It owns only the container storage; elements that are Object handles
+// remain borrowed Godot objects.
+TypedArray :: distinct TypedArrayStorage
+
+// typed_array_ptr returns a mutable GDExtension pointer to initialized TypedArray storage.
+typed_array_ptr :: proc "contextless" (a: ^TypedArray) -> TypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(TypePtr)a
+}
+
+// const_typed_array_ptr returns a read-only GDExtension pointer to initialized TypedArray storage.
+const_typed_array_ptr :: proc "contextless" (a: ^TypedArray) -> ConstTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)a
+}
+
+// uninitialized_typed_array_ptr returns storage Godot is about to initialize.
+uninitialized_typed_array_ptr :: proc "contextless" (a: ^TypedArray) -> UninitializedTypePtr {
+	if a == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)a
+}
+
+typed_array_free :: proc "contextless" (a: ^TypedArray) {
+	destroy_builtin(.Array, typed_array_ptr(a))
+}
+
 // array_ptr returns a mutable GDExtension pointer to initialized Array storage.
 array_ptr :: proc "contextless" (a: ^Array) -> TypePtr {
 	if a == nil do _trap_nil_godot_function()
