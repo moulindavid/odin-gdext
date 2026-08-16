@@ -56,92 +56,93 @@ coverage includes `Timer`, `CollisionObject2D`, `Area2D`, and a cautious minimal
 `PackedScene` slice. The public facade and examples now exercise these APIs
 through `godot:godot`, and `make ci` passed for the completed slice.
 
-## Current goal: Signals and Callable groundwork
+## Completed: Signals and Callable groundwork
 
-Add a small, safe signal and callable model so generated gameplay APIs can grow
-beyond direct method calls. This is the next feature bottleneck for real Godot
-usage: `Area2D`, UI controls, timers, and many scene systems rely on connecting,
-emitting, and handling signals.
+The signal and callable slice added a minimal safe model for direct gameplay
+usage without enabling broad generated signal APIs. Completed coverage includes
+owned `Callable` and `Signal` storage helpers, explicit destruction rules, safe
+object signal connection helpers, fixed-arity signal emission helpers, generated
+blocker reporting, facade compile coverage, smoke/example coverage, and full
+`make ci` validation.
 
-Keep this roadmap narrow. Start with explicit, fixed-shape helpers and generated
-support reporting. Do not enable broad vararg signal emission, arbitrary
-`Callable` construction, or generated signal wrappers until ownership and
-temporary `Variant` cleanup are proven.
+## Current goal: typed arrays and typed dictionaries
 
-1. Define signal and callable ownership rules.
-   - [ ] Document borrowed versus owned `Callable` and `Signal` storage rules in
-     code comments near the wrappers.
-   - [ ] Decide which helpers return owned initialized values and which only
-     borrow existing Godot storage.
-   - [ ] Document temporary `Variant` cleanup rules for signal arguments.
-   - [ ] Keep unsupported callable/signal forms skipped with stable reasons in
-     generated reports.
+Add a small, safe model for Godot typed containers so generated gameplay APIs can
+return or consume collections without exposing raw temporary storage. This is the
+next practical blocker for methods such as overlap queries, scene-tree queries,
+and APIs that return collections of borrowed object/class handles.
 
-2. Add minimal `Callable` storage helpers.
-   - [ ] Add `Callable` storage, pointer helpers, copy/init helpers, and a
-     destructor if the Godot ABI exposes them through builtin APIs.
-   - [ ] Add nil/trap checks for any constructor, destructor, or method bind used
-     by the wrappers.
-   - [ ] Add a compile or smoke check proving owned `Callable` values are
-     destroyed on every path.
-   - [ ] Do not expose arbitrary lambda/object binding helpers until the object
-     lifetime model is explicit.
+Keep this roadmap narrow. Start with reporting, ownership rules, and selected
+read-only or copy-out helpers. Do not expose broad typed container mutation,
+borrowed slices into Godot storage, or typed arrays of lifetime-sensitive objects
+until the contained-handle rules are explicit and tested.
 
-3. Add minimal `Signal` storage helpers.
-   - [ ] Add `Signal` storage, pointer helpers, copy/init helpers, and a
-     destructor if needed by the Godot ABI.
-   - [ ] Support constructing or retrieving a signal only through safe selected
-     paths.
-   - [ ] Keep signal values owned or borrowed according to explicit helper names.
-   - [ ] Add focused tests for destruction and type checks where practical.
+1. Define typed container ownership rules.
+   - [ ] Document that typed array and dictionary wrapper values own only the
+     container storage, not the Godot objects referenced inside it.
+   - [ ] Document that object/class handles read from containers are borrowed by
+     value and must be checked for nil/class identity before use.
+   - [ ] Document that helpers must not return Odin slices into temporary Godot
+     storage.
+   - [ ] Keep typed container helpers explicit about whether they copy, borrow,
+     or destroy storage.
 
-4. Add safe object signal connection helpers.
-   - [ ] Wrap selected Godot object signal connection APIs behind helpers with
-     explicit object-handle borrowing rules.
-   - [ ] Start with connecting an object signal to an existing `Callable`.
-   - [ ] Return checked errors or trap consistently based on the existing call
-     error pattern.
-   - [ ] Defer flags-heavy or bind-argument-heavy connection helpers until the
-     minimal path is proven.
+2. Improve generated reporting for typed containers.
+   - [ ] Split typed array, typed dictionary, and untyped container skips into
+     separate report buckets.
+   - [ ] Include the element type in skip reasons where `extension_api.json`
+     exposes it.
+   - [ ] Identify the smallest selected APIs unblocked by safe typed container
+     reads.
+   - [ ] Keep generated wrappers disabled until their container and element
+     ownership rules are implemented.
 
-5. Add safe signal emission helpers.
-   - [ ] Keep the existing no-argument emission path working through the public
-     facade.
-   - [ ] Add fixed-arity primitive emission helpers, starting with one and two
-     primitive arguments.
-   - [ ] Destroy every temporary `Variant` on success and failure paths.
-   - [ ] Return or trap on `GDExtensionCallError` consistently.
-   - [ ] Defer broad vararg emission helpers.
+3. Add typed array storage aliases and pointer helpers where needed.
+   - [ ] Reuse existing `Array` storage for Godot typed arrays when the ABI uses
+     normal `Array` storage with type metadata.
+   - [ ] Add named typed-array wrapper aliases only if they improve type safety
+     for generated APIs.
+   - [ ] Preserve existing `Array` construction, copy, and destruction rules.
+   - [ ] Add facade exports only for helpers intended for normal users.
 
-6. Teach the generator to report signal and callable blockers.
-   - [ ] Extend generated API reporting to separate skipped `Callable` and
-     `Signal` methods from other unsupported signatures.
-   - [ ] Identify a small set of generated APIs that become safe once the minimal
-     helpers exist.
-   - [ ] Keep generated wrappers disabled for APIs whose object lifetime or
-     argument ownership remains unclear.
+4. Add safe typed array read helpers for borrowed object handles.
+   - [ ] Start with arrays of selected classes such as `Node`, `Node2D`,
+     `Area2D`, and `CollisionObject2D`.
+   - [ ] Provide checked `get_as_*` helpers returning `(value, ok)`.
+   - [ ] Treat nil elements and failed class checks as `ok = false`.
+   - [ ] Keep returned handles borrowed and avoid retaining or freeing objects.
 
-7. Exercise the minimal model in examples.
-   - [ ] Use normal `godot:godot` imports only.
-   - [ ] Add or update a real example where Odin registers or emits a signal in a
-     way visible from the Godot project.
-   - [ ] If safe connection is ready, connect a selected Godot signal to an Odin
-     method or callable path.
-   - [ ] Keep broad smoke coverage separate from the beginner example.
+5. Enable one small generated typed-array API batch.
+   - [ ] Prefer `Area2D` overlap query methods if their return ownership is a
+     normal owned `Array` value.
+   - [ ] Generate wrappers only when the return container is owned and has an
+     explicit destruction path.
+   - [ ] Keep mutation-heavy or lifetime-sensitive container APIs skipped.
+   - [ ] Re-export the selected wrappers through `godot:godot`.
 
-8. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm every temporary `Variant`, owned `Callable`, and owned `Signal`
-     has an explicit destruction path.
-   - [ ] Confirm generated reports explain remaining signal/callable skips.
+6. Add smoke and facade coverage.
+   - [ ] Add facade compile checks for typed container helpers and selected
+     generated methods.
+   - [ ] Add a smoke path that constructs or receives a typed container and reads
+     borrowed handles safely.
+   - [ ] Keep beginner examples readable and avoid making typed containers the
+     first concept users see.
    - [ ] Confirm normal examples still import only `godot:godot`.
+
+7. Validate before moving to the next feature roadmap.
+   - [ ] Run `make ci`.
+   - [ ] Confirm generated reports explain remaining typed container skips.
+   - [ ] Confirm no helper returns slices or pointers into temporary Godot
+     storage.
+   - [ ] Confirm owned container values have matching destruction paths.
 
 ## Deferred until after this goal
 
+- broad typed container mutation APIs
+- default arguments and overload ergonomics
 - broad vararg signal emission
 - arbitrary callable binding helpers
-- default arguments and overload ergonomics
-- typed arrays and typed dictionaries
+- generated signal wrappers beyond selected safe paths
 - broad `Resource`, `PackedScene`, texture, theme, and asset APIs
 - `PackedScene.instantiate` and `Resource.duplicate` ownership-transfer wrappers
 - full virtual method generation

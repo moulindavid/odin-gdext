@@ -190,7 +190,9 @@ owned_ref_counted_destroy :: proc "contextless" (self: ^OwnedRefCounted) -> (ok:
 	return release_ok
 }
 
-// Signal emission.
+// Signal emission. These helpers call Object.emit_signal through Variant call
+// storage. The signal name is borrowed, and each temporary Variant is destroyed
+// before returning, including checked error paths.
 
 emit_signal_method_name_data: StaticStringName
 signal_emission_object_class_name_data: StaticStringName
@@ -288,6 +290,55 @@ object_emit_signal_1_godot_real :: proc "contextless" (
 	value: GodotReal,
 ) {
 	err := object_emit_signal_1_godot_real_checked(object, signal_name, value)
+	require_call_ok(&err)
+}
+
+
+object_emit_signal_2_godot_real_checked :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	a: GodotReal,
+	b: GodotReal,
+) -> (
+	err: CallError,
+) {
+	if object == nil || signal_name == nil do _trap_nil_godot_function()
+	init_signal_emission()
+
+	if object_method_bind_call == nil do _trap_nil_godot_function()
+	if emit_signal_method_bind == nil do _trap_nil_godot_function()
+
+	signal_variant := variant_from_string_name_ptr(signal_name)
+	a_variant := variant_from_float(a)
+	b_variant := variant_from_float(b)
+	args := [3]ConstVariantPtr {
+		const_variant_ptr(&signal_variant),
+		const_variant_ptr(&a_variant),
+		const_variant_ptr(&b_variant),
+	}
+	ret: Variant
+	object_method_bind_call(
+		emit_signal_method_bind,
+		object,
+		&args[0],
+		3,
+		uninitialized_variant_ptr(&ret),
+		&err,
+	)
+	if call_error_ok(&err) do variant_free(&ret)
+	variant_free(&b_variant)
+	variant_free(&a_variant)
+	variant_free(&signal_variant)
+	return
+}
+
+object_emit_signal_2_godot_real :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	a: GodotReal,
+	b: GodotReal,
+) {
+	err := object_emit_signal_2_godot_real_checked(object, signal_name, a, b)
 	require_call_ok(&err)
 }
 

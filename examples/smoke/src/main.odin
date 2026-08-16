@@ -253,7 +253,6 @@ hello_ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
 			position.y,
 		),
 	)
-
 	// Generated utility smoke checks.
 	gt.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
 	gt.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
@@ -286,7 +285,13 @@ add_adapter_method :: proc "contextless" (
 ) {
 	self, self_ok := hello_node_from_instance(instance)
 	if !self_ok do return 0, false
-	gt.object_emit_signal_0(hello_node_object(self), pinged_signal_name)
+	object := hello_node_object(self)
+	pinged_signal := gt.signal_from_object_signal(object, pinged_signal_name)
+	defer gt.signal_free(&pinged_signal)
+	roll_math_callable := gt.callable_from_object_method(object, roll_math_method_name)
+	defer gt.callable_free(&roll_math_callable)
+	if gt.signal_connect_checked(&pinged_signal, &roll_math_callable) != 0 do return 0, false
+	gt.object_emit_signal_0(object, pinged_signal_name)
 	return add(self, a, b), true
 }
 

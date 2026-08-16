@@ -18,6 +18,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
 	meta_value: ^gt.Variant,
+	callable: ^gt.Callable,
+	signal: ^gt.Signal,
 ) {
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
@@ -78,6 +80,32 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.node_set_physics_process(node, true)
 	_ = gt.node_is_physics_processing(node)
 	_ = gt.node_get_physics_process_delta_time(node)
+	callable_copy := gt.callable_copy(callable)
+	_ = gt.callable_is_null(&callable_copy)
+	_ = gt.callable_is_valid(&callable_copy)
+	gt.callable_free(&callable_copy)
+
+	signal_copy := gt.signal_copy(signal)
+	_ = gt.signal_is_null(&signal_copy)
+	signal_name_copy := gt.signal_get_name(&signal_copy)
+	gt.string_name_free(&signal_name_copy)
+	gt.signal_free(&signal_copy)
+
+	_ = gt.signal_connect_checked(signal, callable, 0)
+	_ = gt.object_signal_connect_checked(
+		gt.Node2D(node2d),
+		gt.const_string_name_ptr(meta_name),
+		callable,
+		0,
+	)
+
+	_ = gt.object_emit_signal_2_godot_real_checked(
+		gt.Node2D(node2d),
+		gt.const_string_name_ptr(meta_name),
+		1,
+		2,
+	)
+
 
 	gt.canvas_item_set_visible(canvas_item, true)
 	_ = gt.canvas_item_is_visible(canvas_item)

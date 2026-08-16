@@ -14,6 +14,11 @@ NODE_PATH_IS_ABSOLUTE_HASH :: 3918633141
 NODE_PATH_GET_NAME_HASH :: 2948586938
 NODE_PATH_GET_NAME_COUNT_HASH :: 3173160232
 NODE_PATH_GET_CONCATENATED_NAMES_HASH :: 1825232092
+CALLABLE_IS_NULL_HASH :: 3918633141
+CALLABLE_IS_VALID_HASH :: 3918633141
+SIGNAL_IS_NULL_HASH :: 3918633141
+SIGNAL_GET_NAME_HASH :: 1825232092
+SIGNAL_CONNECT_HASH :: 979702392
 ARRAY_SIZE_HASH :: 3173160232
 ARRAY_IS_EMPTY_HASH :: 3918633141
 ARRAY_CLEAR_HASH :: 3218959716
@@ -94,6 +99,8 @@ GDExtensionVariant_Size :: 24
 GDExtensionString_Size :: 8
 GDExtensionStringName_Size :: 8
 GDExtensionNodePath_Size :: 8
+GDExtensionCallable_Size :: 16
+GDExtensionSignal_Size :: 16
 GDExtensionRID_Size :: 8
 GDExtensionArray_Size :: 8
 GDExtensionDictionary_Size :: 8
@@ -673,6 +680,255 @@ node_path_hash :: proc "contextless" (p: ^NodePath) -> i64 {
 	return call_builtin_method_ptr_ret(node_path_hash_method.method, const_node_path_ptr(p), i64)
 }
 
+
+CallableStorage :: [GDExtensionCallable_Size]u8
+
+// Callable is owned initialized Godot Callable storage. Values returned by
+// callable_* constructors must be destroyed with callable_free. Helpers taking
+// ^Callable borrow that storage for the call only and never retain captured
+// Object handles.
+Callable :: distinct CallableStorage
+
+callable_ptr :: proc "contextless" (c: ^Callable) -> TypePtr {
+	if c == nil do _trap_nil_godot_function()
+	return cast(TypePtr)c
+}
+
+const_callable_ptr :: proc "contextless" (c: ^Callable) -> ConstTypePtr {
+	if c == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)c
+}
+
+uninitialized_callable_ptr :: proc "contextless" (c: ^Callable) -> UninitializedTypePtr {
+	if c == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)c
+}
+
+callable_init_nil :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	if !construct_builtin(.Callable, dest) do _trap_nil_godot_function()
+}
+
+callable_nil :: proc "contextless" () -> (result: Callable) {
+	callable_init_nil(uninitialized_callable_ptr(&result))
+	return
+}
+
+callable_init_copy :: proc "contextless" (dest: UninitializedTypePtr, value: ^Callable) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Callable, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_callable_ptr(value))
+}
+
+callable_copy :: proc "contextless" (value: ^Callable) -> (result: Callable) {
+	callable_init_copy(uninitialized_callable_ptr(&result), value)
+	return
+}
+
+callable_init_object_method :: proc "contextless" (
+	dest: UninitializedTypePtr,
+	object: ObjectPtr,
+	method: ConstStringNamePtr,
+) {
+	if dest == nil || object == nil || method == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Callable, 2)
+	if ctor == nil do _trap_nil_godot_function()
+	object_arg := object
+	call_builtin_constructor(ctor, dest, cast(TypePtr)&object_arg, method)
+}
+
+// callable_from_object_method returns an initialized Callable; call
+// callable_free when done. The ObjectPtr is captured as a borrowed Godot object
+// handle, not retained by this Odin wrapper.
+callable_from_object_method :: proc "contextless" (
+	object: ObjectPtr,
+	method: ConstStringNamePtr,
+) -> (
+	result: Callable,
+) {
+	callable_init_object_method(uninitialized_callable_ptr(&result), object, method)
+	return
+}
+
+callable_free :: proc "contextless" (c: ^Callable) {
+	destroy_builtin(.Callable, callable_ptr(c))
+}
+
+callable_is_null_method: BuiltinMethod
+callable_is_valid_method: BuiltinMethod
+
+callable_is_null :: proc "contextless" (c: ^Callable) -> bool {
+	ensure_builtin_method(
+		&callable_is_null_method,
+		.Callable,
+		cstring("is_null"),
+		CALLABLE_IS_NULL_HASH,
+	)
+	return call_builtin_method_ptr_ret(callable_is_null_method.method, const_callable_ptr(c), bool)
+}
+
+callable_is_valid :: proc "contextless" (c: ^Callable) -> bool {
+	ensure_builtin_method(
+		&callable_is_valid_method,
+		.Callable,
+		cstring("is_valid"),
+		CALLABLE_IS_VALID_HASH,
+	)
+	return call_builtin_method_ptr_ret(
+		callable_is_valid_method.method,
+		const_callable_ptr(c),
+		bool,
+	)
+}
+
+
+SignalStorage :: [GDExtensionSignal_Size]u8
+
+// Signal is owned initialized Godot Signal storage. Values returned by signal_*
+// constructors must be destroyed with signal_free. The referenced Object handle
+// is borrowed; this wrapper does not retain or extend the object lifetime.
+Signal :: distinct SignalStorage
+
+signal_ptr :: proc "contextless" (s: ^Signal) -> TypePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(TypePtr)s
+}
+
+const_signal_ptr :: proc "contextless" (s: ^Signal) -> ConstTypePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(ConstTypePtr)s
+}
+
+uninitialized_signal_ptr :: proc "contextless" (s: ^Signal) -> UninitializedTypePtr {
+	if s == nil do _trap_nil_godot_function()
+	return cast(UninitializedTypePtr)s
+}
+
+signal_init_nil :: proc "contextless" (dest: UninitializedTypePtr) {
+	if dest == nil do _trap_nil_godot_function()
+	if !construct_builtin(.Signal, dest) do _trap_nil_godot_function()
+}
+
+signal_nil :: proc "contextless" () -> (result: Signal) {
+	signal_init_nil(uninitialized_signal_ptr(&result))
+	return
+}
+
+signal_init_copy :: proc "contextless" (dest: UninitializedTypePtr, value: ^Signal) {
+	if dest == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Signal, 1)
+	if ctor == nil do _trap_nil_godot_function()
+	call_builtin_constructor(ctor, dest, const_signal_ptr(value))
+}
+
+signal_copy :: proc "contextless" (value: ^Signal) -> (result: Signal) {
+	signal_init_copy(uninitialized_signal_ptr(&result), value)
+	return
+}
+
+signal_init_object_signal :: proc "contextless" (
+	dest: UninitializedTypePtr,
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+) {
+	if dest == nil || object == nil || signal_name == nil do _trap_nil_godot_function()
+	ctor := get_builtin_constructor_by_index(.Signal, 2)
+	if ctor == nil do _trap_nil_godot_function()
+	object_arg := object
+	call_builtin_constructor(ctor, dest, cast(TypePtr)&object_arg, signal_name)
+}
+
+// signal_from_object_signal returns an initialized Signal; call signal_free
+// when done. The object handle and signal name storage are borrowed inputs.
+signal_from_object_signal :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+) -> (
+	result: Signal,
+) {
+	signal_init_object_signal(uninitialized_signal_ptr(&result), object, signal_name)
+	return
+}
+
+signal_free :: proc "contextless" (s: ^Signal) {
+	destroy_builtin(.Signal, signal_ptr(s))
+}
+
+signal_is_null_method: BuiltinMethod
+signal_get_name_method: BuiltinMethod
+
+signal_is_null :: proc "contextless" (s: ^Signal) -> bool {
+	ensure_builtin_method(&signal_is_null_method, .Signal, cstring("is_null"), SIGNAL_IS_NULL_HASH)
+	return call_builtin_method_ptr_ret(signal_is_null_method.method, const_signal_ptr(s), bool)
+}
+
+
+signal_connect_method: BuiltinMethod
+
+// signal_connect_checked connects an owned Signal wrapper to an existing
+// Callable. Both values are borrowed for the call; this helper does not retain
+// the target ObjectPtr stored in either value. It returns Godot's Error code.
+signal_connect_checked :: proc "contextless" (
+	signal: ^Signal,
+	callable: ^Callable,
+	flags: i64 = 0,
+) -> i64 {
+	ensure_builtin_method(&signal_connect_method, .Signal, cstring("connect"), SIGNAL_CONNECT_HASH)
+	flags_arg := flags
+	return call_builtin_method_ptr_ret(
+		signal_connect_method.method,
+		signal_ptr(signal),
+		i64,
+		const_callable_ptr(callable),
+		cast(TypePtr)&flags_arg,
+	)
+}
+
+signal_connect :: proc "contextless" (signal: ^Signal, callable: ^Callable, flags: i64 = 0) {
+	err := signal_connect_checked(signal, callable, flags)
+	if err != 0 do _trap_godot_call_error()
+}
+
+// object_signal_connect_checked constructs a temporary Signal for `object` and
+// `signal_name`, connects it to `callable`, destroys the Signal storage, and
+// returns Godot's Error code.
+object_signal_connect_checked :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	callable: ^Callable,
+	flags: i64 = 0,
+) -> i64 {
+	signal := signal_from_object_signal(object, signal_name)
+	defer signal_free(&signal)
+	return signal_connect_checked(&signal, callable, flags)
+}
+
+object_signal_connect :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	callable: ^Callable,
+	flags: i64 = 0,
+) {
+	err := object_signal_connect_checked(object, signal_name, callable, flags)
+	if err != 0 do _trap_godot_call_error()
+}
+
+// signal_get_name returns an owned StringName; call string_name_free when done.
+signal_get_name :: proc "contextless" (s: ^Signal) -> (result: StringName) {
+	ensure_builtin_method(
+		&signal_get_name_method,
+		.Signal,
+		cstring("get_name"),
+		SIGNAL_GET_NAME_HASH,
+	)
+	call_builtin_method_ptr_ret_into(
+		signal_get_name_method.method,
+		const_signal_ptr(s),
+		uninitialized_string_name_ptr(&result),
+	)
+	return
+}
 
 // RIDStorage is raw storage large enough for Godot's ABI RID handle. Treat it
 // as uninitialized until a rid_init_* helper or Godot API has constructed it.
