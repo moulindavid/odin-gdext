@@ -2114,6 +2114,16 @@ attach_instance :: proc "contextless" (
 	set_instance_binding(object, instance, callbacks)
 }
 
+attach_typed_instance :: proc "contextless" (
+	object: ObjectPtr,
+	class_name: ConstStringNamePtr,
+	instance: ^$T,
+	callbacks: ^InstanceBindingCallbacks,
+) {
+	if instance == nil do _trap_nil_godot_function()
+	attach_instance(object, class_name, instance, callbacks)
+}
+
 // class_instance_data returns typed Odin instance data previously attached to a
 // Godot object. A nil ClassInstancePtr is treated as a failed lookup.
 class_instance_data :: proc "contextless" (
@@ -2125,6 +2135,12 @@ class_instance_data :: proc "contextless" (
 ) {
 	if instance == nil do return nil, false
 	return cast(^T)instance, true
+}
+
+class_instance_data_or_trap :: proc "contextless" (instance: ClassInstancePtr, $T: typeid) -> ^T {
+	data, ok := class_instance_data(instance, T)
+	if !ok do _trap_nil_godot_function()
+	return data
 }
 
 // Construct a plain Object of the given class.

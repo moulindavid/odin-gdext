@@ -137,11 +137,11 @@ rules.
      registration helpers.
 
 6. Add typed instance callback helpers.
-   - [ ] Provide small helpers for retrieving typed extension-owned instance
+   - [x] Provide small helpers for retrieving typed extension-owned instance
      data inside callbacks.
-   - [ ] Preserve explicit allocation and freeing of extension-owned data.
-   - [ ] Keep the owning Godot object handle borrowed by value.
-   - [ ] Add nil checks for invalid `ClassInstancePtr` and missing instance
+   - [x] Preserve explicit allocation and freeing of extension-owned data.
+   - [x] Keep the owning Godot object handle borrowed by value.
+   - [x] Add nil checks for invalid `ClassInstancePtr` and missing instance
      data.
 
 7. Convert a beginner example to the authoring helpers.

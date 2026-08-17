@@ -179,7 +179,9 @@ class_registration_names_init :: gcore.class_registration_names_init
 class_registration_class_name :: gcore.class_registration_class_name
 class_registration_parent_name :: gcore.class_registration_parent_name
 attach_instance :: gcore.attach_instance
+attach_typed_instance :: gcore.attach_typed_instance
 class_instance_data :: gcore.class_instance_data
+class_instance_data_or_trap :: gcore.class_instance_data_or_trap
 class_member_defaults :: gcore.class_member_defaults
 class_member_property :: gcore.class_member_property
 init_method_property_info :: gcore.init_method_property_info

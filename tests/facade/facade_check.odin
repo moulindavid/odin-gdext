@@ -2,6 +2,10 @@ package facade_tests
 
 import gt "godot:godot"
 
+FacadeInstanceData :: struct {
+	object: gt.ObjectPtr,
+}
+
 nil_proc_create_instance :: proc "c" (
 	class_userdata: rawptr,
 	notify_postinitialize: bool,
@@ -195,6 +199,17 @@ class_facade_compile_smoke :: proc "contextless" (
 		gt.registration_string_name_mut_ptr(registration_name),
 		gt.registration_string_name_mut_ptr(registration_name),
 	)
+	instance_data := FacadeInstanceData {
+		object = gt.ObjectPtr(object),
+	}
+	gt.attach_typed_instance(
+		gt.ObjectPtr(object),
+		gt.class_registration_class_name(registration_names),
+		&instance_data,
+		&gt.InstanceBindingCallbacks{},
+	)
+	_, _ = gt.class_instance_data(gt.ClassInstancePtr(&instance_data), FacadeInstanceData)
+	_ = gt.class_instance_data_or_trap(gt.ClassInstancePtr(&instance_data), FacadeInstanceData)
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
 	gt.node2d_set_rotation(node2d, 0.5)
