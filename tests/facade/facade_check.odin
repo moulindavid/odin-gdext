@@ -44,6 +44,23 @@ nil_method_real2_real :: proc "contextless" (
 	return a + b, instance != nil
 }
 
+nil_method_get_string :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.String,
+	ok: bool,
+) {
+	return gt.string_from_utf8(""), instance != nil
+}
+
+nil_method_set_string :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: ^gt.String,
+) -> bool {
+	_ = value
+	return instance != nil
+}
+
 // Compile-only facade smoke coverage. Users should not need internal generated imports.
 class_facade_compile_smoke :: proc "contextless" (
 	object: gt.Object,
@@ -127,6 +144,40 @@ class_facade_compile_smoke :: proc "contextless" (
 		gt.registration_string_name_mut_ptr(registration_name),
 		gt.registration_string_name_mut_ptr(registration_name),
 		&real2_adapter,
+	)
+	property_storage: gt.ClassPrimitivePropertyStorage
+	string_property_storage: gt.ClassPrimitivePropertyStorage
+	string_get_adapter := gt.ClassMethodGetStringAdapter {
+		method = nil_method_get_string,
+	}
+	string_set_adapter := gt.ClassMethodSetStringAdapter {
+		method = nil_method_set_string,
+	}
+	property_desc := gt.class_typed_property_descriptor(
+		defaults,
+		.Float,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+	)
+	_ = gt.class_property_godot_real(
+		&property_storage,
+		property_desc,
+		&get_real_adapter,
+		&set_real_adapter,
+	)
+	string_property_desc := gt.class_typed_property_descriptor(
+		defaults,
+		.String,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+	)
+	_ = gt.class_property_string(
+		&string_property_storage,
+		string_property_desc,
+		&string_get_adapter,
+		&string_set_adapter,
 	)
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)

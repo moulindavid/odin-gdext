@@ -1064,6 +1064,22 @@ ClassTypedProperty :: struct {
 	setter:   OdinClassMethod,
 }
 
+class_typed_property_descriptor :: proc "contextless" (
+	defaults: ClassMemberDefaults,
+	type: VariantType,
+	name: StringNamePtr,
+	getter_name: StringNamePtr,
+	setter_name: StringNamePtr,
+	usage: u32 = PropertyUsageDefault,
+) -> ClassTypedPropertyDescriptor {
+	if name == nil || getter_name == nil || setter_name == nil do _trap_nil_godot_function()
+	return ClassTypedPropertyDescriptor {
+		property = class_member_property(defaults, type, name, usage),
+		getter_name = getter_name,
+		setter_name = setter_name,
+	}
+}
+
 class_property_godot_real :: proc "contextless" (
 	storage: ^ClassPrimitivePropertyStorage,
 	desc: ClassTypedPropertyDescriptor,
@@ -1124,6 +1140,27 @@ class_property_bool :: proc "contextless" (
 		class_method_get_bool_ptrcall,
 		class_method_set_bool_call,
 		class_method_set_bool_ptrcall,
+	)
+}
+
+class_property_string :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: ^ClassMethodGetStringAdapter,
+	setter_adapter: ^ClassMethodSetStringAdapter,
+) -> ClassTypedProperty {
+	if storage == nil || getter_adapter == nil || setter_adapter == nil {
+		_trap_nil_godot_function()
+	}
+	return class_property_primitive(
+		storage,
+		desc,
+		getter_adapter,
+		setter_adapter,
+		class_method_get_string_call,
+		class_method_get_string_ptrcall,
+		class_method_set_string_call,
+		class_method_set_string_ptrcall,
 	)
 }
 

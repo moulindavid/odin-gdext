@@ -121,12 +121,12 @@ rules.
      method signatures in this slice.
 
 4. Add higher-level property helpers.
-   - [ ] Add helpers for common editor-visible properties such as `GodotReal`,
+   - [x] Add helpers for common editor-visible properties such as `GodotReal`,
      `bool`, `int`, and `String` where ownership rules are clear.
-   - [ ] Keep getter and setter method names explicit and backed by stable
+   - [x] Keep getter and setter method names explicit and backed by stable
      storage.
-   - [ ] Reuse the existing `PropertyInfo` construction path.
-   - [ ] Keep hints, hint strings, and usage flags visible to the caller.
+   - [x] Reuse the existing `PropertyInfo` construction path.
+   - [x] Keep hints, hint strings, and usage flags visible to the caller.
 
 5. Add higher-level signal registration helpers.
    - [ ] Add concise helpers for no-argument signals and fixed primitive

@@ -223,9 +223,11 @@ class_method_set_string_call :: gcore.class_method_set_string_call
 class_method_set_string_ptrcall :: gcore.class_method_set_string_ptrcall
 class_method_set_object_ptr_call :: gcore.class_method_set_object_ptr_call
 class_method_set_object_ptr_ptrcall :: gcore.class_method_set_object_ptr_ptrcall
+class_typed_property_descriptor :: gcore.class_typed_property_descriptor
 class_property_godot_real :: gcore.class_property_godot_real
 class_property_int :: gcore.class_property_int
 class_property_bool :: gcore.class_property_bool
+class_property_string :: gcore.class_property_string
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object
