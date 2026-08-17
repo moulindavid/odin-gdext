@@ -44,7 +44,9 @@ ClassMethodDescriptor :: gcore.ClassMethodDescriptor
 OdinClassMethod :: gcore.OdinClassMethod
 OdinClassProperty :: gcore.OdinClassProperty
 OdinClassSignal :: gcore.OdinClassSignal
+ClassSignalStorage :: gcore.ClassSignalStorage
 OdinClassDescriptor :: gcore.OdinClassDescriptor
+ClassBuilder :: gcore.ClassBuilder
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
 ClassMethodVoid :: gcore.ClassMethodVoid
@@ -67,6 +69,7 @@ ClassMethodSetString :: gcore.ClassMethodSetString
 ClassMethodSetStringAdapter :: gcore.ClassMethodSetStringAdapter
 ClassMethodSetObjectPtr :: gcore.ClassMethodSetObjectPtr
 ClassMethodSetObjectPtrAdapter :: gcore.ClassMethodSetObjectPtrAdapter
+ClassFixedMethodStorage :: gcore.ClassFixedMethodStorage
 ClassPrimitivePropertyStorage :: gcore.ClassPrimitivePropertyStorage
 ClassTypedPropertyDescriptor :: gcore.ClassTypedPropertyDescriptor
 ClassTypedProperty :: gcore.ClassTypedProperty
@@ -80,6 +83,9 @@ StringNameStorage :: gcore.StringNameStorage
 StringName :: gcore.StringName
 StaticStringName :: gcore.StaticStringName
 ClassName :: gcore.ClassName
+RegistrationStringName :: gcore.RegistrationStringName
+RegistrationString :: gcore.RegistrationString
+ClassRegistrationNames :: gcore.ClassRegistrationNames
 NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
 CallableStorage :: gcore.CallableStorage
@@ -162,8 +168,20 @@ init_class_casting :: gcore.init_class_casting
 register_editor_visible_class :: gcore.register_editor_visible_class
 register_class_with_defaults :: gcore.register_class_with_defaults
 unregister_class :: gcore.unregister_class
+registration_string_name_ptr :: gcore.registration_string_name_ptr
+registration_string_name_mut_ptr :: gcore.registration_string_name_mut_ptr
+registration_string_name_init_latin1_cstring :: gcore.registration_string_name_init_latin1_cstring
+registration_string_ptr :: gcore.registration_string_ptr
+registration_string_mut_ptr :: gcore.registration_string_mut_ptr
+registration_string_init_utf8 :: gcore.registration_string_init_utf8
+registration_string_free :: gcore.registration_string_free
+class_registration_names_init :: gcore.class_registration_names_init
+class_registration_class_name :: gcore.class_registration_class_name
+class_registration_parent_name :: gcore.class_registration_parent_name
 attach_instance :: gcore.attach_instance
+attach_typed_instance :: gcore.attach_typed_instance
 class_instance_data :: gcore.class_instance_data
+class_instance_data_or_trap :: gcore.class_instance_data_or_trap
 class_member_defaults :: gcore.class_member_defaults
 class_member_property :: gcore.class_member_property
 init_method_property_info :: gcore.init_method_property_info
@@ -174,6 +192,20 @@ register_class_signal_with_descriptor :: gcore.register_class_signal_with_descri
 register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
 register_odin_class :: gcore.register_odin_class
 unregister_odin_class :: gcore.unregister_odin_class
+class_signal_0 :: gcore.class_signal_0
+class_signal_1_godot_real :: gcore.class_signal_1_godot_real
+class_signal_2_godot_real :: gcore.class_signal_2_godot_real
+class_builder_begin :: gcore.class_builder_begin
+class_builder_methods :: gcore.class_builder_methods
+class_builder_properties :: gcore.class_builder_properties
+class_builder_signals :: gcore.class_builder_signals
+class_builder_finalize :: gcore.class_builder_finalize
+class_builder_register :: gcore.class_builder_register
+class_builder_unregister :: gcore.class_builder_unregister
+class_method_void :: gcore.class_method_void
+class_method_get_godot_real :: gcore.class_method_get_godot_real
+class_method_set_godot_real :: gcore.class_method_set_godot_real
+class_method_godot_real2_to_godot_real :: gcore.class_method_godot_real2_to_godot_real
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall
@@ -197,9 +229,11 @@ class_method_set_string_call :: gcore.class_method_set_string_call
 class_method_set_string_ptrcall :: gcore.class_method_set_string_ptrcall
 class_method_set_object_ptr_call :: gcore.class_method_set_object_ptr_call
 class_method_set_object_ptr_ptrcall :: gcore.class_method_set_object_ptr_ptrcall
+class_typed_property_descriptor :: gcore.class_typed_property_descriptor
 class_property_godot_real :: gcore.class_property_godot_real
 class_property_int :: gcore.class_property_int
 class_property_bool :: gcore.class_property_bool
+class_property_string :: gcore.class_property_string
 object_to_variant :: gcore.object_to_variant
 object_from_variant :: gcore.object_from_variant
 variant_try_object :: gcore.variant_try_object

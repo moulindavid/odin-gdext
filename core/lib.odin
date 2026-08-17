@@ -369,6 +369,88 @@ class_name_init_latin1_cstring :: proc "contextless" (name: ^ClassName, value: c
 	)
 }
 
+RegistrationStringName :: struct {
+	storage: StaticStringName,
+}
+
+registration_string_name_ptr :: proc "contextless" (
+	name: ^RegistrationStringName,
+) -> ConstStringNamePtr {
+	if name == nil do _trap_nil_godot_function()
+	return const_static_string_name_ptr(&name.storage)
+}
+
+registration_string_name_mut_ptr :: proc "contextless" (
+	name: ^RegistrationStringName,
+) -> StringNamePtr {
+	if name == nil do _trap_nil_godot_function()
+	return static_string_name_ptr(&name.storage)
+}
+
+registration_string_name_init_latin1_cstring :: proc "contextless" (
+	name: ^RegistrationStringName,
+	value: cstring,
+) {
+	if name == nil do _trap_nil_godot_function()
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&name.storage),
+		value,
+	)
+}
+
+RegistrationString :: struct {
+	storage: String,
+}
+
+registration_string_ptr :: proc "contextless" (value: ^RegistrationString) -> ConstStringPtr {
+	if value == nil do _trap_nil_godot_function()
+	return const_string_ptr(&value.storage)
+}
+
+registration_string_mut_ptr :: proc "contextless" (value: ^RegistrationString) -> StringPtr {
+	if value == nil do _trap_nil_godot_function()
+	return string_ptr(&value.storage)
+}
+
+registration_string_init_utf8 :: proc "contextless" (value: ^RegistrationString, text: string) {
+	if value == nil do _trap_nil_godot_function()
+	string_init_utf8(uninitialized_string_ptr(&value.storage), text)
+}
+
+registration_string_free :: proc "contextless" (value: ^RegistrationString) {
+	if value == nil do return
+	string_free(&value.storage)
+}
+
+ClassRegistrationNames :: struct {
+	class_name:  ClassName,
+	parent_name: ClassName,
+}
+
+class_registration_names_init :: proc "contextless" (
+	names: ^ClassRegistrationNames,
+	class_name: cstring,
+	parent_name: cstring,
+) {
+	if names == nil do _trap_nil_godot_function()
+	class_name_init_latin1_cstring(&names.class_name, class_name)
+	class_name_init_latin1_cstring(&names.parent_name, parent_name)
+}
+
+class_registration_class_name :: proc "contextless" (
+	names: ^ClassRegistrationNames,
+) -> ConstStringNamePtr {
+	if names == nil do _trap_nil_godot_function()
+	return class_name_ptr(&names.class_name)
+}
+
+class_registration_parent_name :: proc "contextless" (
+	names: ^ClassRegistrationNames,
+) -> ConstStringNamePtr {
+	if names == nil do _trap_nil_godot_function()
+	return class_name_ptr(&names.parent_name)
+}
+
 // Class registration.
 
 // Register an extension class using the current (Godot 4.7) creation info.
@@ -548,6 +630,62 @@ OdinClassSignal :: struct {
 	descriptor: ClassSignalDescriptor,
 }
 
+ClassSignalStorage :: struct {
+	argument_info: [2]PropertyInfo,
+}
+
+class_signal_0 :: proc "contextless" (name: ConstStringNamePtr) -> OdinClassSignal {
+	if name == nil do _trap_nil_godot_function()
+	return OdinClassSignal{descriptor = ClassSignalDescriptor{name = name}}
+}
+
+class_signal_1_godot_real :: proc "contextless" (
+	storage: ^ClassSignalStorage,
+	defaults: ClassMemberDefaults,
+	name: ConstStringNamePtr,
+	argument_name: StringNamePtr,
+) -> OdinClassSignal {
+	if storage == nil || name == nil || argument_name == nil do _trap_nil_godot_function()
+	init_method_property_info(
+		&storage.argument_info[0],
+		class_member_property(defaults, .Float, argument_name),
+	)
+	return OdinClassSignal {
+		descriptor = ClassSignalDescriptor {
+			name = name,
+			argument_info = &storage.argument_info[0],
+			argument_count = 1,
+		},
+	}
+}
+
+class_signal_2_godot_real :: proc "contextless" (
+	storage: ^ClassSignalStorage,
+	defaults: ClassMemberDefaults,
+	name: ConstStringNamePtr,
+	argument_a_name: StringNamePtr,
+	argument_b_name: StringNamePtr,
+) -> OdinClassSignal {
+	if storage == nil || name == nil || argument_a_name == nil || argument_b_name == nil {
+		_trap_nil_godot_function()
+	}
+	init_method_property_info(
+		&storage.argument_info[0],
+		class_member_property(defaults, .Float, argument_a_name),
+	)
+	init_method_property_info(
+		&storage.argument_info[1],
+		class_member_property(defaults, .Float, argument_b_name),
+	)
+	return OdinClassSignal {
+		descriptor = ClassSignalDescriptor {
+			name = name,
+			argument_info = &storage.argument_info[0],
+			argument_count = 2,
+		},
+	}
+}
+
 OdinClassDescriptor :: struct {
 	class_name:           ConstStringNamePtr,
 	parent_class_name:    ConstStringNamePtr,
@@ -558,6 +696,75 @@ OdinClassDescriptor :: struct {
 	methods:              []OdinClassMethod,
 	properties:           []OdinClassProperty,
 	signals:              []OdinClassSignal,
+}
+
+ClassBuilder :: struct {
+	desc: OdinClassDescriptor,
+}
+
+class_builder_begin :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	parent_class_name: ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func: ClassFreeInstance,
+	notification_func: ClassNotification = nil,
+	class_userdata: rawptr = nil,
+) -> ClassBuilder {
+	if class_name == nil ||
+	   parent_class_name == nil ||
+	   create_instance_func == nil ||
+	   free_instance_func == nil {
+		_trap_nil_godot_function()
+	}
+	return ClassBuilder {
+		desc = OdinClassDescriptor {
+			class_name = class_name,
+			parent_class_name = parent_class_name,
+			create_instance_func = create_instance_func,
+			free_instance_func = free_instance_func,
+			notification_func = notification_func,
+			class_userdata = class_userdata,
+		},
+	}
+}
+
+class_builder_methods :: proc "contextless" (builder: ^ClassBuilder, methods: []OdinClassMethod) {
+	if builder == nil do _trap_nil_godot_function()
+	builder.desc.methods = methods
+}
+
+class_builder_properties :: proc "contextless" (
+	builder: ^ClassBuilder,
+	properties: []OdinClassProperty,
+) {
+	if builder == nil do _trap_nil_godot_function()
+	builder.desc.properties = properties
+}
+
+class_builder_signals :: proc "contextless" (builder: ^ClassBuilder, signals: []OdinClassSignal) {
+	if builder == nil do _trap_nil_godot_function()
+	builder.desc.signals = signals
+}
+
+class_builder_finalize :: proc "contextless" (builder: ^ClassBuilder) -> OdinClassDescriptor {
+	if builder == nil ||
+	   builder.desc.class_name == nil ||
+	   builder.desc.parent_class_name == nil ||
+	   builder.desc.create_instance_func == nil ||
+	   builder.desc.free_instance_func == nil {
+		_trap_nil_godot_function()
+	}
+	return builder.desc
+}
+
+class_builder_register :: proc "contextless" (builder: ^ClassBuilder) {
+	desc := class_builder_finalize(builder)
+	register_odin_class(desc)
+}
+
+class_builder_unregister :: proc "contextless" (builder: ^ClassBuilder) {
+	desc := class_builder_finalize(builder)
+	unregister_odin_class(desc)
 }
 
 // register_odin_class registers one Odin-backed class and its member metadata.
@@ -776,6 +983,122 @@ ClassMethodSetObjectPtrAdapter :: struct {
 	method: ClassMethodSetObjectPtr,
 }
 
+ClassFixedMethodStorage :: struct {
+	method_info:       ClassMethodInfo,
+	return_info:       PropertyInfo,
+	argument_info:     [2]PropertyInfo,
+	argument_metadata: [2]ClassMethodArgumentMetadata,
+}
+
+class_method_void :: proc "contextless" (
+	info: ^ClassMethodInfo,
+	name: StringNamePtr,
+	adapter: ^ClassMethodVoidAdapter,
+) -> OdinClassMethod {
+	if info == nil || name == nil || adapter == nil do _trap_nil_godot_function()
+	return OdinClassMethod {
+		info = info,
+		descriptor = ClassMethodDescriptor {
+			name = name,
+			method_userdata = adapter,
+			call_func = class_method_void_call,
+			ptrcall_func = class_method_void_ptrcall,
+		},
+	}
+}
+
+class_method_get_godot_real :: proc "contextless" (
+	storage: ^ClassFixedMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	adapter: ^ClassMethodGetGodotRealAdapter,
+) -> OdinClassMethod {
+	if storage == nil || name == nil || adapter == nil do _trap_nil_godot_function()
+	init_method_property_info(&storage.return_info, class_member_property(defaults, .Float, name))
+	return OdinClassMethod {
+		info = &storage.method_info,
+		descriptor = ClassMethodDescriptor {
+			name = name,
+			method_userdata = adapter,
+			call_func = class_method_get_godot_real_call,
+			ptrcall_func = class_method_get_godot_real_ptrcall,
+			return_value_info = &storage.return_info,
+			return_value_metadata = .None,
+		},
+	}
+}
+
+class_method_set_godot_real :: proc "contextless" (
+	storage: ^ClassFixedMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	argument_name: StringNamePtr,
+	adapter: ^ClassMethodSetGodotRealAdapter,
+) -> OdinClassMethod {
+	if storage == nil || name == nil || argument_name == nil || adapter == nil {
+		_trap_nil_godot_function()
+	}
+	storage.argument_metadata[0] = .None
+	init_method_property_info(
+		&storage.argument_info[0],
+		class_member_property(defaults, .Float, argument_name),
+	)
+	return OdinClassMethod {
+		info = &storage.method_info,
+		descriptor = ClassMethodDescriptor {
+			name = name,
+			method_userdata = adapter,
+			call_func = class_method_set_godot_real_call,
+			ptrcall_func = class_method_set_godot_real_ptrcall,
+			argument_count = 1,
+			arguments_info = &storage.argument_info[0],
+			arguments_metadata = &storage.argument_metadata[0],
+		},
+	}
+}
+
+class_method_godot_real2_to_godot_real :: proc "contextless" (
+	storage: ^ClassFixedMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	argument_a_name: StringNamePtr,
+	argument_b_name: StringNamePtr,
+	adapter: ^ClassMethodGodotReal2ToGodotRealAdapter,
+) -> OdinClassMethod {
+	if storage == nil ||
+	   name == nil ||
+	   argument_a_name == nil ||
+	   argument_b_name == nil ||
+	   adapter == nil {
+		_trap_nil_godot_function()
+	}
+	storage.argument_metadata[0] = .None
+	storage.argument_metadata[1] = .None
+	init_method_property_info(&storage.return_info, class_member_property(defaults, .Float, name))
+	init_method_property_info(
+		&storage.argument_info[0],
+		class_member_property(defaults, .Float, argument_a_name),
+	)
+	init_method_property_info(
+		&storage.argument_info[1],
+		class_member_property(defaults, .Float, argument_b_name),
+	)
+	return OdinClassMethod {
+		info = &storage.method_info,
+		descriptor = ClassMethodDescriptor {
+			name = name,
+			method_userdata = adapter,
+			call_func = class_method_godot_real2_to_godot_real_call,
+			ptrcall_func = class_method_godot_real2_to_godot_real_ptrcall,
+			return_value_info = &storage.return_info,
+			return_value_metadata = .None,
+			argument_count = 2,
+			arguments_info = &storage.argument_info[0],
+			arguments_metadata = &storage.argument_metadata[0],
+		},
+	}
+}
+
 ClassPrimitivePropertyStorage :: struct {
 	property_info:      PropertyInfo,
 	getter_return_info: PropertyInfo,
@@ -795,6 +1118,22 @@ ClassTypedProperty :: struct {
 	property: OdinClassProperty,
 	getter:   OdinClassMethod,
 	setter:   OdinClassMethod,
+}
+
+class_typed_property_descriptor :: proc "contextless" (
+	defaults: ClassMemberDefaults,
+	type: VariantType,
+	name: StringNamePtr,
+	getter_name: StringNamePtr,
+	setter_name: StringNamePtr,
+	usage: u32 = PropertyUsageDefault,
+) -> ClassTypedPropertyDescriptor {
+	if name == nil || getter_name == nil || setter_name == nil do _trap_nil_godot_function()
+	return ClassTypedPropertyDescriptor {
+		property = class_member_property(defaults, type, name, usage),
+		getter_name = getter_name,
+		setter_name = setter_name,
+	}
 }
 
 class_property_godot_real :: proc "contextless" (
@@ -857,6 +1196,27 @@ class_property_bool :: proc "contextless" (
 		class_method_get_bool_ptrcall,
 		class_method_set_bool_call,
 		class_method_set_bool_ptrcall,
+	)
+}
+
+class_property_string :: proc "contextless" (
+	storage: ^ClassPrimitivePropertyStorage,
+	desc: ClassTypedPropertyDescriptor,
+	getter_adapter: ^ClassMethodGetStringAdapter,
+	setter_adapter: ^ClassMethodSetStringAdapter,
+) -> ClassTypedProperty {
+	if storage == nil || getter_adapter == nil || setter_adapter == nil {
+		_trap_nil_godot_function()
+	}
+	return class_property_primitive(
+		storage,
+		desc,
+		getter_adapter,
+		setter_adapter,
+		class_method_get_string_call,
+		class_method_get_string_ptrcall,
+		class_method_set_string_call,
+		class_method_set_string_ptrcall,
 	)
 }
 
@@ -1754,6 +2114,16 @@ attach_instance :: proc "contextless" (
 	set_instance_binding(object, instance, callbacks)
 }
 
+attach_typed_instance :: proc "contextless" (
+	object: ObjectPtr,
+	class_name: ConstStringNamePtr,
+	instance: ^$T,
+	callbacks: ^InstanceBindingCallbacks,
+) {
+	if instance == nil do _trap_nil_godot_function()
+	attach_instance(object, class_name, instance, callbacks)
+}
+
 // class_instance_data returns typed Odin instance data previously attached to a
 // Godot object. A nil ClassInstancePtr is treated as a failed lookup.
 class_instance_data :: proc "contextless" (
@@ -1765,6 +2135,12 @@ class_instance_data :: proc "contextless" (
 ) {
 	if instance == nil do return nil, false
 	return cast(^T)instance, true
+}
+
+class_instance_data_or_trap :: proc "contextless" (instance: ClassInstancePtr, $T: typeid) -> ^T {
+	data, ok := class_instance_data(instance, T)
+	if !ok do _trap_nil_godot_function()
+	return data
 }
 
 // Construct a plain Object of the given class.

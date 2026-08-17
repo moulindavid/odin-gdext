@@ -2,6 +2,69 @@ package facade_tests
 
 import gt "godot:godot"
 
+FacadeInstanceData :: struct {
+	object: gt.ObjectPtr,
+}
+
+nil_proc_create_instance :: proc "c" (
+	class_userdata: rawptr,
+	notify_postinitialize: bool,
+) -> gt.ObjectPtr {
+	return nil
+}
+
+nil_proc_free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr) {
+}
+
+nil_method_void :: proc "contextless" (instance: gt.ClassInstancePtr) -> bool {
+	return instance != nil
+}
+
+nil_method_get_real :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	return 0, instance != nil
+}
+
+nil_method_set_real :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: gt.GodotReal,
+) -> bool {
+	_ = value
+	return instance != nil
+}
+
+nil_method_real2_real :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	a: gt.GodotReal,
+	b: gt.GodotReal,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	return a + b, instance != nil
+}
+
+nil_method_get_string :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.String,
+	ok: bool,
+) {
+	return gt.string_from_utf8(""), instance != nil
+}
+
+nil_method_set_string :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: ^gt.String,
+) -> bool {
+	_ = value
+	return instance != nil
+}
+
 // Compile-only facade smoke coverage. Users should not need internal generated imports.
 class_facade_compile_smoke :: proc "contextless" (
 	object: gt.Object,
@@ -20,7 +83,133 @@ class_facade_compile_smoke :: proc "contextless" (
 	meta_value: ^gt.Variant,
 	callable: ^gt.Callable,
 	signal: ^gt.Signal,
+	registration_name: ^gt.RegistrationStringName,
+	registration_string: ^gt.RegistrationString,
+	registration_names: ^gt.ClassRegistrationNames,
 ) {
+	_ = gt.registration_string_name_ptr(registration_name)
+	_ = gt.registration_string_name_mut_ptr(registration_name)
+	_ = gt.registration_string_ptr(registration_string)
+	_ = gt.registration_string_mut_ptr(registration_string)
+	_ = gt.class_registration_class_name(registration_names)
+	_ = gt.class_registration_parent_name(registration_names)
+	builder := gt.class_builder_begin(
+		gt.class_registration_class_name(registration_names),
+		gt.class_registration_parent_name(registration_names),
+		nil_proc_create_instance,
+		nil_proc_free_instance,
+	)
+	gt.class_builder_methods(&builder, nil)
+	gt.class_builder_properties(&builder, nil)
+	gt.class_builder_signals(&builder, nil)
+	_ = gt.class_builder_finalize(&builder)
+	method_info: gt.ClassMethodInfo
+	method_storage: gt.ClassFixedMethodStorage
+	method_storage_2: gt.ClassFixedMethodStorage
+	method_storage_3: gt.ClassFixedMethodStorage
+	void_adapter := gt.ClassMethodVoidAdapter {
+		method = nil_method_void,
+	}
+	get_real_adapter := gt.ClassMethodGetGodotRealAdapter {
+		method = nil_method_get_real,
+	}
+	set_real_adapter := gt.ClassMethodSetGodotRealAdapter {
+		method = nil_method_set_real,
+	}
+	real2_adapter := gt.ClassMethodGodotReal2ToGodotRealAdapter {
+		method = nil_method_real2_real,
+	}
+	defaults := gt.class_member_defaults(
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_mut_ptr(registration_string),
+	)
+	_ = gt.class_method_void(
+		&method_info,
+		gt.registration_string_name_mut_ptr(registration_name),
+		&void_adapter,
+	)
+	_ = gt.class_method_get_godot_real(
+		&method_storage,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		&get_real_adapter,
+	)
+	_ = gt.class_method_set_godot_real(
+		&method_storage_2,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		&set_real_adapter,
+	)
+	_ = gt.class_method_godot_real2_to_godot_real(
+		&method_storage_3,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		&real2_adapter,
+	)
+	property_storage: gt.ClassPrimitivePropertyStorage
+	string_property_storage: gt.ClassPrimitivePropertyStorage
+	string_get_adapter := gt.ClassMethodGetStringAdapter {
+		method = nil_method_get_string,
+	}
+	string_set_adapter := gt.ClassMethodSetStringAdapter {
+		method = nil_method_set_string,
+	}
+	property_desc := gt.class_typed_property_descriptor(
+		defaults,
+		.Float,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+	)
+	_ = gt.class_property_godot_real(
+		&property_storage,
+		property_desc,
+		&get_real_adapter,
+		&set_real_adapter,
+	)
+	string_property_desc := gt.class_typed_property_descriptor(
+		defaults,
+		.String,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+	)
+	_ = gt.class_property_string(
+		&string_property_storage,
+		string_property_desc,
+		&string_get_adapter,
+		&string_set_adapter,
+	)
+	signal_storage: gt.ClassSignalStorage
+	signal_storage_2: gt.ClassSignalStorage
+	_ = gt.class_signal_0(gt.registration_string_name_ptr(registration_name))
+	_ = gt.class_signal_1_godot_real(
+		&signal_storage,
+		defaults,
+		gt.registration_string_name_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+	)
+	_ = gt.class_signal_2_godot_real(
+		&signal_storage_2,
+		defaults,
+		gt.registration_string_name_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+	)
+	instance_data := FacadeInstanceData {
+		object = gt.ObjectPtr(object),
+	}
+	gt.attach_typed_instance(
+		gt.ObjectPtr(object),
+		gt.class_registration_class_name(registration_names),
+		&instance_data,
+		&gt.InstanceBindingCallbacks{},
+	)
+	_, _ = gt.class_instance_data(gt.ClassInstancePtr(&instance_data), FacadeInstanceData)
+	_ = gt.class_instance_data_or_trap(gt.ClassInstancePtr(&instance_data), FacadeInstanceData)
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
 	gt.node2d_set_rotation(node2d, 0.5)

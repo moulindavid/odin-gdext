@@ -97,66 +97,66 @@ to remove repetitive metadata boilerplate, not to hide ownership or lifetime
 rules.
 
 1. Add stable registration storage helpers.
-   - [ ] Provide reusable storage structs for class names, parent names, method
+   - [x] Provide reusable storage structs for class names, parent names, method
      names, property names, signal names, and hint strings.
-   - [ ] Keep backing storage caller-owned and long-lived for the registered
+   - [x] Keep backing storage caller-owned and long-lived for the registered
      class.
-   - [ ] Make `StaticStringName` and `String` initialization less repetitive for
+   - [x] Make `StaticStringName` and `String` initialization less repetitive for
      registration metadata.
-   - [ ] Do not hide explicit class unregister during deinitialization.
+   - [x] Do not hide explicit class unregister during deinitialization.
 
 2. Add a small class builder API.
-   - [ ] Provide a begin/register/finalize pattern for one extension class.
-   - [ ] Keep create, free, and notification callbacks explicit.
-   - [ ] Register methods, properties, and signals through builder helpers.
-   - [ ] Trap or return errors consistently when required metadata or function
+   - [x] Provide a begin/register/finalize pattern for one extension class.
+   - [x] Keep create, free, and notification callbacks explicit.
+   - [x] Register methods, properties, and signals through builder helpers.
+   - [x] Trap or return errors consistently when required metadata or function
      pointers are missing.
 
 3. Add higher-level method descriptor helpers.
-   - [ ] Add concise helpers for common fixed signatures such as no-argument
+   - [x] Add concise helpers for common fixed signatures such as no-argument
      methods, `GodotReal -> void`, and `GodotReal, GodotReal -> GodotReal`.
-   - [ ] Preserve the existing call and ptrcall adapter safety rules.
-   - [ ] Keep raw descriptors available for advanced signatures.
-   - [ ] Do not add varargs, default-argument adapters, `Callable`, or `Signal`
+   - [x] Preserve the existing call and ptrcall adapter safety rules.
+   - [x] Keep raw descriptors available for advanced signatures.
+   - [x] Do not add varargs, default-argument adapters, `Callable`, or `Signal`
      method signatures in this slice.
 
 4. Add higher-level property helpers.
-   - [ ] Add helpers for common editor-visible properties such as `GodotReal`,
+   - [x] Add helpers for common editor-visible properties such as `GodotReal`,
      `bool`, `int`, and `String` where ownership rules are clear.
-   - [ ] Keep getter and setter method names explicit and backed by stable
+   - [x] Keep getter and setter method names explicit and backed by stable
      storage.
-   - [ ] Reuse the existing `PropertyInfo` construction path.
-   - [ ] Keep hints, hint strings, and usage flags visible to the caller.
+   - [x] Reuse the existing `PropertyInfo` construction path.
+   - [x] Keep hints, hint strings, and usage flags visible to the caller.
 
 5. Add higher-level signal registration helpers.
-   - [ ] Add concise helpers for no-argument signals and fixed primitive
+   - [x] Add concise helpers for no-argument signals and fixed primitive
      argument signals.
-   - [ ] Reuse the existing signal metadata storage and emission cleanup rules.
-   - [ ] Keep broad vararg signals deferred.
-   - [ ] Keep generated signal wrappers separate from user class signal
+   - [x] Reuse the existing signal metadata storage and emission cleanup rules.
+   - [x] Keep broad vararg signals deferred.
+   - [x] Keep generated signal wrappers separate from user class signal
      registration helpers.
 
 6. Add typed instance callback helpers.
-   - [ ] Provide small helpers for retrieving typed extension-owned instance
+   - [x] Provide small helpers for retrieving typed extension-owned instance
      data inside callbacks.
-   - [ ] Preserve explicit allocation and freeing of extension-owned data.
-   - [ ] Keep the owning Godot object handle borrowed by value.
-   - [ ] Add nil checks for invalid `ClassInstancePtr` and missing instance
+   - [x] Preserve explicit allocation and freeing of extension-owned data.
+   - [x] Keep the owning Godot object handle borrowed by value.
+   - [x] Add nil checks for invalid `ClassInstancePtr` and missing instance
      data.
 
 7. Convert a beginner example to the authoring helpers.
-   - [ ] Keep `examples/hello` importing only `godot:godot`.
-   - [ ] Show one class with instance data, one method, one property, one signal,
+   - [x] Keep `examples/hello` importing only `godot:godot`.
+   - [x] Show one class with instance data, one method, one property, one signal,
      and notification handling.
-   - [ ] Keep broad coverage in `examples/smoke` instead of the beginner
+   - [x] Keep broad coverage in `examples/smoke` instead of the beginner
      example.
-   - [ ] Keep unregister cleanup explicit and visible.
+   - [x] Keep unregister cleanup explicit and visible.
 
 8. Validate before moving to the next feature roadmap.
-   - [ ] Add facade compile checks for the new authoring helpers.
-   - [ ] Run `make ci`.
-   - [ ] Confirm normal examples import only `godot:godot`.
-   - [ ] Confirm registration metadata storage outlives registration.
+   - [x] Add facade compile checks for the new authoring helpers.
+   - [x] Run `make ci`.
+   - [x] Confirm normal examples import only `godot:godot`.
+   - [x] Confirm registration metadata storage outlives registration.
 
 ## Deferred until after this goal
 
