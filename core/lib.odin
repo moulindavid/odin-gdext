@@ -369,6 +369,88 @@ class_name_init_latin1_cstring :: proc "contextless" (name: ^ClassName, value: c
 	)
 }
 
+RegistrationStringName :: struct {
+	storage: StaticStringName,
+}
+
+registration_string_name_ptr :: proc "contextless" (
+	name: ^RegistrationStringName,
+) -> ConstStringNamePtr {
+	if name == nil do _trap_nil_godot_function()
+	return const_static_string_name_ptr(&name.storage)
+}
+
+registration_string_name_mut_ptr :: proc "contextless" (
+	name: ^RegistrationStringName,
+) -> StringNamePtr {
+	if name == nil do _trap_nil_godot_function()
+	return static_string_name_ptr(&name.storage)
+}
+
+registration_string_name_init_latin1_cstring :: proc "contextless" (
+	name: ^RegistrationStringName,
+	value: cstring,
+) {
+	if name == nil do _trap_nil_godot_function()
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&name.storage),
+		value,
+	)
+}
+
+RegistrationString :: struct {
+	storage: String,
+}
+
+registration_string_ptr :: proc "contextless" (value: ^RegistrationString) -> ConstStringPtr {
+	if value == nil do _trap_nil_godot_function()
+	return const_string_ptr(&value.storage)
+}
+
+registration_string_mut_ptr :: proc "contextless" (value: ^RegistrationString) -> StringPtr {
+	if value == nil do _trap_nil_godot_function()
+	return string_ptr(&value.storage)
+}
+
+registration_string_init_utf8 :: proc "contextless" (value: ^RegistrationString, text: string) {
+	if value == nil do _trap_nil_godot_function()
+	string_init_utf8(uninitialized_string_ptr(&value.storage), text)
+}
+
+registration_string_free :: proc "contextless" (value: ^RegistrationString) {
+	if value == nil do return
+	string_free(&value.storage)
+}
+
+ClassRegistrationNames :: struct {
+	class_name:  ClassName,
+	parent_name: ClassName,
+}
+
+class_registration_names_init :: proc "contextless" (
+	names: ^ClassRegistrationNames,
+	class_name: cstring,
+	parent_name: cstring,
+) {
+	if names == nil do _trap_nil_godot_function()
+	class_name_init_latin1_cstring(&names.class_name, class_name)
+	class_name_init_latin1_cstring(&names.parent_name, parent_name)
+}
+
+class_registration_class_name :: proc "contextless" (
+	names: ^ClassRegistrationNames,
+) -> ConstStringNamePtr {
+	if names == nil do _trap_nil_godot_function()
+	return class_name_ptr(&names.class_name)
+}
+
+class_registration_parent_name :: proc "contextless" (
+	names: ^ClassRegistrationNames,
+) -> ConstStringNamePtr {
+	if names == nil do _trap_nil_godot_function()
+	return class_name_ptr(&names.parent_name)
+}
+
 // Class registration.
 
 // Register an extension class using the current (Godot 4.7) creation info.

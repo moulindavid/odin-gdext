@@ -20,7 +20,16 @@ class_facade_compile_smoke :: proc "contextless" (
 	meta_value: ^gt.Variant,
 	callable: ^gt.Callable,
 	signal: ^gt.Signal,
+	registration_name: ^gt.RegistrationStringName,
+	registration_string: ^gt.RegistrationString,
+	registration_names: ^gt.ClassRegistrationNames,
 ) {
+	_ = gt.registration_string_name_ptr(registration_name)
+	_ = gt.registration_string_name_mut_ptr(registration_name)
+	_ = gt.registration_string_ptr(registration_string)
+	_ = gt.registration_string_mut_ptr(registration_string)
+	_ = gt.class_registration_class_name(registration_names)
+	_ = gt.class_registration_parent_name(registration_names)
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
 	gt.node2d_set_rotation(node2d, 0.5)

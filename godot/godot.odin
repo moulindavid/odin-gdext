@@ -80,6 +80,9 @@ StringNameStorage :: gcore.StringNameStorage
 StringName :: gcore.StringName
 StaticStringName :: gcore.StaticStringName
 ClassName :: gcore.ClassName
+RegistrationStringName :: gcore.RegistrationStringName
+RegistrationString :: gcore.RegistrationString
+ClassRegistrationNames :: gcore.ClassRegistrationNames
 NodePathStorage :: gcore.NodePathStorage
 NodePath :: gcore.NodePath
 CallableStorage :: gcore.CallableStorage
@@ -162,6 +165,16 @@ init_class_casting :: gcore.init_class_casting
 register_editor_visible_class :: gcore.register_editor_visible_class
 register_class_with_defaults :: gcore.register_class_with_defaults
 unregister_class :: gcore.unregister_class
+registration_string_name_ptr :: gcore.registration_string_name_ptr
+registration_string_name_mut_ptr :: gcore.registration_string_name_mut_ptr
+registration_string_name_init_latin1_cstring :: gcore.registration_string_name_init_latin1_cstring
+registration_string_ptr :: gcore.registration_string_ptr
+registration_string_mut_ptr :: gcore.registration_string_mut_ptr
+registration_string_init_utf8 :: gcore.registration_string_init_utf8
+registration_string_free :: gcore.registration_string_free
+class_registration_names_init :: gcore.class_registration_names_init
+class_registration_class_name :: gcore.class_registration_class_name
+class_registration_parent_name :: gcore.class_registration_parent_name
 attach_instance :: gcore.attach_instance
 class_instance_data :: gcore.class_instance_data
 class_member_defaults :: gcore.class_member_defaults

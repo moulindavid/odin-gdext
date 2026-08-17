@@ -97,13 +97,13 @@ to remove repetitive metadata boilerplate, not to hide ownership or lifetime
 rules.
 
 1. Add stable registration storage helpers.
-   - [ ] Provide reusable storage structs for class names, parent names, method
+   - [x] Provide reusable storage structs for class names, parent names, method
      names, property names, signal names, and hint strings.
-   - [ ] Keep backing storage caller-owned and long-lived for the registered
+   - [x] Keep backing storage caller-owned and long-lived for the registered
      class.
-   - [ ] Make `StaticStringName` and `String` initialization less repetitive for
+   - [x] Make `StaticStringName` and `String` initialization less repetitive for
      registration metadata.
-   - [ ] Do not hide explicit class unregister during deinitialization.
+   - [x] Do not hide explicit class unregister during deinitialization.
 
 2. Add a small class builder API.
    - [ ] Provide a begin/register/finalize pattern for one extension class.
