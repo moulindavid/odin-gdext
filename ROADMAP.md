@@ -145,12 +145,12 @@ rules.
      data.
 
 7. Convert a beginner example to the authoring helpers.
-   - [ ] Keep `examples/hello` importing only `godot:godot`.
-   - [ ] Show one class with instance data, one method, one property, one signal,
+   - [x] Keep `examples/hello` importing only `godot:godot`.
+   - [x] Show one class with instance data, one method, one property, one signal,
      and notification handling.
-   - [ ] Keep broad coverage in `examples/smoke` instead of the beginner
+   - [x] Keep broad coverage in `examples/smoke` instead of the beginner
      example.
-   - [ ] Keep unregister cleanup explicit and visible.
+   - [x] Keep unregister cleanup explicit and visible.
 
 8. Validate before moving to the next feature roadmap.
    - [ ] Add facade compile checks for the new authoring helpers.
