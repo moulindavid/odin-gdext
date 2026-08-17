@@ -113,11 +113,11 @@ rules.
      pointers are missing.
 
 3. Add higher-level method descriptor helpers.
-   - [ ] Add concise helpers for common fixed signatures such as no-argument
+   - [x] Add concise helpers for common fixed signatures such as no-argument
      methods, `GodotReal -> void`, and `GodotReal, GodotReal -> GodotReal`.
-   - [ ] Preserve the existing call and ptrcall adapter safety rules.
-   - [ ] Keep raw descriptors available for advanced signatures.
-   - [ ] Do not add varargs, default-argument adapters, `Callable`, or `Signal`
+   - [x] Preserve the existing call and ptrcall adapter safety rules.
+   - [x] Keep raw descriptors available for advanced signatures.
+   - [x] Do not add varargs, default-argument adapters, `Callable`, or `Signal`
      method signatures in this slice.
 
 4. Add higher-level property helpers.

@@ -927,6 +927,122 @@ ClassMethodSetObjectPtrAdapter :: struct {
 	method: ClassMethodSetObjectPtr,
 }
 
+ClassFixedMethodStorage :: struct {
+	method_info:       ClassMethodInfo,
+	return_info:       PropertyInfo,
+	argument_info:     [2]PropertyInfo,
+	argument_metadata: [2]ClassMethodArgumentMetadata,
+}
+
+class_method_void :: proc "contextless" (
+	info: ^ClassMethodInfo,
+	name: StringNamePtr,
+	adapter: ^ClassMethodVoidAdapter,
+) -> OdinClassMethod {
+	if info == nil || name == nil || adapter == nil do _trap_nil_godot_function()
+	return OdinClassMethod {
+		info = info,
+		descriptor = ClassMethodDescriptor {
+			name = name,
+			method_userdata = adapter,
+			call_func = class_method_void_call,
+			ptrcall_func = class_method_void_ptrcall,
+		},
+	}
+}
+
+class_method_get_godot_real :: proc "contextless" (
+	storage: ^ClassFixedMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	adapter: ^ClassMethodGetGodotRealAdapter,
+) -> OdinClassMethod {
+	if storage == nil || name == nil || adapter == nil do _trap_nil_godot_function()
+	init_method_property_info(&storage.return_info, class_member_property(defaults, .Float, name))
+	return OdinClassMethod {
+		info = &storage.method_info,
+		descriptor = ClassMethodDescriptor {
+			name = name,
+			method_userdata = adapter,
+			call_func = class_method_get_godot_real_call,
+			ptrcall_func = class_method_get_godot_real_ptrcall,
+			return_value_info = &storage.return_info,
+			return_value_metadata = .None,
+		},
+	}
+}
+
+class_method_set_godot_real :: proc "contextless" (
+	storage: ^ClassFixedMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	argument_name: StringNamePtr,
+	adapter: ^ClassMethodSetGodotRealAdapter,
+) -> OdinClassMethod {
+	if storage == nil || name == nil || argument_name == nil || adapter == nil {
+		_trap_nil_godot_function()
+	}
+	storage.argument_metadata[0] = .None
+	init_method_property_info(
+		&storage.argument_info[0],
+		class_member_property(defaults, .Float, argument_name),
+	)
+	return OdinClassMethod {
+		info = &storage.method_info,
+		descriptor = ClassMethodDescriptor {
+			name = name,
+			method_userdata = adapter,
+			call_func = class_method_set_godot_real_call,
+			ptrcall_func = class_method_set_godot_real_ptrcall,
+			argument_count = 1,
+			arguments_info = &storage.argument_info[0],
+			arguments_metadata = &storage.argument_metadata[0],
+		},
+	}
+}
+
+class_method_godot_real2_to_godot_real :: proc "contextless" (
+	storage: ^ClassFixedMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	argument_a_name: StringNamePtr,
+	argument_b_name: StringNamePtr,
+	adapter: ^ClassMethodGodotReal2ToGodotRealAdapter,
+) -> OdinClassMethod {
+	if storage == nil ||
+	   name == nil ||
+	   argument_a_name == nil ||
+	   argument_b_name == nil ||
+	   adapter == nil {
+		_trap_nil_godot_function()
+	}
+	storage.argument_metadata[0] = .None
+	storage.argument_metadata[1] = .None
+	init_method_property_info(&storage.return_info, class_member_property(defaults, .Float, name))
+	init_method_property_info(
+		&storage.argument_info[0],
+		class_member_property(defaults, .Float, argument_a_name),
+	)
+	init_method_property_info(
+		&storage.argument_info[1],
+		class_member_property(defaults, .Float, argument_b_name),
+	)
+	return OdinClassMethod {
+		info = &storage.method_info,
+		descriptor = ClassMethodDescriptor {
+			name = name,
+			method_userdata = adapter,
+			call_func = class_method_godot_real2_to_godot_real_call,
+			ptrcall_func = class_method_godot_real2_to_godot_real_ptrcall,
+			return_value_info = &storage.return_info,
+			return_value_metadata = .None,
+			argument_count = 2,
+			arguments_info = &storage.argument_info[0],
+			arguments_metadata = &storage.argument_metadata[0],
+		},
+	}
+}
+
 ClassPrimitivePropertyStorage :: struct {
 	property_info:      PropertyInfo,
 	getter_return_info: PropertyInfo,

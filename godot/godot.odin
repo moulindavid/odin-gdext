@@ -68,6 +68,7 @@ ClassMethodSetString :: gcore.ClassMethodSetString
 ClassMethodSetStringAdapter :: gcore.ClassMethodSetStringAdapter
 ClassMethodSetObjectPtr :: gcore.ClassMethodSetObjectPtr
 ClassMethodSetObjectPtrAdapter :: gcore.ClassMethodSetObjectPtrAdapter
+ClassFixedMethodStorage :: gcore.ClassFixedMethodStorage
 ClassPrimitivePropertyStorage :: gcore.ClassPrimitivePropertyStorage
 ClassTypedPropertyDescriptor :: gcore.ClassTypedPropertyDescriptor
 ClassTypedProperty :: gcore.ClassTypedProperty
@@ -195,6 +196,10 @@ class_builder_signals :: gcore.class_builder_signals
 class_builder_finalize :: gcore.class_builder_finalize
 class_builder_register :: gcore.class_builder_register
 class_builder_unregister :: gcore.class_builder_unregister
+class_method_void :: gcore.class_method_void
+class_method_get_godot_real :: gcore.class_method_get_godot_real
+class_method_set_godot_real :: gcore.class_method_set_godot_real
+class_method_godot_real2_to_godot_real :: gcore.class_method_godot_real2_to_godot_real
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall

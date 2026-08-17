@@ -12,6 +12,38 @@ nil_proc_create_instance :: proc "c" (
 nil_proc_free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr) {
 }
 
+nil_method_void :: proc "contextless" (instance: gt.ClassInstancePtr) -> bool {
+	return instance != nil
+}
+
+nil_method_get_real :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	return 0, instance != nil
+}
+
+nil_method_set_real :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	value: gt.GodotReal,
+) -> bool {
+	_ = value
+	return instance != nil
+}
+
+nil_method_real2_real :: proc "contextless" (
+	instance: gt.ClassInstancePtr,
+	a: gt.GodotReal,
+	b: gt.GodotReal,
+) -> (
+	value: gt.GodotReal,
+	ok: bool,
+) {
+	return a + b, instance != nil
+}
+
 // Compile-only facade smoke coverage. Users should not need internal generated imports.
 class_facade_compile_smoke :: proc "contextless" (
 	object: gt.Object,
@@ -50,6 +82,52 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.class_builder_properties(&builder, nil)
 	gt.class_builder_signals(&builder, nil)
 	_ = gt.class_builder_finalize(&builder)
+	method_info: gt.ClassMethodInfo
+	method_storage: gt.ClassFixedMethodStorage
+	method_storage_2: gt.ClassFixedMethodStorage
+	method_storage_3: gt.ClassFixedMethodStorage
+	void_adapter := gt.ClassMethodVoidAdapter {
+		method = nil_method_void,
+	}
+	get_real_adapter := gt.ClassMethodGetGodotRealAdapter {
+		method = nil_method_get_real,
+	}
+	set_real_adapter := gt.ClassMethodSetGodotRealAdapter {
+		method = nil_method_set_real,
+	}
+	real2_adapter := gt.ClassMethodGodotReal2ToGodotRealAdapter {
+		method = nil_method_real2_real,
+	}
+	defaults := gt.class_member_defaults(
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_mut_ptr(registration_string),
+	)
+	_ = gt.class_method_void(
+		&method_info,
+		gt.registration_string_name_mut_ptr(registration_name),
+		&void_adapter,
+	)
+	_ = gt.class_method_get_godot_real(
+		&method_storage,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		&get_real_adapter,
+	)
+	_ = gt.class_method_set_godot_real(
+		&method_storage_2,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		&set_real_adapter,
+	)
+	_ = gt.class_method_godot_real2_to_godot_real(
+		&method_storage_3,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		&real2_adapter,
+	)
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
 	gt.node2d_set_rotation(node2d, 0.5)
