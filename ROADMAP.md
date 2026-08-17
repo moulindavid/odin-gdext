@@ -74,82 +74,102 @@ aliases over `Array` storage, checked read helpers for borrowed object handles,
 selected generated `Area2D` overlap methods, facade exports, smoke/facade
 coverage, and full `make ci` validation.
 
-## Current goal: default arguments and overload ergonomics
+## Completed: default arguments and overload ergonomics
 
-Add a small generated wrapper strategy for Godot methods that are otherwise safe
-but currently skipped or awkward because they expose default arguments. This
-should improve real usability without expanding into varargs, broad overload
-sets, or lifetime-sensitive APIs.
+The default-argument slice added deterministic convenience wrappers for a small
+safe method batch while keeping full-arity generated wrappers canonical.
+Completed coverage includes default-argument reporting, parsing for simple safe
+defaults, selected `_default` wrappers, public facade exports, facade compile
+coverage, example usage, deterministic generated output checks, and full
+`make ci` validation.
 
-Keep this roadmap narrow. Start with reporting and deterministic naming, then
-enable only a selected method batch where all explicit argument types already
-satisfy the ownership model. Do not infer unsafe defaults, hide ownership, or
-emit wrappers that collide with existing generated names.
+## Current goal: class authoring ergonomics
 
-1. Define default-argument wrapper policy.
-   - [ ] Document that full-arity wrappers remain the canonical generated API.
-   - [x] Generate shorter convenience wrappers only when omitted arguments have
-     stable `extension_api.json` defaults and supported types.
-   - [x] Keep wrapper names deterministic and collision-free.
-   - [x] Do not support varargs as part of this roadmap.
+Make custom Odin classes less verbose to write while preserving the explicit
+safety model. This is the main gap between the current low-level registration
+helpers and the kind of day-to-day authoring experience people expect from a
+rust-gdext-like library.
 
-2. Improve reporting for default arguments.
-   - [x] Split default-argument skips from unsupported type and lifetime skips.
-   - [x] Report which arguments have defaults and their raw Godot default value.
-   - [x] Identify the smallest safe selected method batch that becomes useful
-     with convenience wrappers.
-   - [x] Keep methods with unsupported default values skipped with explicit
-     reasons.
+Keep this roadmap focused on helper APIs, not magic. Users should still see the
+important lifecycle pieces: class registration, instance allocation, method
+adapters, properties, signals, notifications, and unregister cleanup. The goal is
+to remove repetitive metadata boilerplate, not to hide ownership or lifetime
+rules.
 
-3. Add default value parsing for primitive and simple value types.
-   - [x] Start with `bool`, integer values, `GodotReal`, empty `String`, and nil
-     object defaults where ownership is clear.
-   - [x] Convert parsed defaults into local Odin temporaries before ptrcall.
-   - [x] Reuse existing owned value construction and destruction helpers for any
-     default that needs Godot storage.
-   - [x] Defer complex expressions, enum aliases, objects needing construction,
-     arrays, dictionaries, `Callable`, `Signal`, and resource defaults.
+1. Add stable registration storage helpers.
+   - [ ] Provide reusable storage structs for class names, parent names, method
+     names, property names, signal names, and hint strings.
+   - [ ] Keep backing storage caller-owned and long-lived for the registered
+     class.
+   - [ ] Make `StaticStringName` and `String` initialization less repetitive for
+     registration metadata.
+   - [ ] Do not hide explicit class unregister during deinitialization.
 
-4. Generate deterministic convenience wrappers for selected methods.
-   - [x] Keep the full explicit wrapper unchanged.
-   - [x] Emit suffix-based or arity-based wrapper names that cannot collide with
-     selected explicit methods.
-   - [x] Ensure temporary defaults are destroyed on every path.
-   - [x] Validate generated output remains stable.
+2. Add a small class builder API.
+   - [ ] Provide a begin/register/finalize pattern for one extension class.
+   - [ ] Keep create, free, and notification callbacks explicit.
+   - [ ] Register methods, properties, and signals through builder helpers.
+   - [ ] Trap or return errors consistently when required metadata or function
+     pointers are missing.
 
-5. Enable one small generated default-argument batch.
-   - [x] Prefer selected `Node`, `Control`, `Timer`, or `Area2D` methods already
-     generated with explicit arguments.
-   - [x] Add only wrappers whose omitted arguments are primitive or simple owned
-     values.
-   - [x] Re-export selected convenience wrappers through `godot:godot`.
-   - [x] Keep broad overload coverage deferred.
+3. Add higher-level method descriptor helpers.
+   - [ ] Add concise helpers for common fixed signatures such as no-argument
+     methods, `GodotReal -> void`, and `GodotReal, GodotReal -> GodotReal`.
+   - [ ] Preserve the existing call and ptrcall adapter safety rules.
+   - [ ] Keep raw descriptors available for advanced signatures.
+   - [ ] Do not add varargs, default-argument adapters, `Callable`, or `Signal`
+     method signatures in this slice.
 
-6. Add facade and smoke coverage.
-   - [x] Add facade compile checks for generated convenience wrappers.
-   - [x] Add or extend smoke/example usage where defaulted wrappers improve
-     readability.
-   - [x] Keep beginner examples readable and still importing only `godot:godot`.
-   - [x] Confirm existing explicit wrappers still compile.
+4. Add higher-level property helpers.
+   - [ ] Add helpers for common editor-visible properties such as `GodotReal`,
+     `bool`, `int`, and `String` where ownership rules are clear.
+   - [ ] Keep getter and setter method names explicit and backed by stable
+     storage.
+   - [ ] Reuse the existing `PropertyInfo` construction path.
+   - [ ] Keep hints, hint strings, and usage flags visible to the caller.
 
-7. Validate before moving to the next feature roadmap.
-   - [x] Run `make ci`.
-   - [x] Confirm generated reports explain remaining default-argument skips.
-   - [x] Confirm no generated wrapper violates borrowed-object or owned-value
-     destruction rules.
-   - [x] Confirm generated output is deterministic.
+5. Add higher-level signal registration helpers.
+   - [ ] Add concise helpers for no-argument signals and fixed primitive
+     argument signals.
+   - [ ] Reuse the existing signal metadata storage and emission cleanup rules.
+   - [ ] Keep broad vararg signals deferred.
+   - [ ] Keep generated signal wrappers separate from user class signal
+     registration helpers.
+
+6. Add typed instance callback helpers.
+   - [ ] Provide small helpers for retrieving typed extension-owned instance
+     data inside callbacks.
+   - [ ] Preserve explicit allocation and freeing of extension-owned data.
+   - [ ] Keep the owning Godot object handle borrowed by value.
+   - [ ] Add nil checks for invalid `ClassInstancePtr` and missing instance
+     data.
+
+7. Convert a beginner example to the authoring helpers.
+   - [ ] Keep `examples/hello` importing only `godot:godot`.
+   - [ ] Show one class with instance data, one method, one property, one signal,
+     and notification handling.
+   - [ ] Keep broad coverage in `examples/smoke` instead of the beginner
+     example.
+   - [ ] Keep unregister cleanup explicit and visible.
+
+8. Validate before moving to the next feature roadmap.
+   - [ ] Add facade compile checks for the new authoring helpers.
+   - [ ] Run `make ci`.
+   - [ ] Confirm normal examples import only `godot:godot`.
+   - [ ] Confirm registration metadata storage outlives registration.
 
 ## Deferred until after this goal
 
-- broad overload coverage
-- vararg methods
-- complex default value expressions
-- broad typed container mutation APIs
+- macro-like or generated user class declarations
+- broad automatic method adapter generation
+- vararg method adapters
+- default-argument adapters for user methods
+- broad generated signal wrappers
 - arbitrary callable binding helpers
-- generated signal wrappers beyond selected safe paths
+- full virtual method generation
+- broad typed container mutation APIs
 - broad `Resource`, `PackedScene`, texture, theme, and asset APIs
 - `PackedScene.instantiate` and `Resource.duplicate` ownership-transfer wrappers
-- full virtual method generation
 - full 1000+ class API generation
 
 ## Validation
