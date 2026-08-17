@@ -153,10 +153,10 @@ rules.
    - [x] Keep unregister cleanup explicit and visible.
 
 8. Validate before moving to the next feature roadmap.
-   - [ ] Add facade compile checks for the new authoring helpers.
-   - [ ] Run `make ci`.
-   - [ ] Confirm normal examples import only `godot:godot`.
-   - [ ] Confirm registration metadata storage outlives registration.
+   - [x] Add facade compile checks for the new authoring helpers.
+   - [x] Run `make ci`.
+   - [x] Confirm normal examples import only `godot:godot`.
+   - [x] Confirm registration metadata storage outlives registration.
 
 ## Deferred until after this goal
 
