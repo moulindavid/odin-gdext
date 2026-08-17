@@ -83,83 +83,73 @@ defaults, selected `_default` wrappers, public facade exports, facade compile
 coverage, example usage, deterministic generated output checks, and full
 `make ci` validation.
 
-## Current goal: class authoring ergonomics
+## Completed: class authoring ergonomics
 
-Make custom Odin classes less verbose to write while preserving the explicit
-safety model. This is the main gap between the current low-level registration
-helpers and the kind of day-to-day authoring experience people expect from a
-rust-gdext-like library.
+The class-authoring slice made custom Odin classes less verbose while keeping
+lifecycle and ownership explicit. Completed coverage includes stable registration
+metadata storage, a small class builder, fixed-signature method helpers,
+typed-property helpers, signal registration helpers, typed instance-data helpers,
+facade compile coverage, and a beginner `examples/hello` class using only
+`godot:godot`. Full `make ci` passed for the completed slice.
 
-Keep this roadmap focused on helper APIs, not magic. Users should still see the
-important lifecycle pieces: class registration, instance allocation, method
-adapters, properties, signals, notifications, and unregister cleanup. The goal is
-to remove repetitive metadata boilerplate, not to hide ownership or lifetime
-rules.
+## Current goal: Input and scene-tree gameplay APIs
 
-1. Add stable registration storage helpers.
-   - [x] Provide reusable storage structs for class names, parent names, method
-     names, property names, signal names, and hint strings.
-   - [x] Keep backing storage caller-owned and long-lived for the registered
-     class.
-   - [x] Make `StaticStringName` and `String` initialization less repetitive for
-     registration metadata.
-   - [x] Do not hide explicit class unregister during deinitialization.
+Input and scene-tree access are likely the next generated API bottleneck for real
+gameplay code. This slice should stay small and should first prove singleton and
+scene-tree access rules before exposing broader engine APIs.
 
-2. Add a small class builder API.
-   - [x] Provide a begin/register/finalize pattern for one extension class.
-   - [x] Keep create, free, and notification callbacks explicit.
-   - [x] Register methods, properties, and signals through builder helpers.
-   - [x] Trap or return errors consistently when required metadata or function
-     pointers are missing.
+Keep this roadmap focused on gameplay-facing APIs that preserve the borrowed
+object-handle model. Singleton and scene-tree handles must be treated as borrowed
+by value. Resource loading, packed-scene instantiation, callable-heavy paths,
+event objects, and ownership-sensitive scene changes stay deferred unless a
+focused wrapper documents the safety model.
 
-3. Add higher-level method descriptor helpers.
-   - [x] Add concise helpers for common fixed signatures such as no-argument
-     methods, `GodotReal -> void`, and `GodotReal, GodotReal -> GodotReal`.
-   - [x] Preserve the existing call and ptrcall adapter safety rules.
-   - [x] Keep raw descriptors available for advanced signatures.
-   - [x] Do not add varargs, default-argument adapters, `Callable`, or `Signal`
-     method signatures in this slice.
+1. Investigate singleton access rules.
+   - [ ] Identify how selected singleton objects are retrieved through the Godot
+     4.7 GDExtension API.
+   - [ ] Treat returned singleton object handles as borrowed by value.
+   - [ ] Trap or return `ok = false` when a singleton lookup is unavailable.
+   - [ ] Keep singleton storage out of user-owned data unless lifetime rules are
+     documented.
 
-4. Add higher-level property helpers.
-   - [x] Add helpers for common editor-visible properties such as `GodotReal`,
-     `bool`, `int`, and `String` where ownership rules are clear.
-   - [x] Keep getter and setter method names explicit and backed by stable
-     storage.
-   - [x] Reuse the existing `PropertyInfo` construction path.
-   - [x] Keep hints, hint strings, and usage flags visible to the caller.
+2. Add a selected `Input` API batch.
+   - [ ] Generate or hand-wrap a minimal safe path for common input queries.
+   - [ ] Prefer primitive, `StringName`, and math-builtin signatures already
+     covered by the safety model.
+   - [ ] Keep event objects, resources, arrays, and callable-heavy APIs skipped
+     until reviewed.
+   - [ ] Re-export selected helpers through `godot:godot`.
 
-5. Add higher-level signal registration helpers.
-   - [x] Add concise helpers for no-argument signals and fixed primitive
-     argument signals.
-   - [x] Reuse the existing signal metadata storage and emission cleanup rules.
-   - [x] Keep broad vararg signals deferred.
-   - [x] Keep generated signal wrappers separate from user class signal
-     registration helpers.
+3. Add a selected `SceneTree` API batch.
+   - [ ] Expose only borrowed-safe scene-tree queries first.
+   - [ ] Keep ownership-sensitive APIs such as scene changing, resource loading,
+     and packed-scene instantiation deferred unless explicitly wrapped.
+   - [ ] Use checked object/class downcasts for returned handles.
+   - [ ] Re-export selected helpers through `godot:godot`.
 
-6. Add typed instance callback helpers.
-   - [x] Provide small helpers for retrieving typed extension-owned instance
-     data inside callbacks.
-   - [x] Preserve explicit allocation and freeing of extension-owned data.
-   - [x] Keep the owning Godot object handle borrowed by value.
-   - [x] Add nil checks for invalid `ClassInstancePtr` and missing instance
-     data.
+4. Exercise the batch in examples.
+   - [ ] Use normal `godot:godot` imports only.
+   - [ ] Add one real example path that reads input or scene-tree state from
+     Odin gameplay code.
+   - [ ] Keep broad engine coverage in smoke checks, not beginner examples.
 
-7. Convert a beginner example to the authoring helpers.
-   - [x] Keep `examples/hello` importing only `godot:godot`.
-   - [x] Show one class with instance data, one method, one property, one signal,
-     and notification handling.
-   - [x] Keep broad coverage in `examples/smoke` instead of the beginner
-     example.
-   - [x] Keep unregister cleanup explicit and visible.
+5. Update generated reporting.
+   - [ ] Report singleton, input, and scene-tree blockers separately if useful.
+   - [ ] Keep unsupported signatures skipped with stable reasons.
+   - [ ] Preserve deterministic report and generated output order.
 
-8. Validate before moving to the next feature roadmap.
-   - [x] Add facade compile checks for the new authoring helpers.
-   - [x] Run `make ci`.
-   - [x] Confirm normal examples import only `godot:godot`.
-   - [x] Confirm registration metadata storage outlives registration.
+6. Validate before moving to the next feature roadmap.
+   - [ ] Run `make ci`.
+   - [ ] Confirm no generated wrapper violates borrowed singleton or object
+     lifetime rules.
+   - [ ] Confirm generated output is deterministic.
 
 ## Deferred until after this goal
 
+- broad singleton coverage beyond selected safe APIs
+- event object wrappers and input event lifetime-sensitive APIs
+- ownership-sensitive scene-tree changes
+- resource loading and scene instantiation workflows
 - macro-like or generated user class declarations
 - broad automatic method adapter generation
 - vararg method adapters
