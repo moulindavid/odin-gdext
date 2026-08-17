@@ -106,10 +106,10 @@ rules.
    - [x] Do not hide explicit class unregister during deinitialization.
 
 2. Add a small class builder API.
-   - [ ] Provide a begin/register/finalize pattern for one extension class.
-   - [ ] Keep create, free, and notification callbacks explicit.
-   - [ ] Register methods, properties, and signals through builder helpers.
-   - [ ] Trap or return errors consistently when required metadata or function
+   - [x] Provide a begin/register/finalize pattern for one extension class.
+   - [x] Keep create, free, and notification callbacks explicit.
+   - [x] Register methods, properties, and signals through builder helpers.
+   - [x] Trap or return errors consistently when required metadata or function
      pointers are missing.
 
 3. Add higher-level method descriptor helpers.

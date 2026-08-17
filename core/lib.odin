@@ -642,6 +642,75 @@ OdinClassDescriptor :: struct {
 	signals:              []OdinClassSignal,
 }
 
+ClassBuilder :: struct {
+	desc: OdinClassDescriptor,
+}
+
+class_builder_begin :: proc "contextless" (
+	class_name: ConstStringNamePtr,
+	parent_class_name: ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func: ClassFreeInstance,
+	notification_func: ClassNotification = nil,
+	class_userdata: rawptr = nil,
+) -> ClassBuilder {
+	if class_name == nil ||
+	   parent_class_name == nil ||
+	   create_instance_func == nil ||
+	   free_instance_func == nil {
+		_trap_nil_godot_function()
+	}
+	return ClassBuilder {
+		desc = OdinClassDescriptor {
+			class_name = class_name,
+			parent_class_name = parent_class_name,
+			create_instance_func = create_instance_func,
+			free_instance_func = free_instance_func,
+			notification_func = notification_func,
+			class_userdata = class_userdata,
+		},
+	}
+}
+
+class_builder_methods :: proc "contextless" (builder: ^ClassBuilder, methods: []OdinClassMethod) {
+	if builder == nil do _trap_nil_godot_function()
+	builder.desc.methods = methods
+}
+
+class_builder_properties :: proc "contextless" (
+	builder: ^ClassBuilder,
+	properties: []OdinClassProperty,
+) {
+	if builder == nil do _trap_nil_godot_function()
+	builder.desc.properties = properties
+}
+
+class_builder_signals :: proc "contextless" (builder: ^ClassBuilder, signals: []OdinClassSignal) {
+	if builder == nil do _trap_nil_godot_function()
+	builder.desc.signals = signals
+}
+
+class_builder_finalize :: proc "contextless" (builder: ^ClassBuilder) -> OdinClassDescriptor {
+	if builder == nil ||
+	   builder.desc.class_name == nil ||
+	   builder.desc.parent_class_name == nil ||
+	   builder.desc.create_instance_func == nil ||
+	   builder.desc.free_instance_func == nil {
+		_trap_nil_godot_function()
+	}
+	return builder.desc
+}
+
+class_builder_register :: proc "contextless" (builder: ^ClassBuilder) {
+	desc := class_builder_finalize(builder)
+	register_odin_class(desc)
+}
+
+class_builder_unregister :: proc "contextless" (builder: ^ClassBuilder) {
+	desc := class_builder_finalize(builder)
+	unregister_odin_class(desc)
+}
+
 // register_odin_class registers one Odin-backed class and its member metadata.
 // The descriptor is consumed immediately; Godot-facing names, PropertyInfo,
 // ClassMethodInfo, adapters, and callback data must be caller-owned stable

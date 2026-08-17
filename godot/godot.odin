@@ -45,6 +45,7 @@ OdinClassMethod :: gcore.OdinClassMethod
 OdinClassProperty :: gcore.OdinClassProperty
 OdinClassSignal :: gcore.OdinClassSignal
 OdinClassDescriptor :: gcore.OdinClassDescriptor
+ClassBuilder :: gcore.ClassBuilder
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
 ClassMethodVoid :: gcore.ClassMethodVoid
@@ -187,6 +188,13 @@ register_class_signal_with_descriptor :: gcore.register_class_signal_with_descri
 register_class_method_with_descriptor :: gcore.register_class_method_with_descriptor
 register_odin_class :: gcore.register_odin_class
 unregister_odin_class :: gcore.unregister_odin_class
+class_builder_begin :: gcore.class_builder_begin
+class_builder_methods :: gcore.class_builder_methods
+class_builder_properties :: gcore.class_builder_properties
+class_builder_signals :: gcore.class_builder_signals
+class_builder_finalize :: gcore.class_builder_finalize
+class_builder_register :: gcore.class_builder_register
+class_builder_unregister :: gcore.class_builder_unregister
 class_method_godot_real2_to_godot_real_call :: gcore.class_method_godot_real2_to_godot_real_call
 class_method_godot_real2_to_godot_real_ptrcall ::
 	gcore.class_method_godot_real2_to_godot_real_ptrcall

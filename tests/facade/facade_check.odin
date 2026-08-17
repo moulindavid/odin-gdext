@@ -2,6 +2,16 @@ package facade_tests
 
 import gt "godot:godot"
 
+nil_proc_create_instance :: proc "c" (
+	class_userdata: rawptr,
+	notify_postinitialize: bool,
+) -> gt.ObjectPtr {
+	return nil
+}
+
+nil_proc_free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr) {
+}
+
 // Compile-only facade smoke coverage. Users should not need internal generated imports.
 class_facade_compile_smoke :: proc "contextless" (
 	object: gt.Object,
@@ -30,6 +40,16 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.registration_string_mut_ptr(registration_string)
 	_ = gt.class_registration_class_name(registration_names)
 	_ = gt.class_registration_parent_name(registration_names)
+	builder := gt.class_builder_begin(
+		gt.class_registration_class_name(registration_names),
+		gt.class_registration_parent_name(registration_names),
+		nil_proc_create_instance,
+		nil_proc_free_instance,
+	)
+	gt.class_builder_methods(&builder, nil)
+	gt.class_builder_properties(&builder, nil)
+	gt.class_builder_signals(&builder, nil)
+	_ = gt.class_builder_finalize(&builder)
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
 	gt.node2d_set_rotation(node2d, 0.5)
