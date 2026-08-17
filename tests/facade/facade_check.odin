@@ -179,6 +179,22 @@ class_facade_compile_smoke :: proc "contextless" (
 		&string_get_adapter,
 		&string_set_adapter,
 	)
+	signal_storage: gt.ClassSignalStorage
+	signal_storage_2: gt.ClassSignalStorage
+	_ = gt.class_signal_0(gt.registration_string_name_ptr(registration_name))
+	_ = gt.class_signal_1_godot_real(
+		&signal_storage,
+		defaults,
+		gt.registration_string_name_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+	)
+	_ = gt.class_signal_2_godot_real(
+		&signal_storage_2,
+		defaults,
+		gt.registration_string_name_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+	)
 	gt.node2d_set_position(node2d, gt.Vector2{1, 2})
 	_ = gt.node2d_get_position(node2d)
 	gt.node2d_set_rotation(node2d, 0.5)

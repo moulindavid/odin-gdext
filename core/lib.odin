@@ -630,6 +630,62 @@ OdinClassSignal :: struct {
 	descriptor: ClassSignalDescriptor,
 }
 
+ClassSignalStorage :: struct {
+	argument_info: [2]PropertyInfo,
+}
+
+class_signal_0 :: proc "contextless" (name: ConstStringNamePtr) -> OdinClassSignal {
+	if name == nil do _trap_nil_godot_function()
+	return OdinClassSignal{descriptor = ClassSignalDescriptor{name = name}}
+}
+
+class_signal_1_godot_real :: proc "contextless" (
+	storage: ^ClassSignalStorage,
+	defaults: ClassMemberDefaults,
+	name: ConstStringNamePtr,
+	argument_name: StringNamePtr,
+) -> OdinClassSignal {
+	if storage == nil || name == nil || argument_name == nil do _trap_nil_godot_function()
+	init_method_property_info(
+		&storage.argument_info[0],
+		class_member_property(defaults, .Float, argument_name),
+	)
+	return OdinClassSignal {
+		descriptor = ClassSignalDescriptor {
+			name = name,
+			argument_info = &storage.argument_info[0],
+			argument_count = 1,
+		},
+	}
+}
+
+class_signal_2_godot_real :: proc "contextless" (
+	storage: ^ClassSignalStorage,
+	defaults: ClassMemberDefaults,
+	name: ConstStringNamePtr,
+	argument_a_name: StringNamePtr,
+	argument_b_name: StringNamePtr,
+) -> OdinClassSignal {
+	if storage == nil || name == nil || argument_a_name == nil || argument_b_name == nil {
+		_trap_nil_godot_function()
+	}
+	init_method_property_info(
+		&storage.argument_info[0],
+		class_member_property(defaults, .Float, argument_a_name),
+	)
+	init_method_property_info(
+		&storage.argument_info[1],
+		class_member_property(defaults, .Float, argument_b_name),
+	)
+	return OdinClassSignal {
+		descriptor = ClassSignalDescriptor {
+			name = name,
+			argument_info = &storage.argument_info[0],
+			argument_count = 2,
+		},
+	}
+}
+
 OdinClassDescriptor :: struct {
 	class_name:           ConstStringNamePtr,
 	parent_class_name:    ConstStringNamePtr,

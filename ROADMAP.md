@@ -129,11 +129,11 @@ rules.
    - [x] Keep hints, hint strings, and usage flags visible to the caller.
 
 5. Add higher-level signal registration helpers.
-   - [ ] Add concise helpers for no-argument signals and fixed primitive
+   - [x] Add concise helpers for no-argument signals and fixed primitive
      argument signals.
-   - [ ] Reuse the existing signal metadata storage and emission cleanup rules.
-   - [ ] Keep broad vararg signals deferred.
-   - [ ] Keep generated signal wrappers separate from user class signal
+   - [x] Reuse the existing signal metadata storage and emission cleanup rules.
+   - [x] Keep broad vararg signals deferred.
+   - [x] Keep generated signal wrappers separate from user class signal
      registration helpers.
 
 6. Add typed instance callback helpers.
