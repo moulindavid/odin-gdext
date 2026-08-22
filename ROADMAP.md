@@ -105,44 +105,44 @@ event objects, and ownership-sensitive scene changes stay deferred unless a
 focused wrapper documents the safety model.
 
 1. Investigate singleton access rules.
-   - [ ] Identify how selected singleton objects are retrieved through the Godot
+   - [x] Identify how selected singleton objects are retrieved through the Godot
      4.7 GDExtension API.
-   - [ ] Treat returned singleton object handles as borrowed by value.
-   - [ ] Trap or return `ok = false` when a singleton lookup is unavailable.
-   - [ ] Keep singleton storage out of user-owned data unless lifetime rules are
+   - [x] Treat returned singleton object handles as borrowed by value.
+   - [x] Trap or return `ok = false` when a singleton lookup is unavailable.
+   - [x] Keep singleton storage out of user-owned data unless lifetime rules are
      documented.
 
 2. Add a selected `Input` API batch.
-   - [ ] Generate or hand-wrap a minimal safe path for common input queries.
-   - [ ] Prefer primitive, `StringName`, and math-builtin signatures already
+   - [x] Generate or hand-wrap a minimal safe path for common input queries.
+   - [x] Prefer primitive, `StringName`, and math-builtin signatures already
      covered by the safety model.
-   - [ ] Keep event objects, resources, arrays, and callable-heavy APIs skipped
+   - [x] Keep event objects, resources, arrays, and callable-heavy APIs skipped
      until reviewed.
-   - [ ] Re-export selected helpers through `godot:godot`.
+   - [x] Re-export selected helpers through `godot:godot`.
 
 3. Add a selected `SceneTree` API batch.
-   - [ ] Expose only borrowed-safe scene-tree queries first.
-   - [ ] Keep ownership-sensitive APIs such as scene changing, resource loading,
+   - [x] Expose only borrowed-safe scene-tree queries first.
+   - [x] Keep ownership-sensitive APIs such as scene changing, resource loading,
      and packed-scene instantiation deferred unless explicitly wrapped.
-   - [ ] Use checked object/class downcasts for returned handles.
-   - [ ] Re-export selected helpers through `godot:godot`.
+   - [x] Use checked object/class downcasts for returned handles.
+   - [x] Re-export selected helpers through `godot:godot`.
 
 4. Exercise the batch in examples.
-   - [ ] Use normal `godot:godot` imports only.
-   - [ ] Add one real example path that reads input or scene-tree state from
+   - [x] Use normal `godot:godot` imports only.
+   - [x] Add one real example path that reads input or scene-tree state from
      Odin gameplay code.
-   - [ ] Keep broad engine coverage in smoke checks, not beginner examples.
+   - [x] Keep broad engine coverage in smoke checks, not beginner examples.
 
 5. Update generated reporting.
-   - [ ] Report singleton, input, and scene-tree blockers separately if useful.
-   - [ ] Keep unsupported signatures skipped with stable reasons.
-   - [ ] Preserve deterministic report and generated output order.
+   - [x] Report singleton, input, and scene-tree blockers separately if useful.
+   - [x] Keep unsupported signatures skipped with stable reasons.
+   - [x] Preserve deterministic report and generated output order.
 
 6. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm no generated wrapper violates borrowed singleton or object
+   - [x] Run `make ci`.
+   - [x] Confirm no generated wrapper violates borrowed singleton or object
      lifetime rules.
-   - [ ] Confirm generated output is deterministic.
+   - [x] Confirm generated output is deterministic.
 
 ## Deferred until after this goal
 

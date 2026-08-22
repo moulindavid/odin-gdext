@@ -1017,6 +1017,8 @@ selected_class_names := []string {
 	"CollisionObject2D",
 	"Area2D",
 	"PackedScene",
+	"Input",
+	"SceneTree",
 }
 
 candidate_class_names := []string{"Resource"}
@@ -1037,6 +1039,7 @@ selected_class_methods := []Selected_Class_Method {
 	{"Resource", "set_local_to_scene"},
 	{"Resource", "is_local_to_scene"},
 	{"Node", "get_parent"},
+	{"Node", "get_tree"},
 	{"Node", "set_name"},
 	{"Node", "get_name"},
 	{"Node", "has_node"},
@@ -1285,6 +1288,35 @@ selected_class_methods := []Selected_Class_Method {
 	{"Area2D", "is_overriding_audio_bus"},
 	{"PackedScene", "pack"},
 	{"PackedScene", "can_instantiate"},
+	{"Input", "is_anything_pressed"},
+	{"Input", "is_action_pressed"},
+	{"Input", "is_action_just_pressed"},
+	{"Input", "is_action_just_released"},
+	{"Input", "get_action_strength"},
+	{"Input", "get_action_raw_strength"},
+	{"Input", "get_axis"},
+	{"Input", "get_vector"},
+	{"Input", "get_last_mouse_velocity"},
+	{"Input", "get_last_mouse_screen_velocity"},
+	{"Input", "set_use_accumulated_input"},
+	{"Input", "is_using_accumulated_input"},
+	{"Input", "flush_buffered_events"},
+	{"SceneTree", "has_group"},
+	{"SceneTree", "is_accessibility_enabled"},
+	{"SceneTree", "is_accessibility_supported"},
+	{"SceneTree", "is_debugging_collisions_hint"},
+	{"SceneTree", "is_debugging_paths_hint"},
+	{"SceneTree", "is_debugging_navigation_hint"},
+	{"SceneTree", "get_edited_scene_root"},
+	{"SceneTree", "is_paused"},
+	{"SceneTree", "get_node_count"},
+	{"SceneTree", "get_frame"},
+	{"SceneTree", "is_physics_interpolation_enabled"},
+	{"SceneTree", "get_nodes_in_group"},
+	{"SceneTree", "get_first_node_in_group"},
+	{"SceneTree", "get_node_count_in_group"},
+	{"SceneTree", "get_current_scene"},
+	{"SceneTree", "is_multiplayer_poll_enabled"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
@@ -2115,6 +2147,51 @@ emit_init_static_string_name :: proc(b: ^strings.Builder, storage_name, literal:
 	)
 }
 
+
+selected_singleton_for_class :: proc(
+	root: ^ExtensionApiRoot,
+	class_name: string,
+) -> (
+	name: string,
+	ok: bool,
+) {
+	for singleton in root.singletons {
+		if singleton.type == class_name do return singleton.name, true
+	}
+	return "", false
+}
+
+emit_selected_singleton_helpers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) {
+	strings.write_string(b, "// ---- Selected singleton helpers ----\n\n")
+	strings.write_string(
+		b,
+		"// Singleton handles are borrowed Godot-owned objects; do not free or unref them.\n\n",
+	)
+
+	for class_name in selected_class_names {
+		singleton_name, singleton_ok := selected_singleton_for_class(root, class_name)
+		if !singleton_ok do continue
+
+		prefix := class_proc_prefix(class_name)
+		fmt.sbprintf(
+			b,
+			"%s_singleton_checked :: proc \"contextless\" () -> (value: %s, ok: bool) {{\n",
+			prefix,
+			class_handle_expr(class_name),
+		)
+		strings.write_string(b, "\tinit_class_bindings()\n")
+		fmt.sbprintf(
+			b,
+			"\tobject, object_ok := core.global_get_singleton_checked(core.const_static_string_name_ptr(&%s_class_name_data))\n",
+			prefix,
+		)
+		strings.write_string(b, "\tif !object_ok do return {}, false\n")
+		fmt.sbprintf(b, "\treturn object_try_as_%s(core.Object(object))\n", prefix)
+		strings.write_string(b, "}\n\n")
+		_ = singleton_name
+	}
+}
+
 emit_class_binding_init :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(b, "init_class_bindings :: proc \"contextless\" () {\n")
 	strings.write_string(b, "\tif class_bindings_initialized do return\n\n")
@@ -2197,6 +2274,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&default_argument_blockers)
 	candidate_analysis := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&candidate_analysis)
+	singleton_report := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&singleton_report)
+	input_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&input_blockers)
+	scene_tree_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&scene_tree_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2210,6 +2293,22 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	candidate_safe_count := 0
 	candidate_owned_wrapper_count := 0
 	candidate_skipped_count := 0
+	singleton_count := 0
+	input_blocker_count := 0
+	scene_tree_blocker_count := 0
+
+	for class_name in selected_class_names {
+		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
+		   singleton_ok {
+			fmt.sbprintf(
+				&singleton_report,
+				"- `%s` singleton returns borrowed `%s` handles.\n",
+				singleton_name,
+				class_name,
+			)
+			singleton_count += 1
+		}
+	}
 
 	for class_name in selected_class_names {
 		class, class_ok := find_class(root, class_name)
@@ -2292,6 +2391,17 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&signal_callable_blockers, ": %s\n", reason)
 					signal_callable_blocker_count += 1
 				}
+				if class.name == "Input" {
+					strings.write_string(&input_blockers, "- ")
+					emit_class_method_report_signature(&input_blockers, class.name, method)
+					fmt.sbprintf(&input_blockers, ": %s\n", reason)
+					input_blocker_count += 1
+				} else if class.name == "SceneTree" {
+					strings.write_string(&scene_tree_blockers, "- ")
+					emit_class_method_report_signature(&scene_tree_blockers, class.name, method)
+					fmt.sbprintf(&scene_tree_blockers, ": %s\n", reason)
+					scene_tree_blocker_count += 1
+				}
 			}
 		}
 	}
@@ -2366,6 +2476,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	)
 	strings.write_string(&b, "## Summary\n\n")
 	fmt.sbprintf(&b, "- Selected classes: %d\n", len(selected_class_names))
+	fmt.sbprintf(&b, "- Selected singleton classes: %d\n", singleton_count)
 	fmt.sbprintf(&b, "- Candidate classes: %d\n", len(candidate_class_names))
 	fmt.sbprintf(&b, "- Borrowed-safe generated methods: %d\n", generated_count)
 	fmt.sbprintf(&b, "- Owned-wrapper methods: %d\n", owned_wrapper_count)
@@ -2380,10 +2491,14 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		default_argument_wrapper_count,
 	)
 	fmt.sbprintf(&b, "- Default-argument blockers: %d\n", default_argument_blocker_count)
+	fmt.sbprintf(&b, "- Input blockers: %d\n", input_blocker_count)
+	fmt.sbprintf(&b, "- SceneTree blockers: %d\n", scene_tree_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
-	strings.write_string(&b, "## Borrowed-safe generated methods\n\n")
+	strings.write_string(&b, "## Selected singleton helpers\n\n")
+	strings.write_string(&b, strings.to_string(singleton_report))
+	strings.write_string(&b, "\n## Borrowed-safe generated methods\n\n")
 	strings.write_string(&b, strings.to_string(generated))
 	strings.write_string(&b, "\n## Owned-wrapper methods\n\n")
 	strings.write_string(&b, strings.to_string(owned_wrapper))
@@ -2401,6 +2516,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(default_argument_wrappers))
 	strings.write_string(&b, "\n## Default-argument blockers\n\n")
 	strings.write_string(&b, strings.to_string(default_argument_blockers))
+	strings.write_string(&b, "\n## Input blockers\n\n")
+	strings.write_string(&b, strings.to_string(input_blockers))
+	strings.write_string(&b, "\n## SceneTree blockers\n\n")
+	strings.write_string(&b, strings.to_string(scene_tree_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 
@@ -2661,6 +2780,7 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	}
 
 	emit_class_downcasts(&b, root, selected)
+	emit_selected_singleton_helpers(&b, root)
 	emit_global_enums(&b, root)
 	emit_class_constants_and_enums(&b, selected)
 

@@ -92,8 +92,29 @@ roll_into_label_adapter_method :: proc "contextless" (
 
 	damage := roll_damage(self)
 	label_node := gt.label_as_node(label)
-	parent := gt.node_get_parent(label_node)
 
+	if input, input_ok := gt.input_singleton_checked(); input_ok {
+		accept_action := gt.string_name_from_utf8_cstring(cstring("ui_accept"))
+		defer gt.string_name_free(&accept_action)
+		if gt.input_is_action_pressed_default(input, &accept_action) {
+			damage += 5
+		}
+		_ = gt.input_get_action_strength_default(input, &accept_action)
+		_ = gt.input_get_last_mouse_velocity(input)
+	}
+
+	tree := gt.node_get_tree(label_node)
+	if !gt.scene_tree_is_nil(tree) {
+		_ = gt.scene_tree_get_node_count(tree)
+		_ = gt.scene_tree_get_frame(tree)
+		_ = gt.scene_tree_get_current_scene(tree)
+		group_name := gt.string_name_from_utf8_cstring(cstring("odin_gameplay"))
+		defer gt.string_name_free(&group_name)
+		group_nodes := gt.scene_tree_get_nodes_in_group(tree, &group_name)
+		gt.typed_array_free(&group_nodes)
+	}
+
+	parent := gt.node_get_parent(label_node)
 	if !gt.node_is_nil(parent) {
 		timer_path := gt.node_path_from_utf8("RollTimer")
 		timer, timer_ok := gt.node_get_node_as_timer(parent, &timer_path)
@@ -116,7 +137,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 	}
 
 	text := gt.string_from_utf8(
-		"Odin rolled damage, updated this Label, armed a Timer, and configured an Area2D.",
+		"Odin read Input and SceneTree, rolled damage, updated this Label, armed a Timer, and configured an Area2D.",
 	)
 	defer gt.string_free(&text)
 	gt.label_set_text(label, &text)
