@@ -139,10 +139,10 @@ focused wrapper documents the safety model.
    - [x] Preserve deterministic report and generated output order.
 
 6. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm no generated wrapper violates borrowed singleton or object
+   - [x] Run `make ci`.
+   - [x] Confirm no generated wrapper violates borrowed singleton or object
      lifetime rules.
-   - [ ] Confirm generated output is deterministic.
+   - [x] Confirm generated output is deterministic.
 
 ## Deferred until after this goal
 
