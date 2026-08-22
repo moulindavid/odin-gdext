@@ -162,6 +162,8 @@ init :: gcore.init
 construct_object :: gcore.construct_object
 debug_print :: gcore.debug_print
 is_nil :: gcore.is_nil
+global_get_singleton_checked :: gcore.global_get_singleton_checked
+global_get_singleton_or_trap :: gcore.global_get_singleton_or_trap
 is_class :: gcore.is_class
 cast_to :: gcore.cast_to
 init_class_casting :: gcore.init_class_casting

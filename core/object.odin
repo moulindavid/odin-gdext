@@ -19,6 +19,26 @@ is_nil :: proc "contextless" (obj: Object) -> bool {
 	return ObjectPtr(obj) == nil
 }
 
+// Singleton lookup returns borrowed Godot-owned objects. Store the returned
+// handle only when the singleton lifetime rule is clear for that use site.
+global_get_singleton_checked :: proc "contextless" (
+	name: ConstStringNamePtr,
+) -> (
+	object: ObjectPtr,
+	ok: bool,
+) {
+	if name == nil do return nil, false
+	if global_get_singleton == nil do _trap_nil_godot_function()
+	object = global_get_singleton(name)
+	return object, object != nil
+}
+
+global_get_singleton_or_trap :: proc "contextless" (name: ConstStringNamePtr) -> ObjectPtr {
+	object, ok := global_get_singleton_checked(name)
+	if !ok do _trap_nil_godot_function()
+	return object
+}
+
 // Variant conversion.
 
 // object_to_variant wraps an ObjectPtr into an initialized Variant. The caller

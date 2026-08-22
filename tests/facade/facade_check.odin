@@ -477,6 +477,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.object_is_node2d(object)
 	_, _ = gt.object_try_as_node2d(object)
 	_, _ = gt.object_try_as_node(object)
+	_, _ = gt.global_get_singleton_checked(facade_method_name)
+	_ = gt.global_get_singleton_or_trap
 
 	_ = gt.object_is_nil(object)
 	_ = gt.ref_counted_is_nil(ref_counted)

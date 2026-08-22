@@ -105,11 +105,11 @@ event objects, and ownership-sensitive scene changes stay deferred unless a
 focused wrapper documents the safety model.
 
 1. Investigate singleton access rules.
-   - [ ] Identify how selected singleton objects are retrieved through the Godot
+   - [x] Identify how selected singleton objects are retrieved through the Godot
      4.7 GDExtension API.
-   - [ ] Treat returned singleton object handles as borrowed by value.
-   - [ ] Trap or return `ok = false` when a singleton lookup is unavailable.
-   - [ ] Keep singleton storage out of user-owned data unless lifetime rules are
+   - [x] Treat returned singleton object handles as borrowed by value.
+   - [x] Trap or return `ok = false` when a singleton lookup is unavailable.
+   - [x] Keep singleton storage out of user-owned data unless lifetime rules are
      documented.
 
 2. Add a selected `Input` API batch.
