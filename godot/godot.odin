@@ -157,6 +157,7 @@ CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PackedScene :: gclass.PackedScene
 Input :: gclass.Input
+SceneTree :: gclass.SceneTree
 
 // --- Core functions ---
 init :: gcore.init
@@ -271,6 +272,7 @@ resource_set_local_to_scene :: gclass.resource_set_local_to_scene
 resource_is_local_to_scene :: gclass.resource_is_local_to_scene
 node_as_object :: gclass.node_as_object
 node_get_parent :: gclass.node_get_parent
+node_get_tree :: gclass.node_get_tree
 node_set_name :: gclass.node_set_name
 node_get_name :: gclass.node_get_name
 node_has_node :: gclass.node_has_node
@@ -510,6 +512,8 @@ object_is_packed_scene :: gclass.object_is_packed_scene
 object_try_as_packed_scene :: gclass.object_try_as_packed_scene
 object_is_input :: gclass.object_is_input
 object_try_as_input :: gclass.object_try_as_input
+object_is_scene_tree :: gclass.object_is_scene_tree
+object_try_as_scene_tree :: gclass.object_try_as_scene_tree
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 ref_counted_is_packed_scene :: gclass.ref_counted_is_packed_scene
@@ -655,6 +659,23 @@ input_get_last_mouse_screen_velocity :: gclass.input_get_last_mouse_screen_veloc
 input_set_use_accumulated_input :: gclass.input_set_use_accumulated_input
 input_is_using_accumulated_input :: gclass.input_is_using_accumulated_input
 input_flush_buffered_events :: gclass.input_flush_buffered_events
+scene_tree_as_object :: gclass.scene_tree_as_object
+scene_tree_has_group :: gclass.scene_tree_has_group
+scene_tree_is_accessibility_enabled :: gclass.scene_tree_is_accessibility_enabled
+scene_tree_is_accessibility_supported :: gclass.scene_tree_is_accessibility_supported
+scene_tree_is_debugging_collisions_hint :: gclass.scene_tree_is_debugging_collisions_hint
+scene_tree_is_debugging_paths_hint :: gclass.scene_tree_is_debugging_paths_hint
+scene_tree_is_debugging_navigation_hint :: gclass.scene_tree_is_debugging_navigation_hint
+scene_tree_get_edited_scene_root :: gclass.scene_tree_get_edited_scene_root
+scene_tree_is_paused :: gclass.scene_tree_is_paused
+scene_tree_get_node_count :: gclass.scene_tree_get_node_count
+scene_tree_get_frame :: gclass.scene_tree_get_frame
+scene_tree_is_physics_interpolation_enabled :: gclass.scene_tree_is_physics_interpolation_enabled
+scene_tree_get_nodes_in_group :: gclass.scene_tree_get_nodes_in_group
+scene_tree_get_first_node_in_group :: gclass.scene_tree_get_first_node_in_group
+scene_tree_get_node_count_in_group :: gclass.scene_tree_get_node_count_in_group
+scene_tree_get_current_scene :: gclass.scene_tree_get_current_scene
+scene_tree_is_multiplayer_poll_enabled :: gclass.scene_tree_is_multiplayer_poll_enabled
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -714,6 +735,10 @@ packed_scene_is_nil :: proc "contextless" (self: PackedScene) -> bool {
 }
 
 input_is_nil :: proc "contextless" (self: Input) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+scene_tree_is_nil :: proc "contextless" (self: SceneTree) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -941,6 +966,10 @@ input_object_ptr :: proc "contextless" (self: Input) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+scene_tree_object_ptr :: proc "contextless" (self: SceneTree) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 object_ptr_try_as_ref_counted :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -1074,6 +1103,16 @@ object_ptr_try_as_input :: proc "contextless" (self: ObjectPtr) -> (value: Input
 	return object_try_as_input(Object(self))
 }
 
+object_ptr_try_as_scene_tree :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: SceneTree,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_scene_tree(Object(self))
+}
+
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
 ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
@@ -1099,6 +1138,7 @@ ControlSizeFlags :: gclass.ControlSizeFlags
 ControlMouseFilter :: gclass.ControlMouseFilter
 InputMouseMode :: gclass.InputMouseMode
 InputCursorShape :: gclass.InputCursorShape
+SceneTreeGroupCallFlags :: gclass.SceneTreeGroupCallFlags
 object_notification_postinitialize :: gclass.object_notification_postinitialize
 object_notification_predelete :: gclass.object_notification_predelete
 object_notification_extension_reloaded :: gclass.object_notification_extension_reloaded

@@ -121,11 +121,11 @@ focused wrapper documents the safety model.
    - [x] Re-export selected helpers through `godot:godot`.
 
 3. Add a selected `SceneTree` API batch.
-   - [ ] Expose only borrowed-safe scene-tree queries first.
-   - [ ] Keep ownership-sensitive APIs such as scene changing, resource loading,
+   - [x] Expose only borrowed-safe scene-tree queries first.
+   - [x] Keep ownership-sensitive APIs such as scene changing, resource loading,
      and packed-scene instantiation deferred unless explicitly wrapped.
-   - [ ] Use checked object/class downcasts for returned handles.
-   - [ ] Re-export selected helpers through `godot:godot`.
+   - [x] Use checked object/class downcasts for returned handles.
+   - [x] Re-export selected helpers through `godot:godot`.
 
 4. Exercise the batch in examples.
    - [ ] Use normal `godot:godot` imports only.

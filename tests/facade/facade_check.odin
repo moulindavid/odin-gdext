@@ -78,6 +78,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	area2d: gt.Area2D,
 	packed_scene: gt.PackedScene,
 	input: gt.Input,
+	scene_tree: gt.SceneTree,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
@@ -503,6 +504,27 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.input_set_use_accumulated_input(input, false)
 	_ = gt.input_is_using_accumulated_input(input)
 	gt.input_flush_buffered_events(input)
+	_ = gt.node_get_tree(node)
+	_ = gt.scene_tree_as_object(scene_tree)
+	_ = gt.scene_tree_has_group(scene_tree, meta_name)
+	_ = gt.scene_tree_is_accessibility_enabled(scene_tree)
+	_ = gt.scene_tree_is_accessibility_supported(scene_tree)
+	_ = gt.scene_tree_is_debugging_collisions_hint(scene_tree)
+	_ = gt.scene_tree_is_debugging_paths_hint(scene_tree)
+	_ = gt.scene_tree_is_debugging_navigation_hint(scene_tree)
+	_ = gt.scene_tree_get_edited_scene_root(scene_tree)
+	_ = gt.scene_tree_is_paused(scene_tree)
+	_ = gt.scene_tree_get_node_count(scene_tree)
+	_ = gt.scene_tree_get_frame(scene_tree)
+	_ = gt.scene_tree_is_physics_interpolation_enabled(scene_tree)
+	group_nodes := gt.scene_tree_get_nodes_in_group(scene_tree, meta_name)
+	gt.typed_array_free(&group_nodes)
+	_ = gt.scene_tree_get_first_node_in_group(scene_tree, meta_name)
+	_ = gt.scene_tree_get_node_count_in_group(scene_tree, meta_name)
+	_ = gt.scene_tree_get_current_scene(scene_tree)
+	_ = gt.scene_tree_is_multiplayer_poll_enabled(scene_tree)
+	_ = gt.object_is_scene_tree(object)
+	_, _ = gt.object_try_as_scene_tree(object)
 
 	_ = gt.object_is_nil(object)
 	_ = gt.ref_counted_is_nil(ref_counted)
@@ -515,6 +537,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.label_is_nil(label)
 	_ = gt.object_ptr_is_nil(gt.node2d_object_ptr(node2d))
 	_ = gt.input_is_nil(input)
+	_ = gt.scene_tree_is_nil(scene_tree)
 	_ = gt.object_ptr_as_object(gt.node_object_ptr(node))
 	_ = gt.ref_counted_object_ptr(ref_counted)
 	_ = gt.resource_object_ptr(resource)
@@ -524,6 +547,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.label_object_ptr(label)
 	_ = gt.timer_object_ptr(timer)
 	_ = gt.input_object_ptr(input)
+	_ = gt.scene_tree_object_ptr(scene_tree)
 	_ = gt.collision_object2d_object_ptr(collision_object2d)
 	_ = gt.area2d_object_ptr(area2d)
 	_ = gt.packed_scene_object_ptr(packed_scene)

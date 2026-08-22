@@ -1018,6 +1018,7 @@ selected_class_names := []string {
 	"Area2D",
 	"PackedScene",
 	"Input",
+	"SceneTree",
 }
 
 candidate_class_names := []string{"Resource"}
@@ -1038,6 +1039,7 @@ selected_class_methods := []Selected_Class_Method {
 	{"Resource", "set_local_to_scene"},
 	{"Resource", "is_local_to_scene"},
 	{"Node", "get_parent"},
+	{"Node", "get_tree"},
 	{"Node", "set_name"},
 	{"Node", "get_name"},
 	{"Node", "has_node"},
@@ -1299,6 +1301,22 @@ selected_class_methods := []Selected_Class_Method {
 	{"Input", "set_use_accumulated_input"},
 	{"Input", "is_using_accumulated_input"},
 	{"Input", "flush_buffered_events"},
+	{"SceneTree", "has_group"},
+	{"SceneTree", "is_accessibility_enabled"},
+	{"SceneTree", "is_accessibility_supported"},
+	{"SceneTree", "is_debugging_collisions_hint"},
+	{"SceneTree", "is_debugging_paths_hint"},
+	{"SceneTree", "is_debugging_navigation_hint"},
+	{"SceneTree", "get_edited_scene_root"},
+	{"SceneTree", "is_paused"},
+	{"SceneTree", "get_node_count"},
+	{"SceneTree", "get_frame"},
+	{"SceneTree", "is_physics_interpolation_enabled"},
+	{"SceneTree", "get_nodes_in_group"},
+	{"SceneTree", "get_first_node_in_group"},
+	{"SceneTree", "get_node_count_in_group"},
+	{"SceneTree", "get_current_scene"},
+	{"SceneTree", "is_multiplayer_poll_enabled"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
