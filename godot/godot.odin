@@ -156,6 +156,7 @@ Timer :: gclass.Timer
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PackedScene :: gclass.PackedScene
+Input :: gclass.Input
 
 // --- Core functions ---
 init :: gcore.init
@@ -507,6 +508,8 @@ object_is_area2d :: gclass.object_is_area2d
 object_try_as_area2d :: gclass.object_try_as_area2d
 object_is_packed_scene :: gclass.object_is_packed_scene
 object_try_as_packed_scene :: gclass.object_try_as_packed_scene
+object_is_input :: gclass.object_is_input
+object_try_as_input :: gclass.object_try_as_input
 ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 ref_counted_is_packed_scene :: gclass.ref_counted_is_packed_scene
@@ -631,6 +634,27 @@ packed_scene_as_ref_counted :: gclass.packed_scene_as_ref_counted
 packed_scene_as_object :: gclass.packed_scene_as_object
 packed_scene_pack :: gclass.packed_scene_pack
 packed_scene_can_instantiate :: gclass.packed_scene_can_instantiate
+input_as_object :: gclass.input_as_object
+input_singleton_checked :: gclass.input_singleton_checked
+input_is_anything_pressed :: gclass.input_is_anything_pressed
+input_is_action_pressed :: gclass.input_is_action_pressed
+input_is_action_pressed_default :: gclass.input_is_action_pressed_default
+input_is_action_just_pressed :: gclass.input_is_action_just_pressed
+input_is_action_just_pressed_default :: gclass.input_is_action_just_pressed_default
+input_is_action_just_released :: gclass.input_is_action_just_released
+input_is_action_just_released_default :: gclass.input_is_action_just_released_default
+input_get_action_strength :: gclass.input_get_action_strength
+input_get_action_strength_default :: gclass.input_get_action_strength_default
+input_get_action_raw_strength :: gclass.input_get_action_raw_strength
+input_get_action_raw_strength_default :: gclass.input_get_action_raw_strength_default
+input_get_axis :: gclass.input_get_axis
+input_get_vector :: gclass.input_get_vector
+input_get_vector_default :: gclass.input_get_vector_default
+input_get_last_mouse_velocity :: gclass.input_get_last_mouse_velocity
+input_get_last_mouse_screen_velocity :: gclass.input_get_last_mouse_screen_velocity
+input_set_use_accumulated_input :: gclass.input_set_use_accumulated_input
+input_is_using_accumulated_input :: gclass.input_is_using_accumulated_input
+input_flush_buffered_events :: gclass.input_flush_buffered_events
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -686,6 +710,10 @@ area2d_is_nil :: proc "contextless" (self: Area2D) -> bool {
 }
 
 packed_scene_is_nil :: proc "contextless" (self: PackedScene) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_is_nil :: proc "contextless" (self: Input) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -909,6 +937,10 @@ packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+input_object_ptr :: proc "contextless" (self: Input) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 object_ptr_try_as_ref_counted :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -1037,6 +1069,11 @@ object_ptr_try_as_packed_scene :: proc "contextless" (
 	return object_try_as_packed_scene(Object(self))
 }
 
+object_ptr_try_as_input :: proc "contextless" (self: ObjectPtr) -> (value: Input, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_input(Object(self))
+}
+
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
 ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
@@ -1060,6 +1097,8 @@ ControlLayoutPreset :: gclass.ControlLayoutPreset
 ControlLayoutPresetMode :: gclass.ControlLayoutPresetMode
 ControlSizeFlags :: gclass.ControlSizeFlags
 ControlMouseFilter :: gclass.ControlMouseFilter
+InputMouseMode :: gclass.InputMouseMode
+InputCursorShape :: gclass.InputCursorShape
 object_notification_postinitialize :: gclass.object_notification_postinitialize
 object_notification_predelete :: gclass.object_notification_predelete
 object_notification_extension_reloaded :: gclass.object_notification_extension_reloaded

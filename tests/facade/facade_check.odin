@@ -77,6 +77,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	collision_object2d: gt.CollisionObject2D,
 	area2d: gt.Area2D,
 	packed_scene: gt.PackedScene,
+	input: gt.Input,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
@@ -479,6 +480,29 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_node(object)
 	_, _ = gt.global_get_singleton_checked(facade_method_name)
 	_ = gt.global_get_singleton_or_trap
+	_, _ = gt.input_singleton_checked()
+	_ = gt.object_is_input(object)
+	_, _ = gt.object_try_as_input(object)
+	_ = gt.input_as_object(input)
+	_ = gt.input_is_anything_pressed(input)
+	_ = gt.input_is_action_pressed(input, meta_name, false)
+	_ = gt.input_is_action_pressed_default(input, meta_name)
+	_ = gt.input_is_action_just_pressed(input, meta_name, false)
+	_ = gt.input_is_action_just_pressed_default(input, meta_name)
+	_ = gt.input_is_action_just_released(input, meta_name, false)
+	_ = gt.input_is_action_just_released_default(input, meta_name)
+	_ = gt.input_get_action_strength(input, meta_name, false)
+	_ = gt.input_get_action_strength_default(input, meta_name)
+	_ = gt.input_get_action_raw_strength(input, meta_name, false)
+	_ = gt.input_get_action_raw_strength_default(input, meta_name)
+	_ = gt.input_get_axis(input, meta_name, meta_name)
+	_ = gt.input_get_vector(input, meta_name, meta_name, meta_name, meta_name, -1)
+	_ = gt.input_get_vector_default(input, meta_name, meta_name, meta_name, meta_name)
+	_ = gt.input_get_last_mouse_velocity(input)
+	_ = gt.input_get_last_mouse_screen_velocity(input)
+	gt.input_set_use_accumulated_input(input, false)
+	_ = gt.input_is_using_accumulated_input(input)
+	gt.input_flush_buffered_events(input)
 
 	_ = gt.object_is_nil(object)
 	_ = gt.ref_counted_is_nil(ref_counted)
@@ -490,6 +514,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.sprite2d_is_nil(sprite2d)
 	_ = gt.label_is_nil(label)
 	_ = gt.object_ptr_is_nil(gt.node2d_object_ptr(node2d))
+	_ = gt.input_is_nil(input)
 	_ = gt.object_ptr_as_object(gt.node_object_ptr(node))
 	_ = gt.ref_counted_object_ptr(ref_counted)
 	_ = gt.resource_object_ptr(resource)
@@ -498,6 +523,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.sprite2d_object_ptr(sprite2d)
 	_ = gt.label_object_ptr(label)
 	_ = gt.timer_object_ptr(timer)
+	_ = gt.input_object_ptr(input)
 	_ = gt.collision_object2d_object_ptr(collision_object2d)
 	_ = gt.area2d_object_ptr(area2d)
 	_ = gt.packed_scene_object_ptr(packed_scene)

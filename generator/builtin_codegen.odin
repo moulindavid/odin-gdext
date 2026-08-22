@@ -1017,6 +1017,7 @@ selected_class_names := []string {
 	"CollisionObject2D",
 	"Area2D",
 	"PackedScene",
+	"Input",
 }
 
 candidate_class_names := []string{"Resource"}
@@ -1285,6 +1286,19 @@ selected_class_methods := []Selected_Class_Method {
 	{"Area2D", "is_overriding_audio_bus"},
 	{"PackedScene", "pack"},
 	{"PackedScene", "can_instantiate"},
+	{"Input", "is_anything_pressed"},
+	{"Input", "is_action_pressed"},
+	{"Input", "is_action_just_pressed"},
+	{"Input", "is_action_just_released"},
+	{"Input", "get_action_strength"},
+	{"Input", "get_action_raw_strength"},
+	{"Input", "get_axis"},
+	{"Input", "get_vector"},
+	{"Input", "get_last_mouse_velocity"},
+	{"Input", "get_last_mouse_screen_velocity"},
+	{"Input", "set_use_accumulated_input"},
+	{"Input", "is_using_accumulated_input"},
+	{"Input", "flush_buffered_events"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
@@ -2115,6 +2129,51 @@ emit_init_static_string_name :: proc(b: ^strings.Builder, storage_name, literal:
 	)
 }
 
+
+selected_singleton_for_class :: proc(
+	root: ^ExtensionApiRoot,
+	class_name: string,
+) -> (
+	name: string,
+	ok: bool,
+) {
+	for singleton in root.singletons {
+		if singleton.type == class_name do return singleton.name, true
+	}
+	return "", false
+}
+
+emit_selected_singleton_helpers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) {
+	strings.write_string(b, "// ---- Selected singleton helpers ----\n\n")
+	strings.write_string(
+		b,
+		"// Singleton handles are borrowed Godot-owned objects; do not free or unref them.\n\n",
+	)
+
+	for class_name in selected_class_names {
+		singleton_name, singleton_ok := selected_singleton_for_class(root, class_name)
+		if !singleton_ok do continue
+
+		prefix := class_proc_prefix(class_name)
+		fmt.sbprintf(
+			b,
+			"%s_singleton_checked :: proc \"contextless\" () -> (value: %s, ok: bool) {{\n",
+			prefix,
+			class_handle_expr(class_name),
+		)
+		strings.write_string(b, "\tinit_class_bindings()\n")
+		fmt.sbprintf(
+			b,
+			"\tobject, object_ok := core.global_get_singleton_checked(core.const_static_string_name_ptr(&%s_class_name_data))\n",
+			prefix,
+		)
+		strings.write_string(b, "\tif !object_ok do return {}, false\n")
+		fmt.sbprintf(b, "\treturn object_try_as_%s(core.Object(object))\n", prefix)
+		strings.write_string(b, "}\n\n")
+		_ = singleton_name
+	}
+}
+
 emit_class_binding_init :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(b, "init_class_bindings :: proc \"contextless\" () {\n")
 	strings.write_string(b, "\tif class_bindings_initialized do return\n\n")
@@ -2661,6 +2720,7 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 	}
 
 	emit_class_downcasts(&b, root, selected)
+	emit_selected_singleton_helpers(&b, root)
 	emit_global_enums(&b, root)
 	emit_class_constants_and_enums(&b, selected)
 

@@ -113,12 +113,12 @@ focused wrapper documents the safety model.
      documented.
 
 2. Add a selected `Input` API batch.
-   - [ ] Generate or hand-wrap a minimal safe path for common input queries.
-   - [ ] Prefer primitive, `StringName`, and math-builtin signatures already
+   - [x] Generate or hand-wrap a minimal safe path for common input queries.
+   - [x] Prefer primitive, `StringName`, and math-builtin signatures already
      covered by the safety model.
-   - [ ] Keep event objects, resources, arrays, and callable-heavy APIs skipped
+   - [x] Keep event objects, resources, arrays, and callable-heavy APIs skipped
      until reviewed.
-   - [ ] Re-export selected helpers through `godot:godot`.
+   - [x] Re-export selected helpers through `godot:godot`.
 
 3. Add a selected `SceneTree` API batch.
    - [ ] Expose only borrowed-safe scene-tree queries first.
