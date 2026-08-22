@@ -128,10 +128,10 @@ focused wrapper documents the safety model.
    - [x] Re-export selected helpers through `godot:godot`.
 
 4. Exercise the batch in examples.
-   - [ ] Use normal `godot:godot` imports only.
-   - [ ] Add one real example path that reads input or scene-tree state from
+   - [x] Use normal `godot:godot` imports only.
+   - [x] Add one real example path that reads input or scene-tree state from
      Odin gameplay code.
-   - [ ] Keep broad engine coverage in smoke checks, not beginner examples.
+   - [x] Keep broad engine coverage in smoke checks, not beginner examples.
 
 5. Update generated reporting.
    - [ ] Report singleton, input, and scene-tree blockers separately if useful.
