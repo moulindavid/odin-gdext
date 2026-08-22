@@ -134,9 +134,9 @@ focused wrapper documents the safety model.
    - [x] Keep broad engine coverage in smoke checks, not beginner examples.
 
 5. Update generated reporting.
-   - [ ] Report singleton, input, and scene-tree blockers separately if useful.
-   - [ ] Keep unsupported signatures skipped with stable reasons.
-   - [ ] Preserve deterministic report and generated output order.
+   - [x] Report singleton, input, and scene-tree blockers separately if useful.
+   - [x] Keep unsupported signatures skipped with stable reasons.
+   - [x] Preserve deterministic report and generated output order.
 
 6. Validate before moving to the next feature roadmap.
    - [ ] Run `make ci`.
