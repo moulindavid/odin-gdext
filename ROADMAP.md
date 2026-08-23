@@ -123,12 +123,12 @@ its object ownership and destruction path are clear.
      implementation.
 
 2. Add a minimal `ResourceLoader` API path.
-   - [ ] Add selected `ResourceLoader` class or singleton access if available.
-   - [ ] Start with one checked load helper for paths that returns an explicit
+   - [x] Add selected `ResourceLoader` class or singleton access if available.
+   - [x] Start with one checked load helper for paths that returns an explicit
      owned or borrowed wrapper according to the investigated policy.
-   - [ ] Keep cache mode, threaded loading, dependencies, and broad type hints
+   - [x] Keep cache mode, threaded loading, dependencies, and broad type hints
      deferred unless the ownership model is clear.
-   - [ ] Re-export selected helpers through `godot:godot`.
+   - [x] Re-export selected helpers through `godot:godot`.
 
 3. Add explicit `PackedScene.instantiate` wrapper.
    - [ ] Keep the generated raw method skipped until a focused wrapper documents

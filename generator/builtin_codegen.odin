@@ -1017,6 +1017,7 @@ selected_class_names := []string {
 	"CollisionObject2D",
 	"Area2D",
 	"PackedScene",
+	"ResourceLoader",
 	"Input",
 	"SceneTree",
 }
@@ -1288,6 +1289,7 @@ selected_class_methods := []Selected_Class_Method {
 	{"Area2D", "is_overriding_audio_bus"},
 	{"PackedScene", "pack"},
 	{"PackedScene", "can_instantiate"},
+	{"ResourceLoader", "exists"},
 	{"Input", "is_anything_pressed"},
 	{"Input", "is_action_pressed"},
 	{"Input", "is_action_just_pressed"},
@@ -1559,6 +1561,13 @@ class_method_deferred_reason :: proc(class_name, method_name: string) -> string 
 	if class_name == "PackedScene" &&
 	   (method_name == "instantiate" || method_name == "get_state") {
 		return "object lifetime"
+	}
+	if class_name == "ResourceLoader" {
+		if method_name == "load" ||
+		   method_name == "load_threaded_get" ||
+		   method_name == "get_cached_ref" {
+			return "resource ownership"
+		}
 	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
 		return "object lifetime"

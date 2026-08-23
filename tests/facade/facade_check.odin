@@ -77,6 +77,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	collision_object2d: gt.CollisionObject2D,
 	area2d: gt.Area2D,
 	packed_scene: gt.PackedScene,
+	resource_loader: gt.ResourceLoader,
 	input: gt.Input,
 	scene_tree: gt.SceneTree,
 	resource: gt.Resource,
@@ -482,8 +483,20 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.global_get_singleton_checked(facade_method_name)
 	_ = gt.global_get_singleton_or_trap
 	_, _ = gt.input_singleton_checked()
+	_, _ = gt.resource_loader_singleton_checked()
 	_ = gt.object_is_input(object)
 	_, _ = gt.object_try_as_input(object)
+	_ = gt.resource_loader_as_object(resource_loader)
+	resource_load_path := gt.string_from_utf8("res://missing.tscn")
+	defer gt.string_free(&resource_load_path)
+	_ = gt.resource_loader_exists(resource_loader, &resource_load_path, &resource_load_path)
+	_ = gt.resource_loader_exists_default(resource_loader, &resource_load_path)
+	loaded_resource, _, _ := gt.resource_loader_load_owned_checked(
+		resource_loader,
+		&resource_load_path,
+	)
+	_ = gt.owned_resource_destroy(&loaded_resource)
+	_ = gt.resource_loader_load_owned
 	_ = gt.input_as_object(input)
 	_ = gt.input_is_anything_pressed(input)
 	_ = gt.input_is_action_pressed(input, meta_name, false)
@@ -551,6 +564,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.collision_object2d_object_ptr(collision_object2d)
 	_ = gt.area2d_object_ptr(area2d)
 	_ = gt.packed_scene_object_ptr(packed_scene)
+	_ = gt.resource_loader_object_ptr(resource_loader)
 	_, _ = gt.object_ptr_try_as_ref_counted(gt.ref_counted_object_ptr(ref_counted))
 	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
 	_, _ = gt.object_ptr_try_as_node(gt.node_object_ptr(node))
@@ -681,6 +695,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_area2d(object)
 	_ = gt.object_is_packed_scene(object)
 	_, _ = gt.object_try_as_packed_scene(object)
+	_ = gt.object_is_resource_loader(object)
+	_, _ = gt.object_try_as_resource_loader(object)
+	_, _ = gt.object_ptr_try_as_resource_loader(gt.resource_loader_object_ptr(resource_loader))
 	_ = gt.node_is_sprite2d(node)
 	_, _ = gt.node_try_as_sprite2d(node)
 	_ = gt.node_is_label(node)
