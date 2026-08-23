@@ -682,6 +682,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.packed_scene_as_object(packed_scene)
 	_ = gt.packed_scene_pack(packed_scene, node)
 	_ = gt.packed_scene_can_instantiate(packed_scene)
+	_, _ = gt.packed_scene_instantiate_node_checked(packed_scene)
+	_ = gt.packed_scene_instantiate_node
+	_, _, _ = gt.packed_scene_instantiate_node2d_checked(packed_scene)
 
 	_ = gt.object_is_sprite2d(object)
 	_, _ = gt.object_try_as_sprite2d(object)

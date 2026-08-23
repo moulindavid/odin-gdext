@@ -131,13 +131,13 @@ its object ownership and destruction path are clear.
    - [x] Re-export selected helpers through `godot:godot`.
 
 3. Add explicit `PackedScene.instantiate` wrapper.
-   - [ ] Keep the generated raw method skipped until a focused wrapper documents
+   - [x] Keep the generated raw method skipped until a focused wrapper documents
      ownership transfer.
-   - [ ] Return a checked borrowed or owned object handle according to Godot's
+   - [x] Return a checked borrowed or owned object handle according to Godot's
      actual lifetime rule.
-   - [ ] Provide selected typed downcast helpers for common instantiated roots
+   - [x] Provide selected typed downcast helpers for common instantiated roots
      such as `Node` and `Node2D`.
-   - [ ] Avoid implicit freeing or unref behavior for instantiated scene roots.
+   - [x] Avoid implicit freeing or unref behavior for instantiated scene roots.
 
 4. Add safe scene-tree integration helpers if needed.
    - [ ] Consider `Node.add_child` only if object lifetime and ownership remain

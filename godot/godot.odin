@@ -1020,6 +1020,73 @@ resource_loader_load_owned :: proc "contextless" (
 	return owned
 }
 
+packed_scene_instantiate_class_name_data: StaticStringName
+packed_scene_instantiate_method_name_data: StaticStringName
+packed_scene_instantiate_method_bind: gcore.MethodBindPtr
+packed_scene_instantiate_initialized: bool
+
+init_packed_scene_instantiate :: proc "contextless" () {
+	if packed_scene_instantiate_initialized do return
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&packed_scene_instantiate_class_name_data),
+		cstring("PackedScene"),
+	)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&packed_scene_instantiate_method_name_data),
+		cstring("instantiate"),
+	)
+	packed_scene_instantiate_method_bind = gcore.require_classdb_method_bind(
+		const_static_string_name_ptr(&packed_scene_instantiate_class_name_data),
+		const_static_string_name_ptr(&packed_scene_instantiate_method_name_data),
+		2628778455,
+	)
+	packed_scene_instantiate_initialized = true
+}
+
+// packed_scene_instantiate_node_checked creates a new scene root. The returned
+// Node is not borrowed from the PackedScene. If it is not added to the scene
+// tree, the caller must destroy it with object_destroy_checked.
+packed_scene_instantiate_node_checked :: proc "contextless" (
+	self: PackedScene,
+) -> (
+	root: Node,
+	ok: bool,
+) {
+	if packed_scene_is_nil(self) do return {}, false
+	init_packed_scene_instantiate()
+
+	edit_state := PackedSceneGenEditState.gen_edit_state_disabled
+	root = gcore.call_method_ptr_ret(
+		packed_scene_instantiate_method_bind,
+		Node,
+		ObjectPtr(self),
+		cast(gcore.TypePtr)&edit_state,
+	)
+	return root, !node_is_nil(root)
+}
+
+packed_scene_instantiate_node :: proc "contextless" (self: PackedScene) -> Node {
+	root, ok := packed_scene_instantiate_node_checked(self)
+	if !ok do gcore._trap_nil_godot_function()
+	return root
+}
+
+// The typed helper returns the root even when the downcast fails so callers can
+// decide whether to destroy or otherwise handle the unparented instance.
+packed_scene_instantiate_node2d_checked :: proc "contextless" (
+	self: PackedScene,
+) -> (
+	root: Node,
+	value: Node2D,
+	ok: bool,
+) {
+	created_root, root_ok := packed_scene_instantiate_node_checked(self)
+	if !root_ok do return {}, {}, false
+	root = created_root
+	value, ok = node_try_as_node2d(root)
+	return
+}
+
 node_object_ptr :: proc "contextless" (self: Node) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -1228,6 +1295,7 @@ object_ptr_try_as_scene_tree :: proc "contextless" (
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
 ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
+PackedSceneGenEditState :: gclass.PackedSceneGenEditState
 ResourceLoaderThreadLoadStatus :: gclass.ResourceLoaderThreadLoadStatus
 ResourceLoaderCacheMode :: gclass.ResourceLoaderCacheMode
 NodeProcessMode :: gclass.NodeProcessMode
