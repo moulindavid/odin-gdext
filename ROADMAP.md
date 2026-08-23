@@ -99,7 +99,7 @@ The input and scene-tree slice added borrowed singleton lookup rules, selected
 exports, generated singleton/input/scene-tree reporting, and real example usage
 through `godot:godot`. Full `make ci` passed for the completed slice.
 
-## Current goal: Resource loading and scene instantiation groundwork
+## Completed: Resource loading and scene instantiation groundwork
 
 Resource loading and scene instantiation are the next feature bottleneck for real
 Godot gameplay projects. This slice should make it possible to load selected
@@ -161,10 +161,10 @@ its object ownership and destruction path are clear.
    - [x] Preserve deterministic report and generated output order.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm no generated wrapper violates borrowed object, `Resource`, or
+   - [x] Run `make ci`.
+   - [x] Confirm no generated wrapper violates borrowed object, `Resource`, or
      `RefCounted` ownership rules.
-   - [ ] Confirm normal examples still import only `godot:godot`.
+   - [x] Confirm normal examples still import only `godot:godot`.
 
 ## Deferred until after this goal
 
