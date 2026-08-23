@@ -154,11 +154,11 @@ its object ownership and destruction path are clear.
    - [x] Destroy or release every owned value on all paths.
 
 6. Update generated reporting.
-   - [ ] Report resource-loading and scene-instantiation blockers separately if
+   - [x] Report resource-loading and scene-instantiation blockers separately if
      useful.
-   - [ ] Keep generated `Resource`, `PackedScene`, and singleton wrappers disabled
+   - [x] Keep generated `Resource`, `PackedScene`, and singleton wrappers disabled
      when ownership remains unclear.
-   - [ ] Preserve deterministic report and generated output order.
+   - [x] Preserve deterministic report and generated output order.
 
 7. Validate before moving to the next feature roadmap.
    - [ ] Run `make ci`.
