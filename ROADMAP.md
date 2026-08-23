@@ -113,13 +113,13 @@ owned return must use the existing owned wrappers or a new documented wrapper.
 its object ownership and destruction path are clear.
 
 1. Investigate resource loader and packed-scene ownership rules.
-   - [ ] Inspect Godot 4.7 `ResourceLoader`, `Resource`, and `PackedScene`
+   - [x] Inspect Godot 4.7 `ResourceLoader`, `Resource`, and `PackedScene`
      signatures in `extension_api.json`.
-   - [ ] Decide which return values are borrowed, retained, or owned by the
+   - [x] Decide which return values are borrowed, retained, or owned by the
      caller.
-   - [ ] Keep unsupported ownership-sensitive methods skipped with stable
+   - [x] Keep unsupported ownership-sensitive methods skipped with stable
      reasons.
-   - [ ] Document the first safe wrapper policy in code comments near the helper
+   - [x] Document the first safe wrapper policy in code comments near the helper
      implementation.
 
 2. Add a minimal `ResourceLoader` API path.

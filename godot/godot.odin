@@ -143,6 +143,10 @@ Side :: gclass.Side
 HorizontalAlignment :: gclass.HorizontalAlignment
 VerticalAlignment :: gclass.VerticalAlignment
 Resource :: gclass.Resource
+// Resource loading policy: ResourceLoader.load returns a Resource through a
+// Variant call in focused helpers. The helper retains the borrowed Resource into
+// OwnedResource before freeing the temporary Variant, so callers always receive
+// an explicit owned reference and must release or destroy it.
 OwnedResource :: struct {
 	ref: OwnedRefCounted,
 }
