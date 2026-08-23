@@ -1087,6 +1087,48 @@ packed_scene_instantiate_node2d_checked :: proc "contextless" (
 	return
 }
 
+node_add_child_class_name_data: StaticStringName
+node_add_child_method_name_data: StaticStringName
+node_add_child_method_bind: gcore.MethodBindPtr
+node_add_child_initialized: bool
+
+init_node_add_child :: proc "contextless" () {
+	if node_add_child_initialized do return
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&node_add_child_class_name_data),
+		cstring("Node"),
+	)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&node_add_child_method_name_data),
+		cstring("add_child"),
+	)
+	node_add_child_method_bind = gcore.require_classdb_method_bind(
+		const_static_string_name_ptr(&node_add_child_class_name_data),
+		const_static_string_name_ptr(&node_add_child_method_name_data),
+		3863233950,
+	)
+	node_add_child_initialized = true
+}
+
+// node_add_child_checked parents an existing unparented child. After success,
+// the scene tree owns the node lifecycle; callers must not destroy that child.
+// This helper intentionally keeps scene changes and deletion APIs deferred.
+node_add_child_checked :: proc "contextless" (parent: Node, child: Node) -> (ok: bool) {
+	if node_is_nil(parent) || node_is_nil(child) do return false
+	init_node_add_child()
+	_child := child
+	force_readable_name := false
+	internal := NodeInternalMode.internal_mode_disabled
+	gcore.call_method_ptr_no_ret(
+		node_add_child_method_bind,
+		ObjectPtr(parent),
+		cast(gcore.TypePtr)&_child,
+		cast(gcore.TypePtr)&force_readable_name,
+		cast(gcore.TypePtr)&internal,
+	)
+	return true
+}
+
 node_object_ptr :: proc "contextless" (self: Node) -> ObjectPtr {
 	return ObjectPtr(self)
 }

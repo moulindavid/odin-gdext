@@ -472,6 +472,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.resource_is_local_to_scene(resource)
 	_ = gt.ref_counted_get_reference_count(ref_counted)
 
+	_ = gt.node_add_child_checked(node, node)
+
 	path := gt.node_get_path_to(node, node, false)
 	gt.node_path_free(&path)
 	default_path := gt.node_get_path_to_default(node, node)

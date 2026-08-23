@@ -140,11 +140,11 @@ its object ownership and destruction path are clear.
    - [x] Avoid implicit freeing or unref behavior for instantiated scene roots.
 
 4. Add safe scene-tree integration helpers if needed.
-   - [ ] Consider `Node.add_child` only if object lifetime and ownership remain
+   - [x] Consider `Node.add_child` only if object lifetime and ownership remain
      clear.
-   - [ ] Keep scene changing, current-scene replacement, and deletion helpers
+   - [x] Keep scene changing, current-scene replacement, and deletion helpers
      deferred unless each has a focused ownership rule.
-   - [ ] Prefer checked helper APIs over broad generated wrappers for
+   - [x] Prefer checked helper APIs over broad generated wrappers for
      ownership-sensitive paths.
 
 5. Exercise the workflow in examples.
