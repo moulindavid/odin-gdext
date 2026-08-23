@@ -148,10 +148,10 @@ its object ownership and destruction path are clear.
      ownership-sensitive paths.
 
 5. Exercise the workflow in examples.
-   - [ ] Add or update a normal example that loads or instantiates a scene from
+   - [x] Add or update a normal example that loads or instantiates a scene from
      Odin through `godot:godot` only.
-   - [ ] Keep the example deterministic in headless CI.
-   - [ ] Destroy or release every owned value on all paths.
+   - [x] Keep the example deterministic in headless CI.
+   - [x] Destroy or release every owned value on all paths.
 
 6. Update generated reporting.
    - [ ] Report resource-loading and scene-instantiation blockers separately if
