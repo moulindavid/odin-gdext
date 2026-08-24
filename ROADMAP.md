@@ -153,11 +153,11 @@ model. Unsupported forms must stay skipped with stable report reasons.
      construction.
 
 4. Generate selected signal connection helpers.
-   - [ ] Start with connecting an object signal to an existing borrowed Callable
+   - [x] Start with connecting an object signal to an existing borrowed Callable
      or selected method callable path that has clear lifetime rules.
-   - [ ] Keep object handles borrowed by value.
-   - [ ] Keep connection flags explicit and avoid bind-argument helpers for now.
-   - [ ] Keep unsupported connection shapes reported rather than generated.
+   - [x] Keep object handles borrowed by value.
+   - [x] Keep connection flags explicit and avoid bind-argument helpers for now.
+   - [x] Keep unsupported connection shapes reported rather than generated.
 
 5. Re-export selected wrappers through the public facade.
    - [ ] Keep godot:godot as the normal user path.

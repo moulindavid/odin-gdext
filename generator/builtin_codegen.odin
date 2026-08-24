@@ -2949,6 +2949,8 @@ emit_class_signal_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 		self_type := class_handle_expr(entry.class_name)
 		name_proc := fmt.aprintf("%s_%s_signal_name", class_prefix, signal_prefix)
 		signal_proc := fmt.aprintf("%s_%s_signal", class_prefix, signal_prefix)
+		connect_checked_proc := fmt.aprintf("%s_connect_%s_checked", class_prefix, signal_prefix)
+		connect_proc := fmt.aprintf("%s_connect_%s", class_prefix, signal_prefix)
 		emit_checked_proc := fmt.aprintf("%s_emit_%s_checked", class_prefix, signal_prefix)
 		emit_proc := fmt.aprintf("%s_emit_%s", class_prefix, signal_prefix)
 
@@ -2972,6 +2974,33 @@ emit_class_signal_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 		fmt.sbprintf(
 			b,
 			"	return core.signal_from_object_signal(core.ObjectPtr(self), core.const_static_string_name_ptr(&%s))\n",
+			name_storage,
+		)
+		strings.write_string(b, "}\n\n")
+
+		fmt.sbprintf(
+			b,
+			"%s :: proc \"contextless\" (self: %s, callable: ^core.Callable, flags: i64 = 0) -> i64 {{\n",
+			connect_checked_proc,
+			self_type,
+		)
+		strings.write_string(b, "\tinit_class_bindings()\n")
+		fmt.sbprintf(
+			b,
+			"\treturn core.object_signal_connect_checked(core.ObjectPtr(self), core.const_static_string_name_ptr(&%s), callable, flags)\n",
+			name_storage,
+		)
+		strings.write_string(b, "}\n\n")
+
+		fmt.sbprintf(
+			b,
+			"%s :: proc \"contextless\" (self: %s, callable: ^core.Callable, flags: i64 = 0) {{\n",
+			connect_proc,
+			self_type,
+		)
+		fmt.sbprintf(
+			b,
+			"\tcore.object_signal_connect(core.ObjectPtr(self), core.const_static_string_name_ptr(&%s), callable, flags)\n",
 			name_storage,
 		)
 		strings.write_string(b, "}\n\n")
