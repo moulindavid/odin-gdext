@@ -1,0 +1,8 @@
+[gd_scene format=3]
+
+[node name="OdinSpawnedLabel" type="Label"]
+offset_left = 24.0
+offset_top = 96.0
+offset_right = 760.0
+offset_bottom = 136.0
+text = "Spawned from Odin ResourceLoader"

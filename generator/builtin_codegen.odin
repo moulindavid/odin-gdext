@@ -1017,6 +1017,7 @@ selected_class_names := []string {
 	"CollisionObject2D",
 	"Area2D",
 	"PackedScene",
+	"ResourceLoader",
 	"Input",
 	"SceneTree",
 }
@@ -1288,6 +1289,7 @@ selected_class_methods := []Selected_Class_Method {
 	{"Area2D", "is_overriding_audio_bus"},
 	{"PackedScene", "pack"},
 	{"PackedScene", "can_instantiate"},
+	{"ResourceLoader", "exists"},
 	{"Input", "is_anything_pressed"},
 	{"Input", "is_action_pressed"},
 	{"Input", "is_action_just_pressed"},
@@ -1559,6 +1561,13 @@ class_method_deferred_reason :: proc(class_name, method_name: string) -> string 
 	if class_name == "PackedScene" &&
 	   (method_name == "instantiate" || method_name == "get_state") {
 		return "object lifetime"
+	}
+	if class_name == "ResourceLoader" {
+		if method_name == "load" ||
+		   method_name == "load_threaded_get" ||
+		   method_name == "get_cached_ref" {
+			return "resource ownership"
+		}
 	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
 		return "object lifetime"
@@ -2280,6 +2289,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&input_blockers)
 	scene_tree_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&scene_tree_blockers)
+	resource_loading_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&resource_loading_blockers)
+	scene_instantiation_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&scene_instantiation_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2296,6 +2309,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	singleton_count := 0
 	input_blocker_count := 0
 	scene_tree_blocker_count := 0
+	resource_loading_blocker_count := 0
+	scene_instantiation_blocker_count := 0
 
 	for class_name in selected_class_names {
 		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
@@ -2401,6 +2416,25 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					emit_class_method_report_signature(&scene_tree_blockers, class.name, method)
 					fmt.sbprintf(&scene_tree_blockers, ": %s\n", reason)
 					scene_tree_blocker_count += 1
+				} else if class.name == "ResourceLoader" {
+					strings.write_string(&resource_loading_blockers, "- ")
+					emit_class_method_report_signature(
+						&resource_loading_blockers,
+						class.name,
+						method,
+					)
+					fmt.sbprintf(&resource_loading_blockers, ": %s\n", reason)
+					resource_loading_blocker_count += 1
+				} else if class.name == "PackedScene" &&
+				   (method.name == "instantiate" || method.name == "get_state") {
+					strings.write_string(&scene_instantiation_blockers, "- ")
+					emit_class_method_report_signature(
+						&scene_instantiation_blockers,
+						class.name,
+						method,
+					)
+					fmt.sbprintf(&scene_instantiation_blockers, ": %s\n", reason)
+					scene_instantiation_blocker_count += 1
 				}
 			}
 		}
@@ -2493,6 +2527,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Default-argument blockers: %d\n", default_argument_blocker_count)
 	fmt.sbprintf(&b, "- Input blockers: %d\n", input_blocker_count)
 	fmt.sbprintf(&b, "- SceneTree blockers: %d\n", scene_tree_blocker_count)
+	fmt.sbprintf(&b, "- Resource-loading blockers: %d\n", resource_loading_blocker_count)
+	fmt.sbprintf(&b, "- Scene-instantiation blockers: %d\n", scene_instantiation_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -2520,6 +2556,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(input_blockers))
 	strings.write_string(&b, "\n## SceneTree blockers\n\n")
 	strings.write_string(&b, strings.to_string(scene_tree_blockers))
+	strings.write_string(&b, "\n## Resource-loading blockers\n\n")
+	strings.write_string(&b, strings.to_string(resource_loading_blockers))
+	strings.write_string(&b, "\n## Scene-instantiation blockers\n\n")
+	strings.write_string(&b, strings.to_string(scene_instantiation_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 

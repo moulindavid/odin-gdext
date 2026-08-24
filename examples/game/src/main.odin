@@ -116,6 +116,34 @@ roll_into_label_adapter_method :: proc "contextless" (
 
 	parent := gt.node_get_parent(label_node)
 	if !gt.node_is_nil(parent) {
+		if loader, loader_ok := gt.resource_loader_singleton_checked(); loader_ok {
+			scene_path := gt.string_from_utf8("res://spawned_label.tscn")
+			defer gt.string_free(&scene_path)
+			loaded, _, loaded_ok := gt.resource_loader_load_owned_checked(loader, &scene_path)
+			if loaded_ok {
+				defer gt.owned_resource_destroy(&loaded)
+				resource := gt.owned_resource_handle(loaded)
+				packed, packed_ok := gt.resource_try_as_packed_scene(resource)
+				if packed_ok && gt.packed_scene_can_instantiate(packed) {
+					spawned, spawned_ok := gt.packed_scene_instantiate_node_checked(packed)
+					if spawned_ok {
+						if gt.node_add_child_checked(parent, spawned) {
+							if spawned_label, spawned_label_ok := gt.node_try_as_label(spawned);
+							   spawned_label_ok {
+								spawned_text := gt.string_from_utf8(
+									"Loaded and instantiated by Odin",
+								)
+								gt.label_set_text(spawned_label, &spawned_text)
+								gt.string_free(&spawned_text)
+							}
+						} else {
+							_ = gt.object_destroy_checked(gt.node_object_ptr(spawned))
+						}
+					}
+				}
+			}
+		}
+
 		timer_path := gt.node_path_from_utf8("RollTimer")
 		timer, timer_ok := gt.node_get_node_as_timer(parent, &timer_path)
 		gt.node_path_free(&timer_path)

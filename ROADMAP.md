@@ -99,7 +99,7 @@ The input and scene-tree slice added borrowed singleton lookup rules, selected
 exports, generated singleton/input/scene-tree reporting, and real example usage
 through `godot:godot`. Full `make ci` passed for the completed slice.
 
-## Current goal: Resource loading and scene instantiation groundwork
+## Completed: Resource loading and scene instantiation groundwork
 
 Resource loading and scene instantiation are the next feature bottleneck for real
 Godot gameplay projects. This slice should make it possible to load selected
@@ -113,58 +113,58 @@ owned return must use the existing owned wrappers or a new documented wrapper.
 its object ownership and destruction path are clear.
 
 1. Investigate resource loader and packed-scene ownership rules.
-   - [ ] Inspect Godot 4.7 `ResourceLoader`, `Resource`, and `PackedScene`
+   - [x] Inspect Godot 4.7 `ResourceLoader`, `Resource`, and `PackedScene`
      signatures in `extension_api.json`.
-   - [ ] Decide which return values are borrowed, retained, or owned by the
+   - [x] Decide which return values are borrowed, retained, or owned by the
      caller.
-   - [ ] Keep unsupported ownership-sensitive methods skipped with stable
+   - [x] Keep unsupported ownership-sensitive methods skipped with stable
      reasons.
-   - [ ] Document the first safe wrapper policy in code comments near the helper
+   - [x] Document the first safe wrapper policy in code comments near the helper
      implementation.
 
 2. Add a minimal `ResourceLoader` API path.
-   - [ ] Add selected `ResourceLoader` class or singleton access if available.
-   - [ ] Start with one checked load helper for paths that returns an explicit
+   - [x] Add selected `ResourceLoader` class or singleton access if available.
+   - [x] Start with one checked load helper for paths that returns an explicit
      owned or borrowed wrapper according to the investigated policy.
-   - [ ] Keep cache mode, threaded loading, dependencies, and broad type hints
+   - [x] Keep cache mode, threaded loading, dependencies, and broad type hints
      deferred unless the ownership model is clear.
-   - [ ] Re-export selected helpers through `godot:godot`.
+   - [x] Re-export selected helpers through `godot:godot`.
 
 3. Add explicit `PackedScene.instantiate` wrapper.
-   - [ ] Keep the generated raw method skipped until a focused wrapper documents
+   - [x] Keep the generated raw method skipped until a focused wrapper documents
      ownership transfer.
-   - [ ] Return a checked borrowed or owned object handle according to Godot's
+   - [x] Return a checked borrowed or owned object handle according to Godot's
      actual lifetime rule.
-   - [ ] Provide selected typed downcast helpers for common instantiated roots
+   - [x] Provide selected typed downcast helpers for common instantiated roots
      such as `Node` and `Node2D`.
-   - [ ] Avoid implicit freeing or unref behavior for instantiated scene roots.
+   - [x] Avoid implicit freeing or unref behavior for instantiated scene roots.
 
 4. Add safe scene-tree integration helpers if needed.
-   - [ ] Consider `Node.add_child` only if object lifetime and ownership remain
+   - [x] Consider `Node.add_child` only if object lifetime and ownership remain
      clear.
-   - [ ] Keep scene changing, current-scene replacement, and deletion helpers
+   - [x] Keep scene changing, current-scene replacement, and deletion helpers
      deferred unless each has a focused ownership rule.
-   - [ ] Prefer checked helper APIs over broad generated wrappers for
+   - [x] Prefer checked helper APIs over broad generated wrappers for
      ownership-sensitive paths.
 
 5. Exercise the workflow in examples.
-   - [ ] Add or update a normal example that loads or instantiates a scene from
+   - [x] Add or update a normal example that loads or instantiates a scene from
      Odin through `godot:godot` only.
-   - [ ] Keep the example deterministic in headless CI.
-   - [ ] Destroy or release every owned value on all paths.
+   - [x] Keep the example deterministic in headless CI.
+   - [x] Destroy or release every owned value on all paths.
 
 6. Update generated reporting.
-   - [ ] Report resource-loading and scene-instantiation blockers separately if
+   - [x] Report resource-loading and scene-instantiation blockers separately if
      useful.
-   - [ ] Keep generated `Resource`, `PackedScene`, and singleton wrappers disabled
+   - [x] Keep generated `Resource`, `PackedScene`, and singleton wrappers disabled
      when ownership remains unclear.
-   - [ ] Preserve deterministic report and generated output order.
+   - [x] Preserve deterministic report and generated output order.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm no generated wrapper violates borrowed object, `Resource`, or
+   - [x] Run `make ci`.
+   - [x] Confirm no generated wrapper violates borrowed object, `Resource`, or
      `RefCounted` ownership rules.
-   - [ ] Confirm normal examples still import only `godot:godot`.
+   - [x] Confirm normal examples still import only `godot:godot`.
 
 ## Deferred until after this goal
 

@@ -143,6 +143,10 @@ Side :: gclass.Side
 HorizontalAlignment :: gclass.HorizontalAlignment
 VerticalAlignment :: gclass.VerticalAlignment
 Resource :: gclass.Resource
+// Resource loading policy: ResourceLoader.load returns a Resource through a
+// Variant call in focused helpers. The helper retains the borrowed Resource into
+// OwnedResource before freeing the temporary Variant, so callers always receive
+// an explicit owned reference and must release or destroy it.
 OwnedResource :: struct {
 	ref: OwnedRefCounted,
 }
@@ -156,6 +160,7 @@ Timer :: gclass.Timer
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PackedScene :: gclass.PackedScene
+ResourceLoader :: gclass.ResourceLoader
 Input :: gclass.Input
 SceneTree :: gclass.SceneTree
 
@@ -510,6 +515,8 @@ object_is_area2d :: gclass.object_is_area2d
 object_try_as_area2d :: gclass.object_try_as_area2d
 object_is_packed_scene :: gclass.object_is_packed_scene
 object_try_as_packed_scene :: gclass.object_try_as_packed_scene
+object_is_resource_loader :: gclass.object_is_resource_loader
+object_try_as_resource_loader :: gclass.object_try_as_resource_loader
 object_is_input :: gclass.object_is_input
 object_try_as_input :: gclass.object_try_as_input
 object_is_scene_tree :: gclass.object_is_scene_tree
@@ -638,6 +645,10 @@ packed_scene_as_ref_counted :: gclass.packed_scene_as_ref_counted
 packed_scene_as_object :: gclass.packed_scene_as_object
 packed_scene_pack :: gclass.packed_scene_pack
 packed_scene_can_instantiate :: gclass.packed_scene_can_instantiate
+resource_loader_as_object :: gclass.resource_loader_as_object
+resource_loader_singleton_checked :: gclass.resource_loader_singleton_checked
+resource_loader_exists :: gclass.resource_loader_exists
+resource_loader_exists_default :: gclass.resource_loader_exists_default
 input_as_object :: gclass.input_as_object
 input_singleton_checked :: gclass.input_singleton_checked
 input_is_anything_pressed :: gclass.input_is_anything_pressed
@@ -731,6 +742,10 @@ area2d_is_nil :: proc "contextless" (self: Area2D) -> bool {
 }
 
 packed_scene_is_nil :: proc "contextless" (self: PackedScene) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+resource_loader_is_nil :: proc "contextless" (self: ResourceLoader) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -922,6 +937,198 @@ owned_resource_destroy :: proc "contextless" (self: ^OwnedResource) -> (ok: bool
 	return release_ok
 }
 
+resource_loader_load_class_name_data: StaticStringName
+resource_loader_load_method_name_data: StaticStringName
+resource_loader_load_method_bind: gcore.MethodBindPtr
+resource_loader_load_initialized: bool
+
+init_resource_loader_load :: proc "contextless" () {
+	if resource_loader_load_initialized do return
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&resource_loader_load_class_name_data),
+		cstring("ResourceLoader"),
+	)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&resource_loader_load_method_name_data),
+		cstring("load"),
+	)
+	resource_loader_load_method_bind = gcore.require_classdb_method_bind(
+		const_static_string_name_ptr(&resource_loader_load_class_name_data),
+		const_static_string_name_ptr(&resource_loader_load_method_name_data),
+		3358495409,
+	)
+	resource_loader_load_initialized = true
+}
+
+// resource_loader_load_owned_checked loads a path through a Variant call, retains
+// the returned Resource into OwnedResource, then destroys the temporary Variant.
+// The caller owns the returned wrapper and must call owned_resource_destroy or
+// owned_resource_release. The ResourceLoader handle itself is borrowed.
+resource_loader_load_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	err: CallError,
+	ok: bool,
+) {
+	if resource_loader_is_nil(self) || path == nil do return {}, {}, false
+	init_resource_loader_load()
+
+	path_variant := variant_from_string(path)
+	type_hint := string_from_utf8("")
+	type_hint_variant := variant_from_string(&type_hint)
+	cache_mode_variant := variant_from_int(i64(ResourceLoaderCacheMode.cache_mode_reuse))
+	args := [3]ConstVariantPtr {
+		const_variant_ptr(&path_variant),
+		const_variant_ptr(&type_hint_variant),
+		const_variant_ptr(&cache_mode_variant),
+	}
+
+	ret: Variant
+	gcore.object_method_bind_call(
+		resource_loader_load_method_bind,
+		ObjectPtr(self),
+		&args[0],
+		3,
+		uninitialized_variant_ptr(&ret),
+		&err,
+	)
+	variant_free(&cache_mode_variant)
+	variant_free(&type_hint_variant)
+	string_free(&type_hint)
+	variant_free(&path_variant)
+
+	if !call_error_ok(&err) do return {}, err, false
+	defer variant_free(&ret)
+
+	object, object_ok := variant_try_object(&ret)
+	if !object_ok || object == nil do return {}, err, false
+	resource, resource_ok := object_ptr_try_as_resource(object)
+	if !resource_ok do return {}, err, false
+	retained, retained_ok := owned_resource_retain(resource)
+	return retained, err, retained_ok
+}
+
+resource_loader_load_owned :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> OwnedResource {
+	owned, err, ok := resource_loader_load_owned_checked(self, path)
+	require_call_ok(&err)
+	if !ok do gcore._trap_nil_godot_function()
+	return owned
+}
+
+packed_scene_instantiate_class_name_data: StaticStringName
+packed_scene_instantiate_method_name_data: StaticStringName
+packed_scene_instantiate_method_bind: gcore.MethodBindPtr
+packed_scene_instantiate_initialized: bool
+
+init_packed_scene_instantiate :: proc "contextless" () {
+	if packed_scene_instantiate_initialized do return
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&packed_scene_instantiate_class_name_data),
+		cstring("PackedScene"),
+	)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&packed_scene_instantiate_method_name_data),
+		cstring("instantiate"),
+	)
+	packed_scene_instantiate_method_bind = gcore.require_classdb_method_bind(
+		const_static_string_name_ptr(&packed_scene_instantiate_class_name_data),
+		const_static_string_name_ptr(&packed_scene_instantiate_method_name_data),
+		2628778455,
+	)
+	packed_scene_instantiate_initialized = true
+}
+
+// packed_scene_instantiate_node_checked creates a new scene root. The returned
+// Node is not borrowed from the PackedScene. If it is not added to the scene
+// tree, the caller must destroy it with object_destroy_checked.
+packed_scene_instantiate_node_checked :: proc "contextless" (
+	self: PackedScene,
+) -> (
+	root: Node,
+	ok: bool,
+) {
+	if packed_scene_is_nil(self) do return {}, false
+	init_packed_scene_instantiate()
+
+	edit_state := PackedSceneGenEditState.gen_edit_state_disabled
+	root = gcore.call_method_ptr_ret(
+		packed_scene_instantiate_method_bind,
+		Node,
+		ObjectPtr(self),
+		cast(gcore.TypePtr)&edit_state,
+	)
+	return root, !node_is_nil(root)
+}
+
+packed_scene_instantiate_node :: proc "contextless" (self: PackedScene) -> Node {
+	root, ok := packed_scene_instantiate_node_checked(self)
+	if !ok do gcore._trap_nil_godot_function()
+	return root
+}
+
+// The typed helper returns the root even when the downcast fails so callers can
+// decide whether to destroy or otherwise handle the unparented instance.
+packed_scene_instantiate_node2d_checked :: proc "contextless" (
+	self: PackedScene,
+) -> (
+	root: Node,
+	value: Node2D,
+	ok: bool,
+) {
+	created_root, root_ok := packed_scene_instantiate_node_checked(self)
+	if !root_ok do return {}, {}, false
+	root = created_root
+	value, ok = node_try_as_node2d(root)
+	return
+}
+
+node_add_child_class_name_data: StaticStringName
+node_add_child_method_name_data: StaticStringName
+node_add_child_method_bind: gcore.MethodBindPtr
+node_add_child_initialized: bool
+
+init_node_add_child :: proc "contextless" () {
+	if node_add_child_initialized do return
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&node_add_child_class_name_data),
+		cstring("Node"),
+	)
+	static_string_name_init_latin1_cstring(
+		uninitialized_static_string_name_ptr(&node_add_child_method_name_data),
+		cstring("add_child"),
+	)
+	node_add_child_method_bind = gcore.require_classdb_method_bind(
+		const_static_string_name_ptr(&node_add_child_class_name_data),
+		const_static_string_name_ptr(&node_add_child_method_name_data),
+		3863233950,
+	)
+	node_add_child_initialized = true
+}
+
+// node_add_child_checked parents an existing unparented child. After success,
+// the scene tree owns the node lifecycle; callers must not destroy that child.
+// This helper intentionally keeps scene changes and deletion APIs deferred.
+node_add_child_checked :: proc "contextless" (parent: Node, child: Node) -> (ok: bool) {
+	if node_is_nil(parent) || node_is_nil(child) do return false
+	init_node_add_child()
+	_child := child
+	force_readable_name := false
+	internal := NodeInternalMode.internal_mode_disabled
+	gcore.call_method_ptr_no_ret(
+		node_add_child_method_bind,
+		ObjectPtr(parent),
+		cast(gcore.TypePtr)&_child,
+		cast(gcore.TypePtr)&force_readable_name,
+		cast(gcore.TypePtr)&internal,
+	)
+	return true
+}
+
 node_object_ptr :: proc "contextless" (self: Node) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -959,6 +1166,10 @@ area2d_object_ptr :: proc "contextless" (self: Area2D) -> ObjectPtr {
 }
 
 packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+resource_loader_object_ptr :: proc "contextless" (self: ResourceLoader) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
@@ -1098,6 +1309,16 @@ object_ptr_try_as_packed_scene :: proc "contextless" (
 	return object_try_as_packed_scene(Object(self))
 }
 
+object_ptr_try_as_resource_loader :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: ResourceLoader,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_resource_loader(Object(self))
+}
+
 object_ptr_try_as_input :: proc "contextless" (self: ObjectPtr) -> (value: Input, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_input(Object(self))
@@ -1116,6 +1337,9 @@ object_ptr_try_as_scene_tree :: proc "contextless" (
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
 ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
+PackedSceneGenEditState :: gclass.PackedSceneGenEditState
+ResourceLoaderThreadLoadStatus :: gclass.ResourceLoaderThreadLoadStatus
+ResourceLoaderCacheMode :: gclass.ResourceLoaderCacheMode
 NodeProcessMode :: gclass.NodeProcessMode
 NodeProcessThreadGroup :: gclass.NodeProcessThreadGroup
 NodeProcessThreadMessages :: gclass.NodeProcessThreadMessages
