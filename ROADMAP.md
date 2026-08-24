@@ -112,7 +112,7 @@ owned return must use the existing owned wrappers or a new documented wrapper.
 `PackedScene.instantiate` must not be generated as a plain borrowed return until
 its object ownership and destruction path are clear.
 
-## Current goal: Physics and character gameplay APIs
+## Completed: Physics and character gameplay APIs
 
 Add a small generated API slice for common 2D physics gameplay. This should make
 basic Odin gameplay code able to move a character body, inspect simple collision
@@ -125,47 +125,47 @@ APIs, `InputEvent` APIs, shape/resource mutation APIs, or object-lifetime-sensit
 helpers until their ownership and callback rules are explicit.
 
 1. Investigate selected physics class signatures.
-   - [ ] Inspect Godot 4.7 `CharacterBody2D`, `PhysicsBody2D`, `RigidBody2D`,
+   - [x] Inspect Godot 4.7 `CharacterBody2D`, `PhysicsBody2D`, `RigidBody2D`,
      `StaticBody2D`, and `CollisionShape2D` signatures in `extension_api.json`.
-   - [ ] Identify a small borrowed-safe method batch using existing type rules.
-   - [ ] Keep RID-heavy, server-heavy, shape-resource, and lifetime-sensitive
+   - [x] Identify a small borrowed-safe method batch using existing type rules.
+   - [x] Keep RID-heavy, server-heavy, shape-resource, and lifetime-sensitive
      methods skipped with stable reasons.
-   - [ ] Decide which classes belong in this batch before expanding generator
+   - [x] Decide which classes belong in this batch before expanding generator
      coverage.
 
 2. Generate selected physics class handles and methods.
-   - [ ] Add selected physics classes to the small generated class batch.
-   - [ ] Generate only methods using supported primitive, `GodotReal`, math
+   - [x] Add selected physics classes to the small generated class batch.
+   - [x] Generate only methods using supported primitive, `GodotReal`, math
      builtin, borrowed object, and typed-array mappings.
-   - [ ] Keep object returns borrowed by value and owned value returns explicitly
+   - [x] Keep object returns borrowed by value and owned value returns explicitly
      documented.
-   - [ ] Re-export selected handles and wrappers through `godot:godot`.
+   - [x] Re-export selected handles and wrappers through `godot:godot`.
 
 3. Add focused facade helpers where generated wrappers are not enough.
-   - [ ] Add checked helpers only for common safe patterns that need downcasts or
+   - [x] Add checked helpers only for common safe patterns that need downcasts or
      nil handling.
-   - [ ] Avoid wrappers that imply ownership transfer or hidden freeing.
-   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [x] Avoid wrappers that imply ownership transfer or hidden freeing.
+   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 4. Exercise the physics API in examples.
-   - [ ] Update a normal example or smoke path to call selected physics wrappers
+   - [x] Update a normal example or smoke path to call selected physics wrappers
      through `godot:godot` only.
-   - [ ] Keep the runtime path deterministic in headless CI.
-   - [ ] Avoid relying on real input events or physics frames unless the CI path
+   - [x] Keep the runtime path deterministic in headless CI.
+   - [x] Avoid relying on real input events or physics frames unless the CI path
      proves them stable.
 
 5. Update generated reporting.
-   - [ ] Add physics-specific blocker reporting if it helps choose the next
+   - [x] Add physics-specific blocker reporting if it helps choose the next
      small batch.
-   - [ ] Preserve deterministic output and stable skip reasons.
-   - [ ] Confirm generated reports still separate resource, scene, input,
+   - [x] Preserve deterministic output and stable skip reasons.
+   - [x] Confirm generated reports still separate resource, scene, input,
      typed-container, callable, and default-argument blockers.
 
 6. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm no generated wrapper violates borrowed object, `Resource`,
+   - [x] Run `make ci`.
+   - [x] Confirm no generated wrapper violates borrowed object, `Resource`,
      `RefCounted`, RID, or owned value rules.
-   - [ ] Confirm normal examples still import only `godot:godot`.
+   - [x] Confirm normal examples still import only `godot:godot`.
 
 ## Deferred
 

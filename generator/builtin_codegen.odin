@@ -1001,7 +1001,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 16
+Max_Selected_Class_Count :: 24
 
 selected_class_names := []string {
 	"Object",
@@ -1016,13 +1016,24 @@ selected_class_names := []string {
 	"Timer",
 	"CollisionObject2D",
 	"Area2D",
+	"PhysicsBody2D",
+	"CharacterBody2D",
+	"RigidBody2D",
+	"StaticBody2D",
+	"CollisionShape2D",
 	"PackedScene",
 	"ResourceLoader",
 	"Input",
 	"SceneTree",
 }
 
-candidate_class_names := []string{"Resource"}
+candidate_class_names := []string {
+	"CharacterBody2D",
+	"PhysicsBody2D",
+	"RigidBody2D",
+	"StaticBody2D",
+	"CollisionShape2D",
+}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1287,6 +1298,43 @@ selected_class_methods := []Selected_Class_Method {
 	{"Area2D", "get_audio_bus_name"},
 	{"Area2D", "set_audio_bus_override"},
 	{"Area2D", "is_overriding_audio_bus"},
+	{"PhysicsBody2D", "get_gravity"},
+	{"PhysicsBody2D", "get_collision_exceptions"},
+	{"PhysicsBody2D", "add_collision_exception_with"},
+	{"PhysicsBody2D", "remove_collision_exception_with"},
+	{"CharacterBody2D", "set_velocity"},
+	{"CharacterBody2D", "get_velocity"},
+	{"CharacterBody2D", "move_and_slide"},
+	{"CharacterBody2D", "apply_floor_snap"},
+	{"CharacterBody2D", "set_safe_margin"},
+	{"CharacterBody2D", "get_safe_margin"},
+	{"CharacterBody2D", "set_up_direction"},
+	{"CharacterBody2D", "get_up_direction"},
+	{"CharacterBody2D", "is_on_floor"},
+	{"CharacterBody2D", "is_on_wall"},
+	{"CharacterBody2D", "get_real_velocity"},
+	{"RigidBody2D", "set_mass"},
+	{"RigidBody2D", "get_mass"},
+	{"RigidBody2D", "set_gravity_scale"},
+	{"RigidBody2D", "get_gravity_scale"},
+	{"RigidBody2D", "set_linear_velocity"},
+	{"RigidBody2D", "get_linear_velocity"},
+	{"RigidBody2D", "set_contact_monitor"},
+	{"RigidBody2D", "is_contact_monitor_enabled"},
+	{"RigidBody2D", "get_contact_count"},
+	{"RigidBody2D", "apply_central_impulse"},
+	{"RigidBody2D", "apply_central_force"},
+	{"RigidBody2D", "get_colliding_bodies"},
+	{"StaticBody2D", "set_constant_linear_velocity"},
+	{"StaticBody2D", "get_constant_linear_velocity"},
+	{"StaticBody2D", "set_constant_angular_velocity"},
+	{"StaticBody2D", "get_constant_angular_velocity"},
+	{"CollisionShape2D", "set_disabled"},
+	{"CollisionShape2D", "is_disabled"},
+	{"CollisionShape2D", "set_one_way_collision_direction"},
+	{"CollisionShape2D", "get_one_way_collision_direction"},
+	{"CollisionShape2D", "set_debug_color"},
+	{"CollisionShape2D", "get_debug_color"},
 	{"PackedScene", "pack"},
 	{"PackedScene", "can_instantiate"},
 	{"ResourceLoader", "exists"},
@@ -1589,6 +1637,16 @@ class_type_deferred_reason :: proc(godot_name: string) -> string {
 	return ""
 }
 
+
+class_method_is_physics_report_class :: proc(class_name: string) -> bool {
+	return(
+		class_name == "CharacterBody2D" ||
+		class_name == "PhysicsBody2D" ||
+		class_name == "RigidBody2D" ||
+		class_name == "StaticBody2D" ||
+		class_name == "CollisionShape2D" \
+	)
+}
 
 class_method_uses_typed_array :: proc(method: ExtensionApiClassMethod) -> bool {
 	if _, ok := typed_array_element_type(method.return_value.type); ok do return true
@@ -2293,6 +2351,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&resource_loading_blockers)
 	scene_instantiation_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&scene_instantiation_blockers)
+	physics_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&physics_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2311,6 +2371,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	scene_tree_blocker_count := 0
 	resource_loading_blocker_count := 0
 	scene_instantiation_blocker_count := 0
+	physics_blocker_count := 0
 
 	for class_name in selected_class_names {
 		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
@@ -2435,6 +2496,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					)
 					fmt.sbprintf(&scene_instantiation_blockers, ": %s\n", reason)
 					scene_instantiation_blocker_count += 1
+				} else if class_method_is_physics_report_class(class.name) {
+					strings.write_string(&physics_blockers, "- ")
+					emit_class_method_report_signature(&physics_blockers, class.name, method)
+					fmt.sbprintf(&physics_blockers, ": %s\n", reason)
+					physics_blocker_count += 1
 				}
 			}
 		}
@@ -2529,6 +2595,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- SceneTree blockers: %d\n", scene_tree_blocker_count)
 	fmt.sbprintf(&b, "- Resource-loading blockers: %d\n", resource_loading_blocker_count)
 	fmt.sbprintf(&b, "- Scene-instantiation blockers: %d\n", scene_instantiation_blocker_count)
+	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -2560,6 +2627,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(resource_loading_blockers))
 	strings.write_string(&b, "\n## Scene-instantiation blockers\n\n")
 	strings.write_string(&b, strings.to_string(scene_instantiation_blockers))
+	strings.write_string(&b, "\n## Physics blockers\n\n")
+	strings.write_string(&b, strings.to_string(physics_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 

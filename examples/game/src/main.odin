@@ -49,6 +49,83 @@ roll_damage :: proc "contextless" (self: ^GameBrainData) -> gt.GodotReal {
 	return value
 }
 
+configure_physics_nodes :: proc "contextless" (parent: gt.Node, damage: gt.GodotReal) {
+	character_object := gt.construct_object(character_body2d_class_name)
+	if character, character_ok := gt.object_ptr_try_as_character_body2d(character_object);
+	   character_ok {
+		gt.character_body2d_set_velocity(character, gt.Vector2{f32(damage), f32(-damage * 0.25)})
+		gt.character_body2d_set_safe_margin(character, 0.08)
+		gt.character_body2d_set_up_direction(character, gt.Vector2{0, -1})
+		_ = gt.character_body2d_get_velocity(character)
+		_ = gt.character_body2d_get_safe_margin(character)
+		_ = gt.character_body2d_get_up_direction(character)
+		_ = gt.character_body2d_is_on_floor(character)
+		_ = gt.character_body2d_is_on_wall(character)
+		_ = gt.character_body2d_get_real_velocity(character)
+		physics := gt.character_body2d_as_physics_body2d(character)
+		exceptions := gt.physics_body2d_get_collision_exceptions(physics)
+		gt.typed_array_free(&exceptions)
+		if !gt.node_add_child_checked(parent, gt.character_body2d_as_node(character)) {
+			_ = gt.object_destroy_checked(gt.character_body2d_object_ptr(character))
+		}
+	} else if character_object != nil {
+		_ = gt.object_destroy_checked(character_object)
+	}
+
+	rigid_object := gt.construct_object(rigid_body2d_class_name)
+	if rigid, rigid_ok := gt.object_ptr_try_as_rigid_body2d(rigid_object); rigid_ok {
+		gt.rigid_body2d_set_mass(rigid, 2)
+		gt.rigid_body2d_set_gravity_scale(rigid, 1)
+		gt.rigid_body2d_set_linear_velocity(rigid, gt.Vector2{f32(damage * 0.1), 0})
+		gt.rigid_body2d_set_contact_monitor(rigid, true)
+		gt.rigid_body2d_apply_central_impulse(rigid, gt.Vector2{0, f32(-damage)})
+		gt.rigid_body2d_apply_central_force(rigid, gt.Vector2{0, f32(damage)})
+		_ = gt.rigid_body2d_get_mass(rigid)
+		_ = gt.rigid_body2d_get_gravity_scale(rigid)
+		_ = gt.rigid_body2d_get_linear_velocity(rigid)
+		_ = gt.rigid_body2d_is_contact_monitor_enabled(rigid)
+		_ = gt.rigid_body2d_get_contact_count(rigid)
+		contacts := gt.rigid_body2d_get_colliding_bodies(rigid)
+		gt.typed_array_free(&contacts)
+		if !gt.node_add_child_checked(parent, gt.rigid_body2d_as_node(rigid)) {
+			_ = gt.object_destroy_checked(gt.rigid_body2d_object_ptr(rigid))
+		}
+	} else if rigid_object != nil {
+		_ = gt.object_destroy_checked(rigid_object)
+	}
+
+	static_object := gt.construct_object(static_body2d_class_name)
+	if static_body, static_ok := gt.object_ptr_try_as_static_body2d(static_object); static_ok {
+		gt.static_body2d_set_constant_linear_velocity(
+			static_body,
+			gt.Vector2{f32(damage * 0.05), 0},
+		)
+		gt.static_body2d_set_constant_angular_velocity(static_body, 0.25)
+		_ = gt.static_body2d_get_constant_linear_velocity(static_body)
+		_ = gt.static_body2d_get_constant_angular_velocity(static_body)
+		if !gt.node_add_child_checked(parent, gt.static_body2d_as_node(static_body)) {
+			_ = gt.object_destroy_checked(gt.static_body2d_object_ptr(static_body))
+		}
+	} else if static_object != nil {
+		_ = gt.object_destroy_checked(static_object)
+	}
+
+	shape_object := gt.construct_object(collision_shape2d_class_name)
+	if shape, shape_ok := gt.object_ptr_try_as_collision_shape2d(shape_object); shape_ok {
+		gt.collision_shape2d_set_disabled(shape, true)
+		gt.collision_shape2d_set_one_way_collision_direction(shape, gt.Vector2{0, -1})
+		gt.collision_shape2d_set_debug_color(shape, gt.Color{0.2, 0.8, 1.0, 0.5})
+		_ = gt.collision_shape2d_is_disabled(shape)
+		_ = gt.collision_shape2d_get_one_way_collision_direction(shape)
+		_ = gt.collision_shape2d_get_debug_color(shape)
+		if !gt.node_add_child_checked(parent, gt.collision_shape2d_as_node(shape)) {
+			_ = gt.object_destroy_checked(gt.collision_shape2d_object_ptr(shape))
+		}
+	} else if shape_object != nil {
+		_ = gt.object_destroy_checked(shape_object)
+	}
+}
+
 roll_damage_adapter_method :: proc "contextless" (
 	instance: gt.ClassInstancePtr,
 ) -> (
@@ -153,6 +230,8 @@ roll_into_label_adapter_method :: proc "contextless" (
 			gt.timer_start_default(timer)
 		}
 
+		configure_physics_nodes(parent, damage)
+
 		area_path := gt.node_path_from_utf8("DamageArea")
 		area, area_ok := gt.node_get_node_as_area2d(parent, &area_path)
 		gt.node_path_free(&area_path)
@@ -165,7 +244,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 	}
 
 	text := gt.string_from_utf8(
-		"Odin read Input and SceneTree, rolled damage, updated this Label, armed a Timer, and configured an Area2D.",
+		"Odin read Input and SceneTree, rolled damage, updated this Label, armed a Timer, configured physics nodes, and configured an Area2D.",
 	)
 	defer gt.string_free(&text)
 	gt.label_set_text(label, &text)
@@ -200,8 +279,16 @@ roll_into_label_method_adapter := gt.ClassMethodSetObjectPtrAdapter {
 
 game_name_data: gt.ClassName
 game_parent_name_data: gt.ClassName
+character_body2d_class_name_data: gt.ClassName
+rigid_body2d_class_name_data: gt.ClassName
+static_body2d_class_name_data: gt.ClassName
+collision_shape2d_class_name_data: gt.ClassName
 game_class_name := gt.class_name_ptr(&game_name_data)
 game_parent_name := gt.class_name_ptr(&game_parent_name_data)
+character_body2d_class_name := gt.class_name_ptr(&character_body2d_class_name_data)
+rigid_body2d_class_name := gt.class_name_ptr(&rigid_body2d_class_name_data)
+static_body2d_class_name := gt.class_name_ptr(&static_body2d_class_name_data)
+collision_shape2d_class_name := gt.class_name_ptr(&collision_shape2d_class_name_data)
 
 empty_name_data: gt.StaticStringName
 empty_name := gt.const_static_string_name_ptr(&empty_name_data)
@@ -413,6 +500,16 @@ register_classes :: proc() {
 	context = gt.godot_context()
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
 	gt.class_name_init_latin1_cstring(&game_parent_name_data, cstring("Node"))
+	gt.class_name_init_latin1_cstring(
+		&character_body2d_class_name_data,
+		cstring("CharacterBody2D"),
+	)
+	gt.class_name_init_latin1_cstring(&rigid_body2d_class_name_data, cstring("RigidBody2D"))
+	gt.class_name_init_latin1_cstring(&static_body2d_class_name_data, cstring("StaticBody2D"))
+	gt.class_name_init_latin1_cstring(
+		&collision_shape2d_class_name_data,
+		cstring("CollisionShape2D"),
+	)
 	gt.init_class_bindings()
 
 	gt.register_editor_visible_class(
