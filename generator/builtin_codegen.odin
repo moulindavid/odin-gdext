@@ -1022,7 +1022,13 @@ selected_class_names := []string {
 	"SceneTree",
 }
 
-candidate_class_names := []string{"Resource"}
+candidate_class_names := []string {
+	"CharacterBody2D",
+	"PhysicsBody2D",
+	"RigidBody2D",
+	"StaticBody2D",
+	"CollisionShape2D",
+}
 
 Selected_Class_Method :: struct {
 	class_name:  string,

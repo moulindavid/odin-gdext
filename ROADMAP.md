@@ -125,12 +125,12 @@ APIs, `InputEvent` APIs, shape/resource mutation APIs, or object-lifetime-sensit
 helpers until their ownership and callback rules are explicit.
 
 1. Investigate selected physics class signatures.
-   - [ ] Inspect Godot 4.7 `CharacterBody2D`, `PhysicsBody2D`, `RigidBody2D`,
+   - [x] Inspect Godot 4.7 `CharacterBody2D`, `PhysicsBody2D`, `RigidBody2D`,
      `StaticBody2D`, and `CollisionShape2D` signatures in `extension_api.json`.
-   - [ ] Identify a small borrowed-safe method batch using existing type rules.
-   - [ ] Keep RID-heavy, server-heavy, shape-resource, and lifetime-sensitive
+   - [x] Identify a small borrowed-safe method batch using existing type rules.
+   - [x] Keep RID-heavy, server-heavy, shape-resource, and lifetime-sensitive
      methods skipped with stable reasons.
-   - [ ] Decide which classes belong in this batch before expanding generator
+   - [x] Decide which classes belong in this batch before expanding generator
      coverage.
 
 2. Generate selected physics class handles and methods.
