@@ -76,6 +76,7 @@ ExtensionApiClass :: struct {
 	name:      string `json:"name"`,
 	inherits:  string `json:"inherits,omitempty"`,
 	methods:   []ExtensionApiClassMethod `json:"methods,omitempty"`,
+	signals:   []ExtensionApiClassSignal `json:"signals,omitempty"`,
 	enums:     []ExtensionApiEnum `json:"enums,omitempty"`,
 	constants: []ExtensionApiClassConstant `json:"constants,omitempty"`,
 }
@@ -88,6 +89,11 @@ ExtensionApiClassMethod :: struct {
 	is_virtual:   bool `json:"is_virtual,omitempty"`,
 	hash:         i64 `json:"hash"`,
 	arguments:    []ExtensionApiMethodArg `json:"arguments,omitempty"`,
+}
+
+ExtensionApiClassSignal :: struct {
+	name:      string `json:"name"`,
+	arguments: []ExtensionApiMethodArg `json:"arguments,omitempty"`,
 }
 
 ExtensionApiClassReturnValue :: struct {
@@ -1040,6 +1046,33 @@ Selected_Class_Method :: struct {
 	method_name: string,
 }
 
+Selected_Class_Signal :: struct {
+	class_name:  string,
+	signal_name: string,
+}
+
+selected_class_signals := []Selected_Class_Signal {
+	{"Object", "script_changed"},
+	{"Object", "property_list_changed"},
+	{"Node", "ready"},
+	{"Node", "renamed"},
+	{"Node", "tree_entered"},
+	{"Node", "tree_exiting"},
+	{"Node", "tree_exited"},
+	{"Node", "child_entered_tree"},
+	{"Node", "child_exiting_tree"},
+	{"Timer", "timeout"},
+	{"Control", "resized"},
+	{"Control", "mouse_entered"},
+	{"Control", "mouse_exited"},
+	{"Area2D", "body_entered"},
+	{"Area2D", "body_exited"},
+	{"Area2D", "area_entered"},
+	{"Area2D", "area_exited"},
+	{"CollisionObject2D", "mouse_entered"},
+	{"CollisionObject2D", "mouse_exited"},
+}
+
 selected_class_methods := []Selected_Class_Method {
 	{"Object", "get_class"},
 	{"Object", "is_class"},
@@ -1396,6 +1429,19 @@ find_class_method :: proc(
 	return {}, false
 }
 
+find_class_signal :: proc(
+	class: ExtensionApiClass,
+	name: string,
+) -> (
+	signal: ExtensionApiClassSignal,
+	ok: bool,
+) {
+	for s in class.signals {
+		if s.name == name do return s, true
+	}
+	return {}, false
+}
+
 validate_selected_class_api :: proc(root: ^ExtensionApiRoot) -> bool {
 	if len(selected_class_names) > Max_Selected_Class_Count {
 		fmt.eprintfln(
@@ -1424,6 +1470,38 @@ validate_selected_class_api :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer delete(seen_methods)
 	seen_proc_names := make(map[string]bool, len(selected_class_methods))
 	defer delete(seen_proc_names)
+	seen_signals := make(map[string]bool, len(selected_class_signals))
+	defer delete(seen_signals)
+	for entry in selected_class_signals {
+		if !seen_classes[entry.class_name] {
+			fmt.eprintfln(
+				"ERROR: selected signal %s.%s uses a class outside selected_class_names",
+				entry.class_name,
+				entry.signal_name,
+			)
+			return false
+		}
+
+		signal_key := fmt.aprintf("%s.%s", entry.class_name, entry.signal_name)
+		if seen_signals[signal_key] {
+			fmt.eprintfln("ERROR: duplicate selected class signal %s", signal_key)
+			return false
+		}
+		seen_signals[signal_key] = true
+
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		_, signal_ok := find_class_signal(class, entry.signal_name)
+		if !signal_ok {
+			fmt.eprintfln(
+				"ERROR: selected class signal %s.%s missing from extension_api.json",
+				entry.class_name,
+				entry.signal_name,
+			)
+			return false
+		}
+	}
+
 	for entry in selected_class_methods {
 		if !seen_classes[entry.class_name] {
 			fmt.eprintfln(

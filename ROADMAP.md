@@ -126,13 +126,13 @@ whose arguments and ownership rules are already covered by the project safety
 model. Unsupported forms must stay skipped with stable report reasons.
 
 1. Investigate generated signal metadata.
-   - [ ] Inspect how Godot 4.7 extension_api.json represents class signals for
+   - [x] Inspect how Godot 4.7 extension_api.json represents class signals for
      selected classes.
-   - [ ] Choose the first small class and signal batch, likely Timer, Area2D,
-     Button or other Control subclasses, and Object/Node where safe.
-   - [ ] Identify no-argument, primitive-argument, and borrowed-object-argument
-     signal shapes that can reuse existing Variant cleanup paths.
-   - [ ] Keep vararg, bind-argument-heavy, Callable-heavy, and lifetime-sensitive
+   - [x] Choose the first small class and signal batch: Object, Node, Timer,
+     Control, CollisionObject2D, and Area2D.
+   - [x] Identify no-argument and borrowed-object-argument signal shapes that can
+     reuse existing Signal/Callable paths without argument ownership transfer.
+   - [x] Keep vararg, bind-argument-heavy, Callable-heavy, and lifetime-sensitive
      signals skipped.
 
 2. Add deterministic signal/callable support reporting.
