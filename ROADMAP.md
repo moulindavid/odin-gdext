@@ -143,13 +143,13 @@ model. Unsupported forms must stay skipped with stable report reasons.
    - [x] Use the report to choose the smallest safe generated wrapper batch.
 
 3. Generate fixed-shape signal helper wrappers.
-   - [ ] Start with no-argument signals and then one or two supported argument
+   - [x] Start with no-argument signals and then one or two supported argument
      signals.
-   - [ ] Reuse existing Signal, Callable, and temporary Variant destruction
+   - [x] Reuse existing Signal, Callable, and temporary Variant destruction
      helpers.
-   - [ ] Return checked errors or trap consistently with the existing call-error
+   - [x] Return checked errors or trap consistently with the existing call-error
      pattern.
-   - [ ] Do not generate broad vararg emission or arbitrary Callable
+   - [x] Do not generate broad vararg emission or arbitrary Callable
      construction.
 
 4. Generate selected signal connection helpers.
