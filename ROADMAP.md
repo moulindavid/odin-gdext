@@ -112,7 +112,7 @@ owned return must use the existing owned wrappers or a new documented wrapper.
 `PackedScene.instantiate` must not be generated as a plain borrowed return until
 its object ownership and destruction path are clear.
 
-## Current goal: Physics and character gameplay APIs
+## Completed: Physics and character gameplay APIs
 
 Add a small generated API slice for common 2D physics gameplay. This should make
 basic Odin gameplay code able to move a character body, inspect simple collision
@@ -162,10 +162,10 @@ helpers until their ownership and callback rules are explicit.
      typed-container, callable, and default-argument blockers.
 
 6. Validate before moving to the next feature roadmap.
-   - [ ] Run `make ci`.
-   - [ ] Confirm no generated wrapper violates borrowed object, `Resource`,
+   - [x] Run `make ci`.
+   - [x] Confirm no generated wrapper violates borrowed object, `Resource`,
      `RefCounted`, RID, or owned value rules.
-   - [ ] Confirm normal examples still import only `godot:godot`.
+   - [x] Confirm normal examples still import only `godot:godot`.
 
 ## Deferred
 
