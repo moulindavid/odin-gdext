@@ -148,10 +148,10 @@ helpers until their ownership and callback rules are explicit.
    - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 4. Exercise the physics API in examples.
-   - [ ] Update a normal example or smoke path to call selected physics wrappers
+   - [x] Update a normal example or smoke path to call selected physics wrappers
      through `godot:godot` only.
-   - [ ] Keep the runtime path deterministic in headless CI.
-   - [ ] Avoid relying on real input events or physics frames unless the CI path
+   - [x] Keep the runtime path deterministic in headless CI.
+   - [x] Avoid relying on real input events or physics frames unless the CI path
      proves them stable.
 
 5. Update generated reporting.
