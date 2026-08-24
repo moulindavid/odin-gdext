@@ -142,10 +142,10 @@ helpers until their ownership and callback rules are explicit.
    - [x] Re-export selected handles and wrappers through `godot:godot`.
 
 3. Add focused facade helpers where generated wrappers are not enough.
-   - [ ] Add checked helpers only for common safe patterns that need downcasts or
+   - [x] Add checked helpers only for common safe patterns that need downcasts or
      nil handling.
-   - [ ] Avoid wrappers that imply ownership transfer or hidden freeing.
-   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [x] Avoid wrappers that imply ownership transfer or hidden freeing.
+   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 4. Exercise the physics API in examples.
    - [ ] Update a normal example or smoke path to call selected physics wrappers

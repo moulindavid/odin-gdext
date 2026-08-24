@@ -518,6 +518,16 @@ object_is_collision_object2d :: gclass.object_is_collision_object2d
 object_try_as_collision_object2d :: gclass.object_try_as_collision_object2d
 object_is_area2d :: gclass.object_is_area2d
 object_try_as_area2d :: gclass.object_try_as_area2d
+object_is_physics_body2d :: gclass.object_is_physics_body2d
+object_try_as_physics_body2d :: gclass.object_try_as_physics_body2d
+object_is_character_body2d :: gclass.object_is_character_body2d
+object_try_as_character_body2d :: gclass.object_try_as_character_body2d
+object_is_rigid_body2d :: gclass.object_is_rigid_body2d
+object_try_as_rigid_body2d :: gclass.object_try_as_rigid_body2d
+object_is_static_body2d :: gclass.object_is_static_body2d
+object_try_as_static_body2d :: gclass.object_try_as_static_body2d
+object_is_collision_shape2d :: gclass.object_is_collision_shape2d
+object_try_as_collision_shape2d :: gclass.object_try_as_collision_shape2d
 object_is_packed_scene :: gclass.object_is_packed_scene
 object_try_as_packed_scene :: gclass.object_try_as_packed_scene
 object_is_resource_loader :: gclass.object_is_resource_loader
@@ -568,6 +578,26 @@ node2d_is_area2d :: gclass.node2d_is_area2d
 node2d_try_as_area2d :: gclass.node2d_try_as_area2d
 collision_object2d_is_area2d :: gclass.collision_object2d_is_area2d
 collision_object2d_try_as_area2d :: gclass.collision_object2d_try_as_area2d
+collision_object2d_is_physics_body2d :: gclass.collision_object2d_is_physics_body2d
+collision_object2d_try_as_physics_body2d :: gclass.collision_object2d_try_as_physics_body2d
+collision_object2d_is_character_body2d :: gclass.collision_object2d_is_character_body2d
+collision_object2d_try_as_character_body2d :: gclass.collision_object2d_try_as_character_body2d
+collision_object2d_is_rigid_body2d :: gclass.collision_object2d_is_rigid_body2d
+collision_object2d_try_as_rigid_body2d :: gclass.collision_object2d_try_as_rigid_body2d
+collision_object2d_is_static_body2d :: gclass.collision_object2d_is_static_body2d
+collision_object2d_try_as_static_body2d :: gclass.collision_object2d_try_as_static_body2d
+physics_body2d_is_character_body2d :: gclass.physics_body2d_is_character_body2d
+physics_body2d_try_as_character_body2d :: gclass.physics_body2d_try_as_character_body2d
+physics_body2d_is_rigid_body2d :: gclass.physics_body2d_is_rigid_body2d
+physics_body2d_try_as_rigid_body2d :: gclass.physics_body2d_try_as_rigid_body2d
+physics_body2d_is_static_body2d :: gclass.physics_body2d_is_static_body2d
+physics_body2d_try_as_static_body2d :: gclass.physics_body2d_try_as_static_body2d
+node_is_collision_shape2d :: gclass.node_is_collision_shape2d
+node_try_as_collision_shape2d :: gclass.node_try_as_collision_shape2d
+canvas_item_is_collision_shape2d :: gclass.canvas_item_is_collision_shape2d
+canvas_item_try_as_collision_shape2d :: gclass.canvas_item_try_as_collision_shape2d
+node2d_is_collision_shape2d :: gclass.node2d_is_collision_shape2d
+node2d_try_as_collision_shape2d :: gclass.node2d_try_as_collision_shape2d
 control_is_label :: gclass.control_is_label
 control_try_as_label :: gclass.control_try_as_label
 timer_as_node :: gclass.timer_as_node
@@ -810,6 +840,26 @@ collision_object2d_is_nil :: proc "contextless" (self: CollisionObject2D) -> boo
 }
 
 area2d_is_nil :: proc "contextless" (self: Area2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+physics_body2d_is_nil :: proc "contextless" (self: PhysicsBody2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+character_body2d_is_nil :: proc "contextless" (self: CharacterBody2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+rigid_body2d_is_nil :: proc "contextless" (self: RigidBody2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+static_body2d_is_nil :: proc "contextless" (self: StaticBody2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+collision_shape2d_is_nil :: proc "contextless" (self: CollisionShape2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -1237,6 +1287,26 @@ area2d_object_ptr :: proc "contextless" (self: Area2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+physics_body2d_object_ptr :: proc "contextless" (self: PhysicsBody2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+character_body2d_object_ptr :: proc "contextless" (self: CharacterBody2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+rigid_body2d_object_ptr :: proc "contextless" (self: RigidBody2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+static_body2d_object_ptr :: proc "contextless" (self: StaticBody2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+collision_shape2d_object_ptr :: proc "contextless" (self: CollisionShape2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -1369,6 +1439,68 @@ typed_array_get_collision_object2d :: proc "contextless" (
 	object, object_ok := typed_array_get_object(array, index)
 	if !object_ok do return {}, false
 	return object_ptr_try_as_collision_object2d(object)
+}
+
+object_ptr_try_as_physics_body2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: PhysicsBody2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_physics_body2d(Object(self))
+}
+
+object_ptr_try_as_character_body2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CharacterBody2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_character_body2d(Object(self))
+}
+
+object_ptr_try_as_rigid_body2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: RigidBody2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_rigid_body2d(Object(self))
+}
+
+object_ptr_try_as_static_body2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: StaticBody2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_static_body2d(Object(self))
+}
+
+object_ptr_try_as_collision_shape2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CollisionShape2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_collision_shape2d(Object(self))
+}
+
+typed_array_get_physics_body2d :: proc "contextless" (
+	array: ^TypedArray,
+	index: i64,
+) -> (
+	value: PhysicsBody2D,
+	ok: bool,
+) {
+	object, object_ok := typed_array_get_object(array, index)
+	if !object_ok do return {}, false
+	return object_ptr_try_as_physics_body2d(object)
 }
 
 object_ptr_try_as_packed_scene :: proc "contextless" (
