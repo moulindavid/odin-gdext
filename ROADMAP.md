@@ -160,11 +160,11 @@ model. Unsupported forms must stay skipped with stable report reasons.
    - [x] Keep unsupported connection shapes reported rather than generated.
 
 5. Re-export selected wrappers through the public facade.
-   - [ ] Keep godot:godot as the normal user path.
-   - [ ] Re-export only the signal/callable helpers intended for gameplay code.
-   - [ ] Keep low-level godot:core access available but unnecessary for the
+   - [x] Keep godot:godot as the normal user path.
+   - [x] Re-export only the signal/callable helpers intended for gameplay code.
+   - [x] Keep low-level godot:core access available but unnecessary for the
      selected path.
-   - [ ] Add facade compile checks for generated signal and callable helpers.
+   - [x] Add facade compile checks for generated signal and callable helpers.
 
 6. Exercise the generated signal path in examples.
    - [ ] Use normal examples or smoke coverage to connect or emit a selected

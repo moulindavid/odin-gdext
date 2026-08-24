@@ -305,6 +305,16 @@ class_facade_compile_smoke :: proc "contextless" (
 		2,
 	)
 
+	_ = gt.timer_timeout_signal_name()
+	timeout_signal := gt.timer_timeout_signal(timer)
+	gt.signal_free(&timeout_signal)
+	_ = gt.timer_connect_timeout_checked(timer, callable, 0)
+	_ = gt.timer_emit_timeout_checked(timer)
+	_ = gt.node_connect_child_entered_tree_checked(node, callable, 0)
+	_ = gt.node_emit_child_entered_tree_checked(node, node)
+	_ = gt.area2d_connect_body_entered_checked(area2d, callable, 0)
+	_ = gt.area2d_emit_body_entered_checked(area2d, node2d)
+
 
 	gt.canvas_item_set_visible(canvas_item, true)
 	_ = gt.canvas_item_is_visible(canvas_item)
