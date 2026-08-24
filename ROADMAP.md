@@ -176,11 +176,11 @@ model. Unsupported forms must stay skipped with stable report reasons.
      stable.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm generated reports explain remaining signal and callable skips.
-   - [ ] Confirm no generated wrapper violates borrowed object or owned value
+   - [x] Run make ci.
+   - [x] Confirm generated reports explain remaining signal and callable skips.
+   - [x] Confirm no generated wrapper violates borrowed object or owned value
      destruction rules.
-   - [ ] Confirm normal examples still import only godot:godot.
+   - [x] Confirm normal examples still import only godot:godot.
 
 ## Deferred
 
