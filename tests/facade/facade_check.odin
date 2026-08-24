@@ -76,6 +76,11 @@ class_facade_compile_smoke :: proc "contextless" (
 	timer: gt.Timer,
 	collision_object2d: gt.CollisionObject2D,
 	area2d: gt.Area2D,
+	physics_body2d: gt.PhysicsBody2D,
+	character_body2d: gt.CharacterBody2D,
+	rigid_body2d: gt.RigidBody2D,
+	static_body2d: gt.StaticBody2D,
+	collision_shape2d: gt.CollisionShape2D,
 	packed_scene: gt.PackedScene,
 	resource_loader: gt.ResourceLoader,
 	input: gt.Input,
@@ -678,6 +683,77 @@ class_facade_compile_smoke :: proc "contextless" (
 	areas := gt.area2d_get_overlapping_areas(area2d)
 	_, _ = gt.typed_array_get_area2d(&areas, 0)
 	gt.typed_array_free(&areas)
+
+	_ = gt.physics_body2d_as_collision_object2d(physics_body2d)
+	_ = gt.physics_body2d_as_node2d(physics_body2d)
+	_ = gt.physics_body2d_as_canvas_item(physics_body2d)
+	_ = gt.physics_body2d_as_node(physics_body2d)
+	_ = gt.physics_body2d_as_object(physics_body2d)
+	_ = gt.physics_body2d_get_gravity(physics_body2d)
+	physics_exceptions := gt.physics_body2d_get_collision_exceptions(physics_body2d)
+	gt.typed_array_free(&physics_exceptions)
+	gt.physics_body2d_add_collision_exception_with(physics_body2d, node)
+	gt.physics_body2d_remove_collision_exception_with(physics_body2d, node)
+
+	_ = gt.character_body2d_as_physics_body2d(character_body2d)
+	_ = gt.character_body2d_as_collision_object2d(character_body2d)
+	_ = gt.character_body2d_as_node2d(character_body2d)
+	_ = gt.character_body2d_as_canvas_item(character_body2d)
+	_ = gt.character_body2d_as_node(character_body2d)
+	_ = gt.character_body2d_as_object(character_body2d)
+	gt.character_body2d_set_velocity(character_body2d, gt.Vector2{10, -4})
+	_ = gt.character_body2d_get_velocity(character_body2d)
+	_ = gt.character_body2d_move_and_slide(character_body2d)
+	gt.character_body2d_apply_floor_snap(character_body2d)
+	gt.character_body2d_set_safe_margin(character_body2d, 0.08)
+	_ = gt.character_body2d_get_safe_margin(character_body2d)
+	gt.character_body2d_set_up_direction(character_body2d, gt.Vector2{0, -1})
+	_ = gt.character_body2d_get_up_direction(character_body2d)
+	_ = gt.character_body2d_is_on_floor(character_body2d)
+	_ = gt.character_body2d_is_on_wall(character_body2d)
+	_ = gt.character_body2d_get_real_velocity(character_body2d)
+
+	_ = gt.rigid_body2d_as_physics_body2d(rigid_body2d)
+	_ = gt.rigid_body2d_as_collision_object2d(rigid_body2d)
+	_ = gt.rigid_body2d_as_node2d(rigid_body2d)
+	_ = gt.rigid_body2d_as_canvas_item(rigid_body2d)
+	_ = gt.rigid_body2d_as_node(rigid_body2d)
+	_ = gt.rigid_body2d_as_object(rigid_body2d)
+	gt.rigid_body2d_set_mass(rigid_body2d, 2)
+	_ = gt.rigid_body2d_get_mass(rigid_body2d)
+	gt.rigid_body2d_set_gravity_scale(rigid_body2d, 1)
+	_ = gt.rigid_body2d_get_gravity_scale(rigid_body2d)
+	gt.rigid_body2d_set_linear_velocity(rigid_body2d, gt.Vector2{1, 2})
+	_ = gt.rigid_body2d_get_linear_velocity(rigid_body2d)
+	gt.rigid_body2d_set_contact_monitor(rigid_body2d, true)
+	_ = gt.rigid_body2d_is_contact_monitor_enabled(rigid_body2d)
+	_ = gt.rigid_body2d_get_contact_count(rigid_body2d)
+	gt.rigid_body2d_apply_central_impulse(rigid_body2d, gt.Vector2{0, -10})
+	gt.rigid_body2d_apply_central_force(rigid_body2d, gt.Vector2{0, 10})
+	rigid_contacts := gt.rigid_body2d_get_colliding_bodies(rigid_body2d)
+	gt.typed_array_free(&rigid_contacts)
+
+	_ = gt.static_body2d_as_physics_body2d(static_body2d)
+	_ = gt.static_body2d_as_collision_object2d(static_body2d)
+	_ = gt.static_body2d_as_node2d(static_body2d)
+	_ = gt.static_body2d_as_canvas_item(static_body2d)
+	_ = gt.static_body2d_as_node(static_body2d)
+	_ = gt.static_body2d_as_object(static_body2d)
+	gt.static_body2d_set_constant_linear_velocity(static_body2d, gt.Vector2{3, 0})
+	_ = gt.static_body2d_get_constant_linear_velocity(static_body2d)
+	gt.static_body2d_set_constant_angular_velocity(static_body2d, 0.5)
+	_ = gt.static_body2d_get_constant_angular_velocity(static_body2d)
+
+	_ = gt.collision_shape2d_as_node2d(collision_shape2d)
+	_ = gt.collision_shape2d_as_canvas_item(collision_shape2d)
+	_ = gt.collision_shape2d_as_node(collision_shape2d)
+	_ = gt.collision_shape2d_as_object(collision_shape2d)
+	gt.collision_shape2d_set_disabled(collision_shape2d, false)
+	_ = gt.collision_shape2d_is_disabled(collision_shape2d)
+	gt.collision_shape2d_set_one_way_collision_direction(collision_shape2d, gt.Vector2{0, -1})
+	_ = gt.collision_shape2d_get_one_way_collision_direction(collision_shape2d)
+	gt.collision_shape2d_set_debug_color(collision_shape2d, gt.Color{1, 0, 0, 1})
+	_ = gt.collision_shape2d_get_debug_color(collision_shape2d)
 
 	_ = gt.packed_scene_as_resource(packed_scene)
 	_ = gt.packed_scene_as_ref_counted(packed_scene)

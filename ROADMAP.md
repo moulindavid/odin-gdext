@@ -134,12 +134,12 @@ helpers until their ownership and callback rules are explicit.
      coverage.
 
 2. Generate selected physics class handles and methods.
-   - [ ] Add selected physics classes to the small generated class batch.
-   - [ ] Generate only methods using supported primitive, `GodotReal`, math
+   - [x] Add selected physics classes to the small generated class batch.
+   - [x] Generate only methods using supported primitive, `GodotReal`, math
      builtin, borrowed object, and typed-array mappings.
-   - [ ] Keep object returns borrowed by value and owned value returns explicitly
+   - [x] Keep object returns borrowed by value and owned value returns explicitly
      documented.
-   - [ ] Re-export selected handles and wrappers through `godot:godot`.
+   - [x] Re-export selected handles and wrappers through `godot:godot`.
 
 3. Add focused facade helpers where generated wrappers are not enough.
    - [ ] Add checked helpers only for common safe patterns that need downcasts or

@@ -159,6 +159,11 @@ Label :: gclass.Label
 Timer :: gclass.Timer
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
+PhysicsBody2D :: gclass.PhysicsBody2D
+CharacterBody2D :: gclass.CharacterBody2D
+RigidBody2D :: gclass.RigidBody2D
+StaticBody2D :: gclass.StaticBody2D
+CollisionShape2D :: gclass.CollisionShape2D
 PackedScene :: gclass.PackedScene
 ResourceLoader :: gclass.ResourceLoader
 Input :: gclass.Input
@@ -640,6 +645,73 @@ area2d_set_audio_bus_name :: gclass.area2d_set_audio_bus_name
 area2d_get_audio_bus_name :: gclass.area2d_get_audio_bus_name
 area2d_set_audio_bus_override :: gclass.area2d_set_audio_bus_override
 area2d_is_overriding_audio_bus :: gclass.area2d_is_overriding_audio_bus
+physics_body2d_as_collision_object2d :: gclass.physics_body2d_as_collision_object2d
+physics_body2d_as_node2d :: gclass.physics_body2d_as_node2d
+physics_body2d_as_canvas_item :: gclass.physics_body2d_as_canvas_item
+physics_body2d_as_node :: gclass.physics_body2d_as_node
+physics_body2d_as_object :: gclass.physics_body2d_as_object
+character_body2d_as_physics_body2d :: gclass.character_body2d_as_physics_body2d
+character_body2d_as_collision_object2d :: gclass.character_body2d_as_collision_object2d
+character_body2d_as_node2d :: gclass.character_body2d_as_node2d
+character_body2d_as_canvas_item :: gclass.character_body2d_as_canvas_item
+character_body2d_as_node :: gclass.character_body2d_as_node
+character_body2d_as_object :: gclass.character_body2d_as_object
+rigid_body2d_as_physics_body2d :: gclass.rigid_body2d_as_physics_body2d
+rigid_body2d_as_collision_object2d :: gclass.rigid_body2d_as_collision_object2d
+rigid_body2d_as_node2d :: gclass.rigid_body2d_as_node2d
+rigid_body2d_as_canvas_item :: gclass.rigid_body2d_as_canvas_item
+rigid_body2d_as_node :: gclass.rigid_body2d_as_node
+rigid_body2d_as_object :: gclass.rigid_body2d_as_object
+static_body2d_as_physics_body2d :: gclass.static_body2d_as_physics_body2d
+static_body2d_as_collision_object2d :: gclass.static_body2d_as_collision_object2d
+static_body2d_as_node2d :: gclass.static_body2d_as_node2d
+static_body2d_as_canvas_item :: gclass.static_body2d_as_canvas_item
+static_body2d_as_node :: gclass.static_body2d_as_node
+static_body2d_as_object :: gclass.static_body2d_as_object
+collision_shape2d_as_node2d :: gclass.collision_shape2d_as_node2d
+collision_shape2d_as_canvas_item :: gclass.collision_shape2d_as_canvas_item
+collision_shape2d_as_node :: gclass.collision_shape2d_as_node
+collision_shape2d_as_object :: gclass.collision_shape2d_as_object
+physics_body2d_get_gravity :: gclass.physics_body2d_get_gravity
+physics_body2d_get_collision_exceptions :: gclass.physics_body2d_get_collision_exceptions
+physics_body2d_add_collision_exception_with :: gclass.physics_body2d_add_collision_exception_with
+physics_body2d_remove_collision_exception_with ::
+	gclass.physics_body2d_remove_collision_exception_with
+character_body2d_set_velocity :: gclass.character_body2d_set_velocity
+character_body2d_get_velocity :: gclass.character_body2d_get_velocity
+character_body2d_move_and_slide :: gclass.character_body2d_move_and_slide
+character_body2d_apply_floor_snap :: gclass.character_body2d_apply_floor_snap
+character_body2d_set_safe_margin :: gclass.character_body2d_set_safe_margin
+character_body2d_get_safe_margin :: gclass.character_body2d_get_safe_margin
+character_body2d_set_up_direction :: gclass.character_body2d_set_up_direction
+character_body2d_get_up_direction :: gclass.character_body2d_get_up_direction
+character_body2d_is_on_floor :: gclass.character_body2d_is_on_floor
+character_body2d_is_on_wall :: gclass.character_body2d_is_on_wall
+character_body2d_get_real_velocity :: gclass.character_body2d_get_real_velocity
+rigid_body2d_set_mass :: gclass.rigid_body2d_set_mass
+rigid_body2d_get_mass :: gclass.rigid_body2d_get_mass
+rigid_body2d_set_gravity_scale :: gclass.rigid_body2d_set_gravity_scale
+rigid_body2d_get_gravity_scale :: gclass.rigid_body2d_get_gravity_scale
+rigid_body2d_set_linear_velocity :: gclass.rigid_body2d_set_linear_velocity
+rigid_body2d_get_linear_velocity :: gclass.rigid_body2d_get_linear_velocity
+rigid_body2d_set_contact_monitor :: gclass.rigid_body2d_set_contact_monitor
+rigid_body2d_is_contact_monitor_enabled :: gclass.rigid_body2d_is_contact_monitor_enabled
+rigid_body2d_get_contact_count :: gclass.rigid_body2d_get_contact_count
+rigid_body2d_apply_central_impulse :: gclass.rigid_body2d_apply_central_impulse
+rigid_body2d_apply_central_force :: gclass.rigid_body2d_apply_central_force
+rigid_body2d_get_colliding_bodies :: gclass.rigid_body2d_get_colliding_bodies
+static_body2d_set_constant_linear_velocity :: gclass.static_body2d_set_constant_linear_velocity
+static_body2d_get_constant_linear_velocity :: gclass.static_body2d_get_constant_linear_velocity
+static_body2d_set_constant_angular_velocity :: gclass.static_body2d_set_constant_angular_velocity
+static_body2d_get_constant_angular_velocity :: gclass.static_body2d_get_constant_angular_velocity
+collision_shape2d_set_disabled :: gclass.collision_shape2d_set_disabled
+collision_shape2d_is_disabled :: gclass.collision_shape2d_is_disabled
+collision_shape2d_set_one_way_collision_direction ::
+	gclass.collision_shape2d_set_one_way_collision_direction
+collision_shape2d_get_one_way_collision_direction ::
+	gclass.collision_shape2d_get_one_way_collision_direction
+collision_shape2d_set_debug_color :: gclass.collision_shape2d_set_debug_color
+collision_shape2d_get_debug_color :: gclass.collision_shape2d_get_debug_color
 packed_scene_as_resource :: gclass.packed_scene_as_resource
 packed_scene_as_ref_counted :: gclass.packed_scene_as_ref_counted
 packed_scene_as_object :: gclass.packed_scene_as_object
