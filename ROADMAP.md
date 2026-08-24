@@ -155,10 +155,10 @@ helpers until their ownership and callback rules are explicit.
      proves them stable.
 
 5. Update generated reporting.
-   - [ ] Add physics-specific blocker reporting if it helps choose the next
+   - [x] Add physics-specific blocker reporting if it helps choose the next
      small batch.
-   - [ ] Preserve deterministic output and stable skip reasons.
-   - [ ] Confirm generated reports still separate resource, scene, input,
+   - [x] Preserve deterministic output and stable skip reasons.
+   - [x] Confirm generated reports still separate resource, scene, input,
      typed-container, callable, and default-argument blockers.
 
 6. Validate before moving to the next feature roadmap.
