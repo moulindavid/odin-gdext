@@ -1758,6 +1758,53 @@ class_method_uses_callable_or_signal :: proc(method: ExtensionApiClassMethod) ->
 	return false
 }
 
+class_signal_selected :: proc(class_name, signal_name: string) -> bool {
+	for entry in selected_class_signals {
+		if entry.class_name == class_name && entry.signal_name == signal_name do return true
+	}
+	return false
+}
+
+class_signal_argument_supported :: proc(arg: ExtensionApiMethodArg) -> bool {
+	if arg.type == "bool" || arg.type == "int" || arg.type == "float" || arg.type == "double" {
+		return true
+	}
+	if is_selected_class(arg.type) do return true
+	return false
+}
+
+class_signal_skip_reason :: proc(class_name: string, signal: ExtensionApiClassSignal) -> string {
+	for arg in signal.arguments {
+		if arg.type == "Callable" do return fmt.aprintf("argument %s type Callable deferred", arg.name)
+		if arg.type == "Signal" do return fmt.aprintf("argument %s type Signal deferred", arg.name)
+		if arg.type == "RID" do return fmt.aprintf("argument %s type RID deferred", arg.name)
+		if strings.has_prefix(arg.type, "typedarray::") do return fmt.aprintf("argument %s typed array deferred", arg.name)
+		if strings.has_prefix(arg.type, "typeddictionary::") do return fmt.aprintf("argument %s typed dictionary deferred", arg.name)
+		if !class_signal_argument_supported(arg) {
+			return fmt.aprintf("unsupported argument %s type %s", arg.name, arg.type)
+		}
+	}
+	if !class_signal_selected(class_name, signal.name) do return "not selected for current signal slice"
+	return ""
+}
+
+class_signal_supported :: proc(class_name: string, signal: ExtensionApiClassSignal) -> bool {
+	return len(class_signal_skip_reason(class_name, signal)) == 0
+}
+
+emit_class_signal_report_signature :: proc(
+	b: ^strings.Builder,
+	class_name: string,
+	signal: ExtensionApiClassSignal,
+) {
+	fmt.sbprintf(b, "`%s.%s(", class_name, signal.name)
+	for arg, index in signal.arguments {
+		if index > 0 do strings.write_string(b, ", ")
+		fmt.sbprintf(b, "%s: %s", arg.name, arg.type)
+	}
+	strings.write_string(b, ")`")
+}
+
 class_method_selected :: proc(class_name, method_name: string) -> bool {
 	for entry in selected_class_methods {
 		if entry.class_name == class_name && entry.method_name == method_name do return true
@@ -2405,6 +2452,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&owned_wrapper)
 	skipped := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&skipped)
+	selected_signals := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&selected_signals)
+	skipped_signals := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&skipped_signals)
 	signal_callable_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&signal_callable_blockers)
 	typed_array_blockers := strings.builder_make(context.allocator)
@@ -2435,6 +2486,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	generated_count := 0
 	owned_wrapper_count := 0
 	skipped_count := 0
+	selected_signal_count := 0
+	skipped_signal_count := 0
 	signal_callable_blocker_count := 0
 	typed_array_blocker_count := 0
 	typed_dictionary_blocker_count := 0
@@ -2461,6 +2514,29 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				class_name,
 			)
 			singleton_count += 1
+		}
+	}
+
+	for class_name in selected_class_names {
+		class, class_ok := find_class(root, class_name)
+		if !class_ok {
+			fmt.eprintfln("ERROR: class %q missing from extension_api.json", class_name)
+			return false
+		}
+
+		for signal in class.signals {
+			reason := class_signal_skip_reason(class.name, signal)
+			if len(reason) == 0 {
+				strings.write_string(&selected_signals, "- ")
+				emit_class_signal_report_signature(&selected_signals, class.name, signal)
+				strings.write_string(&selected_signals, ": selected fixed-shape signal\n")
+				selected_signal_count += 1
+			} else {
+				strings.write_string(&skipped_signals, "- ")
+				emit_class_signal_report_signature(&skipped_signals, class.name, signal)
+				fmt.sbprintf(&skipped_signals, ": %s\n", reason)
+				skipped_signal_count += 1
+			}
 		}
 	}
 
@@ -2716,10 +2792,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		return false
 	}
 	fmt.printfln(
-		"  %s  (%d generated, %d default wrappers, %d owned-wrapper, %d skipped, %d candidate-safe class methods)",
+		"  %s  (%d generated, %d default wrappers, %d generated signals, %d owned-wrapper, %d skipped, %d candidate-safe class methods)",
 		path,
 		generated_count,
 		default_argument_wrapper_count,
+		selected_signal_count,
 		owned_wrapper_count,
 		skipped_count,
 		candidate_safe_count,

@@ -136,11 +136,11 @@ model. Unsupported forms must stay skipped with stable report reasons.
      signals skipped.
 
 2. Add deterministic signal/callable support reporting.
-   - [ ] Extend generated API reports to list selected signals separately from
+   - [x] Extend generated API reports to list selected signals separately from
      skipped signal and callable blockers.
-   - [ ] Include class name, signal name, argument types, and skip reason.
-   - [ ] Preserve stable output ordering and stable skip reason names.
-   - [ ] Use the report to choose the smallest safe generated wrapper batch.
+   - [x] Include class name, signal name, argument types, and skip reason.
+   - [x] Preserve stable output ordering and stable skip reason names.
+   - [x] Use the report to choose the smallest safe generated wrapper batch.
 
 3. Generate fixed-shape signal helper wrappers.
    - [ ] Start with no-argument signals and then one or two supported argument
