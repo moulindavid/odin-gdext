@@ -112,61 +112,62 @@ owned return must use the existing owned wrappers or a new documented wrapper.
 `PackedScene.instantiate` must not be generated as a plain borrowed return until
 its object ownership and destruction path are clear.
 
-1. Investigate resource loader and packed-scene ownership rules.
-   - [x] Inspect Godot 4.7 `ResourceLoader`, `Resource`, and `PackedScene`
-     signatures in `extension_api.json`.
-   - [x] Decide which return values are borrowed, retained, or owned by the
-     caller.
-   - [x] Keep unsupported ownership-sensitive methods skipped with stable
-     reasons.
-   - [x] Document the first safe wrapper policy in code comments near the helper
-     implementation.
+## Current goal: Physics and character gameplay APIs
 
-2. Add a minimal `ResourceLoader` API path.
-   - [x] Add selected `ResourceLoader` class or singleton access if available.
-   - [x] Start with one checked load helper for paths that returns an explicit
-     owned or borrowed wrapper according to the investigated policy.
-   - [x] Keep cache mode, threaded loading, dependencies, and broad type hints
-     deferred unless the ownership model is clear.
-   - [x] Re-export selected helpers through `godot:godot`.
+Add a small generated API slice for common 2D physics gameplay. This should make
+basic Odin gameplay code able to move a character body, inspect simple collision
+state, and use selected collision object helpers without opening broad physics
+server, RID-heavy, or shape/resource ownership surfaces.
 
-3. Add explicit `PackedScene.instantiate` wrapper.
-   - [x] Keep the generated raw method skipped until a focused wrapper documents
-     ownership transfer.
-   - [x] Return a checked borrowed or owned object handle according to Godot's
-     actual lifetime rule.
-   - [x] Provide selected typed downcast helpers for common instantiated roots
-     such as `Node` and `Node2D`.
-   - [x] Avoid implicit freeing or unref behavior for instantiated scene roots.
+Keep this roadmap narrow. Use existing primitive, math builtin, borrowed object,
+typed-array, and explicit-owned-value rules. Do not generate broad physics server
+APIs, `InputEvent` APIs, shape/resource mutation APIs, or object-lifetime-sensitive
+helpers until their ownership and callback rules are explicit.
 
-4. Add safe scene-tree integration helpers if needed.
-   - [x] Consider `Node.add_child` only if object lifetime and ownership remain
-     clear.
-   - [x] Keep scene changing, current-scene replacement, and deletion helpers
-     deferred unless each has a focused ownership rule.
-   - [x] Prefer checked helper APIs over broad generated wrappers for
-     ownership-sensitive paths.
+1. Investigate selected physics class signatures.
+   - [ ] Inspect Godot 4.7 `CharacterBody2D`, `PhysicsBody2D`, `RigidBody2D`,
+     `StaticBody2D`, and `CollisionShape2D` signatures in `extension_api.json`.
+   - [ ] Identify a small borrowed-safe method batch using existing type rules.
+   - [ ] Keep RID-heavy, server-heavy, shape-resource, and lifetime-sensitive
+     methods skipped with stable reasons.
+   - [ ] Decide which classes belong in this batch before expanding generator
+     coverage.
 
-5. Exercise the workflow in examples.
-   - [x] Add or update a normal example that loads or instantiates a scene from
-     Odin through `godot:godot` only.
-   - [x] Keep the example deterministic in headless CI.
-   - [x] Destroy or release every owned value on all paths.
+2. Generate selected physics class handles and methods.
+   - [ ] Add selected physics classes to the small generated class batch.
+   - [ ] Generate only methods using supported primitive, `GodotReal`, math
+     builtin, borrowed object, and typed-array mappings.
+   - [ ] Keep object returns borrowed by value and owned value returns explicitly
+     documented.
+   - [ ] Re-export selected handles and wrappers through `godot:godot`.
 
-6. Update generated reporting.
-   - [x] Report resource-loading and scene-instantiation blockers separately if
-     useful.
-   - [x] Keep generated `Resource`, `PackedScene`, and singleton wrappers disabled
-     when ownership remains unclear.
-   - [x] Preserve deterministic report and generated output order.
+3. Add focused facade helpers where generated wrappers are not enough.
+   - [ ] Add checked helpers only for common safe patterns that need downcasts or
+     nil handling.
+   - [ ] Avoid wrappers that imply ownership transfer or hidden freeing.
+   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
 
-7. Validate before moving to the next feature roadmap.
-   - [x] Run `make ci`.
-   - [x] Confirm no generated wrapper violates borrowed object, `Resource`, or
-     `RefCounted` ownership rules.
-   - [x] Confirm normal examples still import only `godot:godot`.
+4. Exercise the physics API in examples.
+   - [ ] Update a normal example or smoke path to call selected physics wrappers
+     through `godot:godot` only.
+   - [ ] Keep the runtime path deterministic in headless CI.
+   - [ ] Avoid relying on real input events or physics frames unless the CI path
+     proves them stable.
 
-## Deferred until after this goal
+5. Update generated reporting.
+   - [ ] Add physics-specific blocker reporting if it helps choose the next
+     small batch.
+   - [ ] Preserve deterministic output and stable skip reasons.
+   - [ ] Confirm generated reports still separate resource, scene, input,
+     typed-container, callable, and default-argument blockers.
+
+6. Validate before moving to the next feature roadmap.
+   - [ ] Run `make ci`.
+   - [ ] Confirm no generated wrapper violates borrowed object, `Resource`,
+     `RefCounted`, RID, or owned value rules.
+   - [ ] Confirm normal examples still import only `godot:godot`.
+
+## Deferred
 
 - broad singleton coverage beyond selected safe APIs
 - event object wrappers and input event lifetime-sensitive APIs
