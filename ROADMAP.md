@@ -167,12 +167,12 @@ model. Unsupported forms must stay skipped with stable report reasons.
    - [x] Add facade compile checks for generated signal and callable helpers.
 
 6. Exercise the generated signal path in examples.
-   - [ ] Use normal examples or smoke coverage to connect or emit a selected
+   - [x] Use normal examples or smoke coverage to connect or emit a selected
      generated signal through godot:godot.
-   - [ ] Keep beginner examples readable and keep broad smoke coverage separate.
-   - [ ] Destroy every temporary Variant, owned Callable, and owned Signal on
+   - [x] Keep beginner examples readable and keep broad smoke coverage separate.
+   - [x] Destroy every temporary Variant, owned Callable, and owned Signal on
      every success and failure path.
-   - [ ] Avoid relying on timing-sensitive runtime behavior unless CI proves it
+   - [x] Avoid relying on timing-sensitive runtime behavior unless CI proves it
      stable.
 
 7. Validate before moving to the next feature roadmap.
