@@ -178,10 +178,10 @@ hide registration/deinitialization rules.
      deterministically.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm normal examples still import only godot:godot.
-   - [ ] Confirm no raw offset poking or hidden ownership transfer was added.
-   - [ ] Confirm raw notification access remains available.
+   - [x] Run make ci.
+   - [x] Confirm normal examples still import only godot:godot.
+   - [x] Confirm no raw offset poking or hidden ownership transfer was added.
+   - [x] Confirm raw notification access remains available.
 
 ## Deferred
 

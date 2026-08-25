@@ -1909,7 +1909,10 @@ node_disable_process_callback :: proc "contextless" (self: Node) -> bool {
 	return node_set_process_callback_enabled(self, false)
 }
 
-node_set_physics_process_callback_enabled :: proc "contextless" (self: Node, enabled: bool) -> bool {
+node_set_physics_process_callback_enabled :: proc "contextless" (
+	self: Node,
+	enabled: bool,
+) -> bool {
 	if node_is_nil(self) do return false
 	node_set_physics_process(self, enabled)
 	return true
