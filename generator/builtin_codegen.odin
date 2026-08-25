@@ -76,6 +76,7 @@ ExtensionApiClass :: struct {
 	name:      string `json:"name"`,
 	inherits:  string `json:"inherits,omitempty"`,
 	methods:   []ExtensionApiClassMethod `json:"methods,omitempty"`,
+	signals:   []ExtensionApiClassSignal `json:"signals,omitempty"`,
 	enums:     []ExtensionApiEnum `json:"enums,omitempty"`,
 	constants: []ExtensionApiClassConstant `json:"constants,omitempty"`,
 }
@@ -88,6 +89,11 @@ ExtensionApiClassMethod :: struct {
 	is_virtual:   bool `json:"is_virtual,omitempty"`,
 	hash:         i64 `json:"hash"`,
 	arguments:    []ExtensionApiMethodArg `json:"arguments,omitempty"`,
+}
+
+ExtensionApiClassSignal :: struct {
+	name:      string `json:"name"`,
+	arguments: []ExtensionApiMethodArg `json:"arguments,omitempty"`,
 }
 
 ExtensionApiClassReturnValue :: struct {
@@ -1040,6 +1046,33 @@ Selected_Class_Method :: struct {
 	method_name: string,
 }
 
+Selected_Class_Signal :: struct {
+	class_name:  string,
+	signal_name: string,
+}
+
+selected_class_signals := []Selected_Class_Signal {
+	{"Object", "script_changed"},
+	{"Object", "property_list_changed"},
+	{"Node", "ready"},
+	{"Node", "renamed"},
+	{"Node", "tree_entered"},
+	{"Node", "tree_exiting"},
+	{"Node", "tree_exited"},
+	{"Node", "child_entered_tree"},
+	{"Node", "child_exiting_tree"},
+	{"Timer", "timeout"},
+	{"Control", "resized"},
+	{"Control", "mouse_entered"},
+	{"Control", "mouse_exited"},
+	{"Area2D", "body_entered"},
+	{"Area2D", "body_exited"},
+	{"Area2D", "area_entered"},
+	{"Area2D", "area_exited"},
+	{"CollisionObject2D", "mouse_entered"},
+	{"CollisionObject2D", "mouse_exited"},
+}
+
 selected_class_methods := []Selected_Class_Method {
 	{"Object", "get_class"},
 	{"Object", "is_class"},
@@ -1396,6 +1429,19 @@ find_class_method :: proc(
 	return {}, false
 }
 
+find_class_signal :: proc(
+	class: ExtensionApiClass,
+	name: string,
+) -> (
+	signal: ExtensionApiClassSignal,
+	ok: bool,
+) {
+	for s in class.signals {
+		if s.name == name do return s, true
+	}
+	return {}, false
+}
+
 validate_selected_class_api :: proc(root: ^ExtensionApiRoot) -> bool {
 	if len(selected_class_names) > Max_Selected_Class_Count {
 		fmt.eprintfln(
@@ -1417,13 +1463,53 @@ validate_selected_class_api :: proc(root: ^ExtensionApiRoot) -> bool {
 		if _, class_ok := find_class(root, class_name); !class_ok {
 			fmt.eprintfln("ERROR: selected class %q missing from extension_api.json", class_name)
 			return false
-		}
-	}
+		}}
 
 	seen_methods := make(map[string]bool, len(selected_class_methods))
 	defer delete(seen_methods)
 	seen_proc_names := make(map[string]bool, len(selected_class_methods))
 	defer delete(seen_proc_names)
+	seen_signals := make(map[string]bool, len(selected_class_signals))
+	defer delete(seen_signals)
+	for entry in selected_class_signals {
+		if !seen_classes[entry.class_name] {
+			fmt.eprintfln(
+				"ERROR: selected signal %s.%s uses a class outside selected_class_names",
+				entry.class_name,
+				entry.signal_name,
+			)
+			return false
+		}
+
+		signal_key := fmt.aprintf("%s.%s", entry.class_name, entry.signal_name)
+		if seen_signals[signal_key] {
+			fmt.eprintfln("ERROR: duplicate selected class signal %s", signal_key)
+			return false
+		}
+		seen_signals[signal_key] = true
+
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		signal, signal_ok := find_class_signal(class, entry.signal_name)
+		if !signal_ok {
+			fmt.eprintfln(
+				"ERROR: selected class signal %s.%s missing from extension_api.json",
+				entry.class_name,
+				entry.signal_name,
+			)
+			return false
+		}
+		if !class_signal_supported(entry.class_name, signal) {
+			fmt.eprintfln(
+				"ERROR: unsupported selected class signal %s.%s: %s",
+				entry.class_name,
+				entry.signal_name,
+				class_signal_skip_reason(entry.class_name, signal),
+			)
+			return false
+		}
+	}
+
 	for entry in selected_class_methods {
 		if !seen_classes[entry.class_name] {
 			fmt.eprintfln(
@@ -1678,6 +1764,53 @@ class_method_uses_callable_or_signal :: proc(method: ExtensionApiClassMethod) ->
 		if arg.type == "Callable" || arg.type == "Signal" do return true
 	}
 	return false
+}
+
+class_signal_selected :: proc(class_name, signal_name: string) -> bool {
+	for entry in selected_class_signals {
+		if entry.class_name == class_name && entry.signal_name == signal_name do return true
+	}
+	return false
+}
+
+class_signal_argument_supported :: proc(arg: ExtensionApiMethodArg) -> bool {
+	if arg.type == "bool" || arg.type == "int" || arg.type == "float" || arg.type == "double" {
+		return true
+	}
+	if is_selected_class(arg.type) do return true
+	return false
+}
+
+class_signal_skip_reason :: proc(class_name: string, signal: ExtensionApiClassSignal) -> string {
+	for arg in signal.arguments {
+		if arg.type == "Callable" do return fmt.aprintf("argument %s type Callable deferred", arg.name)
+		if arg.type == "Signal" do return fmt.aprintf("argument %s type Signal deferred", arg.name)
+		if arg.type == "RID" do return fmt.aprintf("argument %s type RID deferred", arg.name)
+		if strings.has_prefix(arg.type, "typedarray::") do return fmt.aprintf("argument %s typed array deferred", arg.name)
+		if strings.has_prefix(arg.type, "typeddictionary::") do return fmt.aprintf("argument %s typed dictionary deferred", arg.name)
+		if !class_signal_argument_supported(arg) {
+			return fmt.aprintf("unsupported argument %s type %s", arg.name, arg.type)
+		}
+	}
+	if !class_signal_selected(class_name, signal.name) do return "not selected for current signal slice"
+	return ""
+}
+
+class_signal_supported :: proc(class_name: string, signal: ExtensionApiClassSignal) -> bool {
+	return len(class_signal_skip_reason(class_name, signal)) == 0
+}
+
+emit_class_signal_report_signature :: proc(
+	b: ^strings.Builder,
+	class_name: string,
+	signal: ExtensionApiClassSignal,
+) {
+	fmt.sbprintf(b, "`%s.%s(", class_name, signal.name)
+	for arg, index in signal.arguments {
+		if index > 0 do strings.write_string(b, ", ")
+		fmt.sbprintf(b, "%s: %s", arg.name, arg.type)
+	}
+	strings.write_string(b, ")`")
 }
 
 class_method_selected :: proc(class_name, method_name: string) -> bool {
@@ -2167,6 +2300,18 @@ emit_class_binding_storage :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 	}
 	strings.write_string(b, "\n")
 
+	for entry in selected_class_signals {
+		class_prefix := class_proc_prefix(entry.class_name)
+		signal_prefix := class_proc_prefix(entry.signal_name)
+		fmt.sbprintf(
+			b,
+			"%s_%s_signal_name_data: core.StaticStringName\n",
+			class_prefix,
+			signal_prefix,
+		)
+	}
+	strings.write_string(b, "\n")
+
 	for entry in selected_class_methods {
 		class, class_ok := find_class(root, entry.class_name)
 		if !class_ok {
@@ -2270,6 +2415,17 @@ emit_class_binding_init :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) ->
 	}
 	strings.write_string(b, "\n")
 
+	for entry in selected_class_signals {
+		class_prefix := class_proc_prefix(entry.class_name)
+		signal_prefix := class_proc_prefix(entry.signal_name)
+		emit_init_static_string_name(
+			b,
+			fmt.aprintf("%s_%s_signal_name_data", class_prefix, signal_prefix),
+			entry.signal_name,
+		)
+	}
+	strings.write_string(b, "\n")
+
 	for entry in selected_class_methods {
 		class, class_ok := find_class(root, entry.class_name)
 		if !class_ok do return false
@@ -2327,6 +2483,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&owned_wrapper)
 	skipped := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&skipped)
+	selected_signals := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&selected_signals)
+	skipped_signals := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&skipped_signals)
 	signal_callable_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&signal_callable_blockers)
 	typed_array_blockers := strings.builder_make(context.allocator)
@@ -2357,6 +2517,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	generated_count := 0
 	owned_wrapper_count := 0
 	skipped_count := 0
+	selected_signal_count := 0
+	skipped_signal_count := 0
 	signal_callable_blocker_count := 0
 	typed_array_blocker_count := 0
 	typed_dictionary_blocker_count := 0
@@ -2383,6 +2545,29 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				class_name,
 			)
 			singleton_count += 1
+		}
+	}
+
+	for class_name in selected_class_names {
+		class, class_ok := find_class(root, class_name)
+		if !class_ok {
+			fmt.eprintfln("ERROR: class %q missing from extension_api.json", class_name)
+			return false
+		}
+
+		for signal in class.signals {
+			reason := class_signal_skip_reason(class.name, signal)
+			if len(reason) == 0 {
+				strings.write_string(&selected_signals, "- ")
+				emit_class_signal_report_signature(&selected_signals, class.name, signal)
+				strings.write_string(&selected_signals, ": selected fixed-shape signal\n")
+				selected_signal_count += 1
+			} else {
+				strings.write_string(&skipped_signals, "- ")
+				emit_class_signal_report_signature(&skipped_signals, class.name, signal)
+				fmt.sbprintf(&skipped_signals, ": %s\n", reason)
+				skipped_signal_count += 1
+			}
 		}
 	}
 
@@ -2638,10 +2823,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 		return false
 	}
 	fmt.printfln(
-		"  %s  (%d generated, %d default wrappers, %d owned-wrapper, %d skipped, %d candidate-safe class methods)",
+		"  %s  (%d generated, %d default wrappers, %d generated signals, %d owned-wrapper, %d skipped, %d candidate-safe class methods)",
 		path,
 		generated_count,
 		default_argument_wrapper_count,
+		selected_signal_count,
 		owned_wrapper_count,
 		skipped_count,
 		candidate_safe_count,
@@ -2701,6 +2887,170 @@ emit_class_method_default_wrapper :: proc(
 	}
 	strings.write_string(b, ")\n")
 	strings.write_string(b, "}\n\n")
+	return true
+}
+
+class_signal_arg_param_type :: proc(godot_name: string) -> (odin_type: string, ok: bool) {
+	if godot_name == "bool" ||
+	   godot_name == "int" ||
+	   godot_name == "float" ||
+	   godot_name == "double" {
+		return resolve_class_return_type(godot_name)
+	}
+	if is_selected_class(godot_name) do return class_handle_expr(godot_name), true
+	return "", false
+}
+
+emit_class_signal_variant_local :: proc(b: ^strings.Builder, arg: ExtensionApiMethodArg) -> bool {
+	switch arg.type {
+	case "bool":
+		fmt.sbprintf(b, "	%s_variant := core.variant_from_bool(%s)\n", arg.name, arg.name)
+	case "int", "int32", "int64":
+		fmt.sbprintf(b, "	%s_variant := core.variant_from_int(%s)\n", arg.name, arg.name)
+	case "float", "double":
+		fmt.sbprintf(b, "	%s_variant := core.variant_from_float(%s)\n", arg.name, arg.name)
+	case:
+		if is_selected_class(arg.type) {
+			fmt.sbprintf(
+				b,
+				"	%s_variant := core.object_to_variant(core.ObjectPtr(%s))\n",
+				arg.name,
+				arg.name,
+			)
+		} else {
+			return false
+		}
+	}
+	fmt.sbprintf(b, "	defer core.variant_free(&%s_variant)\n", arg.name)
+	return true
+}
+
+emit_class_signal_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot) -> bool {
+	strings.write_string(b, "// ---- Selected class signals ----\n\n")
+	strings.write_string(
+		b,
+		"// signal helpers return owned Signal values; call core.signal_free when done.\n",
+	)
+	strings.write_string(
+		b,
+		"// emit helpers destroy temporary Variant arguments before returning.\n\n",
+	)
+
+	for entry in selected_class_signals {
+		class, class_ok := find_class(root, entry.class_name)
+		if !class_ok do return false
+		signal, signal_ok := find_class_signal(class, entry.signal_name)
+		if !signal_ok do return false
+		if !class_signal_supported(entry.class_name, signal) do return false
+
+		class_prefix := class_proc_prefix(entry.class_name)
+		signal_prefix := class_proc_prefix(entry.signal_name)
+		name_storage := fmt.aprintf("%s_%s_signal_name_data", class_prefix, signal_prefix)
+		self_type := class_handle_expr(entry.class_name)
+		name_proc := fmt.aprintf("%s_%s_signal_name", class_prefix, signal_prefix)
+		signal_proc := fmt.aprintf("%s_%s_signal", class_prefix, signal_prefix)
+		connect_checked_proc := fmt.aprintf("%s_connect_%s_checked", class_prefix, signal_prefix)
+		connect_proc := fmt.aprintf("%s_connect_%s", class_prefix, signal_prefix)
+		emit_checked_proc := fmt.aprintf("%s_emit_%s_checked", class_prefix, signal_prefix)
+		emit_proc := fmt.aprintf("%s_emit_%s", class_prefix, signal_prefix)
+
+		fmt.sbprintf(b, "%s :: proc \"contextless\" () -> core.ConstStringNamePtr {{\n", name_proc)
+		strings.write_string(b, "	init_class_bindings()\n")
+		fmt.sbprintf(b, "	return core.const_static_string_name_ptr(&%s)\n", name_storage)
+		strings.write_string(b, "}\n\n")
+
+		fmt.sbprintf(
+			b,
+			"// %s returns initialized Signal storage; call core.signal_free when done.\n",
+			signal_proc,
+		)
+		fmt.sbprintf(
+			b,
+			"%s :: proc \"contextless\" (self: %s) -> core.Signal {{\n",
+			signal_proc,
+			self_type,
+		)
+		strings.write_string(b, "	init_class_bindings()\n")
+		fmt.sbprintf(
+			b,
+			"	return core.signal_from_object_signal(core.ObjectPtr(self), core.const_static_string_name_ptr(&%s))\n",
+			name_storage,
+		)
+		strings.write_string(b, "}\n\n")
+
+		fmt.sbprintf(
+			b,
+			"%s :: proc \"contextless\" (self: %s, callable: ^core.Callable, flags: i64 = 0) -> i64 {{\n",
+			connect_checked_proc,
+			self_type,
+		)
+		strings.write_string(b, "\tinit_class_bindings()\n")
+		fmt.sbprintf(
+			b,
+			"\treturn core.object_signal_connect_checked(core.ObjectPtr(self), core.const_static_string_name_ptr(&%s), callable, flags)\n",
+			name_storage,
+		)
+		strings.write_string(b, "}\n\n")
+
+		fmt.sbprintf(
+			b,
+			"%s :: proc \"contextless\" (self: %s, callable: ^core.Callable, flags: i64 = 0) {{\n",
+			connect_proc,
+			self_type,
+		)
+		fmt.sbprintf(
+			b,
+			"\tcore.object_signal_connect(core.ObjectPtr(self), core.const_static_string_name_ptr(&%s), callable, flags)\n",
+			name_storage,
+		)
+		strings.write_string(b, "}\n\n")
+
+		fmt.sbprintf(b, "%s :: proc \"contextless\" (self: %s", emit_checked_proc, self_type)
+		for arg in signal.arguments {
+			param_type, param_ok := class_signal_arg_param_type(arg.type)
+			if !param_ok do return false
+			fmt.sbprintf(b, ", %s: %s", arg.name, param_type)
+		}
+		strings.write_string(b, ") -> core.CallError {\n")
+		strings.write_string(b, "	init_class_bindings()\n")
+		if len(signal.arguments) == 0 {
+			fmt.sbprintf(
+				b,
+				"	return core.object_emit_signal_variants_checked(core.ObjectPtr(self), core.const_static_string_name_ptr(&%s), nil)\n",
+				name_storage,
+			)
+		} else {
+			for arg in signal.arguments {
+				if !emit_class_signal_variant_local(b, arg) do return false
+			}
+			fmt.sbprintf(b, "	args := [%d]core.ConstVariantPtr {{\n", len(signal.arguments))
+			for arg in signal.arguments {
+				fmt.sbprintf(b, "		core.const_variant_ptr(&%s_variant),\n", arg.name)
+			}
+			strings.write_string(b, "	}\n")
+			fmt.sbprintf(
+				b,
+				"	return core.object_emit_signal_variants_checked(core.ObjectPtr(self), core.const_static_string_name_ptr(&%s), args[:])\n",
+				name_storage,
+			)
+		}
+		strings.write_string(b, "}\n\n")
+
+		fmt.sbprintf(b, "%s :: proc \"contextless\" (self: %s", emit_proc, self_type)
+		for arg in signal.arguments {
+			param_type, param_ok := class_signal_arg_param_type(arg.type)
+			if !param_ok do return false
+			fmt.sbprintf(b, ", %s: %s", arg.name, param_type)
+		}
+		strings.write_string(b, ") {\n")
+		fmt.sbprintf(b, "	err := %s(self", emit_checked_proc)
+		for arg in signal.arguments {
+			fmt.sbprintf(b, ", %s", arg.name)
+		}
+		strings.write_string(b, ")\n")
+		strings.write_string(b, "	core.require_call_ok(&err)\n")
+		strings.write_string(b, "}\n\n")
+	}
 	return true
 }
 
@@ -2895,9 +3245,10 @@ generate_class_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 	strings.write_string(
 		&b,
-		"// Callable, Signal, varargs, typed arrays, owned-wrapper-only methods, and lifetime-sensitive APIs are not generated here.\n\n",
+		"// Broad Callable, broad Signal, varargs, typed arrays, owned-wrapper-only methods, and lifetime-sensitive APIs are not generated here.\n\n",
 	)
 
+	if !emit_class_signal_wrappers(&b, root) {return false}
 	if !emit_class_method_wrappers(&b, root) {return false}
 
 	err := os.write_entire_file(path, transmute([]byte)strings.to_string(b))

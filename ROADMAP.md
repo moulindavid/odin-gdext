@@ -126,61 +126,61 @@ whose arguments and ownership rules are already covered by the project safety
 model. Unsupported forms must stay skipped with stable report reasons.
 
 1. Investigate generated signal metadata.
-   - [ ] Inspect how Godot 4.7 extension_api.json represents class signals for
+   - [x] Inspect how Godot 4.7 extension_api.json represents class signals for
      selected classes.
-   - [ ] Choose the first small class and signal batch, likely Timer, Area2D,
-     Button or other Control subclasses, and Object/Node where safe.
-   - [ ] Identify no-argument, primitive-argument, and borrowed-object-argument
-     signal shapes that can reuse existing Variant cleanup paths.
-   - [ ] Keep vararg, bind-argument-heavy, Callable-heavy, and lifetime-sensitive
+   - [x] Choose the first small class and signal batch: Object, Node, Timer,
+     Control, CollisionObject2D, and Area2D.
+   - [x] Identify no-argument and borrowed-object-argument signal shapes that can
+     reuse existing Signal/Callable paths without argument ownership transfer.
+   - [x] Keep vararg, bind-argument-heavy, Callable-heavy, and lifetime-sensitive
      signals skipped.
 
 2. Add deterministic signal/callable support reporting.
-   - [ ] Extend generated API reports to list selected signals separately from
+   - [x] Extend generated API reports to list selected signals separately from
      skipped signal and callable blockers.
-   - [ ] Include class name, signal name, argument types, and skip reason.
-   - [ ] Preserve stable output ordering and stable skip reason names.
-   - [ ] Use the report to choose the smallest safe generated wrapper batch.
+   - [x] Include class name, signal name, argument types, and skip reason.
+   - [x] Preserve stable output ordering and stable skip reason names.
+   - [x] Use the report to choose the smallest safe generated wrapper batch.
 
 3. Generate fixed-shape signal helper wrappers.
-   - [ ] Start with no-argument signals and then one or two supported argument
+   - [x] Start with no-argument signals and then one or two supported argument
      signals.
-   - [ ] Reuse existing Signal, Callable, and temporary Variant destruction
+   - [x] Reuse existing Signal, Callable, and temporary Variant destruction
      helpers.
-   - [ ] Return checked errors or trap consistently with the existing call-error
+   - [x] Return checked errors or trap consistently with the existing call-error
      pattern.
-   - [ ] Do not generate broad vararg emission or arbitrary Callable
+   - [x] Do not generate broad vararg emission or arbitrary Callable
      construction.
 
 4. Generate selected signal connection helpers.
-   - [ ] Start with connecting an object signal to an existing borrowed Callable
+   - [x] Start with connecting an object signal to an existing borrowed Callable
      or selected method callable path that has clear lifetime rules.
-   - [ ] Keep object handles borrowed by value.
-   - [ ] Keep connection flags explicit and avoid bind-argument helpers for now.
-   - [ ] Keep unsupported connection shapes reported rather than generated.
+   - [x] Keep object handles borrowed by value.
+   - [x] Keep connection flags explicit and avoid bind-argument helpers for now.
+   - [x] Keep unsupported connection shapes reported rather than generated.
 
 5. Re-export selected wrappers through the public facade.
-   - [ ] Keep godot:godot as the normal user path.
-   - [ ] Re-export only the signal/callable helpers intended for gameplay code.
-   - [ ] Keep low-level godot:core access available but unnecessary for the
+   - [x] Keep godot:godot as the normal user path.
+   - [x] Re-export only the signal/callable helpers intended for gameplay code.
+   - [x] Keep low-level godot:core access available but unnecessary for the
      selected path.
-   - [ ] Add facade compile checks for generated signal and callable helpers.
+   - [x] Add facade compile checks for generated signal and callable helpers.
 
 6. Exercise the generated signal path in examples.
-   - [ ] Use normal examples or smoke coverage to connect or emit a selected
+   - [x] Use normal examples or smoke coverage to connect or emit a selected
      generated signal through godot:godot.
-   - [ ] Keep beginner examples readable and keep broad smoke coverage separate.
-   - [ ] Destroy every temporary Variant, owned Callable, and owned Signal on
+   - [x] Keep beginner examples readable and keep broad smoke coverage separate.
+   - [x] Destroy every temporary Variant, owned Callable, and owned Signal on
      every success and failure path.
-   - [ ] Avoid relying on timing-sensitive runtime behavior unless CI proves it
+   - [x] Avoid relying on timing-sensitive runtime behavior unless CI proves it
      stable.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm generated reports explain remaining signal and callable skips.
-   - [ ] Confirm no generated wrapper violates borrowed object or owned value
+   - [x] Run make ci.
+   - [x] Confirm generated reports explain remaining signal and callable skips.
+   - [x] Confirm no generated wrapper violates borrowed object or owned value
      destruction rules.
-   - [ ] Confirm normal examples still import only godot:godot.
+   - [x] Confirm normal examples still import only godot:godot.
 
 ## Deferred
 

@@ -237,32 +237,47 @@ init_signal_emission :: proc "contextless" () {
 	signal_emission_initialized = true
 }
 
-object_emit_signal_0_checked :: proc "contextless" (
+object_emit_signal_variants_checked :: proc "contextless" (
 	object: ObjectPtr,
 	signal_name: ConstStringNamePtr,
+	signal_args: []ConstVariantPtr,
 ) -> (
 	err: CallError,
 ) {
 	if object == nil || signal_name == nil do _trap_nil_godot_function()
+	if len(signal_args) > 7 do _trap_nil_godot_function()
 	init_signal_emission()
 
 	if object_method_bind_call == nil do _trap_nil_godot_function()
 	if emit_signal_method_bind == nil do _trap_nil_godot_function()
 
 	signal_variant := variant_from_string_name_ptr(signal_name)
-	args := [1]ConstVariantPtr{const_variant_ptr(&signal_variant)}
+	args: [8]ConstVariantPtr
+	args[0] = const_variant_ptr(&signal_variant)
+	for arg, index in signal_args {
+		args[index + 1] = arg
+	}
 	ret: Variant
 	object_method_bind_call(
 		emit_signal_method_bind,
 		object,
 		&args[0],
-		1,
+		cast(i64)len(signal_args) + 1,
 		uninitialized_variant_ptr(&ret),
 		&err,
 	)
 	if call_error_ok(&err) do variant_free(&ret)
 	variant_free(&signal_variant)
 	return
+}
+
+object_emit_signal_0_checked :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+) -> (
+	err: CallError,
+) {
+	return object_emit_signal_variants_checked(object, signal_name, nil)
 }
 
 object_emit_signal_0 :: proc "contextless" (object: ObjectPtr, signal_name: ConstStringNamePtr) {

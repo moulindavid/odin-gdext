@@ -303,7 +303,14 @@ add_adapter_method :: proc "contextless" (
 	roll_math_callable := gt.callable_from_object_method(object, roll_math_method_name)
 	defer gt.callable_free(&roll_math_callable)
 	if gt.signal_connect_checked(&pinged_signal, &roll_math_callable) != 0 do return 0, false
+	generated_signal := gt.object_property_list_changed_signal(gt.Object(object))
+	defer gt.signal_free(&generated_signal)
+	if gt.object_connect_property_list_changed_checked(gt.Object(object), &roll_math_callable) !=
+	   0 {
+		return 0, false
+	}
 	gt.object_emit_signal_0(object, pinged_signal_name)
+	gt.object_emit_property_list_changed(gt.Object(object))
 	return add(self, a, b), true
 }
 
