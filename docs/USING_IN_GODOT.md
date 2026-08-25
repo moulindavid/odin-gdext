@@ -230,10 +230,40 @@ use checked helpers such as `gt.object_ptr_try_as_label` before calling generate
 class methods. Do not store the handle unless Godot ownership guarantees it stays
 valid for your whole use window.
 
-Unsupported or deferred signatures include varargs, default arguments,
-`Callable`, `Signal`, owned `RefCounted` or `Resource` transfer, and broad
-object-lifetime-sensitive APIs. For those, keep the raw `Variant` and ptrcall
-callbacks explicit until a safe helper exists.
+Unsupported or deferred signatures include varargs, broad object-lifetime-sensitive
+APIs, arbitrary callable binding, broad signal argument shapes, and ownership
+transfer that is not explicitly wrapped. For those, keep the raw `Variant` and
+ptrcall callbacks explicit until a safe helper exists.
+
+## Node lifecycle callbacks
+
+For common `Node` lifecycle hooks, use `gt.NodeVirtualCallbackDescriptor` from
+your class notification callback. The dispatcher maps Godot notifications to
+explicit Odin procedures and leaves raw notification handling available for
+advanced cases.
+
+```odin
+node_virtuals := gt.NodeVirtualCallbackDescriptor{
+    ready = on_ready,
+    process = on_process,
+}
+
+notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+    context = gt.godot_context()
+    self, ok := gt.class_instance_data(instance, MyData)
+    if !ok do return
+
+    node, node_ok := gt.object_ptr_try_as_node(self.object)
+    if !node_ok do return
+    if gt.dispatch_node_virtual_descriptor(instance, node, what, reversed, &node_virtuals) do return
+}
+```
+
+`process(delta)` and `physics_process(delta)` deltas come from Godot through the
+generated `Node.get_process_delta_time` and `Node.get_physics_process_delta_time`
+wrappers. Enable those callbacks explicitly, for example from `ready`, with
+`gt.node_enable_process_callback(node)` or
+`gt.node_enable_physics_process_callback(node)`.
 
 ## Instantiate an Odin-backed class from GDScript
 

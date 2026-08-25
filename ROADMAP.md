@@ -172,9 +172,9 @@ hide registration/deinitialization rules.
    - [x] Preserve existing signal, property, method, and generated class coverage.
 
 6. Update reporting or docs only where useful.
-   - [ ] Document the callback and delta source in code comments near the helper.
-   - [ ] Keep full virtual method generation deferred.
-   - [ ] If generator reporting needs a virtual-method blocker section, add it
+   - [x] Document the callback and delta source in code comments near the helper.
+   - [x] Keep full virtual method generation deferred.
+   - [x] If generator reporting needs a virtual-method blocker section, add it
      deterministically.
 
 7. Validate before moving to the next feature roadmap.
