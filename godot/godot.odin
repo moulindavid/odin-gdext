@@ -1705,6 +1705,13 @@ control_notification_theme_changed :: gclass.control_notification_theme_changed
 // --- Notification helpers ---
 NodeNotificationHandler :: #type proc(instance: ClassInstancePtr, reversed: bool)
 NodeRawNotificationHandler :: #type proc(instance: ClassInstancePtr, what: i32, reversed: bool)
+NodeVirtualHandler :: #type proc(instance: ClassInstancePtr, node: Node, reversed: bool)
+NodeProcessVirtualHandler :: #type proc(
+	instance: ClassInstancePtr,
+	node: Node,
+	delta: GodotReal,
+	reversed: bool,
+)
 
 NodeNotificationHandlers :: struct {
 	enter_tree:      NodeNotificationHandler,
@@ -1724,6 +1731,15 @@ NodeLifecycleCallbacks :: struct {
 }
 
 NodeVirtualCallbacks :: NodeLifecycleCallbacks
+
+NodeVirtualCallbackDescriptor :: struct {
+	enter_tree:       NodeVirtualHandler,
+	exit_tree:        NodeVirtualHandler,
+	ready:            NodeVirtualHandler,
+	process:          NodeProcessVirtualHandler,
+	physics_process:  NodeProcessVirtualHandler,
+	raw_notification: NodeRawNotificationHandler,
+}
 
 // dispatch_node_notification calls a typed handler for common Node lifecycle
 // notifications and returns true when a handler ran. Unknown notifications and
@@ -1821,6 +1837,61 @@ dispatch_node_virtual_callbacks :: proc(
 	callbacks: ^NodeVirtualCallbacks,
 ) -> bool {
 	return dispatch_node_lifecycle_callbacks(instance, what, reversed, callbacks)
+}
+
+// dispatch_node_virtual_descriptor passes a borrowed Node handle to typed
+// callbacks. Process deltas come from Godot through generated Node methods.
+dispatch_node_virtual_descriptor :: proc(
+	instance: ClassInstancePtr,
+	node: Node,
+	what: i32,
+	reversed: bool,
+	callbacks: ^NodeVirtualCallbackDescriptor,
+) -> bool {
+	if callbacks == nil do return false
+	if node_is_nil(node) {
+		if callbacks.raw_notification != nil {
+			callbacks.raw_notification(instance, what, reversed)
+			return true
+		}
+		return false
+	}
+
+	switch what {
+	case node_notification_enter_tree:
+		if callbacks.enter_tree != nil {
+			callbacks.enter_tree(instance, node, reversed)
+			return true
+		}
+	case node_notification_exit_tree:
+		if callbacks.exit_tree != nil {
+			callbacks.exit_tree(instance, node, reversed)
+			return true
+		}
+	case node_notification_ready:
+		if callbacks.ready != nil {
+			callbacks.ready(instance, node, reversed)
+			return true
+		}
+	case node_notification_process:
+		if callbacks.process != nil {
+			delta := node_get_process_delta_time(node)
+			callbacks.process(instance, node, delta, reversed)
+			return true
+		}
+	case node_notification_physics_process:
+		if callbacks.physics_process != nil {
+			delta := node_get_physics_process_delta_time(node)
+			callbacks.physics_process(instance, node, delta, reversed)
+			return true
+		}
+	}
+
+	if callbacks.raw_notification != nil {
+		callbacks.raw_notification(instance, what, reversed)
+		return true
+	}
+	return false
 }
 
 // --- String ---

@@ -143,12 +143,12 @@ hide registration/deinitialization rules.
    - [x] Keep raw notification dispatch available for advanced users.
 
 2. Add typed Node virtual callback descriptors.
-   - [ ] Provide a user-facing descriptor for common Node callbacks.
-   - [ ] Support ready, enter_tree, exit_tree, process(delta), and
+   - [x] Provide a user-facing descriptor for common Node callbacks.
+   - [x] Support ready, enter_tree, exit_tree, process(delta), and
      physics_process(delta) where delta is verified.
-   - [ ] Keep callbacks explicit Odin procedures and avoid macro-like hidden
+   - [x] Keep callbacks explicit Odin procedures and avoid macro-like hidden
      registration for now.
-   - [ ] Preserve explicit reversed notification handling.
+   - [x] Preserve explicit reversed notification handling.
 
 3. Add process enablement helpers.
    - [ ] Provide small facade helpers for enabling and disabling process and
