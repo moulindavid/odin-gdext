@@ -1766,10 +1766,11 @@ dispatch_node_notification :: proc(
 	return false
 }
 
-// dispatch_node_lifecycle_callbacks is the compact public callback-table path
-// for common Node lifecycle notifications. Process callbacks are notification
-// callbacks only; they do not synthesize _process(delta) or
-// _physics_process(delta) data.
+// dispatch_node_lifecycle_callbacks maps Godot Node notifications to a
+// compact callback table. The generated constants currently match Godot 4.7:
+// enter_tree=10, exit_tree=11, ready=13, physics_process=16, process=17.
+// Use generated Node delta getters from a typed virtual helper instead of
+// inventing delta values in the raw notification path.
 dispatch_node_lifecycle_callbacks :: proc(
 	instance: ClassInstancePtr,
 	what: i32,

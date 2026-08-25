@@ -135,12 +135,12 @@ Node process APIs. Do not fake delta values, generate broad virtual methods, or
 hide registration/deinitialization rules.
 
 1. Audit the current notification and virtual callback model.
-   - [ ] Inspect existing NodeVirtualCallbacks, notification dispatch helpers,
+   - [x] Inspect existing NodeVirtualCallbacks, notification dispatch helpers,
      and example usage.
-   - [ ] Verify Godot notification IDs used for ready, enter tree, exit tree,
+   - [x] Verify Godot notification IDs used for ready, enter tree, exit tree,
      process, and physics process.
-   - [ ] Verify the safe source for process delta and physics process delta.
-   - [ ] Keep raw notification dispatch available for advanced users.
+   - [x] Verify the safe source for process delta and physics process delta.
+   - [x] Keep raw notification dispatch available for advanced users.
 
 2. Add typed Node virtual callback descriptors.
    - [ ] Provide a user-facing descriptor for common Node callbacks.
