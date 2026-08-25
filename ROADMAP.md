@@ -114,73 +114,74 @@ CharacterBody2D, RigidBody2D, StaticBody2D, and CollisionShape2D APIs, facade
 exports, downcast/upcast helpers, typed-array helpers, deterministic physics
 blocker reporting, example coverage, and full make ci validation.
 
-## Current goal: Generated signal and callable wrappers
+## Completed: Generated signal and callable wrappers
 
-Use the completed minimal signal and callable storage model as the base for a
-small generated wrapper slice. This should let selected Godot signal APIs become
-usable through godot:godot without exposing broad varargs, arbitrary callable
-binding, or unclear object lifetime behavior.
+The generated signal/callable wrapper slice made selected Godot signals usable
+through godot:godot without enabling broad varargs or arbitrary callable binding.
+Completed coverage includes signal metadata parsing, selected signal reporting,
+generated fixed-shape signal name/Signal/emit/connect wrappers, facade exports,
+facade compile coverage, smoke runtime coverage, and full make ci validation.
 
-Keep this goal narrow. Generate only selected fixed-shape signal/callable APIs
-whose arguments and ownership rules are already covered by the project safety
-model. Unsupported forms must stay skipped with stable report reasons.
+## Current goal: Virtual callbacks and process helpers
 
-1. Investigate generated signal metadata.
-   - [x] Inspect how Godot 4.7 extension_api.json represents class signals for
-     selected classes.
-   - [x] Choose the first small class and signal batch: Object, Node, Timer,
-     Control, CollisionObject2D, and Area2D.
-   - [x] Identify no-argument and borrowed-object-argument signal shapes that can
-     reuse existing Signal/Callable paths without argument ownership transfer.
-   - [x] Keep vararg, bind-argument-heavy, Callable-heavy, and lifetime-sensitive
-     signals skipped.
+Make normal Odin classes feel closer to Godot script classes for common lifecycle
+and frame callbacks while preserving explicit registration and callback safety.
+This is the next practical step toward a rust-gdext-like authoring experience:
+users should be able to define ready, enter_tree, exit_tree, process, and
+physics_process handlers without manually matching raw notification numbers.
 
-2. Add deterministic signal/callable support reporting.
-   - [x] Extend generated API reports to list selected signals separately from
-     skipped signal and callable blockers.
-   - [x] Include class name, signal name, argument types, and skip reason.
-   - [x] Preserve stable output ordering and stable skip reason names.
-   - [x] Use the report to choose the smallest safe generated wrapper batch.
+Keep this goal narrow. Use the existing notification dispatch path and generated
+Node process APIs. Do not fake delta values, generate broad virtual methods, or
+hide registration/deinitialization rules.
 
-3. Generate fixed-shape signal helper wrappers.
-   - [x] Start with no-argument signals and then one or two supported argument
-     signals.
-   - [x] Reuse existing Signal, Callable, and temporary Variant destruction
+1. Audit the current notification and virtual callback model.
+   - [ ] Inspect existing NodeVirtualCallbacks, notification dispatch helpers,
+     and example usage.
+   - [ ] Verify Godot notification IDs used for ready, enter tree, exit tree,
+     process, and physics process.
+   - [ ] Verify the safe source for process delta and physics process delta.
+   - [ ] Keep raw notification dispatch available for advanced users.
+
+2. Add typed Node virtual callback descriptors.
+   - [ ] Provide a user-facing descriptor for common Node callbacks.
+   - [ ] Support ready, enter_tree, exit_tree, process(delta), and
+     physics_process(delta) where delta is verified.
+   - [ ] Keep callbacks explicit Odin procedures and avoid macro-like hidden
+     registration for now.
+   - [ ] Preserve explicit reversed notification handling.
+
+3. Add process enablement helpers.
+   - [ ] Provide small facade helpers for enabling and disabling process and
+     physics_process on extension-owned Node instances.
+   - [ ] Reuse generated Node.set_process and Node.set_physics_process wrappers.
+   - [ ] Keep object handles borrowed by value.
+   - [ ] Avoid event/input callback helpers in this slice.
+
+4. Update examples to use the virtual callback helpers.
+   - [ ] Keep examples importing only godot:godot.
+   - [ ] Update hello or game to use typed ready and process-style helpers.
+   - [ ] Keep the beginner example readable and smoke coverage broader.
+   - [ ] Ensure extension classes still unregister during deinitialization.
+
+5. Add compile and smoke coverage.
+   - [ ] Add facade compile checks for the new callback descriptor and process
      helpers.
-   - [x] Return checked errors or trap consistently with the existing call-error
-     pattern.
-   - [x] Do not generate broad vararg emission or arbitrary Callable
-     construction.
+   - [ ] Add deterministic runtime smoke coverage for ready and, if stable in
+     headless CI, process or physics_process.
+   - [ ] Keep timing-sensitive assertions out unless CI proves them stable.
+   - [ ] Preserve existing signal, property, method, and generated class coverage.
 
-4. Generate selected signal connection helpers.
-   - [x] Start with connecting an object signal to an existing borrowed Callable
-     or selected method callable path that has clear lifetime rules.
-   - [x] Keep object handles borrowed by value.
-   - [x] Keep connection flags explicit and avoid bind-argument helpers for now.
-   - [x] Keep unsupported connection shapes reported rather than generated.
-
-5. Re-export selected wrappers through the public facade.
-   - [x] Keep godot:godot as the normal user path.
-   - [x] Re-export only the signal/callable helpers intended for gameplay code.
-   - [x] Keep low-level godot:core access available but unnecessary for the
-     selected path.
-   - [x] Add facade compile checks for generated signal and callable helpers.
-
-6. Exercise the generated signal path in examples.
-   - [x] Use normal examples or smoke coverage to connect or emit a selected
-     generated signal through godot:godot.
-   - [x] Keep beginner examples readable and keep broad smoke coverage separate.
-   - [x] Destroy every temporary Variant, owned Callable, and owned Signal on
-     every success and failure path.
-   - [x] Avoid relying on timing-sensitive runtime behavior unless CI proves it
-     stable.
+6. Update reporting or docs only where useful.
+   - [ ] Document the callback and delta source in code comments near the helper.
+   - [ ] Keep full virtual method generation deferred.
+   - [ ] If generator reporting needs a virtual-method blocker section, add it
+     deterministically.
 
 7. Validate before moving to the next feature roadmap.
-   - [x] Run make ci.
-   - [x] Confirm generated reports explain remaining signal and callable skips.
-   - [x] Confirm no generated wrapper violates borrowed object or owned value
-     destruction rules.
-   - [x] Confirm normal examples still import only godot:godot.
+   - [ ] Run make ci.
+   - [ ] Confirm normal examples still import only godot:godot.
+   - [ ] Confirm no raw offset poking or hidden ownership transfer was added.
+   - [ ] Confirm raw notification access remains available.
 
 ## Deferred
 
