@@ -222,7 +222,7 @@ free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr
 	free(self_)
 }
 
-hello_ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
+hello_ready :: proc(instance: gt.ClassInstancePtr, node: gt.Node, reversed: bool) {
 	_ = reversed
 	hn, hn_ok := hello_node_from_instance(instance)
 	if !hn_ok do return
@@ -269,15 +269,38 @@ hello_ready :: proc(instance: gt.ClassInstancePtr, reversed: bool) {
 	gt.debug_print(fmt.bprintf(buf[:], "sin(1.0): %.6f (expect ~0.841471)", gt.sin(1.0)))
 	gt.debug_print(fmt.bprintf(buf[:], "cos(0.0): %.6f (expect 1.0)", gt.cos(0.0)))
 	gt.debug_print(fmt.bprintf(buf[:], "randf(): %.6f", gt.randf()))
+	_ = gt.node_enable_process_callback(node)
 }
 
-hello_node_virtuals := gt.NodeVirtualCallbacks {
-	ready = hello_ready,
+hello_process :: proc(
+	instance: gt.ClassInstancePtr,
+	node: gt.Node,
+	delta: gt.GodotReal,
+	reversed: bool,
+) {
+	_ = reversed
+	self_, self_ok := gt.class_instance_data(instance, HelloData)
+	if !self_ok do return
+
+	self_.speed += delta
+	buf: [128]u8
+	gt.debug_print(fmt.bprintf(buf[:], "typed process delta: %.6f", delta))
+	_ = gt.node_disable_process_callback(node)
+}
+
+hello_node_virtuals := gt.NodeVirtualCallbackDescriptor {
+	ready   = hello_ready,
+	process = hello_process,
 }
 
 notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
-	if gt.dispatch_node_virtual_callbacks(instance, what, reversed, &hello_node_virtuals) do return
+	self_, self_ok := gt.class_instance_data(instance, HelloData)
+	if !self_ok do return
+
+	node, node_ok := gt.object_ptr_try_as_node(self_.object)
+	if !node_ok do return
+	if gt.dispatch_node_virtual_descriptor(instance, node, what, reversed, &hello_node_virtuals) do return
 }
 
 // Method adapters.

@@ -164,12 +164,12 @@ hide registration/deinitialization rules.
    - [x] Ensure extension classes still unregister during deinitialization.
 
 5. Add compile and smoke coverage.
-   - [ ] Add facade compile checks for the new callback descriptor and process
+   - [x] Add facade compile checks for the new callback descriptor and process
      helpers.
-   - [ ] Add deterministic runtime smoke coverage for ready and, if stable in
+   - [x] Add deterministic runtime smoke coverage for ready and, if stable in
      headless CI, process or physics_process.
-   - [ ] Keep timing-sensitive assertions out unless CI proves them stable.
-   - [ ] Preserve existing signal, property, method, and generated class coverage.
+   - [x] Keep timing-sensitive assertions out unless CI proves them stable.
+   - [x] Preserve existing signal, property, method, and generated class coverage.
 
 6. Update reporting or docs only where useful.
    - [ ] Document the callback and delta source in code comments near the helper.
