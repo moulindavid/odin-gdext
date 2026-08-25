@@ -1894,6 +1894,35 @@ dispatch_node_virtual_descriptor :: proc(
 	return false
 }
 
+
+node_set_process_callback_enabled :: proc "contextless" (self: Node, enabled: bool) -> bool {
+	if node_is_nil(self) do return false
+	node_set_process(self, enabled)
+	return true
+}
+
+node_enable_process_callback :: proc "contextless" (self: Node) -> bool {
+	return node_set_process_callback_enabled(self, true)
+}
+
+node_disable_process_callback :: proc "contextless" (self: Node) -> bool {
+	return node_set_process_callback_enabled(self, false)
+}
+
+node_set_physics_process_callback_enabled :: proc "contextless" (self: Node, enabled: bool) -> bool {
+	if node_is_nil(self) do return false
+	node_set_physics_process(self, enabled)
+	return true
+}
+
+node_enable_physics_process_callback :: proc "contextless" (self: Node) -> bool {
+	return node_set_physics_process_callback_enabled(self, true)
+}
+
+node_disable_physics_process_callback :: proc "contextless" (self: Node) -> bool {
+	return node_set_physics_process_callback_enabled(self, false)
+}
+
 // --- String ---
 string_ptr :: gcore.string_ptr
 const_string_ptr :: gcore.const_string_ptr

@@ -151,11 +151,11 @@ hide registration/deinitialization rules.
    - [x] Preserve explicit reversed notification handling.
 
 3. Add process enablement helpers.
-   - [ ] Provide small facade helpers for enabling and disabling process and
+   - [x] Provide small facade helpers for enabling and disabling process and
      physics_process on extension-owned Node instances.
-   - [ ] Reuse generated Node.set_process and Node.set_physics_process wrappers.
-   - [ ] Keep object handles borrowed by value.
-   - [ ] Avoid event/input callback helpers in this slice.
+   - [x] Reuse generated Node.set_process and Node.set_physics_process wrappers.
+   - [x] Keep object handles borrowed by value.
+   - [x] Avoid event/input callback helpers in this slice.
 
 4. Update examples to use the virtual callback helpers.
    - [ ] Keep examples importing only godot:godot.
