@@ -158,10 +158,10 @@ hide registration/deinitialization rules.
    - [x] Avoid event/input callback helpers in this slice.
 
 4. Update examples to use the virtual callback helpers.
-   - [ ] Keep examples importing only godot:godot.
-   - [ ] Update hello or game to use typed ready and process-style helpers.
-   - [ ] Keep the beginner example readable and smoke coverage broader.
-   - [ ] Ensure extension classes still unregister during deinitialization.
+   - [x] Keep examples importing only godot:godot.
+   - [x] Update hello or game to use typed ready and process-style helpers.
+   - [x] Keep the beginner example readable and smoke coverage broader.
+   - [x] Ensure extension classes still unregister during deinitialization.
 
 5. Add compile and smoke coverage.
    - [ ] Add facade compile checks for the new callback descriptor and process
