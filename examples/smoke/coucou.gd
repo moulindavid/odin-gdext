@@ -21,6 +21,7 @@ func _ready() -> void:
 		return
 
 	print("HelloNode created!")
+	add_child(node)
 	var has_pinged_signal := node.has_signal("pinged")
 	var has_speed_changed_signal := node.has_signal("speed_changed")
 	print("hello.has_signal(pinged) = ", has_pinged_signal)

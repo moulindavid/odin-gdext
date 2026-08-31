@@ -135,53 +135,53 @@ Node process APIs. Do not fake delta values, generate broad virtual methods, or
 hide registration/deinitialization rules.
 
 1. Audit the current notification and virtual callback model.
-   - [ ] Inspect existing NodeVirtualCallbacks, notification dispatch helpers,
+   - [x] Inspect existing NodeVirtualCallbacks, notification dispatch helpers,
      and example usage.
-   - [ ] Verify Godot notification IDs used for ready, enter tree, exit tree,
+   - [x] Verify Godot notification IDs used for ready, enter tree, exit tree,
      process, and physics process.
-   - [ ] Verify the safe source for process delta and physics process delta.
-   - [ ] Keep raw notification dispatch available for advanced users.
+   - [x] Verify the safe source for process delta and physics process delta.
+   - [x] Keep raw notification dispatch available for advanced users.
 
 2. Add typed Node virtual callback descriptors.
-   - [ ] Provide a user-facing descriptor for common Node callbacks.
-   - [ ] Support ready, enter_tree, exit_tree, process(delta), and
+   - [x] Provide a user-facing descriptor for common Node callbacks.
+   - [x] Support ready, enter_tree, exit_tree, process(delta), and
      physics_process(delta) where delta is verified.
-   - [ ] Keep callbacks explicit Odin procedures and avoid macro-like hidden
+   - [x] Keep callbacks explicit Odin procedures and avoid macro-like hidden
      registration for now.
-   - [ ] Preserve explicit reversed notification handling.
+   - [x] Preserve explicit reversed notification handling.
 
 3. Add process enablement helpers.
-   - [ ] Provide small facade helpers for enabling and disabling process and
+   - [x] Provide small facade helpers for enabling and disabling process and
      physics_process on extension-owned Node instances.
-   - [ ] Reuse generated Node.set_process and Node.set_physics_process wrappers.
-   - [ ] Keep object handles borrowed by value.
-   - [ ] Avoid event/input callback helpers in this slice.
+   - [x] Reuse generated Node.set_process and Node.set_physics_process wrappers.
+   - [x] Keep object handles borrowed by value.
+   - [x] Avoid event/input callback helpers in this slice.
 
 4. Update examples to use the virtual callback helpers.
-   - [ ] Keep examples importing only godot:godot.
-   - [ ] Update hello or game to use typed ready and process-style helpers.
-   - [ ] Keep the beginner example readable and smoke coverage broader.
-   - [ ] Ensure extension classes still unregister during deinitialization.
+   - [x] Keep examples importing only godot:godot.
+   - [x] Update hello or game to use typed ready and process-style helpers.
+   - [x] Keep the beginner example readable and smoke coverage broader.
+   - [x] Ensure extension classes still unregister during deinitialization.
 
 5. Add compile and smoke coverage.
-   - [ ] Add facade compile checks for the new callback descriptor and process
+   - [x] Add facade compile checks for the new callback descriptor and process
      helpers.
-   - [ ] Add deterministic runtime smoke coverage for ready and, if stable in
+   - [x] Add deterministic runtime smoke coverage for ready and, if stable in
      headless CI, process or physics_process.
-   - [ ] Keep timing-sensitive assertions out unless CI proves them stable.
-   - [ ] Preserve existing signal, property, method, and generated class coverage.
+   - [x] Keep timing-sensitive assertions out unless CI proves them stable.
+   - [x] Preserve existing signal, property, method, and generated class coverage.
 
 6. Update reporting or docs only where useful.
-   - [ ] Document the callback and delta source in code comments near the helper.
-   - [ ] Keep full virtual method generation deferred.
-   - [ ] If generator reporting needs a virtual-method blocker section, add it
+   - [x] Document the callback and delta source in code comments near the helper.
+   - [x] Keep full virtual method generation deferred.
+   - [x] If generator reporting needs a virtual-method blocker section, add it
      deterministically.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm normal examples still import only godot:godot.
-   - [ ] Confirm no raw offset poking or hidden ownership transfer was added.
-   - [ ] Confirm raw notification access remains available.
+   - [x] Run make ci.
+   - [x] Confirm normal examples still import only godot:godot.
+   - [x] Confirm no raw offset poking or hidden ownership transfer was added.
+   - [x] Confirm raw notification access remains available.
 
 ## Deferred
 

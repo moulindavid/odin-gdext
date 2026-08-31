@@ -67,13 +67,43 @@ free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr
 	free(self)
 }
 
-notification_instance :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
-	context = gt.godot_context()
-	_ = what
+hello_ready :: proc(instance: gt.ClassInstancePtr, node: gt.Node, reversed: bool) {
 	_ = reversed
-
 	_, ok := gt.class_instance_data(instance, HelloNodeData)
 	if !ok do return
+
+	gt.debug_print("HelloNode ready from Odin")
+	_ = gt.node_enable_process_callback(node)
+}
+
+hello_process :: proc(
+	instance: gt.ClassInstancePtr,
+	node: gt.Node,
+	delta: gt.GodotReal,
+	reversed: bool,
+) {
+	_ = reversed
+	self, ok := gt.class_instance_data(instance, HelloNodeData)
+	if !ok do return
+
+	self.speed += delta
+	gt.object_emit_signal_1_godot_real(self.object, speed_changed_name, self.speed)
+	_ = gt.node_disable_process_callback(node)
+}
+
+hello_virtuals := gt.NodeVirtualCallbackDescriptor {
+	ready   = hello_ready,
+	process = hello_process,
+}
+
+notification_instance :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+	context = gt.godot_context()
+	self, ok := gt.class_instance_data(instance, HelloNodeData)
+	if !ok do return
+
+	node, node_ok := gt.object_ptr_try_as_node(self.object)
+	if !node_ok do return
+	if gt.dispatch_node_virtual_descriptor(instance, node, what, reversed, &hello_virtuals) do return
 }
 
 roll_math :: proc "contextless" (self: ^HelloNodeData) -> gt.GodotReal {

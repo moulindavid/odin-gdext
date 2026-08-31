@@ -1705,6 +1705,13 @@ control_notification_theme_changed :: gclass.control_notification_theme_changed
 // --- Notification helpers ---
 NodeNotificationHandler :: #type proc(instance: ClassInstancePtr, reversed: bool)
 NodeRawNotificationHandler :: #type proc(instance: ClassInstancePtr, what: i32, reversed: bool)
+NodeVirtualHandler :: #type proc(instance: ClassInstancePtr, node: Node, reversed: bool)
+NodeProcessVirtualHandler :: #type proc(
+	instance: ClassInstancePtr,
+	node: Node,
+	delta: GodotReal,
+	reversed: bool,
+)
 
 NodeNotificationHandlers :: struct {
 	enter_tree:      NodeNotificationHandler,
@@ -1724,6 +1731,15 @@ NodeLifecycleCallbacks :: struct {
 }
 
 NodeVirtualCallbacks :: NodeLifecycleCallbacks
+
+NodeVirtualCallbackDescriptor :: struct {
+	enter_tree:       NodeVirtualHandler,
+	exit_tree:        NodeVirtualHandler,
+	ready:            NodeVirtualHandler,
+	process:          NodeProcessVirtualHandler,
+	physics_process:  NodeProcessVirtualHandler,
+	raw_notification: NodeRawNotificationHandler,
+}
 
 // dispatch_node_notification calls a typed handler for common Node lifecycle
 // notifications and returns true when a handler ran. Unknown notifications and
@@ -1766,10 +1782,11 @@ dispatch_node_notification :: proc(
 	return false
 }
 
-// dispatch_node_lifecycle_callbacks is the compact public callback-table path
-// for common Node lifecycle notifications. Process callbacks are notification
-// callbacks only; they do not synthesize _process(delta) or
-// _physics_process(delta) data.
+// dispatch_node_lifecycle_callbacks maps Godot Node notifications to a
+// compact callback table. The generated constants currently match Godot 4.7:
+// enter_tree=10, exit_tree=11, ready=13, physics_process=16, process=17.
+// Use generated Node delta getters from a typed virtual helper instead of
+// inventing delta values in the raw notification path.
 dispatch_node_lifecycle_callbacks :: proc(
 	instance: ClassInstancePtr,
 	what: i32,
@@ -1820,6 +1837,93 @@ dispatch_node_virtual_callbacks :: proc(
 	callbacks: ^NodeVirtualCallbacks,
 ) -> bool {
 	return dispatch_node_lifecycle_callbacks(instance, what, reversed, callbacks)
+}
+
+// dispatch_node_virtual_descriptor passes a borrowed Node handle to typed
+// callbacks. Process deltas come from Godot through generated Node methods.
+dispatch_node_virtual_descriptor :: proc(
+	instance: ClassInstancePtr,
+	node: Node,
+	what: i32,
+	reversed: bool,
+	callbacks: ^NodeVirtualCallbackDescriptor,
+) -> bool {
+	if callbacks == nil do return false
+	if node_is_nil(node) {
+		if callbacks.raw_notification != nil {
+			callbacks.raw_notification(instance, what, reversed)
+			return true
+		}
+		return false
+	}
+
+	switch what {
+	case node_notification_enter_tree:
+		if callbacks.enter_tree != nil {
+			callbacks.enter_tree(instance, node, reversed)
+			return true
+		}
+	case node_notification_exit_tree:
+		if callbacks.exit_tree != nil {
+			callbacks.exit_tree(instance, node, reversed)
+			return true
+		}
+	case node_notification_ready:
+		if callbacks.ready != nil {
+			callbacks.ready(instance, node, reversed)
+			return true
+		}
+	case node_notification_process:
+		if callbacks.process != nil {
+			delta := node_get_process_delta_time(node)
+			callbacks.process(instance, node, delta, reversed)
+			return true
+		}
+	case node_notification_physics_process:
+		if callbacks.physics_process != nil {
+			delta := node_get_physics_process_delta_time(node)
+			callbacks.physics_process(instance, node, delta, reversed)
+			return true
+		}
+	}
+
+	if callbacks.raw_notification != nil {
+		callbacks.raw_notification(instance, what, reversed)
+		return true
+	}
+	return false
+}
+
+
+node_set_process_callback_enabled :: proc "contextless" (self: Node, enabled: bool) -> bool {
+	if node_is_nil(self) do return false
+	node_set_process(self, enabled)
+	return true
+}
+
+node_enable_process_callback :: proc "contextless" (self: Node) -> bool {
+	return node_set_process_callback_enabled(self, true)
+}
+
+node_disable_process_callback :: proc "contextless" (self: Node) -> bool {
+	return node_set_process_callback_enabled(self, false)
+}
+
+node_set_physics_process_callback_enabled :: proc "contextless" (
+	self: Node,
+	enabled: bool,
+) -> bool {
+	if node_is_nil(self) do return false
+	node_set_physics_process(self, enabled)
+	return true
+}
+
+node_enable_physics_process_callback :: proc "contextless" (self: Node) -> bool {
+	return node_set_physics_process_callback_enabled(self, true)
+}
+
+node_disable_physics_process_callback :: proc "contextless" (self: Node) -> bool {
+	return node_set_physics_process_callback_enabled(self, false)
 }
 
 // --- String ---

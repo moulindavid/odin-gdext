@@ -949,6 +949,24 @@ facade_process_notification :: proc(instance: gt.ClassInstancePtr, reversed: boo
 	_ = reversed
 }
 
+facade_ready_virtual :: proc(instance: gt.ClassInstancePtr, node: gt.Node, reversed: bool) {
+	_ = instance
+	_ = node
+	_ = reversed
+}
+
+facade_process_virtual :: proc(
+	instance: gt.ClassInstancePtr,
+	node: gt.Node,
+	delta: gt.GodotReal,
+	reversed: bool,
+) {
+	_ = instance
+	_ = node
+	_ = delta
+	_ = reversed
+}
+
 facade_raw_notification :: proc(instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	_ = instance
 	_ = what
@@ -966,10 +984,28 @@ facade_node_lifecycle := gt.NodeLifecycleCallbacks {
 	raw_notification = facade_raw_notification,
 }
 
+facade_node_virtual_descriptor := gt.NodeVirtualCallbackDescriptor {
+	ready            = facade_ready_virtual,
+	process          = facade_process_virtual,
+	physics_process  = facade_process_virtual,
+	raw_notification = facade_raw_notification,
+}
+
 facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
 	if gt.dispatch_node_lifecycle_callbacks(instance, what, reversed, &facade_node_lifecycle) do return
 	_ = gt.dispatch_node_virtual_callbacks(instance, what, reversed, &facade_node_lifecycle)
+	_ = gt.dispatch_node_virtual_descriptor(
+		instance,
+		gt.Node(nil),
+		what,
+		reversed,
+		&facade_node_virtual_descriptor,
+	)
+	_ = gt.node_enable_process_callback(gt.Node(nil))
+	_ = gt.node_disable_process_callback(gt.Node(nil))
+	_ = gt.node_enable_physics_process_callback(gt.Node(nil))
+	_ = gt.node_disable_physics_process_callback(gt.Node(nil))
 	if gt.dispatch_node_notification(instance, what, reversed, &facade_node_notifications) do return
 	if what == gt.node_notification_ready {
 		_ = what
