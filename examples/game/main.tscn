@@ -18,3 +18,28 @@ one_shot = true
 [node name="DamageArea" type="Area2D" parent="."]
 monitoring = false
 monitorable = true
+
+[node name="RollButton" type="Button" parent="."]
+offset_left = 24.0
+offset_top = 96.0
+offset_right = 224.0
+offset_bottom = 136.0
+text = "Roll from Odin"
+
+[node name="PreviewTexture" type="TextureRect" parent="."]
+offset_left = 248.0
+offset_top = 96.0
+offset_right = 312.0
+offset_bottom = 136.0
+
+[node name="InfoPanel" type="Panel" parent="."]
+offset_left = 24.0
+offset_top = 152.0
+offset_right = 384.0
+offset_bottom = 216.0
+
+[node name="UiContainer" type="Container" parent="."]
+offset_left = 408.0
+offset_top = 96.0
+offset_right = 760.0
+offset_bottom = 216.0

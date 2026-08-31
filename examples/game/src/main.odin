@@ -126,6 +126,53 @@ configure_physics_nodes :: proc "contextless" (parent: gt.Node, damage: gt.Godot
 	}
 }
 
+
+configure_ui_nodes :: proc "contextless" (parent: gt.Node, label: gt.Label, damage: gt.GodotReal) {
+	button_path := gt.node_path_from_utf8("RollButton")
+	button, button_ok := gt.node_get_node_as_button(parent, &button_path)
+	gt.node_path_free(&button_path)
+	if button_ok {
+		_ = gt.button_set_text_utf8_checked(button, "Roll again from Odin")
+		gt.button_set_flat(button, false)
+		gt.button_set_clip_text(button, true)
+		gt.button_set_text_alignment(button, .horizontal_alignment_center)
+		base_button := gt.button_as_base_button(button)
+		gt.base_button_set_disabled(base_button, false)
+		gt.base_button_set_toggle_mode(base_button, false)
+		gt.base_button_set_pressed_no_signal(base_button, false)
+		gt.base_button_set_action_mode(base_button, .action_mode_button_release)
+		_ = gt.base_button_get_draw_mode(base_button)
+	}
+
+	texture_path := gt.node_path_from_utf8("PreviewTexture")
+	texture_rect, texture_ok := gt.node_get_node_as_texture_rect(parent, &texture_path)
+	gt.node_path_free(&texture_path)
+	if texture_ok {
+		gt.texture_rect_set_flip_h(texture_rect, damage > 20)
+		gt.texture_rect_set_flip_v(texture_rect, false)
+		gt.texture_rect_set_expand_mode(texture_rect, .expand_keep_size)
+		gt.texture_rect_set_stretch_mode(texture_rect, .stretch_keep_aspect_centered)
+	}
+
+	panel_path := gt.node_path_from_utf8("InfoPanel")
+	panel, panel_ok := gt.node_get_node_as_panel(parent, &panel_path)
+	gt.node_path_free(&panel_path)
+	if panel_ok {
+		panel_control := gt.panel_as_control(panel)
+		gt.control_set_position_default(panel_control, gt.Vector2{24, 152})
+		gt.control_set_size_default(panel_control, gt.Vector2{360, 64})
+		gt.control_set_mouse_filter(panel_control, .mouse_filter_ignore)
+	}
+
+	container_path := gt.node_path_from_utf8("UiContainer")
+	container, container_ok := gt.node_get_node_as_container(parent, &container_path)
+	gt.node_path_free(&container_path)
+	if container_ok {
+		gt.container_queue_sort(container)
+		gt.container_set_accessibility_region(container, true)
+	}
+}
+
 roll_damage_adapter_method :: proc "contextless" (
 	instance: gt.ClassInstancePtr,
 ) -> (
@@ -230,6 +277,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 			gt.timer_start_default(timer)
 		}
 
+		configure_ui_nodes(parent, label, damage)
 		configure_physics_nodes(parent, damage)
 
 		area_path := gt.node_path_from_utf8("DamageArea")
@@ -243,11 +291,10 @@ roll_into_label_adapter_method :: proc "contextless" (
 		}
 	}
 
-	text := gt.string_from_utf8(
-		"Odin read Input and SceneTree, rolled damage, updated this Label, armed a Timer, configured physics nodes, and configured an Area2D.",
+	_ = gt.label_set_text_utf8_checked(
+		label,
+		"Odin updated Label, Button, TextureRect, Panel, Container, Timer, physics nodes, and Area2D.",
 	)
-	defer gt.string_free(&text)
-	gt.label_set_text(label, &text)
 	gt.label_set_horizontal_alignment(label, .horizontal_alignment_center)
 	gt.label_set_visible_ratio(label, 1)
 

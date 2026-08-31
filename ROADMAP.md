@@ -145,50 +145,50 @@ lifetimes, theme/resource ownership-sensitive APIs, broad texture loading, or th
 full UI class tree in this slice.
 
 1. Audit selected UI and Control signatures.
-   - [ ] Inspect Button, BaseButton, Label, TextureRect, Panel, Container, and
+   - [x] Inspect Button, BaseButton, Label, TextureRect, Panel, Container, and
      common Control methods in extension_api.json.
-   - [ ] Identify primitive, String, StringName, NodePath, Variant, and borrowed
+   - [x] Identify primitive, String, StringName, NodePath, Variant, and borrowed
      object signatures that already fit the safety model.
-   - [ ] Keep InputEvent, Theme, StyleBox, Texture, Font, Shortcut, Callable, and
+   - [x] Keep InputEvent, Theme, StyleBox, Texture, Font, Shortcut, Callable, and
      other ownership-sensitive signatures skipped with stable reasons.
-   - [ ] Prefer a small first batch over broad UI generation.
+   - [x] Prefer a small first batch over broad UI generation.
 
 2. Expand selected generated UI class handles.
-   - [ ] Add a minimal selected batch for BaseButton, Button, TextureRect, Panel,
+   - [x] Add a minimal selected batch for BaseButton, Button, TextureRect, Panel,
      and one or two container classes if their safe method surface is useful.
-   - [ ] Generate nil-safe checked downcasts and explicit inheritance upcasts for
+   - [x] Generate nil-safe checked downcasts and explicit inheritance upcasts for
      the selected classes.
-   - [ ] Re-export selected handles and helpers through godot:godot.
-   - [ ] Keep generated output deterministic.
+   - [x] Re-export selected handles and helpers through godot:godot.
+   - [x] Keep generated output deterministic.
 
 3. Generate safe UI method wrappers.
-   - [ ] Generate selected Label and Button text/state helpers using existing
+   - [x] Generate selected Label and Button text/state helpers using existing
      owned String and borrowed StringName rules.
-   - [ ] Generate selected Control layout, visibility, disabled/focus, and size
+   - [x] Generate selected Control layout, visibility, disabled/focus, and size
      helpers where signatures are primitive or memory-compatible builtin values.
-   - [ ] Keep resource-backed APIs, event callbacks, theme overrides, and varargs
+   - [x] Keep resource-backed APIs, event callbacks, theme overrides, and varargs
      deferred.
-   - [ ] Add ownership comments for any owned value returns.
+   - [x] Add ownership comments for any owned value returns.
 
 4. Add focused facade helpers where generated wrappers are too raw.
-   - [ ] Add small checked helpers for common UI operations only when they clarify
+   - [x] Add small checked helpers for common UI operations only when they clarify
      nil handling or ownership.
-   - [ ] Keep object/class handles borrowed by value.
-   - [ ] Avoid hiding Godot node ownership when adding UI nodes to scenes.
+   - [x] Keep object/class handles borrowed by value.
+   - [x] Avoid hiding Godot node ownership when adding UI nodes to scenes.
 
 5. Exercise UI APIs in examples.
-   - [ ] Update examples/game to drive a Label and a Button or button-like class
+   - [x] Update examples/game to drive a Label and a Button or button-like class
      through godot:godot only.
-   - [ ] Keep examples deterministic in headless CI.
-   - [ ] Preserve existing method, property, signal, virtual callback, resource,
+   - [x] Keep examples deterministic in headless CI.
+   - [x] Preserve existing method, property, signal, virtual callback, resource,
      scene, and physics coverage.
 
 6. Improve generated reporting for UI blockers.
-   - [ ] Add or refine UI-specific blocker reporting if the generic skip reasons
+   - [x] Add or refine UI-specific blocker reporting if the generic skip reasons
      are not clear enough.
-   - [ ] Keep skipped UI APIs explainable by lifetime, ownership, vararg, event,
+   - [x] Keep skipped UI APIs explainable by lifetime, ownership, vararg, event,
      resource, or unsupported type reason.
-   - [ ] Use the report to choose the next UI batch instead of manually patching
+   - [x] Use the report to choose the next UI batch instead of manually patching
      generated files.
 
 7. Validate before moving to the next feature roadmap.

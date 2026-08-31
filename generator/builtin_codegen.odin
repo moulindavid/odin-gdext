@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 24
+Max_Selected_Class_Count :: 32
 
 selected_class_names := []string {
 	"Object",
@@ -1017,6 +1017,11 @@ selected_class_names := []string {
 	"CanvasItem",
 	"Node2D",
 	"Control",
+	"BaseButton",
+	"Button",
+	"TextureRect",
+	"Panel",
+	"Container",
 	"Sprite2D",
 	"Label",
 	"Timer",
@@ -1034,11 +1039,10 @@ selected_class_names := []string {
 }
 
 candidate_class_names := []string {
-	"CharacterBody2D",
-	"PhysicsBody2D",
-	"RigidBody2D",
-	"StaticBody2D",
-	"CollisionShape2D",
+	"BoxContainer",
+	"HBoxContainer",
+	"VBoxContainer",
+	"MarginContainer",
 }
 
 Selected_Class_Method :: struct {
@@ -1268,6 +1272,53 @@ selected_class_methods := []Selected_Class_Method {
 	{"Label", "set_structured_text_bidi_override_options"},
 	{"Label", "get_structured_text_bidi_override_options"},
 	{"Label", "get_character_bounds"},
+	{"BaseButton", "set_pressed"},
+	{"BaseButton", "is_pressed"},
+	{"BaseButton", "set_pressed_no_signal"},
+	{"BaseButton", "is_hovered"},
+	{"BaseButton", "set_toggle_mode"},
+	{"BaseButton", "is_toggle_mode"},
+	{"BaseButton", "set_shortcut_in_tooltip"},
+	{"BaseButton", "is_shortcut_in_tooltip_enabled"},
+	{"BaseButton", "set_disabled"},
+	{"BaseButton", "is_disabled"},
+	{"BaseButton", "set_action_mode"},
+	{"BaseButton", "get_action_mode"},
+	{"BaseButton", "get_draw_mode"},
+	{"BaseButton", "set_keep_pressed_outside"},
+	{"BaseButton", "is_keep_pressed_outside"},
+	{"BaseButton", "set_shortcut_feedback"},
+	{"BaseButton", "is_shortcut_feedback"},
+	{"Button", "set_text"},
+	{"Button", "get_text"},
+	{"Button", "set_text_direction"},
+	{"Button", "get_text_direction"},
+	{"Button", "set_language"},
+	{"Button", "get_language"},
+	{"Button", "set_flat"},
+	{"Button", "is_flat"},
+	{"Button", "set_clip_text"},
+	{"Button", "get_clip_text"},
+	{"Button", "set_text_alignment"},
+	{"Button", "get_text_alignment"},
+	{"Button", "set_icon_alignment"},
+	{"Button", "get_icon_alignment"},
+	{"Button", "set_vertical_icon_alignment"},
+	{"Button", "get_vertical_icon_alignment"},
+	{"Button", "set_expand_icon"},
+	{"Button", "is_expand_icon"},
+	{"TextureRect", "set_expand_mode"},
+	{"TextureRect", "get_expand_mode"},
+	{"TextureRect", "set_flip_h"},
+	{"TextureRect", "is_flipped_h"},
+	{"TextureRect", "set_flip_v"},
+	{"TextureRect", "is_flipped_v"},
+	{"TextureRect", "set_stretch_mode"},
+	{"TextureRect", "get_stretch_mode"},
+	{"Container", "queue_sort"},
+	{"Container", "fit_child_in_rect"},
+	{"Container", "set_accessibility_region"},
+	{"Container", "is_accessibility_region"},
 	{"Timer", "set_wait_time"},
 	{"Timer", "get_wait_time"},
 	{"Timer", "set_one_shot"},
@@ -1731,6 +1782,21 @@ class_method_is_physics_report_class :: proc(class_name: string) -> bool {
 		class_name == "RigidBody2D" ||
 		class_name == "StaticBody2D" ||
 		class_name == "CollisionShape2D" \
+	)
+}
+
+class_method_is_ui_report_class :: proc(class_name: string) -> bool {
+	return(
+		class_name == "Control" ||
+		class_name == "BaseButton" ||
+		class_name == "Button" ||
+		class_name == "TextureRect" ||
+		class_name == "Panel" ||
+		class_name == "Container" ||
+		class_name == "BoxContainer" ||
+		class_name == "HBoxContainer" ||
+		class_name == "VBoxContainer" ||
+		class_name == "MarginContainer" \
 	)
 }
 
@@ -2513,6 +2579,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&scene_instantiation_blockers)
 	physics_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&physics_blockers)
+	ui_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&ui_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2534,6 +2602,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	resource_loading_blocker_count := 0
 	scene_instantiation_blocker_count := 0
 	physics_blocker_count := 0
+	ui_blocker_count := 0
 
 	for class_name in selected_class_names {
 		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
@@ -2686,6 +2755,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					emit_class_method_report_signature(&physics_blockers, class.name, method)
 					fmt.sbprintf(&physics_blockers, ": %s\n", reason)
 					physics_blocker_count += 1
+				} else if class_method_is_ui_report_class(class.name) {
+					strings.write_string(&ui_blockers, "- ")
+					emit_class_method_report_signature(&ui_blockers, class.name, method)
+					fmt.sbprintf(&ui_blockers, ": %s\n", reason)
+					ui_blocker_count += 1
 				}
 			}
 		}
@@ -2741,6 +2815,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&signal_callable_blockers, ": %s\n", reason)
 					signal_callable_blocker_count += 1
 				}
+				if class_method_is_ui_report_class(class.name) {
+					strings.write_string(&ui_blockers, "- candidate ")
+					emit_class_method_report_signature(&ui_blockers, class.name, method)
+					fmt.sbprintf(&ui_blockers, ": %s\n", reason)
+					ui_blocker_count += 1
+				}
 			}
 		}
 		strings.write_byte(&candidate_analysis, '\n')
@@ -2781,6 +2861,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Resource-loading blockers: %d\n", resource_loading_blocker_count)
 	fmt.sbprintf(&b, "- Scene-instantiation blockers: %d\n", scene_instantiation_blocker_count)
 	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
+	fmt.sbprintf(&b, "- UI blockers: %d\n", ui_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -2814,6 +2895,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(scene_instantiation_blockers))
 	strings.write_string(&b, "\n## Physics blockers\n\n")
 	strings.write_string(&b, strings.to_string(physics_blockers))
+	strings.write_string(&b, "\n## UI blockers\n\n")
+	strings.write_string(&b, strings.to_string(ui_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 
