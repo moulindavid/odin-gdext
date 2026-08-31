@@ -413,6 +413,12 @@ resource_get_path :: gclass.resource_get_path
 resource_get_rid :: gclass.resource_get_rid
 resource_set_local_to_scene :: gclass.resource_set_local_to_scene
 resource_is_local_to_scene :: gclass.resource_is_local_to_scene
+texture2d_get_mipmap_count :: gclass.texture2d_get_mipmap_count
+texture2d_get_width :: gclass.texture2d_get_width
+texture2d_get_height :: gclass.texture2d_get_height
+texture2d_get_size :: gclass.texture2d_get_size
+texture2d_has_alpha :: gclass.texture2d_has_alpha
+texture2d_has_mipmaps :: gclass.texture2d_has_mipmaps
 node_as_object :: gclass.node_as_object
 node_get_parent :: gclass.node_get_parent
 node_get_tree :: gclass.node_get_tree
@@ -558,6 +564,8 @@ control_grab_focus_default :: gclass.control_grab_focus_default
 control_release_focus :: gclass.control_release_focus
 control_set_mouse_filter :: gclass.control_set_mouse_filter
 control_get_mouse_filter :: gclass.control_get_mouse_filter
+sprite2d_set_texture :: gclass.sprite2d_set_texture
+sprite2d_get_texture :: gclass.sprite2d_get_texture
 sprite2d_set_centered :: gclass.sprite2d_set_centered
 sprite2d_is_centered :: gclass.sprite2d_is_centered
 sprite2d_set_offset :: gclass.sprite2d_set_offset
@@ -653,6 +661,8 @@ button_set_vertical_icon_alignment :: gclass.button_set_vertical_icon_alignment
 button_get_vertical_icon_alignment :: gclass.button_get_vertical_icon_alignment
 button_set_expand_icon :: gclass.button_set_expand_icon
 button_is_expand_icon :: gclass.button_is_expand_icon
+texture_rect_set_texture :: gclass.texture_rect_set_texture
+texture_rect_get_texture :: gclass.texture_rect_get_texture
 texture_rect_set_expand_mode :: gclass.texture_rect_set_expand_mode
 texture_rect_get_expand_mode :: gclass.texture_rect_get_expand_mode
 texture_rect_set_flip_h :: gclass.texture_rect_set_flip_h

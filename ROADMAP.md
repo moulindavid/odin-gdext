@@ -115,12 +115,12 @@ until each ownership transfer and lifetime rule is explicit.
    - [x] Keep destruction explicit through owned_resource_destroy.
 
 4. Enable one safe asset-consumer path.
-   - [ ] Add or generate a small texture consumer path such as TextureRect or
+   - [x] Add or generate a small texture consumer path such as TextureRect or
      Sprite2D texture assignment.
-   - [ ] Require the caller to keep the OwnedResource alive for as long as Godot
+   - [x] Require the caller to keep the OwnedResource alive for as long as Godot
      may use the borrowed texture handle.
-   - [ ] Avoid hiding Godot node/resource ownership behind broad convenience APIs.
-   - [ ] Keep theme, font, stylebox, material, and event-object APIs deferred.
+   - [x] Avoid hiding Godot node/resource ownership behind broad convenience APIs.
+   - [x] Keep theme, font, stylebox, material, and event-object APIs deferred.
 
 5. Exercise the asset path in examples.
    - [ ] Update examples/game to load one texture-like resource and use it
