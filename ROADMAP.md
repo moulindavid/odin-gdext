@@ -122,66 +122,80 @@ Completed coverage includes signal metadata parsing, selected signal reporting,
 generated fixed-shape signal name/Signal/emit/connect wrappers, facade exports,
 facade compile coverage, smoke runtime coverage, and full make ci validation.
 
-## Current goal: Virtual callbacks and process helpers
+## Completed: Virtual callbacks and process helpers
 
-Make normal Odin classes feel closer to Godot script classes for common lifecycle
-and frame callbacks while preserving explicit registration and callback safety.
-This is the next practical step toward a rust-gdext-like authoring experience:
-users should be able to define ready, enter_tree, exit_tree, process, and
-physics_process handlers without manually matching raw notification numbers.
+The virtual-callback slice made common Node lifecycle and frame callbacks easier
+for normal Odin classes without hiding registration or ownership rules. Completed
+coverage includes typed Node virtual callback descriptors, process and physics
+process enablement helpers, Godot-provided delta lookup through generated Node
+APIs, hello/smoke example coverage, facade compile checks, raw notification
+fallbacks, documentation, and full make ci validation.
 
-Keep this goal narrow. Use the existing notification dispatch path and generated
-Node process APIs. Do not fake delta values, generate broad virtual methods, or
-hide registration/deinitialization rules.
+## Current goal: Broader UI and Control APIs
 
-1. Audit the current notification and virtual callback model.
-   - [x] Inspect existing NodeVirtualCallbacks, notification dispatch helpers,
-     and example usage.
-   - [x] Verify Godot notification IDs used for ready, enter tree, exit tree,
-     process, and physics process.
-   - [x] Verify the safe source for process delta and physics process delta.
-   - [x] Keep raw notification dispatch available for advanced users.
+Expand the selected generated UI surface so Odin gameplay code can drive simple
+Godot interfaces through godot:godot. This should make examples and small games
+able to create and update labels, buttons, panels, texture rects, and basic
+containers without importing internal packages or touching unsupported event
+objects.
 
-2. Add typed Node virtual callback descriptors.
-   - [x] Provide a user-facing descriptor for common Node callbacks.
-   - [x] Support ready, enter_tree, exit_tree, process(delta), and
-     physics_process(delta) where delta is verified.
-   - [x] Keep callbacks explicit Odin procedures and avoid macro-like hidden
-     registration for now.
-   - [x] Preserve explicit reversed notification handling.
+Keep this goal narrow. Generate only borrowed-safe Control/UI methods and small
+helper wrappers whose ownership rules are clear. Do not expose input event object
+lifetimes, theme/resource ownership-sensitive APIs, broad texture loading, or the
+full UI class tree in this slice.
 
-3. Add process enablement helpers.
-   - [x] Provide small facade helpers for enabling and disabling process and
-     physics_process on extension-owned Node instances.
-   - [x] Reuse generated Node.set_process and Node.set_physics_process wrappers.
-   - [x] Keep object handles borrowed by value.
-   - [x] Avoid event/input callback helpers in this slice.
+1. Audit selected UI and Control signatures.
+   - [ ] Inspect Button, BaseButton, Label, TextureRect, Panel, Container, and
+     common Control methods in extension_api.json.
+   - [ ] Identify primitive, String, StringName, NodePath, Variant, and borrowed
+     object signatures that already fit the safety model.
+   - [ ] Keep InputEvent, Theme, StyleBox, Texture, Font, Shortcut, Callable, and
+     other ownership-sensitive signatures skipped with stable reasons.
+   - [ ] Prefer a small first batch over broad UI generation.
 
-4. Update examples to use the virtual callback helpers.
-   - [x] Keep examples importing only godot:godot.
-   - [x] Update hello or game to use typed ready and process-style helpers.
-   - [x] Keep the beginner example readable and smoke coverage broader.
-   - [x] Ensure extension classes still unregister during deinitialization.
+2. Expand selected generated UI class handles.
+   - [ ] Add a minimal selected batch for BaseButton, Button, TextureRect, Panel,
+     and one or two container classes if their safe method surface is useful.
+   - [ ] Generate nil-safe checked downcasts and explicit inheritance upcasts for
+     the selected classes.
+   - [ ] Re-export selected handles and helpers through godot:godot.
+   - [ ] Keep generated output deterministic.
 
-5. Add compile and smoke coverage.
-   - [x] Add facade compile checks for the new callback descriptor and process
-     helpers.
-   - [x] Add deterministic runtime smoke coverage for ready and, if stable in
-     headless CI, process or physics_process.
-   - [x] Keep timing-sensitive assertions out unless CI proves them stable.
-   - [x] Preserve existing signal, property, method, and generated class coverage.
+3. Generate safe UI method wrappers.
+   - [ ] Generate selected Label and Button text/state helpers using existing
+     owned String and borrowed StringName rules.
+   - [ ] Generate selected Control layout, visibility, disabled/focus, and size
+     helpers where signatures are primitive or memory-compatible builtin values.
+   - [ ] Keep resource-backed APIs, event callbacks, theme overrides, and varargs
+     deferred.
+   - [ ] Add ownership comments for any owned value returns.
 
-6. Update reporting or docs only where useful.
-   - [x] Document the callback and delta source in code comments near the helper.
-   - [x] Keep full virtual method generation deferred.
-   - [x] If generator reporting needs a virtual-method blocker section, add it
-     deterministically.
+4. Add focused facade helpers where generated wrappers are too raw.
+   - [ ] Add small checked helpers for common UI operations only when they clarify
+     nil handling or ownership.
+   - [ ] Keep object/class handles borrowed by value.
+   - [ ] Avoid hiding Godot node ownership when adding UI nodes to scenes.
+
+5. Exercise UI APIs in examples.
+   - [ ] Update examples/game to drive a Label and a Button or button-like class
+     through godot:godot only.
+   - [ ] Keep examples deterministic in headless CI.
+   - [ ] Preserve existing method, property, signal, virtual callback, resource,
+     scene, and physics coverage.
+
+6. Improve generated reporting for UI blockers.
+   - [ ] Add or refine UI-specific blocker reporting if the generic skip reasons
+     are not clear enough.
+   - [ ] Keep skipped UI APIs explainable by lifetime, ownership, vararg, event,
+     resource, or unsupported type reason.
+   - [ ] Use the report to choose the next UI batch instead of manually patching
+     generated files.
 
 7. Validate before moving to the next feature roadmap.
-   - [x] Run make ci.
-   - [x] Confirm normal examples still import only godot:godot.
-   - [x] Confirm no raw offset poking or hidden ownership transfer was added.
-   - [x] Confirm raw notification access remains available.
+   - [ ] Run make ci.
+   - [ ] Confirm normal examples still import only godot:godot.
+   - [ ] Confirm generated reports explain remaining UI skips.
+   - [ ] Confirm no raw offset poking or hidden ownership transfer was added.
 
 ## Deferred
 
