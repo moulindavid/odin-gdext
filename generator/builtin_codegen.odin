@@ -1013,6 +1013,8 @@ selected_class_names := []string {
 	"Object",
 	"RefCounted",
 	"Resource",
+	"Texture2D",
+	"ImageTexture",
 	"Node",
 	"CanvasItem",
 	"Node2D",
@@ -1039,8 +1041,6 @@ selected_class_names := []string {
 }
 
 candidate_class_names := []string {
-	"Texture2D",
-	"ImageTexture",
 	"AudioStream",
 	"AudioStreamPlayer",
 	"Theme",

@@ -99,12 +99,12 @@ until each ownership transfer and lifetime rule is explicit.
      Resource coverage.
 
 2. Add selected generated resource handle coverage.
-   - [ ] Add selected handles for Texture2D and ImageTexture if their safe method
+   - [x] Add selected handles for Texture2D and ImageTexture if their safe method
      surface is useful.
-   - [ ] Generate checked downcasts from Resource/Object to selected resource
+   - [x] Generate checked downcasts from Resource/Object to selected resource
      handle types.
-   - [ ] Keep resource handles borrowed by value, never ownership-transferring.
-   - [ ] Re-export selected handles and casts through godot:godot.
+   - [x] Keep resource handles borrowed by value, never ownership-transferring.
+   - [x] Re-export selected handles and casts through godot:godot.
 
 3. Add typed OwnedResource helper APIs.
    - [ ] Add checked helpers that load a resource and expose a borrowed typed

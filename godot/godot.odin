@@ -143,6 +143,8 @@ Side :: gclass.Side
 HorizontalAlignment :: gclass.HorizontalAlignment
 VerticalAlignment :: gclass.VerticalAlignment
 Resource :: gclass.Resource
+Texture2D :: gclass.Texture2D
+ImageTexture :: gclass.ImageTexture
 // Resource loading policy: ResourceLoader.load returns a Resource through a
 // Variant call in focused helpers. The helper retains the borrowed Resource into
 // OwnedResource before freeing the temporary Variant, so callers always receive
@@ -399,6 +401,13 @@ init_class_bindings :: gclass.init_class_bindings
 ref_counted_as_object :: gclass.ref_counted_as_object
 resource_as_ref_counted :: gclass.resource_as_ref_counted
 resource_as_object :: gclass.resource_as_object
+texture2d_as_resource :: gclass.texture2d_as_resource
+texture2d_as_ref_counted :: gclass.texture2d_as_ref_counted
+texture2d_as_object :: gclass.texture2d_as_object
+image_texture_as_texture2d :: gclass.image_texture_as_texture2d
+image_texture_as_resource :: gclass.image_texture_as_resource
+image_texture_as_ref_counted :: gclass.image_texture_as_ref_counted
+image_texture_as_object :: gclass.image_texture_as_object
 ref_counted_get_reference_count :: gclass.ref_counted_get_reference_count
 resource_get_path :: gclass.resource_get_path
 resource_get_rid :: gclass.resource_get_rid
@@ -692,6 +701,16 @@ object_is_ref_counted :: gclass.object_is_ref_counted
 object_try_as_ref_counted :: gclass.object_try_as_ref_counted
 object_is_resource :: gclass.object_is_resource
 object_try_as_resource :: gclass.object_try_as_resource
+object_is_texture2d :: gclass.object_is_texture2d
+object_try_as_texture2d :: gclass.object_try_as_texture2d
+object_is_image_texture :: gclass.object_is_image_texture
+object_try_as_image_texture :: gclass.object_try_as_image_texture
+resource_is_texture2d :: gclass.resource_is_texture2d
+resource_try_as_texture2d :: gclass.resource_try_as_texture2d
+resource_is_image_texture :: gclass.resource_is_image_texture
+resource_try_as_image_texture :: gclass.resource_try_as_image_texture
+texture2d_is_image_texture :: gclass.texture2d_is_image_texture
+texture2d_try_as_image_texture :: gclass.texture2d_try_as_image_texture
 object_is_node :: gclass.object_is_node
 object_try_as_node :: gclass.object_try_as_node
 object_is_canvas_item :: gclass.object_is_canvas_item
@@ -1038,6 +1057,14 @@ ref_counted_is_nil :: proc "contextless" (self: RefCounted) -> bool {
 }
 
 resource_is_nil :: proc "contextless" (self: Resource) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+texture2d_is_nil :: proc "contextless" (self: Texture2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+image_texture_is_nil :: proc "contextless" (self: ImageTexture) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -1689,6 +1716,14 @@ packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+texture2d_object_ptr :: proc "contextless" (self: Texture2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+image_texture_object_ptr :: proc "contextless" (self: ImageTexture) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 resource_loader_object_ptr :: proc "contextless" (self: ResourceLoader) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -1714,6 +1749,21 @@ object_ptr_try_as_ref_counted :: proc "contextless" (
 object_ptr_try_as_resource :: proc "contextless" (self: ObjectPtr) -> (value: Resource, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_resource(Object(self))
+}
+
+object_ptr_try_as_texture2d :: proc "contextless" (self: ObjectPtr) -> (value: Texture2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_texture2d(Object(self))
+}
+
+object_ptr_try_as_image_texture :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: ImageTexture,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_image_texture(Object(self))
 }
 
 object_ptr_try_as_node :: proc "contextless" (self: ObjectPtr) -> (value: Node, ok: bool) {
