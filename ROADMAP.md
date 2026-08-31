@@ -131,71 +131,14 @@ process enablement helpers, Godot-provided delta lookup through generated Node
 APIs, hello/smoke example coverage, facade compile checks, raw notification
 fallbacks, documentation, and full make ci validation.
 
-## Current goal: Broader UI and Control APIs
+## Completed: Broader UI and Control APIs
 
-Expand the selected generated UI surface so Odin gameplay code can drive simple
-Godot interfaces through godot:godot. This should make examples and small games
-able to create and update labels, buttons, panels, texture rects, and basic
-containers without importing internal packages or touching unsupported event
-objects.
-
-Keep this goal narrow. Generate only borrowed-safe Control/UI methods and small
-helper wrappers whose ownership rules are clear. Do not expose input event object
-lifetimes, theme/resource ownership-sensitive APIs, broad texture loading, or the
-full UI class tree in this slice.
-
-1. Audit selected UI and Control signatures.
-   - [x] Inspect Button, BaseButton, Label, TextureRect, Panel, Container, and
-     common Control methods in extension_api.json.
-   - [x] Identify primitive, String, StringName, NodePath, Variant, and borrowed
-     object signatures that already fit the safety model.
-   - [x] Keep InputEvent, Theme, StyleBox, Texture, Font, Shortcut, Callable, and
-     other ownership-sensitive signatures skipped with stable reasons.
-   - [x] Prefer a small first batch over broad UI generation.
-
-2. Expand selected generated UI class handles.
-   - [x] Add a minimal selected batch for BaseButton, Button, TextureRect, Panel,
-     and one or two container classes if their safe method surface is useful.
-   - [x] Generate nil-safe checked downcasts and explicit inheritance upcasts for
-     the selected classes.
-   - [x] Re-export selected handles and helpers through godot:godot.
-   - [x] Keep generated output deterministic.
-
-3. Generate safe UI method wrappers.
-   - [x] Generate selected Label and Button text/state helpers using existing
-     owned String and borrowed StringName rules.
-   - [x] Generate selected Control layout, visibility, disabled/focus, and size
-     helpers where signatures are primitive or memory-compatible builtin values.
-   - [x] Keep resource-backed APIs, event callbacks, theme overrides, and varargs
-     deferred.
-   - [x] Add ownership comments for any owned value returns.
-
-4. Add focused facade helpers where generated wrappers are too raw.
-   - [x] Add small checked helpers for common UI operations only when they clarify
-     nil handling or ownership.
-   - [x] Keep object/class handles borrowed by value.
-   - [x] Avoid hiding Godot node ownership when adding UI nodes to scenes.
-
-5. Exercise UI APIs in examples.
-   - [x] Update examples/game to drive a Label and a Button or button-like class
-     through godot:godot only.
-   - [x] Keep examples deterministic in headless CI.
-   - [x] Preserve existing method, property, signal, virtual callback, resource,
-     scene, and physics coverage.
-
-6. Improve generated reporting for UI blockers.
-   - [x] Add or refine UI-specific blocker reporting if the generic skip reasons
-     are not clear enough.
-   - [x] Keep skipped UI APIs explainable by lifetime, ownership, vararg, event,
-     resource, or unsupported type reason.
-   - [x] Use the report to choose the next UI batch instead of manually patching
-     generated files.
-
-7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm normal examples still import only godot:godot.
-   - [ ] Confirm generated reports explain remaining UI skips.
-   - [ ] Confirm no raw offset poking or hidden ownership transfer was added.
+The UI/Control slice expanded the selected generated UI surface so Odin gameplay
+code can drive simple Godot interfaces through godot:godot. Completed coverage
+includes selected BaseButton, Button, TextureRect, Panel, and Container handles,
+checked casts and lookup helpers, safe generated UI method wrappers, focused
+facade UTF-8 text helpers, examples/game UI usage, UI-specific blocker
+reporting, facade compile coverage, and full make ci validation.
 
 ## Deferred
 
