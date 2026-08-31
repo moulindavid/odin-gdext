@@ -88,14 +88,14 @@ threaded loading, arbitrary resource mutation, or full texture/theme/font APIs
 until each ownership transfer and lifetime rule is explicit.
 
 1. Audit resource and asset signatures.
-   - [ ] Inspect ResourceLoader, Resource, Texture2D, ImageTexture, AudioStream,
+   - [x] Inspect ResourceLoader, Resource, Texture2D, ImageTexture, AudioStream,
      PackedScene, TextureRect, Button, Sprite2D, and common asset consumers.
-   - [ ] Identify methods that fit the existing OwnedResource, borrowed handle,
+   - [x] Identify methods that fit the existing OwnedResource, borrowed handle,
      String, StringName, RID, primitive, and math-builtin rules.
-   - [ ] Keep threaded loading, cache-sensitive APIs, duplicate/instantiate
+   - [x] Keep threaded loading, cache-sensitive APIs, duplicate/instantiate
      ownership transfers, theme/font/stylebox APIs, and unsupported server APIs
      skipped with deterministic reasons.
-   - [ ] Prefer a small texture-first batch before audio, themes, or broader
+   - [x] Prefer a small texture-first batch before audio, themes, or broader
      Resource coverage.
 
 2. Add selected generated resource handle coverage.

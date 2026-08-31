@@ -1039,10 +1039,14 @@ selected_class_names := []string {
 }
 
 candidate_class_names := []string {
-	"BoxContainer",
-	"HBoxContainer",
-	"VBoxContainer",
-	"MarginContainer",
+	"Texture2D",
+	"ImageTexture",
+	"AudioStream",
+	"AudioStreamPlayer",
+	"Theme",
+	"Font",
+	"StyleBox",
+	"TextureButton",
 }
 
 Selected_Class_Method :: struct {
