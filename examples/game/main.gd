@@ -1,6 +1,7 @@
 extends Node
 
 @onready var label: Label = $Label
+@onready var roll_button: Button = $RollButton
 
 var brain: Object
 var roll_count := 0
@@ -14,6 +15,7 @@ func _ready() -> void:
 
     add_child(brain)
     brain.connect("damage_rolled", _on_damage_rolled)
+    roll_button.pressed.connect(_roll_once)
     brain.difficulty = 2.0
     _roll_once()
 

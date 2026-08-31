@@ -177,10 +177,10 @@ full UI class tree in this slice.
    - [x] Avoid hiding Godot node ownership when adding UI nodes to scenes.
 
 5. Exercise UI APIs in examples.
-   - [ ] Update examples/game to drive a Label and a Button or button-like class
+   - [x] Update examples/game to drive a Label and a Button or button-like class
      through godot:godot only.
-   - [ ] Keep examples deterministic in headless CI.
-   - [ ] Preserve existing method, property, signal, virtual callback, resource,
+   - [x] Keep examples deterministic in headless CI.
+   - [x] Preserve existing method, property, signal, virtual callback, resource,
      scene, and physics coverage.
 
 6. Improve generated reporting for UI blockers.
