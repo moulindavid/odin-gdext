@@ -107,12 +107,12 @@ until each ownership transfer and lifetime rule is explicit.
    - [x] Re-export selected handles and casts through godot:godot.
 
 3. Add typed OwnedResource helper APIs.
-   - [ ] Add checked helpers that load a resource and expose a borrowed typed
+   - [x] Add checked helpers that load a resource and expose a borrowed typed
      handle while the OwnedResource remains alive.
-   - [ ] Make the lifetime rule obvious in procedure names and comments.
-   - [ ] Return ok = false for nil resources, failed loads, or failed class
+   - [x] Make the lifetime rule obvious in procedure names and comments.
+   - [x] Return ok = false for nil resources, failed loads, or failed class
      checks.
-   - [ ] Keep destruction explicit through owned_resource_free.
+   - [x] Keep destruction explicit through owned_resource_destroy.
 
 4. Enable one safe asset-consumer path.
    - [ ] Add or generate a small texture consumer path such as TextureRect or

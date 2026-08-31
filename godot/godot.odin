@@ -1398,6 +1398,30 @@ owned_resource_handle :: proc "contextless" (self: OwnedResource) -> Resource {
 	return Resource(ObjectPtr(owned_ref_counted_handle(self.ref)))
 }
 
+// The returned Texture2D is a borrowed view of the owned resource. Keep the
+// OwnedResource alive for as long as Godot may use the texture handle.
+owned_resource_try_as_texture2d :: proc "contextless" (
+	self: OwnedResource,
+) -> (
+	texture: Texture2D,
+	ok: bool,
+) {
+	if owned_resource_is_nil(self) do return {}, false
+	return resource_try_as_texture2d(owned_resource_handle(self))
+}
+
+// The returned ImageTexture is a borrowed view of the owned resource. Keep the
+// OwnedResource alive for as long as Godot may use the image texture handle.
+owned_resource_try_as_image_texture :: proc "contextless" (
+	self: OwnedResource,
+) -> (
+	texture: ImageTexture,
+	ok: bool,
+) {
+	if owned_resource_is_nil(self) do return {}, false
+	return resource_try_as_image_texture(owned_resource_handle(self))
+}
+
 owned_resource_init_owned :: proc "contextless" (
 	handle: Resource,
 ) -> (
@@ -1525,6 +1549,83 @@ resource_loader_load_owned :: proc "contextless" (
 	require_call_ok(&err)
 	if !ok do gcore._trap_nil_godot_function()
 	return owned
+}
+
+// resource_loader_load_texture2d_owned_checked loads a resource and returns a
+// borrowed Texture2D view tied to the returned OwnedResource. Destroy the owned
+// wrapper after Godot no longer needs the texture handle.
+resource_loader_load_texture2d_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	texture: Texture2D,
+	err: CallError,
+	ok: bool,
+) {
+	owned, err, ok = resource_loader_load_owned_checked(self, path)
+	if !call_error_ok(&err) || !ok do return {}, {}, err, false
+
+	texture_ok: bool
+	texture, texture_ok = owned_resource_try_as_texture2d(owned)
+	if !texture_ok {
+		owned_resource_destroy(&owned)
+		return {}, {}, err, false
+	}
+	return owned, texture, err, true
+}
+
+resource_loader_load_texture2d_owned :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	texture: Texture2D,
+) {
+	checked_err: CallError
+	checked_ok: bool
+	owned, texture, checked_err, checked_ok = resource_loader_load_texture2d_owned_checked(self, path)
+	require_call_ok(&checked_err)
+	if !checked_ok do gcore._trap_nil_godot_function()
+	return owned, texture
+}
+
+// resource_loader_load_image_texture_owned_checked is the ImageTexture variant
+// of resource_loader_load_texture2d_owned_checked.
+resource_loader_load_image_texture_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	texture: ImageTexture,
+	err: CallError,
+	ok: bool,
+) {
+	owned, err, ok = resource_loader_load_owned_checked(self, path)
+	if !call_error_ok(&err) || !ok do return {}, {}, err, false
+
+	texture_ok: bool
+	texture, texture_ok = owned_resource_try_as_image_texture(owned)
+	if !texture_ok {
+		owned_resource_destroy(&owned)
+		return {}, {}, err, false
+	}
+	return owned, texture, err, true
+}
+
+resource_loader_load_image_texture_owned :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	texture: ImageTexture,
+) {
+	checked_err: CallError
+	checked_ok: bool
+	owned, texture, checked_err, checked_ok = resource_loader_load_image_texture_owned_checked(self, path)
+	require_call_ok(&checked_err)
+	if !checked_ok do gcore._trap_nil_godot_function()
+	return owned, texture
 }
 
 packed_scene_instantiate_class_name_data: StaticStringName
