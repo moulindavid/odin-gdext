@@ -162,13 +162,13 @@ full UI class tree in this slice.
    - [x] Keep generated output deterministic.
 
 3. Generate safe UI method wrappers.
-   - [ ] Generate selected Label and Button text/state helpers using existing
+   - [x] Generate selected Label and Button text/state helpers using existing
      owned String and borrowed StringName rules.
-   - [ ] Generate selected Control layout, visibility, disabled/focus, and size
+   - [x] Generate selected Control layout, visibility, disabled/focus, and size
      helpers where signatures are primitive or memory-compatible builtin values.
-   - [ ] Keep resource-backed APIs, event callbacks, theme overrides, and varargs
+   - [x] Keep resource-backed APIs, event callbacks, theme overrides, and varargs
      deferred.
-   - [ ] Add ownership comments for any owned value returns.
+   - [x] Add ownership comments for any owned value returns.
 
 4. Add focused facade helpers where generated wrappers are too raw.
    - [ ] Add small checked helpers for common UI operations only when they clarify
