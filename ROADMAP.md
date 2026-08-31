@@ -154,12 +154,12 @@ full UI class tree in this slice.
    - [x] Prefer a small first batch over broad UI generation.
 
 2. Expand selected generated UI class handles.
-   - [ ] Add a minimal selected batch for BaseButton, Button, TextureRect, Panel,
+   - [x] Add a minimal selected batch for BaseButton, Button, TextureRect, Panel,
      and one or two container classes if their safe method surface is useful.
-   - [ ] Generate nil-safe checked downcasts and explicit inheritance upcasts for
+   - [x] Generate nil-safe checked downcasts and explicit inheritance upcasts for
      the selected classes.
-   - [ ] Re-export selected handles and helpers through godot:godot.
-   - [ ] Keep generated output deterministic.
+   - [x] Re-export selected handles and helpers through godot:godot.
+   - [x] Keep generated output deterministic.
 
 3. Generate safe UI method wrappers.
    - [ ] Generate selected Label and Button text/state helpers using existing

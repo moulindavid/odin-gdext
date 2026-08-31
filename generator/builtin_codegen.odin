@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 24
+Max_Selected_Class_Count :: 32
 
 selected_class_names := []string {
 	"Object",
@@ -1017,6 +1017,11 @@ selected_class_names := []string {
 	"CanvasItem",
 	"Node2D",
 	"Control",
+	"BaseButton",
+	"Button",
+	"TextureRect",
+	"Panel",
+	"Container",
 	"Sprite2D",
 	"Label",
 	"Timer",
@@ -1034,11 +1039,7 @@ selected_class_names := []string {
 }
 
 candidate_class_names := []string {
-	"BaseButton",
-	"Button",
-	"TextureRect",
-	"Panel",
-	"Container",
+	"BoxContainer",
 	"HBoxContainer",
 	"VBoxContainer",
 	"MarginContainer",

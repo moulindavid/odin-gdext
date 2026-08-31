@@ -154,6 +154,11 @@ Node :: gclass.Node
 CanvasItem :: gclass.CanvasItem
 Node2D :: gclass.Node2D
 Control :: gclass.Control
+BaseButton :: gclass.BaseButton
+Button :: gclass.Button
+TextureRect :: gclass.TextureRect
+Panel :: gclass.Panel
+Container :: gclass.Container
 Sprite2D :: gclass.Sprite2D
 Label :: gclass.Label
 Timer :: gclass.Timer
@@ -615,6 +620,27 @@ label_as_control :: gclass.label_as_control
 label_as_canvas_item :: gclass.label_as_canvas_item
 label_as_node :: gclass.label_as_node
 label_as_object :: gclass.label_as_object
+base_button_as_control :: gclass.base_button_as_control
+base_button_as_canvas_item :: gclass.base_button_as_canvas_item
+base_button_as_node :: gclass.base_button_as_node
+base_button_as_object :: gclass.base_button_as_object
+button_as_base_button :: gclass.button_as_base_button
+button_as_control :: gclass.button_as_control
+button_as_canvas_item :: gclass.button_as_canvas_item
+button_as_node :: gclass.button_as_node
+button_as_object :: gclass.button_as_object
+texture_rect_as_control :: gclass.texture_rect_as_control
+texture_rect_as_canvas_item :: gclass.texture_rect_as_canvas_item
+texture_rect_as_node :: gclass.texture_rect_as_node
+texture_rect_as_object :: gclass.texture_rect_as_object
+panel_as_control :: gclass.panel_as_control
+panel_as_canvas_item :: gclass.panel_as_canvas_item
+panel_as_node :: gclass.panel_as_node
+panel_as_object :: gclass.panel_as_object
+container_as_control :: gclass.container_as_control
+container_as_canvas_item :: gclass.container_as_canvas_item
+container_as_node :: gclass.container_as_node
+container_as_object :: gclass.container_as_object
 object_is_ref_counted :: gclass.object_is_ref_counted
 object_try_as_ref_counted :: gclass.object_try_as_ref_counted
 object_is_resource :: gclass.object_is_resource
@@ -631,6 +657,16 @@ object_is_sprite2d :: gclass.object_is_sprite2d
 object_try_as_sprite2d :: gclass.object_try_as_sprite2d
 object_is_label :: gclass.object_is_label
 object_try_as_label :: gclass.object_try_as_label
+object_is_base_button :: gclass.object_is_base_button
+object_try_as_base_button :: gclass.object_try_as_base_button
+object_is_button :: gclass.object_is_button
+object_try_as_button :: gclass.object_try_as_button
+object_is_texture_rect :: gclass.object_is_texture_rect
+object_try_as_texture_rect :: gclass.object_try_as_texture_rect
+object_is_panel :: gclass.object_is_panel
+object_try_as_panel :: gclass.object_try_as_panel
+object_is_container :: gclass.object_is_container
+object_try_as_container :: gclass.object_try_as_container
 object_is_timer :: gclass.object_is_timer
 object_try_as_timer :: gclass.object_try_as_timer
 object_is_collision_object2d :: gclass.object_is_collision_object2d
@@ -671,6 +707,16 @@ node_is_sprite2d :: gclass.node_is_sprite2d
 node_try_as_sprite2d :: gclass.node_try_as_sprite2d
 node_is_label :: gclass.node_is_label
 node_try_as_label :: gclass.node_try_as_label
+node_is_base_button :: gclass.node_is_base_button
+node_try_as_base_button :: gclass.node_try_as_base_button
+node_is_button :: gclass.node_is_button
+node_try_as_button :: gclass.node_try_as_button
+node_is_texture_rect :: gclass.node_is_texture_rect
+node_try_as_texture_rect :: gclass.node_try_as_texture_rect
+node_is_panel :: gclass.node_is_panel
+node_try_as_panel :: gclass.node_try_as_panel
+node_is_container :: gclass.node_is_container
+node_try_as_container :: gclass.node_try_as_container
 node_is_timer :: gclass.node_is_timer
 node_try_as_timer :: gclass.node_try_as_timer
 node_is_collision_object2d :: gclass.node_is_collision_object2d
@@ -685,6 +731,16 @@ canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
 canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
 canvas_item_is_label :: gclass.canvas_item_is_label
 canvas_item_try_as_label :: gclass.canvas_item_try_as_label
+canvas_item_is_base_button :: gclass.canvas_item_is_base_button
+canvas_item_try_as_base_button :: gclass.canvas_item_try_as_base_button
+canvas_item_is_button :: gclass.canvas_item_is_button
+canvas_item_try_as_button :: gclass.canvas_item_try_as_button
+canvas_item_is_texture_rect :: gclass.canvas_item_is_texture_rect
+canvas_item_try_as_texture_rect :: gclass.canvas_item_try_as_texture_rect
+canvas_item_is_panel :: gclass.canvas_item_is_panel
+canvas_item_try_as_panel :: gclass.canvas_item_try_as_panel
+canvas_item_is_container :: gclass.canvas_item_is_container
+canvas_item_try_as_container :: gclass.canvas_item_try_as_container
 canvas_item_is_collision_object2d :: gclass.canvas_item_is_collision_object2d
 canvas_item_try_as_collision_object2d :: gclass.canvas_item_try_as_collision_object2d
 canvas_item_is_area2d :: gclass.canvas_item_is_area2d
@@ -719,6 +775,18 @@ node2d_is_collision_shape2d :: gclass.node2d_is_collision_shape2d
 node2d_try_as_collision_shape2d :: gclass.node2d_try_as_collision_shape2d
 control_is_label :: gclass.control_is_label
 control_try_as_label :: gclass.control_try_as_label
+control_is_base_button :: gclass.control_is_base_button
+control_try_as_base_button :: gclass.control_try_as_base_button
+control_is_button :: gclass.control_is_button
+control_try_as_button :: gclass.control_try_as_button
+control_is_texture_rect :: gclass.control_is_texture_rect
+control_try_as_texture_rect :: gclass.control_try_as_texture_rect
+control_is_panel :: gclass.control_is_panel
+control_try_as_panel :: gclass.control_try_as_panel
+control_is_container :: gclass.control_is_container
+control_try_as_container :: gclass.control_try_as_container
+base_button_is_button :: gclass.base_button_is_button
+base_button_try_as_button :: gclass.base_button_try_as_button
 timer_as_node :: gclass.timer_as_node
 timer_as_object :: gclass.timer_as_object
 timer_set_wait_time :: gclass.timer_set_wait_time
@@ -942,6 +1010,26 @@ control_is_nil :: proc "contextless" (self: Control) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+base_button_is_nil :: proc "contextless" (self: BaseButton) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+button_is_nil :: proc "contextless" (self: Button) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+texture_rect_is_nil :: proc "contextless" (self: TextureRect) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+panel_is_nil :: proc "contextless" (self: Panel) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+container_is_nil :: proc "contextless" (self: Container) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 sprite2d_is_nil :: proc "contextless" (self: Sprite2D) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -1046,6 +1134,66 @@ node_get_node_as_control :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Control(nil), false
 	return node_try_as_control(node)
+}
+
+node_get_node_as_base_button :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: BaseButton,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return BaseButton(nil), false
+	return node_try_as_base_button(node)
+}
+
+node_get_node_as_button :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Button,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Button(nil), false
+	return node_try_as_button(node)
+}
+
+node_get_node_as_texture_rect :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: TextureRect,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return TextureRect(nil), false
+	return node_try_as_texture_rect(node)
+}
+
+node_get_node_as_panel :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Panel,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Panel(nil), false
+	return node_try_as_panel(node)
+}
+
+node_get_node_as_container :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Container,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Container(nil), false
+	return node_try_as_container(node)
 }
 
 node_get_node_as_sprite2d :: proc "contextless" (
@@ -1386,6 +1534,26 @@ control_object_ptr :: proc "contextless" (self: Control) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+base_button_object_ptr :: proc "contextless" (self: BaseButton) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+button_object_ptr :: proc "contextless" (self: Button) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+texture_rect_object_ptr :: proc "contextless" (self: TextureRect) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+panel_object_ptr :: proc "contextless" (self: Panel) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+container_object_ptr :: proc "contextless" (self: Container) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 sprite2d_object_ptr :: proc "contextless" (self: Sprite2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -1480,6 +1648,46 @@ object_ptr_try_as_node2d :: proc "contextless" (self: ObjectPtr) -> (value: Node
 object_ptr_try_as_control :: proc "contextless" (self: ObjectPtr) -> (value: Control, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_control(Object(self))
+}
+
+object_ptr_try_as_base_button :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: BaseButton,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_base_button(Object(self))
+}
+
+object_ptr_try_as_button :: proc "contextless" (self: ObjectPtr) -> (value: Button, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_button(Object(self))
+}
+
+object_ptr_try_as_texture_rect :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: TextureRect,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_texture_rect(Object(self))
+}
+
+object_ptr_try_as_panel :: proc "contextless" (self: ObjectPtr) -> (value: Panel, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_panel(Object(self))
+}
+
+object_ptr_try_as_container :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: Container,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_container(Object(self))
 }
 
 object_ptr_try_as_sprite2d :: proc "contextless" (self: ObjectPtr) -> (value: Sprite2D, ok: bool) {
