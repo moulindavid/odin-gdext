@@ -123,10 +123,10 @@ until each ownership transfer and lifetime rule is explicit.
    - [x] Keep theme, font, stylebox, material, and event-object APIs deferred.
 
 5. Exercise the asset path in examples.
-   - [ ] Update examples/game to load one texture-like resource and use it
+   - [x] Update examples/game to load one texture-like resource and use it
      through godot:godot only.
-   - [ ] Keep the example deterministic in headless CI.
-   - [ ] Preserve existing method, property, signal, virtual callback, scene,
+   - [x] Keep the example deterministic in headless CI.
+   - [x] Preserve existing method, property, signal, virtual callback, scene,
      physics, and UI coverage.
 
 6. Improve generated resource reporting.

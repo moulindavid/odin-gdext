@@ -1501,13 +1501,15 @@ init_resource_loader_load :: proc "contextless" () {
 	resource_loader_load_initialized = true
 }
 
-// resource_loader_load_owned_checked loads a path through a Variant call, retains
-// the returned Resource into OwnedResource, then destroys the temporary Variant.
-// The caller owns the returned wrapper and must call owned_resource_destroy or
-// owned_resource_release. The ResourceLoader handle itself is borrowed.
-resource_loader_load_owned_checked :: proc "contextless" (
+// resource_loader_load_owned_with_cache_mode_checked loads a path through a
+// Variant call and stores the returned Resource in an OwnedResource. The caller
+// owns the returned wrapper and must call owned_resource_destroy or
+// owned_resource_release.
+resource_loader_load_owned_with_cache_mode_checked :: proc "contextless" (
 	self: ResourceLoader,
 	path: ^String,
+	cache_mode: ResourceLoaderCacheMode,
+	take_returned_reference: bool,
 ) -> (
 	owned: OwnedResource,
 	err: CallError,
@@ -1519,7 +1521,7 @@ resource_loader_load_owned_checked :: proc "contextless" (
 	path_variant := variant_from_string(path)
 	type_hint := string_from_utf8("")
 	type_hint_variant := variant_from_string(&type_hint)
-	cache_mode_variant := variant_from_int(i64(ResourceLoaderCacheMode.cache_mode_reuse))
+	cache_mode_variant := variant_from_int(i64(cache_mode))
 	args := [3]ConstVariantPtr {
 		const_variant_ptr(&path_variant),
 		const_variant_ptr(&type_hint_variant),
@@ -1547,8 +1549,30 @@ resource_loader_load_owned_checked :: proc "contextless" (
 	if !object_ok || object == nil do return {}, err, false
 	resource, resource_ok := object_ptr_try_as_resource(object)
 	if !resource_ok do return {}, err, false
+	if take_returned_reference {
+		owned_resource, owned_ok := owned_resource_init_owned(resource)
+		return owned_resource, err, owned_ok
+	}
 	retained, retained_ok := owned_resource_retain(resource)
 	return retained, err, retained_ok
+}
+
+// resource_loader_load_owned_checked keeps the default Godot cache reuse policy.
+// Use typed helpers when the borrow must be tied to a specific OwnedResource.
+resource_loader_load_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	err: CallError,
+	ok: bool,
+) {
+	return resource_loader_load_owned_with_cache_mode_checked(
+		self,
+		path,
+		.cache_mode_reuse,
+		false,
+	)
 }
 
 resource_loader_load_owned :: proc "contextless" (
@@ -1573,7 +1597,12 @@ resource_loader_load_texture2d_owned_checked :: proc "contextless" (
 	err: CallError,
 	ok: bool,
 ) {
-	owned, err, ok = resource_loader_load_owned_checked(self, path)
+	owned, err, ok = resource_loader_load_owned_with_cache_mode_checked(
+		self,
+		path,
+		.cache_mode_ignore,
+		true,
+	)
 	if !call_error_ok(&err) || !ok do return {}, {}, err, false
 
 	texture_ok: bool
@@ -1611,7 +1640,12 @@ resource_loader_load_image_texture_owned_checked :: proc "contextless" (
 	err: CallError,
 	ok: bool,
 ) {
-	owned, err, ok = resource_loader_load_owned_checked(self, path)
+	owned, err, ok = resource_loader_load_owned_with_cache_mode_checked(
+		self,
+		path,
+		.cache_mode_ignore,
+		true,
+	)
 	if !call_error_ok(&err) || !ok do return {}, {}, err, false
 
 	texture_ok: bool
