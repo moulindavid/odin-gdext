@@ -2,7 +2,8 @@
 
 ## Long-term goal
 
-Build an Odin GDExtension library:
+Build an Odin GDExtension library that feels close to godot-rust/gdext in
+capability while staying Odin-idiomatic:
 
 - safe low-level GDExtension bindings
 - explicit Godot value ownership and destruction rules
@@ -23,6 +24,8 @@ Keep these rules intact while adding features:
   retain/reference rule.
 - RefCounted and Resource remain borrowed by default. Owned references must use
   the explicit OwnedRefCounted or OwnedResource wrappers.
+- Owned Resource wrappers may expose borrowed typed handles only while the owned
+  wrapper remains alive.
 - No raw offset poking in examples, generated code, or public helpers.
 - Resolved GDExtension function pointers and method binds must be checked or
   trapped before use.
@@ -31,134 +34,162 @@ Keep these rules intact while adding features:
 - Extension classes must unregister during deinitialization.
 - Normal examples should import only godot:godot.
 
-## Completed: generated class API expansion
+## Completed feature slices
 
-Selected generated Godot class APIs are useful for focused Odin gameplay code
-while preserving the borrowed-object and explicit-owned-value safety model. The
-completed baseline includes support reporting, safer method type mapping,
-practical scene and UI APIs, checked NodePath lookup helpers, public facade
-exports, runtime example coverage, and generator guardrails for deterministic
-small-batch class expansion.
+These slices are complete and were validated with make ci when merged:
 
-## Completed: Resource and RefCounted ownership model
+1. Low-level safety and value ownership groundwork.
+   - Allocator/context policy, function pointer checks, explicit destruction
+     rules, Variant/String/StringName/NodePath/RID/container ownership helpers,
+     and primitive/builtin conversions.
 
-RefCounted and Resource now have an explicit owned-reference path while normal
-object/class handles remain borrowed by default. The completed slice added
-low-level retain/unreference helpers, OwnedRefCounted, OwnedResource, generator
-reporting for owned-wrapper-only methods, runtime smoke coverage, and full make
-ci validation.
+2. Generated class API baseline.
+   - Deterministic generated class reporting, selected class handles, safer
+     method type mapping, checked casts, NodePath lookup helpers, public facade
+     exports, and smoke/example coverage.
 
-## Completed: generated gameplay class API expansion
+3. Resource and RefCounted ownership model.
+   - Borrowed handles remain the default, with explicit OwnedRefCounted and
+     OwnedResource wrappers for retained references.
 
-The generated gameplay class slice added selected borrowed-safe APIs for common
-2D gameplay classes while keeping lifetime-sensitive APIs skipped. Completed
-coverage includes Timer, CollisionObject2D, Area2D, and a cautious minimal
-PackedScene slice. The public facade and examples exercise these APIs through
-godot:godot, and make ci passed for the completed slice.
+4. Gameplay class expansion.
+   - Selected Object, Node, Node2D, CanvasItem, Control, Timer,
+     CollisionObject2D, Area2D, PackedScene, input, scene-tree, physics, and
+     character APIs.
 
-## Completed: Signals and Callable groundwork
+5. Signals and Callable groundwork.
+   - Owned Callable and Signal storage, fixed-shape signal emission, selected
+     generated signal wrappers, safe connection helpers, and blocker reporting.
 
-The signal and callable groundwork added owned Callable and Signal storage
-helpers, explicit destruction rules, safe object signal connection helpers,
-fixed-arity signal emission helpers, generated blocker reporting, facade compile
-coverage, smoke/example coverage, and full make ci validation.
+6. Typed containers and default-argument ergonomics.
+   - TypedArray storage over Array storage, checked typed-array reads for
+     borrowed object handles, selected typed-array API coverage, and deterministic
+     default-argument convenience wrappers.
 
-## Completed: typed arrays and typed dictionaries
+7. Class authoring ergonomics.
+   - Stable registration metadata, class builders, method/property/signal
+     descriptors, typed instance-data helpers, virtual callback descriptors, and
+     process/physics-process helpers.
 
-The typed container slice added a first safe model for typed arrays returned by
-selected generated APIs. Completed coverage includes typed container ownership
-rules, typed array and typed dictionary blocker reporting, TypedArray storage
-over Array storage, checked read helpers for borrowed object handles, selected
-generated Area2D overlap methods, facade exports, smoke/facade coverage, and
-full make ci validation.
+8. Broader UI and Control APIs.
+   - Selected BaseButton, Button, TextureRect, Panel, and Container handles,
+     generated UI method wrappers, UTF-8 text facade helpers, UI blocker
+     reporting, and examples/game UI coverage through godot:godot.
 
-## Completed: default arguments and overload ergonomics
+## Current goal: Broader resource and asset APIs
 
-The default-argument slice added deterministic convenience wrappers for a small
-safe method batch while keeping full-arity generated wrappers canonical.
-Completed coverage includes default-argument reporting, parsing for simple safe
-defaults, selected default wrappers, public facade exports, facade compile
-coverage, example usage, deterministic generated output checks, and full make ci
-validation.
+Make common asset workflows usable from Odin gameplay code without weakening the
+ownership model. The first target is loading resources, downcasting them to
+selected borrowed typed handles, and passing those handles into generated APIs
+only while the owning wrapper remains alive.
 
-## Completed: class authoring ergonomics
+Keep this goal narrow. Do not expose broad cache APIs, Resource.duplicate,
+threaded loading, arbitrary resource mutation, or full texture/theme/font APIs
+until each ownership transfer and lifetime rule is explicit.
 
-The class-authoring slice made custom Odin classes less verbose while keeping
-lifecycle and ownership explicit. Completed coverage includes stable registration
-metadata storage, a small class builder, fixed-signature method helpers,
-typed-property helpers, signal registration helpers, typed instance-data helpers,
-facade compile coverage, and a beginner examples/hello class using only
-godot:godot. Full make ci passed for the completed slice.
+1. Audit resource and asset signatures.
+   - [ ] Inspect ResourceLoader, Resource, Texture2D, ImageTexture, AudioStream,
+     PackedScene, TextureRect, Button, Sprite2D, and common asset consumers.
+   - [ ] Identify methods that fit the existing OwnedResource, borrowed handle,
+     String, StringName, RID, primitive, and math-builtin rules.
+   - [ ] Keep threaded loading, cache-sensitive APIs, duplicate/instantiate
+     ownership transfers, theme/font/stylebox APIs, and unsupported server APIs
+     skipped with deterministic reasons.
+   - [ ] Prefer a small texture-first batch before audio, themes, or broader
+     Resource coverage.
 
-## Completed: Input and scene-tree gameplay APIs
+2. Add selected generated resource handle coverage.
+   - [ ] Add selected handles for Texture2D and ImageTexture if their safe method
+     surface is useful.
+   - [ ] Generate checked downcasts from Resource/Object to selected resource
+     handle types.
+   - [ ] Keep resource handles borrowed by value, never ownership-transferring.
+   - [ ] Re-export selected handles and casts through godot:godot.
 
-The input and scene-tree slice added borrowed singleton lookup rules, selected
-Input query APIs, selected borrowed-safe SceneTree APIs, public facade exports,
-generated singleton/input/scene-tree reporting, and real example usage through
-godot:godot. Full make ci passed for the completed slice.
+3. Add typed OwnedResource helper APIs.
+   - [ ] Add checked helpers that load a resource and expose a borrowed typed
+     handle while the OwnedResource remains alive.
+   - [ ] Make the lifetime rule obvious in procedure names and comments.
+   - [ ] Return ok = false for nil resources, failed loads, or failed class
+     checks.
+   - [ ] Keep destruction explicit through owned_resource_free.
 
-## Completed: Resource loading and scene instantiation groundwork
+4. Enable one safe asset-consumer path.
+   - [ ] Add or generate a small texture consumer path such as TextureRect or
+     Sprite2D texture assignment.
+   - [ ] Require the caller to keep the OwnedResource alive for as long as Godot
+     may use the borrowed texture handle.
+   - [ ] Avoid hiding Godot node/resource ownership behind broad convenience APIs.
+   - [ ] Keep theme, font, stylebox, material, and event-object APIs deferred.
 
-The resource loading and scene instantiation slice made it possible to load
-selected resources and instantiate scenes while keeping ownership transfers
-explicit. Completed coverage includes selected ResourceLoader singleton APIs,
-owned resource loading helpers, explicit PackedScene instantiation helpers,
-checked Node.add_child helpers, resource and scene blocker reporting, example
-coverage, and full make ci validation.
+5. Exercise the asset path in examples.
+   - [ ] Update examples/game to load one texture-like resource and use it
+     through godot:godot only.
+   - [ ] Keep the example deterministic in headless CI.
+   - [ ] Preserve existing method, property, signal, virtual callback, scene,
+     physics, and UI coverage.
 
-## Completed: Physics and character gameplay APIs
+6. Improve generated resource reporting.
+   - [ ] Refine report categories for texture, audio, theme/font/stylebox,
+     threaded loading, duplicate, and cache-related blockers.
+   - [ ] Use the report to choose the next asset batch instead of manually
+     patching generated files.
 
-The physics and character gameplay slice added a small generated API batch for
-common 2D physics gameplay. Completed coverage includes selected PhysicsBody2D,
-CharacterBody2D, RigidBody2D, StaticBody2D, and CollisionShape2D APIs, facade
-exports, downcast/upcast helpers, typed-array helpers, deterministic physics
-blocker reporting, example coverage, and full make ci validation.
+7. Validate before moving to the next feature roadmap.
+   - [ ] Run make ci.
+   - [ ] Confirm normal examples still import only godot:godot.
+   - [ ] Confirm generated reports explain remaining resource and asset skips.
+   - [ ] Confirm no hidden ownership transfer or raw offset poking was added.
 
-## Completed: Generated signal and callable wrappers
+## Planned next iterations
 
-The generated signal/callable wrapper slice made selected Godot signals usable
-through godot:godot without enabling broad varargs or arbitrary callable binding.
-Completed coverage includes signal metadata parsing, selected signal reporting,
-generated fixed-shape signal name/Signal/emit/connect wrappers, facade exports,
-facade compile coverage, smoke runtime coverage, and full make ci validation.
+After the current resource/asset slice, pick one roadmap at a time:
 
-## Completed: Virtual callbacks and process helpers
+1. Input event and viewport APIs.
+   - Minimal InputEvent wrappers, Viewport mouse/keyboard queries, and event
+     lifetime rules for callbacks.
 
-The virtual-callback slice made common Node lifecycle and frame callbacks easier
-for normal Odin classes without hiding registration or ownership rules. Completed
-coverage includes typed Node virtual callback descriptors, process and physics
-process enablement helpers, Godot-provided delta lookup through generated Node
-APIs, hello/smoke example coverage, facade compile checks, raw notification
-fallbacks, documentation, and full make ci validation.
+2. Animation and tween APIs.
+   - AnimationPlayer, Tween, SceneTree tween creation, and callable/signal limits
+     needed for common gameplay animation.
 
-## Completed: Broader UI and Control APIs
+3. More UI resource integration.
+   - Theme, Font, StyleBox, TextureButton, ProgressBar, and common Control APIs
+     once resource lifetimes are proven.
 
-The UI/Control slice expanded the selected generated UI surface so Odin gameplay
-code can drive simple Godot interfaces through godot:godot. Completed coverage
-includes selected BaseButton, Button, TextureRect, Panel, and Container handles,
-checked casts and lookup helpers, safe generated UI method wrappers, focused
-facade UTF-8 text helpers, examples/game UI usage, UI-specific blocker
-reporting, facade compile coverage, and full make ci validation.
+4. Broader 2D gameplay classes.
+   - TileMap/TileMapLayer, RayCast2D, Marker2D, Camera2D, NavigationAgent2D, and
+     small physics/resource-dependent batches.
 
-## Deferred
+5. Higher-level class authoring code generation.
+   - Reduce method/property/signal registration boilerplate while preserving
+     explicit callbacks, metadata lifetime, and unregistering.
+
+6. Error handling and diagnostics polish.
+   - More checked wrappers, clearer traps, generated support summaries, and
+     better user-facing failure messages.
+
+7. Packaging and external project workflow.
+   - Template project, collection/LSP setup docs, release/versioning policy, and
+     repeatable use from a separate Godot game repository.
+
+## Deferred until the related safety model exists
 
 - broad singleton coverage beyond selected safe APIs
-- event object wrappers and input event lifetime-sensitive APIs
+- arbitrary input event storage or callbacks
 - broad ownership-sensitive scene-tree changes
-- broad resource loading and asset APIs
-- macro-like or generated user class declarations
-- broad automatic method adapter generation
+- broad generated Signal wrappers beyond fixed safe shapes
+- broad generated Callable wrappers
 - vararg method adapters
-- default-argument adapters for user methods
-- broad generated signal wrappers beyond fixed safe shapes
-- arbitrary callable binding helpers
-- full virtual method generation
 - broad typed container mutation APIs
-- broad Resource, PackedScene, texture, theme, and asset APIs
+- broad Resource, PackedScene, texture, theme, font, and asset APIs
 - Resource.duplicate ownership-transfer wrappers
+- full generated virtual method bindings
 - full 1000+ class API generation
 
-## Validation
+## Validation baseline
+
+Before considering any roadmap slice complete:
 
 - make ci passes.
 - Normal examples import only godot:godot.
@@ -167,6 +198,8 @@ reporting, facade compile coverage, and full make ci validation.
   - method registration
   - property registration
   - signal registration and emission
-  - notification handling
+  - notification or virtual callback handling
   - generated class handle usage
-- Facade compile checks cover the public authoring helpers.
+- Facade compile checks cover the public authoring helpers and selected generated
+  APIs.
+- Generated reports explain unsupported APIs with stable reasons.
