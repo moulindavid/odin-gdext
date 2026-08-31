@@ -184,11 +184,11 @@ full UI class tree in this slice.
      scene, and physics coverage.
 
 6. Improve generated reporting for UI blockers.
-   - [ ] Add or refine UI-specific blocker reporting if the generic skip reasons
+   - [x] Add or refine UI-specific blocker reporting if the generic skip reasons
      are not clear enough.
-   - [ ] Keep skipped UI APIs explainable by lifetime, ownership, vararg, event,
+   - [x] Keep skipped UI APIs explainable by lifetime, ownership, vararg, event,
      resource, or unsupported type reason.
-   - [ ] Use the report to choose the next UI batch instead of manually patching
+   - [x] Use the report to choose the next UI batch instead of manually patching
      generated files.
 
 7. Validate before moving to the next feature roadmap.

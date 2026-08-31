@@ -1785,6 +1785,21 @@ class_method_is_physics_report_class :: proc(class_name: string) -> bool {
 	)
 }
 
+class_method_is_ui_report_class :: proc(class_name: string) -> bool {
+	return(
+		class_name == "Control" ||
+		class_name == "BaseButton" ||
+		class_name == "Button" ||
+		class_name == "TextureRect" ||
+		class_name == "Panel" ||
+		class_name == "Container" ||
+		class_name == "BoxContainer" ||
+		class_name == "HBoxContainer" ||
+		class_name == "VBoxContainer" ||
+		class_name == "MarginContainer" \
+	)
+}
+
 class_method_uses_typed_array :: proc(method: ExtensionApiClassMethod) -> bool {
 	if _, ok := typed_array_element_type(method.return_value.type); ok do return true
 	for arg in method.arguments {
@@ -2564,6 +2579,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&scene_instantiation_blockers)
 	physics_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&physics_blockers)
+	ui_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&ui_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2585,6 +2602,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	resource_loading_blocker_count := 0
 	scene_instantiation_blocker_count := 0
 	physics_blocker_count := 0
+	ui_blocker_count := 0
 
 	for class_name in selected_class_names {
 		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
@@ -2737,6 +2755,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					emit_class_method_report_signature(&physics_blockers, class.name, method)
 					fmt.sbprintf(&physics_blockers, ": %s\n", reason)
 					physics_blocker_count += 1
+				} else if class_method_is_ui_report_class(class.name) {
+					strings.write_string(&ui_blockers, "- ")
+					emit_class_method_report_signature(&ui_blockers, class.name, method)
+					fmt.sbprintf(&ui_blockers, ": %s\n", reason)
+					ui_blocker_count += 1
 				}
 			}
 		}
@@ -2792,6 +2815,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&signal_callable_blockers, ": %s\n", reason)
 					signal_callable_blocker_count += 1
 				}
+				if class_method_is_ui_report_class(class.name) {
+					strings.write_string(&ui_blockers, "- candidate ")
+					emit_class_method_report_signature(&ui_blockers, class.name, method)
+					fmt.sbprintf(&ui_blockers, ": %s\n", reason)
+					ui_blocker_count += 1
+				}
 			}
 		}
 		strings.write_byte(&candidate_analysis, '\n')
@@ -2832,6 +2861,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Resource-loading blockers: %d\n", resource_loading_blocker_count)
 	fmt.sbprintf(&b, "- Scene-instantiation blockers: %d\n", scene_instantiation_blocker_count)
 	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
+	fmt.sbprintf(&b, "- UI blockers: %d\n", ui_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -2865,6 +2895,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(scene_instantiation_blockers))
 	strings.write_string(&b, "\n## Physics blockers\n\n")
 	strings.write_string(&b, strings.to_string(physics_blockers))
+	strings.write_string(&b, "\n## UI blockers\n\n")
+	strings.write_string(&b, strings.to_string(ui_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 
