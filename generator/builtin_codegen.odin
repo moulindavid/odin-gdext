@@ -1034,11 +1034,14 @@ selected_class_names := []string {
 }
 
 candidate_class_names := []string {
-	"CharacterBody2D",
-	"PhysicsBody2D",
-	"RigidBody2D",
-	"StaticBody2D",
-	"CollisionShape2D",
+	"BaseButton",
+	"Button",
+	"TextureRect",
+	"Panel",
+	"Container",
+	"HBoxContainer",
+	"VBoxContainer",
+	"MarginContainer",
 }
 
 Selected_Class_Method :: struct {

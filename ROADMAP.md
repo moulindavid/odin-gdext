@@ -145,13 +145,13 @@ lifetimes, theme/resource ownership-sensitive APIs, broad texture loading, or th
 full UI class tree in this slice.
 
 1. Audit selected UI and Control signatures.
-   - [ ] Inspect Button, BaseButton, Label, TextureRect, Panel, Container, and
+   - [x] Inspect Button, BaseButton, Label, TextureRect, Panel, Container, and
      common Control methods in extension_api.json.
-   - [ ] Identify primitive, String, StringName, NodePath, Variant, and borrowed
+   - [x] Identify primitive, String, StringName, NodePath, Variant, and borrowed
      object signatures that already fit the safety model.
-   - [ ] Keep InputEvent, Theme, StyleBox, Texture, Font, Shortcut, Callable, and
+   - [x] Keep InputEvent, Theme, StyleBox, Texture, Font, Shortcut, Callable, and
      other ownership-sensitive signatures skipped with stable reasons.
-   - [ ] Prefer a small first batch over broad UI generation.
+   - [x] Prefer a small first batch over broad UI generation.
 
 2. Expand selected generated UI class handles.
    - [ ] Add a minimal selected batch for BaseButton, Button, TextureRect, Panel,
