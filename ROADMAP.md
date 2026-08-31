@@ -130,9 +130,9 @@ until each ownership transfer and lifetime rule is explicit.
      physics, and UI coverage.
 
 6. Improve generated resource reporting.
-   - [ ] Refine report categories for texture, audio, theme/font/stylebox,
+   - [x] Refine report categories for texture, audio, theme/font/stylebox,
      threaded loading, duplicate, and cache-related blockers.
-   - [ ] Use the report to choose the next asset batch instead of manually
+   - [x] Use the report to choose the next asset batch instead of manually
      patching generated files.
 
 7. Validate before moving to the next feature roadmap.
