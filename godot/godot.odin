@@ -1267,6 +1267,50 @@ node_get_node_as_label :: proc "contextless" (
 	return node_try_as_label(node)
 }
 
+label_set_text_utf8_checked :: proc "contextless" (self: Label, text: string) -> bool {
+	if label_is_nil(self) do return false
+	value := string_from_utf8(text)
+	defer string_free(&value)
+	label_set_text(self, &value)
+	return true
+}
+
+label_get_text_utf8_checked :: proc "contextless" (
+	self: Label,
+	buffer: []u8,
+) -> (
+	value: string,
+	ok: bool,
+	needed: int,
+) {
+	if label_is_nil(self) do return "", false, 0
+	text := label_get_text(self)
+	defer string_free(&text)
+	return string_to_utf8(&text, buffer)
+}
+
+button_set_text_utf8_checked :: proc "contextless" (self: Button, text: string) -> bool {
+	if button_is_nil(self) do return false
+	value := string_from_utf8(text)
+	defer string_free(&value)
+	button_set_text(self, &value)
+	return true
+}
+
+button_get_text_utf8_checked :: proc "contextless" (
+	self: Button,
+	buffer: []u8,
+) -> (
+	value: string,
+	ok: bool,
+	needed: int,
+) {
+	if button_is_nil(self) do return "", false, 0
+	text := button_get_text(self)
+	defer string_free(&text)
+	return string_to_utf8(&text, buffer)
+}
+
 node_get_node_as_timer :: proc "contextless" (
 	self: Node,
 	path: ^NodePath,

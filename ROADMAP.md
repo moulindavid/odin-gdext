@@ -171,10 +171,10 @@ full UI class tree in this slice.
    - [x] Add ownership comments for any owned value returns.
 
 4. Add focused facade helpers where generated wrappers are too raw.
-   - [ ] Add small checked helpers for common UI operations only when they clarify
+   - [x] Add small checked helpers for common UI operations only when they clarify
      nil handling or ownership.
-   - [ ] Keep object/class handles borrowed by value.
-   - [ ] Avoid hiding Godot node ownership when adding UI nodes to scenes.
+   - [x] Keep object/class handles borrowed by value.
+   - [x] Avoid hiding Godot node ownership when adding UI nodes to scenes.
 
 5. Exercise UI APIs in examples.
    - [ ] Update examples/game to drive a Label and a Button or button-like class
