@@ -1426,6 +1426,38 @@ input_is_nil :: proc "contextless" (self: Input) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+input_event_is_nil :: proc "contextless" (self: InputEvent) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_from_window_is_nil :: proc "contextless" (self: InputEventFromWindow) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_with_modifiers_is_nil :: proc "contextless" (self: InputEventWithModifiers) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_key_is_nil :: proc "contextless" (self: InputEventKey) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_mouse_is_nil :: proc "contextless" (self: InputEventMouse) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_mouse_button_is_nil :: proc "contextless" (self: InputEventMouseButton) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_mouse_motion_is_nil :: proc "contextless" (self: InputEventMouseMotion) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+viewport_is_nil :: proc "contextless" (self: Viewport) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 scene_tree_is_nil :: proc "contextless" (self: SceneTree) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -2138,6 +2170,46 @@ input_object_ptr :: proc "contextless" (self: Input) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+input_event_object_ptr :: proc "contextless" (self: InputEvent) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_from_window_object_ptr :: proc "contextless" (
+	self: InputEventFromWindow,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_with_modifiers_object_ptr :: proc "contextless" (
+	self: InputEventWithModifiers,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_key_object_ptr :: proc "contextless" (self: InputEventKey) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_mouse_object_ptr :: proc "contextless" (self: InputEventMouse) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_mouse_button_object_ptr :: proc "contextless" (
+	self: InputEventMouseButton,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_mouse_motion_object_ptr :: proc "contextless" (
+	self: InputEventMouseMotion,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+viewport_object_ptr :: proc "contextless" (self: Viewport) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 scene_tree_object_ptr :: proc "contextless" (self: SceneTree) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -2175,6 +2247,157 @@ object_ptr_try_as_image_texture :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_image_texture(Object(self))
+}
+
+object_ptr_try_as_input_event :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: InputEvent,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_input_event(Object(self))
+}
+
+object_ptr_try_as_input_event_key :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: InputEventKey,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_input_event_key(Object(self))
+}
+
+object_ptr_try_as_input_event_mouse_button :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: InputEventMouseButton,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_input_event_mouse_button(Object(self))
+}
+
+object_ptr_try_as_input_event_mouse_motion :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: InputEventMouseMotion,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_input_event_mouse_motion(Object(self))
+}
+
+object_ptr_try_as_viewport :: proc "contextless" (self: ObjectPtr) -> (value: Viewport, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_viewport(Object(self))
+}
+
+// InputEvent handles are borrowed from Godot. Do not store them beyond the
+// callback or object storage that supplied them.
+input_event_try_key :: proc "contextless" (self: InputEvent) -> (value: InputEventKey, ok: bool) {
+	if input_event_is_nil(self) do return {}, false
+	return input_event_try_as_input_event_key(self)
+}
+
+input_event_try_mouse_button :: proc "contextless" (
+	self: InputEvent,
+) -> (
+	value: InputEventMouseButton,
+	ok: bool,
+) {
+	if input_event_is_nil(self) do return {}, false
+	return input_event_try_as_input_event_mouse_button(self)
+}
+
+input_event_try_mouse_motion :: proc "contextless" (
+	self: InputEvent,
+) -> (
+	value: InputEventMouseMotion,
+	ok: bool,
+) {
+	if input_event_is_nil(self) do return {}, false
+	return input_event_try_as_input_event_mouse_motion(self)
+}
+
+input_event_action_pressed :: proc "contextless" (self: InputEvent, action: ^StringName) -> bool {
+	if input_event_is_nil(self) || action == nil do return false
+	return input_event_is_action_pressed_default(self, action)
+}
+
+input_event_action_released :: proc "contextless" (self: InputEvent, action: ^StringName) -> bool {
+	if input_event_is_nil(self) || action == nil do return false
+	return input_event_is_action_released_default(self, action)
+}
+
+input_event_action_strength :: proc "contextless" (
+	self: InputEvent,
+	action: ^StringName,
+) -> GodotReal {
+	if input_event_is_nil(self) || action == nil do return 0
+	return input_event_get_action_strength_default(self, action)
+}
+
+input_event_key_code_checked :: proc "contextless" (self: InputEvent) -> (key: Key, ok: bool) {
+	event, event_ok := input_event_try_key(self)
+	if !event_ok do return {}, false
+	return input_event_key_get_keycode(event), true
+}
+
+input_event_mouse_button_index_checked :: proc "contextless" (
+	self: InputEvent,
+) -> (
+	button: MouseButton,
+	ok: bool,
+) {
+	event, event_ok := input_event_try_mouse_button(self)
+	if !event_ok do return {}, false
+	return input_event_mouse_button_get_button_index(event), true
+}
+
+input_event_mouse_position_checked :: proc "contextless" (
+	self: InputEvent,
+) -> (
+	position: Vector2,
+	ok: bool,
+) {
+	if input_event_is_nil(self) do return {}, false
+	if mouse_motion, motion_ok := input_event_try_mouse_motion(self); motion_ok {
+		return input_event_mouse_get_position(
+				input_event_mouse_motion_as_input_event_mouse(mouse_motion),
+			),
+			true
+	}
+	if mouse_button, button_ok := input_event_try_mouse_button(self); button_ok {
+		return input_event_mouse_get_position(
+				input_event_mouse_button_as_input_event_mouse(mouse_button),
+			),
+			true
+	}
+	return {}, false
+}
+
+viewport_mouse_position_checked :: proc "contextless" (
+	self: Viewport,
+) -> (
+	position: Vector2,
+	ok: bool,
+) {
+	if viewport_is_nil(self) do return {}, false
+	return viewport_get_mouse_position(self), true
+}
+
+viewport_focused_control_checked :: proc "contextless" (
+	self: Viewport,
+) -> (
+	control: Control,
+	ok: bool,
+) {
+	if viewport_is_nil(self) do return {}, false
+	control = viewport_gui_get_focus_owner(self)
+	if control_is_nil(control) do return {}, false
+	return control, true
 }
 
 object_ptr_try_as_node :: proc "contextless" (self: ObjectPtr) -> (value: Node, ok: bool) {

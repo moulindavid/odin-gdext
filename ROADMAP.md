@@ -117,10 +117,10 @@ Viewport ownership-sensitive APIs until their lifetime rules are clear.
      APIs until resource ownership rules are explicit.
 
 4. Add public facade helpers for common input-event checks.
-   - [ ] Provide nil-safe helpers for selected InputEvent subclasses.
-   - [ ] Add checked helpers for common key, mouse button, mouse motion, and
+   - [x] Provide nil-safe helpers for selected InputEvent subclasses.
+   - [x] Add checked helpers for common key, mouse button, mouse motion, and
      action-style queries where generated names are too low-level.
-   - [ ] Keep helpers borrowed by value and document that event handles must not
+   - [x] Keep helpers borrowed by value and document that event handles must not
      be retained after the callback.
 
 5. Exercise the input and viewport path in examples.
