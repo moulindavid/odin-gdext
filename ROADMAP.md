@@ -136,11 +136,11 @@ Viewport ownership-sensitive APIs until their lifetime rules are clear.
    - [x] Use the report to choose the next input or viewport batch.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm normal examples still import only godot:godot.
-   - [ ] Confirm generated reports explain remaining input-event and viewport
+   - [x] Run make ci.
+   - [x] Confirm normal examples still import only godot:godot.
+   - [x] Confirm generated reports explain remaining input-event and viewport
      skips.
-   - [ ] Confirm no event handle storage, hidden ownership transfer, or raw
+   - [x] Confirm no event handle storage, hidden ownership transfer, or raw
      offset poking was added.
 
 ## Planned next iterations
