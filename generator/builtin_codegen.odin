@@ -2796,22 +2796,52 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				skipped_count += 1
 				asset_kind := class_method_resource_asset_blocker_kind(class.name, method)
 				if asset_kind == "texture" {
-					emit_class_method_blocker_line(&texture_blockers, "", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&texture_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
 					texture_blocker_count += 1
 				} else if asset_kind == "audio" {
 					emit_class_method_blocker_line(&audio_blockers, "", class.name, method, reason)
 					audio_blocker_count += 1
 				} else if asset_kind == "theme-font-stylebox" {
-					emit_class_method_blocker_line(&theme_font_stylebox_blockers, "", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&theme_font_stylebox_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
 					theme_font_stylebox_blocker_count += 1
 				} else if asset_kind == "threaded-loading" {
-					emit_class_method_blocker_line(&threaded_loading_blockers, "", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&threaded_loading_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
 					threaded_loading_blocker_count += 1
 				} else if asset_kind == "duplicate" {
-					emit_class_method_blocker_line(&resource_duplicate_blockers, "", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&resource_duplicate_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
 					resource_duplicate_blocker_count += 1
 				} else if asset_kind == "cache" {
-					emit_class_method_blocker_line(&resource_cache_blockers, "", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&resource_cache_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
 					resource_cache_blocker_count += 1
 				}
 				if class_method_has_default_arguments(method) {
@@ -2925,22 +2955,58 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				candidate_skipped_count += 1
 				asset_kind := class_method_resource_asset_blocker_kind(class.name, method)
 				if asset_kind == "texture" {
-					emit_class_method_blocker_line(&texture_blockers, "candidate ", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&texture_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
 					texture_blocker_count += 1
 				} else if asset_kind == "audio" {
-					emit_class_method_blocker_line(&audio_blockers, "candidate ", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&audio_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
 					audio_blocker_count += 1
 				} else if asset_kind == "theme-font-stylebox" {
-					emit_class_method_blocker_line(&theme_font_stylebox_blockers, "candidate ", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&theme_font_stylebox_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
 					theme_font_stylebox_blocker_count += 1
 				} else if asset_kind == "threaded-loading" {
-					emit_class_method_blocker_line(&threaded_loading_blockers, "candidate ", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&threaded_loading_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
 					threaded_loading_blocker_count += 1
 				} else if asset_kind == "duplicate" {
-					emit_class_method_blocker_line(&resource_duplicate_blockers, "candidate ", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&resource_duplicate_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
 					resource_duplicate_blocker_count += 1
 				} else if asset_kind == "cache" {
-					emit_class_method_blocker_line(&resource_cache_blockers, "candidate ", class.name, method, reason)
+					emit_class_method_blocker_line(
+						&resource_cache_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
 					resource_cache_blocker_count += 1
 				}
 				if class_method_uses_callable_or_signal(method) {
