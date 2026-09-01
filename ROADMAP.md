@@ -76,100 +76,98 @@ These slices are complete and were validated with make ci when merged:
      generated UI method wrappers, UTF-8 text facade helpers, UI blocker
      reporting, and examples/game UI coverage through godot:godot.
 
-## Current goal: Broader resource and asset APIs
+9. Broader resource and asset APIs.
+   - Selected Texture2D and ImageTexture handles, checked resource downcasts,
+     typed OwnedResource loading helpers, a safe texture consumer path,
+     deterministic resource blocker reporting, and examples/game asset coverage.
 
-Make common asset workflows usable from Odin gameplay code without weakening the
-ownership model. The first target is loading resources, downcasting them to
-selected borrowed typed handles, and passing those handles into generated APIs
-only while the owning wrapper remains alive.
+## Current goal: Input event and viewport APIs
 
-Keep this goal narrow. Do not expose broad cache APIs, Resource.duplicate,
-threaded loading, arbitrary resource mutation, or full texture/theme/font APIs
-until each ownership transfer and lifetime rule is explicit.
+Expose a small, useful input-event and viewport API surface for gameplay code
+while preserving the borrowed-handle and event-lifetime model. Existing input
+polling is useful, but real projects also need selected InputEvent subclasses
+and viewport queries for mouse, keyboard, UI, and camera-related systems.
 
-1. Audit resource and asset signatures.
-   - [x] Inspect ResourceLoader, Resource, Texture2D, ImageTexture, AudioStream,
-     PackedScene, TextureRect, Button, Sprite2D, and common asset consumers.
-   - [x] Identify methods that fit the existing OwnedResource, borrowed handle,
-     String, StringName, RID, primitive, and math-builtin rules.
-   - [x] Keep threaded loading, cache-sensitive APIs, duplicate/instantiate
-     ownership transfers, theme/font/stylebox APIs, and unsupported server APIs
-     skipped with deterministic reasons.
-   - [x] Prefer a small texture-first batch before audio, themes, or broader
-     Resource coverage.
+Keep this goal narrow. InputEvent handles are borrowed unless an explicit owned
+resource/reference wrapper is added. Do not store event handles beyond the Godot
+callback that supplied them, and do not expose broad input-event mutation or
+Viewport ownership-sensitive APIs until their lifetime rules are clear.
 
-2. Add selected generated resource handle coverage.
-   - [x] Add selected handles for Texture2D and ImageTexture if their safe method
-     surface is useful.
-   - [x] Generate checked downcasts from Resource/Object to selected resource
-     handle types.
-   - [x] Keep resource handles borrowed by value, never ownership-transferring.
-   - [x] Re-export selected handles and casts through godot:godot.
+1. Audit InputEvent and Viewport signatures.
+   - [ ] Inspect InputEvent, InputEventKey, InputEventMouseButton,
+     InputEventMouseMotion, Viewport, Window, and related input/viewport methods.
+   - [ ] Classify methods by borrowed-safe signatures, explicit owned-wrapper
+     needs, and unsupported event-lifetime-sensitive cases.
+   - [ ] Keep event storage, arbitrary event construction, Viewport texture
+     ownership, and server-heavy APIs skipped with deterministic reasons.
 
-3. Add typed OwnedResource helper APIs.
-   - [x] Add checked helpers that load a resource and expose a borrowed typed
-     handle while the OwnedResource remains alive.
-   - [x] Make the lifetime rule obvious in procedure names and comments.
-   - [x] Return ok = false for nil resources, failed loads, or failed class
-     checks.
-   - [x] Keep destruction explicit through owned_resource_destroy.
+2. Add selected generated InputEvent handle coverage.
+   - [ ] Add selected InputEvent class handles and checked downcasts.
+   - [ ] Generate only borrowed-safe primitive, StringName, Vector2, and simple
+     boolean/query methods.
+   - [ ] Re-export selected handles and casts through godot:godot.
+   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
 
-4. Enable one safe asset-consumer path.
-   - [x] Add or generate a small texture consumer path such as TextureRect or
-     Sprite2D texture assignment.
-   - [x] Require the caller to keep the OwnedResource alive for as long as Godot
-     may use the borrowed texture handle.
-   - [x] Avoid hiding Godot node/resource ownership behind broad convenience APIs.
-   - [x] Keep theme, font, stylebox, material, and event-object APIs deferred.
+3. Add selected generated Viewport coverage.
+   - [ ] Generate small borrowed-safe Viewport query wrappers needed by gameplay
+     and UI code.
+   - [ ] Prefer methods returning primitives, Vector2, Rect2, or borrowed object
+     handles with clear nil behavior.
+   - [ ] Defer ViewportTexture, render target, world, camera, and ownership-heavy
+     APIs until resource ownership rules are explicit.
 
-5. Exercise the asset path in examples.
-   - [x] Update examples/game to load one texture-like resource and use it
-     through godot:godot only.
-   - [x] Keep the example deterministic in headless CI.
-   - [x] Preserve existing method, property, signal, virtual callback, scene,
-     physics, and UI coverage.
+4. Add public facade helpers for common input-event checks.
+   - [ ] Provide nil-safe helpers for selected InputEvent subclasses.
+   - [ ] Add checked helpers for common key, mouse button, mouse motion, and
+     action-style queries where generated names are too low-level.
+   - [ ] Keep helpers borrowed by value and document that event handles must not
+     be retained after the callback.
 
-6. Improve generated resource reporting.
-   - [x] Refine report categories for texture, audio, theme/font/stylebox,
-     threaded loading, duplicate, and cache-related blockers.
-   - [x] Use the report to choose the next asset batch instead of manually
-     patching generated files.
+5. Exercise the input and viewport path in examples.
+   - [ ] Keep examples/game importing only godot:godot.
+   - [ ] Add compile or runtime coverage for selected InputEvent downcasts and
+     Viewport queries that remains deterministic in headless CI.
+   - [ ] Avoid tests that depend on real keyboard or mouse input from CI.
+
+6. Improve generated input and viewport reporting.
+   - [ ] Split blocker report categories for input events, viewport resources,
+     event construction, and ownership-sensitive viewport APIs where useful.
+   - [ ] Keep generated output deterministic.
+   - [ ] Use the report to choose the next input or viewport batch.
 
 7. Validate before moving to the next feature roadmap.
-   - [x] Run make ci.
-   - [x] Confirm normal examples still import only godot:godot.
-   - [x] Confirm generated reports explain remaining resource and asset skips.
-   - [x] Confirm no hidden ownership transfer or raw offset poking was added.
+   - [ ] Run make ci.
+   - [ ] Confirm normal examples still import only godot:godot.
+   - [ ] Confirm generated reports explain remaining input-event and viewport
+     skips.
+   - [ ] Confirm no event handle storage, hidden ownership transfer, or raw
+     offset poking was added.
 
 ## Planned next iterations
 
-After the current resource/asset slice, pick one roadmap at a time:
+After the current input-event/viewport slice, pick one roadmap at a time:
 
-1. Input event and viewport APIs.
-   - Minimal InputEvent wrappers, Viewport mouse/keyboard queries, and event
-     lifetime rules for callbacks.
-
-2. Animation and tween APIs.
+1. Animation and tween APIs.
    - AnimationPlayer, Tween, SceneTree tween creation, and callable/signal limits
      needed for common gameplay animation.
 
-3. More UI resource integration.
+2. More UI resource integration.
    - Theme, Font, StyleBox, TextureButton, ProgressBar, and common Control APIs
      once resource lifetimes are proven.
 
-4. Broader 2D gameplay classes.
+3. Broader 2D gameplay classes.
    - TileMap/TileMapLayer, RayCast2D, Marker2D, Camera2D, NavigationAgent2D, and
      small physics/resource-dependent batches.
 
-5. Higher-level class authoring code generation.
+4. Higher-level class authoring code generation.
    - Reduce method/property/signal registration boilerplate while preserving
      explicit callbacks, metadata lifetime, and unregistering.
 
-6. Error handling and diagnostics polish.
+5. Error handling and diagnostics polish.
    - More checked wrappers, clearer traps, generated support summaries, and
      better user-facing failure messages.
 
-7. Packaging and external project workflow.
+6. Packaging and external project workflow.
    - Template project, collection/LSP setup docs, release/versioning policy, and
      repeatable use from a separate Godot game repository.
 
