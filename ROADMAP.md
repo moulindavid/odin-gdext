@@ -109,11 +109,11 @@ Viewport ownership-sensitive APIs until their lifetime rules are clear.
    - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 3. Add selected generated Viewport coverage.
-   - [ ] Generate small borrowed-safe Viewport query wrappers needed by gameplay
+   - [x] Generate small borrowed-safe Viewport query wrappers needed by gameplay
      and UI code.
-   - [ ] Prefer methods returning primitives, Vector2, Rect2, or borrowed object
+   - [x] Prefer methods returning primitives, Vector2, Rect2, or borrowed object
      handles with clear nil behavior.
-   - [ ] Defer ViewportTexture, render target, world, camera, and ownership-heavy
+   - [x] Defer ViewportTexture, render target, world, camera, and ownership-heavy
      APIs until resource ownership rules are explicit.
 
 4. Add public facade helpers for common input-event checks.

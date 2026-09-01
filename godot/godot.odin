@@ -184,6 +184,7 @@ InputEventKey :: gclass.InputEventKey
 InputEventMouse :: gclass.InputEventMouse
 InputEventMouseButton :: gclass.InputEventMouseButton
 InputEventMouseMotion :: gclass.InputEventMouseMotion
+Viewport :: gclass.Viewport
 SceneTree :: gclass.SceneTree
 
 // --- Core functions ---
@@ -432,6 +433,7 @@ texture2d_has_mipmaps :: gclass.texture2d_has_mipmaps
 node_as_object :: gclass.node_as_object
 node_get_parent :: gclass.node_get_parent
 node_get_tree :: gclass.node_get_tree
+node_get_viewport :: gclass.node_get_viewport
 node_set_name :: gclass.node_set_name
 node_get_name :: gclass.node_get_name
 node_has_node :: gclass.node_has_node
@@ -789,6 +791,8 @@ object_is_input_event_mouse_button :: gclass.object_is_input_event_mouse_button
 object_try_as_input_event_mouse_button :: gclass.object_try_as_input_event_mouse_button
 object_is_input_event_mouse_motion :: gclass.object_is_input_event_mouse_motion
 object_try_as_input_event_mouse_motion :: gclass.object_try_as_input_event_mouse_motion
+object_is_viewport :: gclass.object_is_viewport
+object_try_as_viewport :: gclass.object_try_as_viewport
 object_is_scene_tree :: gclass.object_is_scene_tree
 object_try_as_scene_tree :: gclass.object_try_as_scene_tree
 ref_counted_is_resource :: gclass.ref_counted_is_resource
@@ -953,6 +957,8 @@ physics_body2d_is_static_body2d :: gclass.physics_body2d_is_static_body2d
 physics_body2d_try_as_static_body2d :: gclass.physics_body2d_try_as_static_body2d
 node_is_collision_shape2d :: gclass.node_is_collision_shape2d
 node_try_as_collision_shape2d :: gclass.node_try_as_collision_shape2d
+node_is_viewport :: gclass.node_is_viewport
+node_try_as_viewport :: gclass.node_try_as_viewport
 canvas_item_is_collision_shape2d :: gclass.canvas_item_is_collision_shape2d
 canvas_item_try_as_collision_shape2d :: gclass.canvas_item_try_as_collision_shape2d
 node2d_is_collision_shape2d :: gclass.node2d_is_collision_shape2d
@@ -1170,6 +1176,8 @@ input_event_mouse_motion_as_input_event :: gclass.input_event_mouse_motion_as_in
 input_event_mouse_motion_as_resource :: gclass.input_event_mouse_motion_as_resource
 input_event_mouse_motion_as_ref_counted :: gclass.input_event_mouse_motion_as_ref_counted
 input_event_mouse_motion_as_object :: gclass.input_event_mouse_motion_as_object
+viewport_as_node :: gclass.viewport_as_node
+viewport_as_object :: gclass.viewport_as_object
 input_singleton_checked :: gclass.input_singleton_checked
 input_is_anything_pressed :: gclass.input_is_anything_pressed
 input_is_action_pressed :: gclass.input_is_action_pressed
@@ -1241,6 +1249,52 @@ input_event_mouse_motion_get_relative :: gclass.input_event_mouse_motion_get_rel
 input_event_mouse_motion_get_screen_relative :: gclass.input_event_mouse_motion_get_screen_relative
 input_event_mouse_motion_get_velocity :: gclass.input_event_mouse_motion_get_velocity
 input_event_mouse_motion_get_screen_velocity :: gclass.input_event_mouse_motion_get_screen_velocity
+viewport_get_canvas_transform :: gclass.viewport_get_canvas_transform
+viewport_get_global_canvas_transform :: gclass.viewport_get_global_canvas_transform
+viewport_get_stretch_transform :: gclass.viewport_get_stretch_transform
+viewport_get_final_transform :: gclass.viewport_get_final_transform
+viewport_get_screen_transform :: gclass.viewport_get_screen_transform
+viewport_get_visible_rect :: gclass.viewport_get_visible_rect
+viewport_has_transparent_background :: gclass.viewport_has_transparent_background
+viewport_is_using_hdr_2d :: gclass.viewport_is_using_hdr_2d
+viewport_is_using_taa :: gclass.viewport_is_using_taa
+viewport_is_using_debanding :: gclass.viewport_is_using_debanding
+viewport_is_using_occlusion_culling :: gclass.viewport_is_using_occlusion_culling
+viewport_is_using_oversampling :: gclass.viewport_is_using_oversampling
+viewport_get_oversampling_override :: gclass.viewport_get_oversampling_override
+viewport_get_oversampling :: gclass.viewport_get_oversampling
+viewport_get_physics_object_picking :: gclass.viewport_get_physics_object_picking
+viewport_get_physics_object_picking_sort :: gclass.viewport_get_physics_object_picking_sort
+viewport_get_physics_object_picking_first_only ::
+	gclass.viewport_get_physics_object_picking_first_only
+viewport_get_viewport_rid :: gclass.viewport_get_viewport_rid
+viewport_get_mouse_position :: gclass.viewport_get_mouse_position
+viewport_gui_is_dragging :: gclass.viewport_gui_is_dragging
+viewport_gui_is_drag_successful :: gclass.viewport_gui_is_drag_successful
+viewport_gui_get_focus_owner :: gclass.viewport_gui_get_focus_owner
+viewport_gui_get_hovered_control :: gclass.viewport_gui_get_hovered_control
+viewport_is_input_disabled :: gclass.viewport_is_input_disabled
+viewport_get_positional_shadow_atlas_size :: gclass.viewport_get_positional_shadow_atlas_size
+viewport_get_positional_shadow_atlas_16_bits :: gclass.viewport_get_positional_shadow_atlas_16_bits
+viewport_is_snap_controls_to_pixels_enabled :: gclass.viewport_is_snap_controls_to_pixels_enabled
+viewport_is_snap_2d_transforms_to_pixel_enabled ::
+	gclass.viewport_is_snap_2d_transforms_to_pixel_enabled
+viewport_is_snap_2d_vertices_to_pixel_enabled ::
+	gclass.viewport_is_snap_2d_vertices_to_pixel_enabled
+viewport_is_input_handled :: gclass.viewport_is_input_handled
+viewport_is_handling_input_locally :: gclass.viewport_is_handling_input_locally
+viewport_is_embedding_subwindows :: gclass.viewport_is_embedding_subwindows
+viewport_get_drag_threshold :: gclass.viewport_get_drag_threshold
+viewport_get_canvas_cull_mask :: gclass.viewport_get_canvas_cull_mask
+viewport_get_canvas_cull_mask_bit :: gclass.viewport_get_canvas_cull_mask_bit
+viewport_get_mesh_lod_threshold :: gclass.viewport_get_mesh_lod_threshold
+viewport_is_audio_listener_2d :: gclass.viewport_is_audio_listener_2d
+viewport_is_using_own_world_3d :: gclass.viewport_is_using_own_world_3d
+viewport_is_3d_disabled :: gclass.viewport_is_3d_disabled
+viewport_is_using_xr :: gclass.viewport_is_using_xr
+viewport_get_scaling_3d_scale :: gclass.viewport_get_scaling_3d_scale
+viewport_get_fsr_sharpness :: gclass.viewport_get_fsr_sharpness
+viewport_get_texture_mipmap_bias :: gclass.viewport_get_texture_mipmap_bias
 scene_tree_as_object :: gclass.scene_tree_as_object
 scene_tree_has_group :: gclass.scene_tree_has_group
 scene_tree_is_accessibility_enabled :: gclass.scene_tree_is_accessibility_enabled
