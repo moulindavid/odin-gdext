@@ -94,53 +94,53 @@ callback that supplied them, and do not expose broad input-event mutation or
 Viewport ownership-sensitive APIs until their lifetime rules are clear.
 
 1. Audit InputEvent and Viewport signatures.
-   - [ ] Inspect InputEvent, InputEventKey, InputEventMouseButton,
+   - [x] Inspect InputEvent, InputEventKey, InputEventMouseButton,
      InputEventMouseMotion, Viewport, Window, and related input/viewport methods.
-   - [ ] Classify methods by borrowed-safe signatures, explicit owned-wrapper
+   - [x] Classify methods by borrowed-safe signatures, explicit owned-wrapper
      needs, and unsupported event-lifetime-sensitive cases.
-   - [ ] Keep event storage, arbitrary event construction, Viewport texture
+   - [x] Keep event storage, arbitrary event construction, Viewport texture
      ownership, and server-heavy APIs skipped with deterministic reasons.
 
 2. Add selected generated InputEvent handle coverage.
-   - [ ] Add selected InputEvent class handles and checked downcasts.
-   - [ ] Generate only borrowed-safe primitive, StringName, Vector2, and simple
+   - [x] Add selected InputEvent class handles and checked downcasts.
+   - [x] Generate only borrowed-safe primitive, StringName, Vector2, and simple
      boolean/query methods.
-   - [ ] Re-export selected handles and casts through godot:godot.
-   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [x] Re-export selected handles and casts through godot:godot.
+   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 3. Add selected generated Viewport coverage.
-   - [ ] Generate small borrowed-safe Viewport query wrappers needed by gameplay
+   - [x] Generate small borrowed-safe Viewport query wrappers needed by gameplay
      and UI code.
-   - [ ] Prefer methods returning primitives, Vector2, Rect2, or borrowed object
+   - [x] Prefer methods returning primitives, Vector2, Rect2, or borrowed object
      handles with clear nil behavior.
-   - [ ] Defer ViewportTexture, render target, world, camera, and ownership-heavy
+   - [x] Defer ViewportTexture, render target, world, camera, and ownership-heavy
      APIs until resource ownership rules are explicit.
 
 4. Add public facade helpers for common input-event checks.
-   - [ ] Provide nil-safe helpers for selected InputEvent subclasses.
-   - [ ] Add checked helpers for common key, mouse button, mouse motion, and
+   - [x] Provide nil-safe helpers for selected InputEvent subclasses.
+   - [x] Add checked helpers for common key, mouse button, mouse motion, and
      action-style queries where generated names are too low-level.
-   - [ ] Keep helpers borrowed by value and document that event handles must not
+   - [x] Keep helpers borrowed by value and document that event handles must not
      be retained after the callback.
 
 5. Exercise the input and viewport path in examples.
-   - [ ] Keep examples/game importing only godot:godot.
-   - [ ] Add compile or runtime coverage for selected InputEvent downcasts and
+   - [x] Keep examples/game importing only godot:godot.
+   - [x] Add compile or runtime coverage for selected InputEvent downcasts and
      Viewport queries that remains deterministic in headless CI.
-   - [ ] Avoid tests that depend on real keyboard or mouse input from CI.
+   - [x] Avoid tests that depend on real keyboard or mouse input from CI.
 
 6. Improve generated input and viewport reporting.
-   - [ ] Split blocker report categories for input events, viewport resources,
+   - [x] Split blocker report categories for input events, viewport resources,
      event construction, and ownership-sensitive viewport APIs where useful.
-   - [ ] Keep generated output deterministic.
-   - [ ] Use the report to choose the next input or viewport batch.
+   - [x] Keep generated output deterministic.
+   - [x] Use the report to choose the next input or viewport batch.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm normal examples still import only godot:godot.
-   - [ ] Confirm generated reports explain remaining input-event and viewport
+   - [x] Run make ci.
+   - [x] Confirm normal examples still import only godot:godot.
+   - [x] Confirm generated reports explain remaining input-event and viewport
      skips.
-   - [ ] Confirm no event handle storage, hidden ownership transfer, or raw
+   - [x] Confirm no event handle storage, hidden ownership transfer, or raw
      offset poking was added.
 
 ## Planned next iterations

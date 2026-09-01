@@ -140,6 +140,9 @@ Transform3D :: gbind_builtin.Transform3D
 Projection :: gbind_builtin.Projection
 Error :: gclass.Error
 Side :: gclass.Side
+Key :: gclass.Key
+KeyLocation :: gclass.KeyLocation
+MouseButton :: gclass.MouseButton
 HorizontalAlignment :: gclass.HorizontalAlignment
 VerticalAlignment :: gclass.VerticalAlignment
 Resource :: gclass.Resource
@@ -174,6 +177,14 @@ CollisionShape2D :: gclass.CollisionShape2D
 PackedScene :: gclass.PackedScene
 ResourceLoader :: gclass.ResourceLoader
 Input :: gclass.Input
+InputEvent :: gclass.InputEvent
+InputEventFromWindow :: gclass.InputEventFromWindow
+InputEventWithModifiers :: gclass.InputEventWithModifiers
+InputEventKey :: gclass.InputEventKey
+InputEventMouse :: gclass.InputEventMouse
+InputEventMouseButton :: gclass.InputEventMouseButton
+InputEventMouseMotion :: gclass.InputEventMouseMotion
+Viewport :: gclass.Viewport
 SceneTree :: gclass.SceneTree
 
 // --- Core functions ---
@@ -422,6 +433,7 @@ texture2d_has_mipmaps :: gclass.texture2d_has_mipmaps
 node_as_object :: gclass.node_as_object
 node_get_parent :: gclass.node_get_parent
 node_get_tree :: gclass.node_get_tree
+node_get_viewport :: gclass.node_get_viewport
 node_set_name :: gclass.node_set_name
 node_get_name :: gclass.node_get_name
 node_has_node :: gclass.node_has_node
@@ -765,6 +777,22 @@ object_is_resource_loader :: gclass.object_is_resource_loader
 object_try_as_resource_loader :: gclass.object_try_as_resource_loader
 object_is_input :: gclass.object_is_input
 object_try_as_input :: gclass.object_try_as_input
+object_is_input_event :: gclass.object_is_input_event
+object_try_as_input_event :: gclass.object_try_as_input_event
+object_is_input_event_from_window :: gclass.object_is_input_event_from_window
+object_try_as_input_event_from_window :: gclass.object_try_as_input_event_from_window
+object_is_input_event_with_modifiers :: gclass.object_is_input_event_with_modifiers
+object_try_as_input_event_with_modifiers :: gclass.object_try_as_input_event_with_modifiers
+object_is_input_event_key :: gclass.object_is_input_event_key
+object_try_as_input_event_key :: gclass.object_try_as_input_event_key
+object_is_input_event_mouse :: gclass.object_is_input_event_mouse
+object_try_as_input_event_mouse :: gclass.object_try_as_input_event_mouse
+object_is_input_event_mouse_button :: gclass.object_is_input_event_mouse_button
+object_try_as_input_event_mouse_button :: gclass.object_try_as_input_event_mouse_button
+object_is_input_event_mouse_motion :: gclass.object_is_input_event_mouse_motion
+object_try_as_input_event_mouse_motion :: gclass.object_try_as_input_event_mouse_motion
+object_is_viewport :: gclass.object_is_viewport
+object_try_as_viewport :: gclass.object_try_as_viewport
 object_is_scene_tree :: gclass.object_is_scene_tree
 object_try_as_scene_tree :: gclass.object_try_as_scene_tree
 ref_counted_is_resource :: gclass.ref_counted_is_resource
@@ -773,6 +801,90 @@ ref_counted_is_packed_scene :: gclass.ref_counted_is_packed_scene
 ref_counted_try_as_packed_scene :: gclass.ref_counted_try_as_packed_scene
 resource_is_packed_scene :: gclass.resource_is_packed_scene
 resource_try_as_packed_scene :: gclass.resource_try_as_packed_scene
+ref_counted_is_input_event :: gclass.ref_counted_is_input_event
+ref_counted_try_as_input_event :: gclass.ref_counted_try_as_input_event
+ref_counted_is_input_event_from_window :: gclass.ref_counted_is_input_event_from_window
+ref_counted_try_as_input_event_from_window :: gclass.ref_counted_try_as_input_event_from_window
+ref_counted_is_input_event_with_modifiers :: gclass.ref_counted_is_input_event_with_modifiers
+ref_counted_try_as_input_event_with_modifiers ::
+	gclass.ref_counted_try_as_input_event_with_modifiers
+ref_counted_is_input_event_key :: gclass.ref_counted_is_input_event_key
+ref_counted_try_as_input_event_key :: gclass.ref_counted_try_as_input_event_key
+ref_counted_is_input_event_mouse :: gclass.ref_counted_is_input_event_mouse
+ref_counted_try_as_input_event_mouse :: gclass.ref_counted_try_as_input_event_mouse
+ref_counted_is_input_event_mouse_button :: gclass.ref_counted_is_input_event_mouse_button
+ref_counted_try_as_input_event_mouse_button :: gclass.ref_counted_try_as_input_event_mouse_button
+ref_counted_is_input_event_mouse_motion :: gclass.ref_counted_is_input_event_mouse_motion
+ref_counted_try_as_input_event_mouse_motion :: gclass.ref_counted_try_as_input_event_mouse_motion
+resource_is_input_event :: gclass.resource_is_input_event
+resource_try_as_input_event :: gclass.resource_try_as_input_event
+resource_is_input_event_from_window :: gclass.resource_is_input_event_from_window
+resource_try_as_input_event_from_window :: gclass.resource_try_as_input_event_from_window
+resource_is_input_event_with_modifiers :: gclass.resource_is_input_event_with_modifiers
+resource_try_as_input_event_with_modifiers :: gclass.resource_try_as_input_event_with_modifiers
+resource_is_input_event_key :: gclass.resource_is_input_event_key
+resource_try_as_input_event_key :: gclass.resource_try_as_input_event_key
+resource_is_input_event_mouse :: gclass.resource_is_input_event_mouse
+resource_try_as_input_event_mouse :: gclass.resource_try_as_input_event_mouse
+resource_is_input_event_mouse_button :: gclass.resource_is_input_event_mouse_button
+resource_try_as_input_event_mouse_button :: gclass.resource_try_as_input_event_mouse_button
+resource_is_input_event_mouse_motion :: gclass.resource_is_input_event_mouse_motion
+resource_try_as_input_event_mouse_motion :: gclass.resource_try_as_input_event_mouse_motion
+input_event_is_input_event_from_window :: gclass.input_event_is_input_event_from_window
+input_event_try_as_input_event_from_window :: gclass.input_event_try_as_input_event_from_window
+input_event_is_input_event_with_modifiers :: gclass.input_event_is_input_event_with_modifiers
+input_event_try_as_input_event_with_modifiers ::
+	gclass.input_event_try_as_input_event_with_modifiers
+input_event_is_input_event_key :: gclass.input_event_is_input_event_key
+input_event_try_as_input_event_key :: gclass.input_event_try_as_input_event_key
+input_event_is_input_event_mouse :: gclass.input_event_is_input_event_mouse
+input_event_try_as_input_event_mouse :: gclass.input_event_try_as_input_event_mouse
+input_event_is_input_event_mouse_button :: gclass.input_event_is_input_event_mouse_button
+input_event_try_as_input_event_mouse_button :: gclass.input_event_try_as_input_event_mouse_button
+input_event_is_input_event_mouse_motion :: gclass.input_event_is_input_event_mouse_motion
+input_event_try_as_input_event_mouse_motion :: gclass.input_event_try_as_input_event_mouse_motion
+input_event_from_window_is_input_event_with_modifiers ::
+	gclass.input_event_from_window_is_input_event_with_modifiers
+input_event_from_window_try_as_input_event_with_modifiers ::
+	gclass.input_event_from_window_try_as_input_event_with_modifiers
+input_event_from_window_is_input_event_key :: gclass.input_event_from_window_is_input_event_key
+input_event_from_window_try_as_input_event_key ::
+	gclass.input_event_from_window_try_as_input_event_key
+input_event_from_window_is_input_event_mouse :: gclass.input_event_from_window_is_input_event_mouse
+input_event_from_window_try_as_input_event_mouse ::
+	gclass.input_event_from_window_try_as_input_event_mouse
+input_event_from_window_is_input_event_mouse_button ::
+	gclass.input_event_from_window_is_input_event_mouse_button
+input_event_from_window_try_as_input_event_mouse_button ::
+	gclass.input_event_from_window_try_as_input_event_mouse_button
+input_event_from_window_is_input_event_mouse_motion ::
+	gclass.input_event_from_window_is_input_event_mouse_motion
+input_event_from_window_try_as_input_event_mouse_motion ::
+	gclass.input_event_from_window_try_as_input_event_mouse_motion
+input_event_with_modifiers_is_input_event_key ::
+	gclass.input_event_with_modifiers_is_input_event_key
+input_event_with_modifiers_try_as_input_event_key ::
+	gclass.input_event_with_modifiers_try_as_input_event_key
+input_event_with_modifiers_is_input_event_mouse ::
+	gclass.input_event_with_modifiers_is_input_event_mouse
+input_event_with_modifiers_try_as_input_event_mouse ::
+	gclass.input_event_with_modifiers_try_as_input_event_mouse
+input_event_with_modifiers_is_input_event_mouse_button ::
+	gclass.input_event_with_modifiers_is_input_event_mouse_button
+input_event_with_modifiers_try_as_input_event_mouse_button ::
+	gclass.input_event_with_modifiers_try_as_input_event_mouse_button
+input_event_with_modifiers_is_input_event_mouse_motion ::
+	gclass.input_event_with_modifiers_is_input_event_mouse_motion
+input_event_with_modifiers_try_as_input_event_mouse_motion ::
+	gclass.input_event_with_modifiers_try_as_input_event_mouse_motion
+input_event_mouse_is_input_event_mouse_button ::
+	gclass.input_event_mouse_is_input_event_mouse_button
+input_event_mouse_try_as_input_event_mouse_button ::
+	gclass.input_event_mouse_try_as_input_event_mouse_button
+input_event_mouse_is_input_event_mouse_motion ::
+	gclass.input_event_mouse_is_input_event_mouse_motion
+input_event_mouse_try_as_input_event_mouse_motion ::
+	gclass.input_event_mouse_try_as_input_event_mouse_motion
 node_is_canvas_item :: gclass.node_is_canvas_item
 node_try_as_canvas_item :: gclass.node_try_as_canvas_item
 node_is_node2d :: gclass.node_is_node2d
@@ -845,6 +957,8 @@ physics_body2d_is_static_body2d :: gclass.physics_body2d_is_static_body2d
 physics_body2d_try_as_static_body2d :: gclass.physics_body2d_try_as_static_body2d
 node_is_collision_shape2d :: gclass.node_is_collision_shape2d
 node_try_as_collision_shape2d :: gclass.node_try_as_collision_shape2d
+node_is_viewport :: gclass.node_is_viewport
+node_try_as_viewport :: gclass.node_try_as_viewport
 canvas_item_is_collision_shape2d :: gclass.canvas_item_is_collision_shape2d
 canvas_item_try_as_collision_shape2d :: gclass.canvas_item_try_as_collision_shape2d
 node2d_is_collision_shape2d :: gclass.node2d_is_collision_shape2d
@@ -1015,6 +1129,55 @@ resource_loader_singleton_checked :: gclass.resource_loader_singleton_checked
 resource_loader_exists :: gclass.resource_loader_exists
 resource_loader_exists_default :: gclass.resource_loader_exists_default
 input_as_object :: gclass.input_as_object
+input_event_as_resource :: gclass.input_event_as_resource
+input_event_as_ref_counted :: gclass.input_event_as_ref_counted
+input_event_as_object :: gclass.input_event_as_object
+input_event_from_window_as_input_event :: gclass.input_event_from_window_as_input_event
+input_event_from_window_as_resource :: gclass.input_event_from_window_as_resource
+input_event_from_window_as_ref_counted :: gclass.input_event_from_window_as_ref_counted
+input_event_from_window_as_object :: gclass.input_event_from_window_as_object
+input_event_with_modifiers_as_input_event_from_window ::
+	gclass.input_event_with_modifiers_as_input_event_from_window
+input_event_with_modifiers_as_input_event :: gclass.input_event_with_modifiers_as_input_event
+input_event_with_modifiers_as_resource :: gclass.input_event_with_modifiers_as_resource
+input_event_with_modifiers_as_ref_counted :: gclass.input_event_with_modifiers_as_ref_counted
+input_event_with_modifiers_as_object :: gclass.input_event_with_modifiers_as_object
+input_event_key_as_input_event_with_modifiers ::
+	gclass.input_event_key_as_input_event_with_modifiers
+input_event_key_as_input_event_from_window :: gclass.input_event_key_as_input_event_from_window
+input_event_key_as_input_event :: gclass.input_event_key_as_input_event
+input_event_key_as_resource :: gclass.input_event_key_as_resource
+input_event_key_as_ref_counted :: gclass.input_event_key_as_ref_counted
+input_event_key_as_object :: gclass.input_event_key_as_object
+input_event_mouse_as_input_event_with_modifiers ::
+	gclass.input_event_mouse_as_input_event_with_modifiers
+input_event_mouse_as_input_event_from_window :: gclass.input_event_mouse_as_input_event_from_window
+input_event_mouse_as_input_event :: gclass.input_event_mouse_as_input_event
+input_event_mouse_as_resource :: gclass.input_event_mouse_as_resource
+input_event_mouse_as_ref_counted :: gclass.input_event_mouse_as_ref_counted
+input_event_mouse_as_object :: gclass.input_event_mouse_as_object
+input_event_mouse_button_as_input_event_mouse ::
+	gclass.input_event_mouse_button_as_input_event_mouse
+input_event_mouse_button_as_input_event_with_modifiers ::
+	gclass.input_event_mouse_button_as_input_event_with_modifiers
+input_event_mouse_button_as_input_event_from_window ::
+	gclass.input_event_mouse_button_as_input_event_from_window
+input_event_mouse_button_as_input_event :: gclass.input_event_mouse_button_as_input_event
+input_event_mouse_button_as_resource :: gclass.input_event_mouse_button_as_resource
+input_event_mouse_button_as_ref_counted :: gclass.input_event_mouse_button_as_ref_counted
+input_event_mouse_button_as_object :: gclass.input_event_mouse_button_as_object
+input_event_mouse_motion_as_input_event_mouse ::
+	gclass.input_event_mouse_motion_as_input_event_mouse
+input_event_mouse_motion_as_input_event_with_modifiers ::
+	gclass.input_event_mouse_motion_as_input_event_with_modifiers
+input_event_mouse_motion_as_input_event_from_window ::
+	gclass.input_event_mouse_motion_as_input_event_from_window
+input_event_mouse_motion_as_input_event :: gclass.input_event_mouse_motion_as_input_event
+input_event_mouse_motion_as_resource :: gclass.input_event_mouse_motion_as_resource
+input_event_mouse_motion_as_ref_counted :: gclass.input_event_mouse_motion_as_ref_counted
+input_event_mouse_motion_as_object :: gclass.input_event_mouse_motion_as_object
+viewport_as_node :: gclass.viewport_as_node
+viewport_as_object :: gclass.viewport_as_object
 input_singleton_checked :: gclass.input_singleton_checked
 input_is_anything_pressed :: gclass.input_is_anything_pressed
 input_is_action_pressed :: gclass.input_is_action_pressed
@@ -1035,6 +1198,103 @@ input_get_last_mouse_screen_velocity :: gclass.input_get_last_mouse_screen_veloc
 input_set_use_accumulated_input :: gclass.input_set_use_accumulated_input
 input_is_using_accumulated_input :: gclass.input_is_using_accumulated_input
 input_flush_buffered_events :: gclass.input_flush_buffered_events
+input_event_get_device :: gclass.input_event_get_device
+input_event_is_action :: gclass.input_event_is_action
+input_event_is_action_default :: gclass.input_event_is_action_default
+input_event_is_action_pressed :: gclass.input_event_is_action_pressed
+input_event_is_action_pressed_default :: gclass.input_event_is_action_pressed_default
+input_event_is_action_released :: gclass.input_event_is_action_released
+input_event_is_action_released_default :: gclass.input_event_is_action_released_default
+input_event_get_action_strength :: gclass.input_event_get_action_strength
+input_event_get_action_strength_default :: gclass.input_event_get_action_strength_default
+input_event_is_canceled :: gclass.input_event_is_canceled
+input_event_is_pressed :: gclass.input_event_is_pressed
+input_event_is_released :: gclass.input_event_is_released
+input_event_is_echo :: gclass.input_event_is_echo
+input_event_as_text :: gclass.input_event_as_text
+input_event_is_match :: gclass.input_event_is_match
+input_event_is_match_default :: gclass.input_event_is_match_default
+input_event_is_action_type :: gclass.input_event_is_action_type
+input_event_from_window_get_window_id :: gclass.input_event_from_window_get_window_id
+input_event_with_modifiers_is_command_or_control_autoremap ::
+	gclass.input_event_with_modifiers_is_command_or_control_autoremap
+input_event_with_modifiers_is_command_or_control_pressed ::
+	gclass.input_event_with_modifiers_is_command_or_control_pressed
+input_event_with_modifiers_is_alt_pressed :: gclass.input_event_with_modifiers_is_alt_pressed
+input_event_with_modifiers_is_shift_pressed :: gclass.input_event_with_modifiers_is_shift_pressed
+input_event_with_modifiers_is_ctrl_pressed :: gclass.input_event_with_modifiers_is_ctrl_pressed
+input_event_with_modifiers_is_meta_pressed :: gclass.input_event_with_modifiers_is_meta_pressed
+input_event_key_get_keycode :: gclass.input_event_key_get_keycode
+input_event_key_get_physical_keycode :: gclass.input_event_key_get_physical_keycode
+input_event_key_get_key_label :: gclass.input_event_key_get_key_label
+input_event_key_get_unicode :: gclass.input_event_key_get_unicode
+input_event_key_get_location :: gclass.input_event_key_get_location
+input_event_key_get_keycode_with_modifiers :: gclass.input_event_key_get_keycode_with_modifiers
+input_event_key_get_physical_keycode_with_modifiers ::
+	gclass.input_event_key_get_physical_keycode_with_modifiers
+input_event_key_get_key_label_with_modifiers :: gclass.input_event_key_get_key_label_with_modifiers
+input_event_key_as_text_keycode :: gclass.input_event_key_as_text_keycode
+input_event_key_as_text_physical_keycode :: gclass.input_event_key_as_text_physical_keycode
+input_event_key_as_text_key_label :: gclass.input_event_key_as_text_key_label
+input_event_key_as_text_location :: gclass.input_event_key_as_text_location
+input_event_mouse_get_position :: gclass.input_event_mouse_get_position
+input_event_mouse_get_global_position :: gclass.input_event_mouse_get_global_position
+input_event_mouse_button_get_factor :: gclass.input_event_mouse_button_get_factor
+input_event_mouse_button_get_button_index :: gclass.input_event_mouse_button_get_button_index
+input_event_mouse_button_is_double_click :: gclass.input_event_mouse_button_is_double_click
+input_event_mouse_motion_get_tilt :: gclass.input_event_mouse_motion_get_tilt
+input_event_mouse_motion_get_pressure :: gclass.input_event_mouse_motion_get_pressure
+input_event_mouse_motion_get_pen_inverted :: gclass.input_event_mouse_motion_get_pen_inverted
+input_event_mouse_motion_get_relative :: gclass.input_event_mouse_motion_get_relative
+input_event_mouse_motion_get_screen_relative :: gclass.input_event_mouse_motion_get_screen_relative
+input_event_mouse_motion_get_velocity :: gclass.input_event_mouse_motion_get_velocity
+input_event_mouse_motion_get_screen_velocity :: gclass.input_event_mouse_motion_get_screen_velocity
+viewport_get_canvas_transform :: gclass.viewport_get_canvas_transform
+viewport_get_global_canvas_transform :: gclass.viewport_get_global_canvas_transform
+viewport_get_stretch_transform :: gclass.viewport_get_stretch_transform
+viewport_get_final_transform :: gclass.viewport_get_final_transform
+viewport_get_screen_transform :: gclass.viewport_get_screen_transform
+viewport_get_visible_rect :: gclass.viewport_get_visible_rect
+viewport_has_transparent_background :: gclass.viewport_has_transparent_background
+viewport_is_using_hdr_2d :: gclass.viewport_is_using_hdr_2d
+viewport_is_using_taa :: gclass.viewport_is_using_taa
+viewport_is_using_debanding :: gclass.viewport_is_using_debanding
+viewport_is_using_occlusion_culling :: gclass.viewport_is_using_occlusion_culling
+viewport_is_using_oversampling :: gclass.viewport_is_using_oversampling
+viewport_get_oversampling_override :: gclass.viewport_get_oversampling_override
+viewport_get_oversampling :: gclass.viewport_get_oversampling
+viewport_get_physics_object_picking :: gclass.viewport_get_physics_object_picking
+viewport_get_physics_object_picking_sort :: gclass.viewport_get_physics_object_picking_sort
+viewport_get_physics_object_picking_first_only ::
+	gclass.viewport_get_physics_object_picking_first_only
+viewport_get_viewport_rid :: gclass.viewport_get_viewport_rid
+viewport_get_mouse_position :: gclass.viewport_get_mouse_position
+viewport_gui_is_dragging :: gclass.viewport_gui_is_dragging
+viewport_gui_is_drag_successful :: gclass.viewport_gui_is_drag_successful
+viewport_gui_get_focus_owner :: gclass.viewport_gui_get_focus_owner
+viewport_gui_get_hovered_control :: gclass.viewport_gui_get_hovered_control
+viewport_is_input_disabled :: gclass.viewport_is_input_disabled
+viewport_get_positional_shadow_atlas_size :: gclass.viewport_get_positional_shadow_atlas_size
+viewport_get_positional_shadow_atlas_16_bits :: gclass.viewport_get_positional_shadow_atlas_16_bits
+viewport_is_snap_controls_to_pixels_enabled :: gclass.viewport_is_snap_controls_to_pixels_enabled
+viewport_is_snap_2d_transforms_to_pixel_enabled ::
+	gclass.viewport_is_snap_2d_transforms_to_pixel_enabled
+viewport_is_snap_2d_vertices_to_pixel_enabled ::
+	gclass.viewport_is_snap_2d_vertices_to_pixel_enabled
+viewport_is_input_handled :: gclass.viewport_is_input_handled
+viewport_is_handling_input_locally :: gclass.viewport_is_handling_input_locally
+viewport_is_embedding_subwindows :: gclass.viewport_is_embedding_subwindows
+viewport_get_drag_threshold :: gclass.viewport_get_drag_threshold
+viewport_get_canvas_cull_mask :: gclass.viewport_get_canvas_cull_mask
+viewport_get_canvas_cull_mask_bit :: gclass.viewport_get_canvas_cull_mask_bit
+viewport_get_mesh_lod_threshold :: gclass.viewport_get_mesh_lod_threshold
+viewport_is_audio_listener_2d :: gclass.viewport_is_audio_listener_2d
+viewport_is_using_own_world_3d :: gclass.viewport_is_using_own_world_3d
+viewport_is_3d_disabled :: gclass.viewport_is_3d_disabled
+viewport_is_using_xr :: gclass.viewport_is_using_xr
+viewport_get_scaling_3d_scale :: gclass.viewport_get_scaling_3d_scale
+viewport_get_fsr_sharpness :: gclass.viewport_get_fsr_sharpness
+viewport_get_texture_mipmap_bias :: gclass.viewport_get_texture_mipmap_bias
 scene_tree_as_object :: gclass.scene_tree_as_object
 scene_tree_has_group :: gclass.scene_tree_has_group
 scene_tree_is_accessibility_enabled :: gclass.scene_tree_is_accessibility_enabled
@@ -1163,6 +1423,38 @@ resource_loader_is_nil :: proc "contextless" (self: ResourceLoader) -> bool {
 }
 
 input_is_nil :: proc "contextless" (self: Input) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_is_nil :: proc "contextless" (self: InputEvent) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_from_window_is_nil :: proc "contextless" (self: InputEventFromWindow) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_with_modifiers_is_nil :: proc "contextless" (self: InputEventWithModifiers) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_key_is_nil :: proc "contextless" (self: InputEventKey) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_mouse_is_nil :: proc "contextless" (self: InputEventMouse) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_mouse_button_is_nil :: proc "contextless" (self: InputEventMouseButton) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+input_event_mouse_motion_is_nil :: proc "contextless" (self: InputEventMouseMotion) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+viewport_is_nil :: proc "contextless" (self: Viewport) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -1878,6 +2170,46 @@ input_object_ptr :: proc "contextless" (self: Input) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+input_event_object_ptr :: proc "contextless" (self: InputEvent) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_from_window_object_ptr :: proc "contextless" (
+	self: InputEventFromWindow,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_with_modifiers_object_ptr :: proc "contextless" (
+	self: InputEventWithModifiers,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_key_object_ptr :: proc "contextless" (self: InputEventKey) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_mouse_object_ptr :: proc "contextless" (self: InputEventMouse) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_mouse_button_object_ptr :: proc "contextless" (
+	self: InputEventMouseButton,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+input_event_mouse_motion_object_ptr :: proc "contextless" (
+	self: InputEventMouseMotion,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+viewport_object_ptr :: proc "contextless" (self: Viewport) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 scene_tree_object_ptr :: proc "contextless" (self: SceneTree) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -1915,6 +2247,157 @@ object_ptr_try_as_image_texture :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_image_texture(Object(self))
+}
+
+object_ptr_try_as_input_event :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: InputEvent,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_input_event(Object(self))
+}
+
+object_ptr_try_as_input_event_key :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: InputEventKey,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_input_event_key(Object(self))
+}
+
+object_ptr_try_as_input_event_mouse_button :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: InputEventMouseButton,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_input_event_mouse_button(Object(self))
+}
+
+object_ptr_try_as_input_event_mouse_motion :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: InputEventMouseMotion,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_input_event_mouse_motion(Object(self))
+}
+
+object_ptr_try_as_viewport :: proc "contextless" (self: ObjectPtr) -> (value: Viewport, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_viewport(Object(self))
+}
+
+// InputEvent handles are borrowed from Godot. Do not store them beyond the
+// callback or object storage that supplied them.
+input_event_try_key :: proc "contextless" (self: InputEvent) -> (value: InputEventKey, ok: bool) {
+	if input_event_is_nil(self) do return {}, false
+	return input_event_try_as_input_event_key(self)
+}
+
+input_event_try_mouse_button :: proc "contextless" (
+	self: InputEvent,
+) -> (
+	value: InputEventMouseButton,
+	ok: bool,
+) {
+	if input_event_is_nil(self) do return {}, false
+	return input_event_try_as_input_event_mouse_button(self)
+}
+
+input_event_try_mouse_motion :: proc "contextless" (
+	self: InputEvent,
+) -> (
+	value: InputEventMouseMotion,
+	ok: bool,
+) {
+	if input_event_is_nil(self) do return {}, false
+	return input_event_try_as_input_event_mouse_motion(self)
+}
+
+input_event_action_pressed :: proc "contextless" (self: InputEvent, action: ^StringName) -> bool {
+	if input_event_is_nil(self) || action == nil do return false
+	return input_event_is_action_pressed_default(self, action)
+}
+
+input_event_action_released :: proc "contextless" (self: InputEvent, action: ^StringName) -> bool {
+	if input_event_is_nil(self) || action == nil do return false
+	return input_event_is_action_released_default(self, action)
+}
+
+input_event_action_strength :: proc "contextless" (
+	self: InputEvent,
+	action: ^StringName,
+) -> GodotReal {
+	if input_event_is_nil(self) || action == nil do return 0
+	return input_event_get_action_strength_default(self, action)
+}
+
+input_event_key_code_checked :: proc "contextless" (self: InputEvent) -> (key: Key, ok: bool) {
+	event, event_ok := input_event_try_key(self)
+	if !event_ok do return {}, false
+	return input_event_key_get_keycode(event), true
+}
+
+input_event_mouse_button_index_checked :: proc "contextless" (
+	self: InputEvent,
+) -> (
+	button: MouseButton,
+	ok: bool,
+) {
+	event, event_ok := input_event_try_mouse_button(self)
+	if !event_ok do return {}, false
+	return input_event_mouse_button_get_button_index(event), true
+}
+
+input_event_mouse_position_checked :: proc "contextless" (
+	self: InputEvent,
+) -> (
+	position: Vector2,
+	ok: bool,
+) {
+	if input_event_is_nil(self) do return {}, false
+	if mouse_motion, motion_ok := input_event_try_mouse_motion(self); motion_ok {
+		return input_event_mouse_get_position(
+				input_event_mouse_motion_as_input_event_mouse(mouse_motion),
+			),
+			true
+	}
+	if mouse_button, button_ok := input_event_try_mouse_button(self); button_ok {
+		return input_event_mouse_get_position(
+				input_event_mouse_button_as_input_event_mouse(mouse_button),
+			),
+			true
+	}
+	return {}, false
+}
+
+viewport_mouse_position_checked :: proc "contextless" (
+	self: Viewport,
+) -> (
+	position: Vector2,
+	ok: bool,
+) {
+	if viewport_is_nil(self) do return {}, false
+	return viewport_get_mouse_position(self), true
+}
+
+viewport_focused_control_checked :: proc "contextless" (
+	self: Viewport,
+) -> (
+	control: Control,
+	ok: bool,
+) {
+	if viewport_is_nil(self) do return {}, false
+	control = viewport_gui_get_focus_owner(self)
+	if control_is_nil(control) do return {}, false
+	return control, true
 }
 
 object_ptr_try_as_node :: proc "contextless" (self: ObjectPtr) -> (value: Node, ok: bool) {

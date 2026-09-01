@@ -77,6 +77,24 @@ roll_damage :: proc "contextless" (self: ^GameBrainData) -> gt.GodotReal {
 	return value
 }
 
+exercise_input_viewport_helpers :: proc "contextless" (parent: gt.Node) {
+	viewport := gt.node_get_viewport(parent)
+	if !gt.viewport_is_nil(viewport) {
+		_, _ = gt.viewport_mouse_position_checked(viewport)
+		_, _ = gt.viewport_focused_control_checked(viewport)
+		_ = gt.viewport_get_visible_rect(viewport)
+		_ = gt.viewport_get_mouse_position(viewport)
+		_ = gt.viewport_get_viewport_rid(viewport)
+		_ = gt.viewport_is_input_disabled(viewport)
+	}
+
+	event := gt.InputEvent(nil)
+	_, key_ok := gt.input_event_try_key(event)
+	_, button_ok := gt.input_event_try_mouse_button(event)
+	_, motion_ok := gt.input_event_try_mouse_motion(event)
+	_ = !key_ok && !button_ok && !motion_ok
+}
+
 configure_physics_nodes :: proc "contextless" (parent: gt.Node, damage: gt.GodotReal) {
 	character_object := gt.construct_object(character_body2d_class_name)
 	if character, character_ok := gt.object_ptr_try_as_character_body2d(character_object);
@@ -162,6 +180,8 @@ configure_ui_nodes :: proc "contextless" (
 	texture: gt.Texture2D,
 	texture_loaded: bool,
 ) {
+	exercise_input_viewport_helpers(parent)
+
 	button_path := gt.node_path_from_utf8("RollButton")
 	button, button_ok := gt.node_get_node_as_button(parent, &button_path)
 	gt.node_path_free(&button_path)

@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 32
+Max_Selected_Class_Count :: 40
 
 selected_class_names := []string {
 	"Object",
@@ -1037,10 +1037,19 @@ selected_class_names := []string {
 	"PackedScene",
 	"ResourceLoader",
 	"Input",
+	"InputEvent",
+	"InputEventFromWindow",
+	"InputEventWithModifiers",
+	"InputEventKey",
+	"InputEventMouse",
+	"InputEventMouseButton",
+	"InputEventMouseMotion",
+	"Viewport",
 	"SceneTree",
 }
 
 candidate_class_names := []string {
+	"Window",
 	"AudioStream",
 	"AudioStreamPlayer",
 	"Theme",
@@ -1093,6 +1102,7 @@ selected_class_methods := []Selected_Class_Method {
 	{"Resource", "is_local_to_scene"},
 	{"Node", "get_parent"},
 	{"Node", "get_tree"},
+	{"Node", "get_viewport"},
 	{"Node", "set_name"},
 	{"Node", "get_name"},
 	{"Node", "has_node"},
@@ -1449,6 +1459,92 @@ selected_class_methods := []Selected_Class_Method {
 	{"Input", "set_use_accumulated_input"},
 	{"Input", "is_using_accumulated_input"},
 	{"Input", "flush_buffered_events"},
+	{"InputEvent", "get_device"},
+	{"InputEvent", "is_action"},
+	{"InputEvent", "is_action_pressed"},
+	{"InputEvent", "is_action_released"},
+	{"InputEvent", "get_action_strength"},
+	{"InputEvent", "is_canceled"},
+	{"InputEvent", "is_pressed"},
+	{"InputEvent", "is_released"},
+	{"InputEvent", "is_echo"},
+	{"InputEvent", "as_text"},
+	{"InputEvent", "is_match"},
+	{"InputEvent", "is_action_type"},
+	{"InputEventFromWindow", "get_window_id"},
+	{"InputEventWithModifiers", "is_command_or_control_autoremap"},
+	{"InputEventWithModifiers", "is_command_or_control_pressed"},
+	{"InputEventWithModifiers", "is_alt_pressed"},
+	{"InputEventWithModifiers", "is_shift_pressed"},
+	{"InputEventWithModifiers", "is_ctrl_pressed"},
+	{"InputEventWithModifiers", "is_meta_pressed"},
+	{"InputEventKey", "get_keycode"},
+	{"InputEventKey", "get_physical_keycode"},
+	{"InputEventKey", "get_key_label"},
+	{"InputEventKey", "get_unicode"},
+	{"InputEventKey", "get_location"},
+	{"InputEventKey", "get_keycode_with_modifiers"},
+	{"InputEventKey", "get_physical_keycode_with_modifiers"},
+	{"InputEventKey", "get_key_label_with_modifiers"},
+	{"InputEventKey", "as_text_keycode"},
+	{"InputEventKey", "as_text_physical_keycode"},
+	{"InputEventKey", "as_text_key_label"},
+	{"InputEventKey", "as_text_location"},
+	{"InputEventMouse", "get_position"},
+	{"InputEventMouse", "get_global_position"},
+	{"InputEventMouseButton", "get_factor"},
+	{"InputEventMouseButton", "get_button_index"},
+	{"InputEventMouseButton", "is_double_click"},
+	{"InputEventMouseMotion", "get_tilt"},
+	{"InputEventMouseMotion", "get_pressure"},
+	{"InputEventMouseMotion", "get_pen_inverted"},
+	{"InputEventMouseMotion", "get_relative"},
+	{"InputEventMouseMotion", "get_screen_relative"},
+	{"InputEventMouseMotion", "get_velocity"},
+	{"InputEventMouseMotion", "get_screen_velocity"},
+	{"Viewport", "get_canvas_transform"},
+	{"Viewport", "get_global_canvas_transform"},
+	{"Viewport", "get_stretch_transform"},
+	{"Viewport", "get_final_transform"},
+	{"Viewport", "get_screen_transform"},
+	{"Viewport", "get_visible_rect"},
+	{"Viewport", "has_transparent_background"},
+	{"Viewport", "is_using_hdr_2d"},
+	{"Viewport", "is_using_taa"},
+	{"Viewport", "is_using_debanding"},
+	{"Viewport", "is_using_occlusion_culling"},
+	{"Viewport", "is_using_oversampling"},
+	{"Viewport", "get_oversampling_override"},
+	{"Viewport", "get_oversampling"},
+	{"Viewport", "get_physics_object_picking"},
+	{"Viewport", "get_physics_object_picking_sort"},
+	{"Viewport", "get_physics_object_picking_first_only"},
+	{"Viewport", "get_viewport_rid"},
+	{"Viewport", "get_mouse_position"},
+	{"Viewport", "gui_is_dragging"},
+	{"Viewport", "gui_is_drag_successful"},
+	{"Viewport", "gui_get_focus_owner"},
+	{"Viewport", "gui_get_hovered_control"},
+	{"Viewport", "is_input_disabled"},
+	{"Viewport", "get_positional_shadow_atlas_size"},
+	{"Viewport", "get_positional_shadow_atlas_16_bits"},
+	{"Viewport", "is_snap_controls_to_pixels_enabled"},
+	{"Viewport", "is_snap_2d_transforms_to_pixel_enabled"},
+	{"Viewport", "is_snap_2d_vertices_to_pixel_enabled"},
+	{"Viewport", "is_input_handled"},
+	{"Viewport", "is_handling_input_locally"},
+	{"Viewport", "is_embedding_subwindows"},
+	{"Viewport", "get_drag_threshold"},
+	{"Viewport", "get_canvas_cull_mask"},
+	{"Viewport", "get_canvas_cull_mask_bit"},
+	{"Viewport", "get_mesh_lod_threshold"},
+	{"Viewport", "is_audio_listener_2d"},
+	{"Viewport", "is_using_own_world_3d"},
+	{"Viewport", "is_3d_disabled"},
+	{"Viewport", "is_using_xr"},
+	{"Viewport", "get_scaling_3d_scale"},
+	{"Viewport", "get_fsr_sharpness"},
+	{"Viewport", "get_texture_mipmap_bias"},
 	{"SceneTree", "has_group"},
 	{"SceneTree", "is_accessibility_enabled"},
 	{"SceneTree", "is_accessibility_supported"},
@@ -1768,6 +1864,16 @@ class_method_deferred_reason :: proc(class_name, method_name: string) -> string 
 			return "resource ownership"
 		}
 	}
+	if strings.has_prefix(class_name, "InputEvent") {
+		if strings.has_prefix(method_name, "set_") || method_name == "accumulate" {
+			return "input event mutation"
+		}
+		if method_name == "xformed_by" do return "input event ownership"
+	}
+	if class_name == "Viewport" &&
+	   (method_name == "push_input" || method_name == "push_unhandled_input") {
+		return "input event lifetime"
+	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
 		return "object lifetime"
 	}
@@ -1812,6 +1918,52 @@ class_method_is_ui_report_class :: proc(class_name: string) -> bool {
 		class_name == "VBoxContainer" ||
 		class_name == "MarginContainer" \
 	)
+}
+
+class_method_is_input_event_report_class :: proc(class_name: string) -> bool {
+	return strings.has_prefix(class_name, "InputEvent")
+}
+
+class_method_input_viewport_blocker_kind :: proc(
+	class_name: string,
+	method: ExtensionApiClassMethod,
+) -> string {
+	if class_method_is_input_event_report_class(class_name) do return "input-event"
+	if class_name == "Viewport" || class_name == "Window" {
+		if method.name == "push_input" || method.name == "push_unhandled_input" {
+			return "event-construction"
+		}
+		if method.name == "get_texture" ||
+		   method.name == "set_world_2d" ||
+		   method.name == "get_world_2d" ||
+		   method.name == "find_world_2d" ||
+		   method.name == "set_world_3d" ||
+		   method.name == "get_world_3d" ||
+		   method.name == "find_world_3d" ||
+		   method.name == "get_camera_2d" ||
+		   method.name == "get_camera_3d" ||
+		   method.name == "get_audio_listener_2d" ||
+		   method.name == "get_audio_listener_3d" ||
+		   method.name == "get_embedded_subwindows" ||
+		   method.name == "set_vrs_texture" ||
+		   method.name == "get_vrs_texture" {
+			return "viewport-ownership"
+		}
+		return "viewport"
+	}
+	if class_method_has_type(method, "InputEvent") ||
+	   class_method_has_type(method, "InputEventKey") ||
+	   class_method_has_type(method, "InputEventMouseButton") ||
+	   class_method_has_type(method, "InputEventMouseMotion") {
+		return "input-event"
+	}
+	if class_method_has_type(method, "Viewport") ||
+	   class_method_has_type(method, "ViewportTexture") ||
+	   class_method_has_type(method, "World2D") ||
+	   class_method_has_type(method, "World3D") {
+		return "viewport-resource"
+	}
+	return ""
 }
 
 class_method_has_type :: proc(method: ExtensionApiClassMethod, type_name: string) -> bool {
@@ -2673,6 +2825,16 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&resource_duplicate_blockers)
 	resource_cache_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&resource_cache_blockers)
+	input_event_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&input_event_blockers)
+	viewport_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&viewport_blockers)
+	viewport_resource_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&viewport_resource_blockers)
+	viewport_ownership_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&viewport_ownership_blockers)
+	event_construction_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&event_construction_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2701,6 +2863,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	threaded_loading_blocker_count := 0
 	resource_duplicate_blocker_count := 0
 	resource_cache_blocker_count := 0
+	input_event_blocker_count := 0
+	viewport_blocker_count := 0
+	viewport_resource_blocker_count := 0
+	viewport_ownership_blocker_count := 0
+	event_construction_blocker_count := 0
 
 	for class_name in selected_class_names {
 		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
@@ -2869,6 +3036,53 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&signal_callable_blockers, ": %s\n", reason)
 					signal_callable_blocker_count += 1
 				}
+				input_viewport_kind := class_method_input_viewport_blocker_kind(class.name, method)
+				if input_viewport_kind == "input-event" {
+					emit_class_method_blocker_line(
+						&input_event_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					input_event_blocker_count += 1
+				} else if input_viewport_kind == "viewport" {
+					emit_class_method_blocker_line(
+						&viewport_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					viewport_blocker_count += 1
+				} else if input_viewport_kind == "viewport-resource" {
+					emit_class_method_blocker_line(
+						&viewport_resource_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					viewport_resource_blocker_count += 1
+				} else if input_viewport_kind == "viewport-ownership" {
+					emit_class_method_blocker_line(
+						&viewport_ownership_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					viewport_ownership_blocker_count += 1
+				} else if input_viewport_kind == "event-construction" {
+					emit_class_method_blocker_line(
+						&event_construction_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					event_construction_blocker_count += 1
+				}
 				if class.name == "Input" {
 					strings.write_string(&input_blockers, "- ")
 					emit_class_method_report_signature(&input_blockers, class.name, method)
@@ -3019,6 +3233,53 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&signal_callable_blockers, ": %s\n", reason)
 					signal_callable_blocker_count += 1
 				}
+				input_viewport_kind := class_method_input_viewport_blocker_kind(class.name, method)
+				if input_viewport_kind == "input-event" {
+					emit_class_method_blocker_line(
+						&input_event_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					input_event_blocker_count += 1
+				} else if input_viewport_kind == "viewport" {
+					emit_class_method_blocker_line(
+						&viewport_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					viewport_blocker_count += 1
+				} else if input_viewport_kind == "viewport-resource" {
+					emit_class_method_blocker_line(
+						&viewport_resource_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					viewport_resource_blocker_count += 1
+				} else if input_viewport_kind == "viewport-ownership" {
+					emit_class_method_blocker_line(
+						&viewport_ownership_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					viewport_ownership_blocker_count += 1
+				} else if input_viewport_kind == "event-construction" {
+					emit_class_method_blocker_line(
+						&event_construction_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					event_construction_blocker_count += 1
+				}
 				if class_method_is_ui_report_class(class.name) {
 					strings.write_string(&ui_blockers, "- candidate ")
 					emit_class_method_report_signature(&ui_blockers, class.name, method)
@@ -3072,6 +3333,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Threaded-loading blockers: %d\n", threaded_loading_blocker_count)
 	fmt.sbprintf(&b, "- Resource duplicate blockers: %d\n", resource_duplicate_blocker_count)
 	fmt.sbprintf(&b, "- Resource cache blockers: %d\n", resource_cache_blocker_count)
+	fmt.sbprintf(&b, "- InputEvent blockers: %d\n", input_event_blocker_count)
+	fmt.sbprintf(&b, "- Viewport blockers: %d\n", viewport_blocker_count)
+	fmt.sbprintf(&b, "- Viewport resource blockers: %d\n", viewport_resource_blocker_count)
+	fmt.sbprintf(&b, "- Viewport ownership blockers: %d\n", viewport_ownership_blocker_count)
+	fmt.sbprintf(&b, "- Event construction blockers: %d\n", event_construction_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -3119,6 +3385,16 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(resource_duplicate_blockers))
 	strings.write_string(&b, "\n## Resource cache blockers\n\n")
 	strings.write_string(&b, strings.to_string(resource_cache_blockers))
+	strings.write_string(&b, "\n## InputEvent blockers\n\n")
+	strings.write_string(&b, strings.to_string(input_event_blockers))
+	strings.write_string(&b, "\n## Viewport blockers\n\n")
+	strings.write_string(&b, strings.to_string(viewport_blockers))
+	strings.write_string(&b, "\n## Viewport resource blockers\n\n")
+	strings.write_string(&b, strings.to_string(viewport_resource_blockers))
+	strings.write_string(&b, "\n## Viewport ownership blockers\n\n")
+	strings.write_string(&b, strings.to_string(viewport_ownership_blockers))
+	strings.write_string(&b, "\n## Event construction blockers\n\n")
+	strings.write_string(&b, strings.to_string(event_construction_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 
