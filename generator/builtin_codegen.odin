@@ -1013,6 +1013,8 @@ selected_class_names := []string {
 	"Object",
 	"RefCounted",
 	"Resource",
+	"Texture2D",
+	"ImageTexture",
 	"Node",
 	"CanvasItem",
 	"Node2D",
@@ -1039,10 +1041,12 @@ selected_class_names := []string {
 }
 
 candidate_class_names := []string {
-	"BoxContainer",
-	"HBoxContainer",
-	"VBoxContainer",
-	"MarginContainer",
+	"AudioStream",
+	"AudioStreamPlayer",
+	"Theme",
+	"Font",
+	"StyleBox",
+	"TextureButton",
 }
 
 Selected_Class_Method :: struct {
@@ -1421,6 +1425,16 @@ selected_class_methods := []Selected_Class_Method {
 	{"CollisionShape2D", "get_debug_color"},
 	{"PackedScene", "pack"},
 	{"PackedScene", "can_instantiate"},
+	{"Texture2D", "get_mipmap_count"},
+	{"Texture2D", "get_width"},
+	{"Texture2D", "get_height"},
+	{"Texture2D", "get_size"},
+	{"Texture2D", "has_alpha"},
+	{"Texture2D", "has_mipmaps"},
+	{"TextureRect", "set_texture"},
+	{"TextureRect", "get_texture"},
+	{"Sprite2D", "set_texture"},
+	{"Sprite2D", "get_texture"},
 	{"ResourceLoader", "exists"},
 	{"Input", "is_anything_pressed"},
 	{"Input", "is_action_pressed"},
@@ -1798,6 +1812,72 @@ class_method_is_ui_report_class :: proc(class_name: string) -> bool {
 		class_name == "VBoxContainer" ||
 		class_name == "MarginContainer" \
 	)
+}
+
+class_method_has_type :: proc(method: ExtensionApiClassMethod, type_name: string) -> bool {
+	if method.return_value.type == type_name do return true
+	for arg in method.arguments {
+		if arg.type == type_name do return true
+	}
+	return false
+}
+
+class_method_resource_asset_blocker_kind :: proc(
+	class_name: string,
+	method: ExtensionApiClassMethod,
+) -> string {
+	if class_name == "ResourceLoader" {
+		if strings.has_prefix(method.name, "load_threaded") do return "threaded-loading"
+		if method.name == "get_cached_ref" || method.name == "has_cached" do return "cache"
+		return "resource-loading"
+	}
+	if class_name == "Resource" {
+		if method.name == "duplicate" || method.name == "duplicate_deep" do return "duplicate"
+		return "resource"
+	}
+	if class_name == "PackedScene" {
+		if method.name == "instantiate" || method.name == "get_state" do return "scene"
+	}
+	if class_name == "Texture2D" ||
+	   class_name == "ImageTexture" ||
+	   class_name == "TextureRect" ||
+	   class_name == "Sprite2D" ||
+	   class_name == "Button" ||
+	   class_name == "TextureButton" ||
+	   class_method_has_type(method, "Texture2D") ||
+	   class_method_has_type(method, "ImageTexture") ||
+	   class_method_has_type(method, "Image") {
+		return "texture"
+	}
+	if class_name == "AudioStream" ||
+	   class_name == "AudioStreamPlayer" ||
+	   class_method_has_type(method, "AudioStream") ||
+	   class_method_has_type(method, "AudioStreamPlayback") ||
+	   class_method_has_type(method, "AudioSample") {
+		return "audio"
+	}
+	if class_name == "Theme" ||
+	   class_name == "Font" ||
+	   class_name == "StyleBox" ||
+	   class_method_has_type(method, "Theme") ||
+	   class_method_has_type(method, "Font") ||
+	   class_method_has_type(method, "StyleBox") {
+		return "theme-font-stylebox"
+	}
+	return ""
+}
+
+emit_class_method_blocker_line :: proc(
+	b: ^strings.Builder,
+	prefix: string,
+	class_name: string,
+	method: ExtensionApiClassMethod,
+	reason: string,
+) {
+	strings.write_string(b, "- ")
+	strings.write_string(b, prefix)
+	emit_class_method_report_signature(b, class_name, method)
+	fmt.sbprintf(b, ": %s\n", reason)
 }
 
 class_method_uses_typed_array :: proc(method: ExtensionApiClassMethod) -> bool {
@@ -2581,6 +2661,18 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&physics_blockers)
 	ui_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&ui_blockers)
+	texture_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&texture_blockers)
+	audio_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&audio_blockers)
+	theme_font_stylebox_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&theme_font_stylebox_blockers)
+	threaded_loading_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&threaded_loading_blockers)
+	resource_duplicate_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&resource_duplicate_blockers)
+	resource_cache_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&resource_cache_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2603,6 +2695,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	scene_instantiation_blocker_count := 0
 	physics_blocker_count := 0
 	ui_blocker_count := 0
+	texture_blocker_count := 0
+	audio_blocker_count := 0
+	theme_font_stylebox_blocker_count := 0
+	threaded_loading_blocker_count := 0
+	resource_duplicate_blocker_count := 0
+	resource_cache_blocker_count := 0
 
 	for class_name in selected_class_names {
 		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
@@ -2696,6 +2794,56 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 				emit_class_method_report_signature(&skipped, class.name, method)
 				fmt.sbprintf(&skipped, ": %s\n", reason)
 				skipped_count += 1
+				asset_kind := class_method_resource_asset_blocker_kind(class.name, method)
+				if asset_kind == "texture" {
+					emit_class_method_blocker_line(
+						&texture_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					texture_blocker_count += 1
+				} else if asset_kind == "audio" {
+					emit_class_method_blocker_line(&audio_blockers, "", class.name, method, reason)
+					audio_blocker_count += 1
+				} else if asset_kind == "theme-font-stylebox" {
+					emit_class_method_blocker_line(
+						&theme_font_stylebox_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					theme_font_stylebox_blocker_count += 1
+				} else if asset_kind == "threaded-loading" {
+					emit_class_method_blocker_line(
+						&threaded_loading_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					threaded_loading_blocker_count += 1
+				} else if asset_kind == "duplicate" {
+					emit_class_method_blocker_line(
+						&resource_duplicate_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					resource_duplicate_blocker_count += 1
+				} else if asset_kind == "cache" {
+					emit_class_method_blocker_line(
+						&resource_cache_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					resource_cache_blocker_count += 1
+				}
 				if class_method_has_default_arguments(method) {
 					strings.write_string(&default_argument_blockers, "- ")
 					emit_class_method_report_signature(
@@ -2805,6 +2953,62 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 			} else {
 				fmt.sbprintf(&candidate_analysis, ": skipped, %s\n", reason)
 				candidate_skipped_count += 1
+				asset_kind := class_method_resource_asset_blocker_kind(class.name, method)
+				if asset_kind == "texture" {
+					emit_class_method_blocker_line(
+						&texture_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					texture_blocker_count += 1
+				} else if asset_kind == "audio" {
+					emit_class_method_blocker_line(
+						&audio_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					audio_blocker_count += 1
+				} else if asset_kind == "theme-font-stylebox" {
+					emit_class_method_blocker_line(
+						&theme_font_stylebox_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					theme_font_stylebox_blocker_count += 1
+				} else if asset_kind == "threaded-loading" {
+					emit_class_method_blocker_line(
+						&threaded_loading_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					threaded_loading_blocker_count += 1
+				} else if asset_kind == "duplicate" {
+					emit_class_method_blocker_line(
+						&resource_duplicate_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					resource_duplicate_blocker_count += 1
+				} else if asset_kind == "cache" {
+					emit_class_method_blocker_line(
+						&resource_cache_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					resource_cache_blocker_count += 1
+				}
 				if class_method_uses_callable_or_signal(method) {
 					strings.write_string(&signal_callable_blockers, "- candidate ")
 					emit_class_method_report_signature(
@@ -2862,6 +3066,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Scene-instantiation blockers: %d\n", scene_instantiation_blocker_count)
 	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
 	fmt.sbprintf(&b, "- UI blockers: %d\n", ui_blocker_count)
+	fmt.sbprintf(&b, "- Texture blockers: %d\n", texture_blocker_count)
+	fmt.sbprintf(&b, "- Audio blockers: %d\n", audio_blocker_count)
+	fmt.sbprintf(&b, "- Theme/Font/StyleBox blockers: %d\n", theme_font_stylebox_blocker_count)
+	fmt.sbprintf(&b, "- Threaded-loading blockers: %d\n", threaded_loading_blocker_count)
+	fmt.sbprintf(&b, "- Resource duplicate blockers: %d\n", resource_duplicate_blocker_count)
+	fmt.sbprintf(&b, "- Resource cache blockers: %d\n", resource_cache_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -2897,6 +3107,18 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(physics_blockers))
 	strings.write_string(&b, "\n## UI blockers\n\n")
 	strings.write_string(&b, strings.to_string(ui_blockers))
+	strings.write_string(&b, "\n## Texture blockers\n\n")
+	strings.write_string(&b, strings.to_string(texture_blockers))
+	strings.write_string(&b, "\n## Audio blockers\n\n")
+	strings.write_string(&b, strings.to_string(audio_blockers))
+	strings.write_string(&b, "\n## Theme Font StyleBox blockers\n\n")
+	strings.write_string(&b, strings.to_string(theme_font_stylebox_blockers))
+	strings.write_string(&b, "\n## Threaded-loading blockers\n\n")
+	strings.write_string(&b, strings.to_string(threaded_loading_blockers))
+	strings.write_string(&b, "\n## Resource duplicate blockers\n\n")
+	strings.write_string(&b, strings.to_string(resource_duplicate_blockers))
+	strings.write_string(&b, "\n## Resource cache blockers\n\n")
+	strings.write_string(&b, strings.to_string(resource_cache_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 

@@ -5,8 +5,9 @@ import gt "godot:godot"
 GameBrain :: distinct gt.ObjectPtr
 
 GameBrainData :: struct {
-	object:     gt.ObjectPtr,
-	difficulty: gt.GodotReal,
+	object:       gt.ObjectPtr,
+	difficulty:   gt.GodotReal,
+	icon_texture: gt.OwnedResource,
 }
 
 game_brain_object :: proc "contextless" (self: GameBrain) -> gt.ObjectPtr {
@@ -38,7 +39,34 @@ free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr
 	context = gt.godot_context()
 	self, ok := gt.class_instance_data(instance, GameBrainData)
 	if !ok do return
+	if !gt.owned_resource_is_nil(self.icon_texture) {
+		gt.owned_resource_destroy(&self.icon_texture)
+	}
 	free(self)
+}
+
+ensure_icon_texture :: proc "contextless" (
+	self: ^GameBrainData,
+) -> (
+	texture: gt.Texture2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	if !gt.owned_resource_is_nil(self.icon_texture) {
+		return gt.owned_resource_try_as_texture2d(self.icon_texture)
+	}
+	loader, loader_ok := gt.resource_loader_singleton_checked()
+	if !loader_ok do return {}, false
+	path := gt.string_from_utf8("res://odin_texture.tres")
+	defer gt.string_free(&path)
+	owned, loaded_texture, err, loaded_ok := gt.resource_loader_load_texture2d_owned_checked(
+		loader,
+		&path,
+	)
+	gt.require_call_ok(&err)
+	if !loaded_ok do return {}, false
+	self.icon_texture = gt.owned_resource_take(&owned)
+	return loaded_texture, true
 }
 
 roll_damage :: proc "contextless" (self: ^GameBrainData) -> gt.GodotReal {
@@ -127,7 +155,13 @@ configure_physics_nodes :: proc "contextless" (parent: gt.Node, damage: gt.Godot
 }
 
 
-configure_ui_nodes :: proc "contextless" (parent: gt.Node, label: gt.Label, damage: gt.GodotReal) {
+configure_ui_nodes :: proc "contextless" (
+	parent: gt.Node,
+	label: gt.Label,
+	damage: gt.GodotReal,
+	texture: gt.Texture2D,
+	texture_loaded: bool,
+) {
 	button_path := gt.node_path_from_utf8("RollButton")
 	button, button_ok := gt.node_get_node_as_button(parent, &button_path)
 	gt.node_path_free(&button_path)
@@ -152,6 +186,16 @@ configure_ui_nodes :: proc "contextless" (parent: gt.Node, label: gt.Label, dama
 		gt.texture_rect_set_flip_v(texture_rect, false)
 		gt.texture_rect_set_expand_mode(texture_rect, .expand_keep_size)
 		gt.texture_rect_set_stretch_mode(texture_rect, .stretch_keep_aspect_centered)
+		if texture_loaded {
+			gt.texture_rect_set_texture(texture_rect, texture)
+			_ = gt.texture_rect_get_texture(texture_rect)
+			_ = gt.texture2d_get_width(texture)
+			_ = gt.texture2d_get_height(texture)
+			_ = gt.texture2d_get_size(texture)
+			_ = gt.texture2d_has_alpha(texture)
+			_ = gt.texture2d_has_mipmaps(texture)
+			gt.texture_rect_set_texture(texture_rect, gt.Texture2D(nil))
+		}
 	}
 
 	panel_path := gt.node_path_from_utf8("InfoPanel")
@@ -277,7 +321,8 @@ roll_into_label_adapter_method :: proc "contextless" (
 			gt.timer_start_default(timer)
 		}
 
-		configure_ui_nodes(parent, label, damage)
+		texture, texture_loaded := ensure_icon_texture(self)
+		configure_ui_nodes(parent, label, damage, texture, texture_loaded)
 		configure_physics_nodes(parent, damage)
 
 		area_path := gt.node_path_from_utf8("DamageArea")
@@ -293,7 +338,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 
 	_ = gt.label_set_text_utf8_checked(
 		label,
-		"Odin updated Label, Button, TextureRect, Panel, Container, Timer, physics nodes, and Area2D.",
+		"Odin updated UI nodes, loaded a texture resource, armed a Timer, and configured physics nodes.",
 	)
 	gt.label_set_horizontal_alignment(label, .horizontal_alignment_center)
 	gt.label_set_visible_ratio(label, 1)

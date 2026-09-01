@@ -88,58 +88,58 @@ threaded loading, arbitrary resource mutation, or full texture/theme/font APIs
 until each ownership transfer and lifetime rule is explicit.
 
 1. Audit resource and asset signatures.
-   - [ ] Inspect ResourceLoader, Resource, Texture2D, ImageTexture, AudioStream,
+   - [x] Inspect ResourceLoader, Resource, Texture2D, ImageTexture, AudioStream,
      PackedScene, TextureRect, Button, Sprite2D, and common asset consumers.
-   - [ ] Identify methods that fit the existing OwnedResource, borrowed handle,
+   - [x] Identify methods that fit the existing OwnedResource, borrowed handle,
      String, StringName, RID, primitive, and math-builtin rules.
-   - [ ] Keep threaded loading, cache-sensitive APIs, duplicate/instantiate
+   - [x] Keep threaded loading, cache-sensitive APIs, duplicate/instantiate
      ownership transfers, theme/font/stylebox APIs, and unsupported server APIs
      skipped with deterministic reasons.
-   - [ ] Prefer a small texture-first batch before audio, themes, or broader
+   - [x] Prefer a small texture-first batch before audio, themes, or broader
      Resource coverage.
 
 2. Add selected generated resource handle coverage.
-   - [ ] Add selected handles for Texture2D and ImageTexture if their safe method
+   - [x] Add selected handles for Texture2D and ImageTexture if their safe method
      surface is useful.
-   - [ ] Generate checked downcasts from Resource/Object to selected resource
+   - [x] Generate checked downcasts from Resource/Object to selected resource
      handle types.
-   - [ ] Keep resource handles borrowed by value, never ownership-transferring.
-   - [ ] Re-export selected handles and casts through godot:godot.
+   - [x] Keep resource handles borrowed by value, never ownership-transferring.
+   - [x] Re-export selected handles and casts through godot:godot.
 
 3. Add typed OwnedResource helper APIs.
-   - [ ] Add checked helpers that load a resource and expose a borrowed typed
+   - [x] Add checked helpers that load a resource and expose a borrowed typed
      handle while the OwnedResource remains alive.
-   - [ ] Make the lifetime rule obvious in procedure names and comments.
-   - [ ] Return ok = false for nil resources, failed loads, or failed class
+   - [x] Make the lifetime rule obvious in procedure names and comments.
+   - [x] Return ok = false for nil resources, failed loads, or failed class
      checks.
-   - [ ] Keep destruction explicit through owned_resource_free.
+   - [x] Keep destruction explicit through owned_resource_destroy.
 
 4. Enable one safe asset-consumer path.
-   - [ ] Add or generate a small texture consumer path such as TextureRect or
+   - [x] Add or generate a small texture consumer path such as TextureRect or
      Sprite2D texture assignment.
-   - [ ] Require the caller to keep the OwnedResource alive for as long as Godot
+   - [x] Require the caller to keep the OwnedResource alive for as long as Godot
      may use the borrowed texture handle.
-   - [ ] Avoid hiding Godot node/resource ownership behind broad convenience APIs.
-   - [ ] Keep theme, font, stylebox, material, and event-object APIs deferred.
+   - [x] Avoid hiding Godot node/resource ownership behind broad convenience APIs.
+   - [x] Keep theme, font, stylebox, material, and event-object APIs deferred.
 
 5. Exercise the asset path in examples.
-   - [ ] Update examples/game to load one texture-like resource and use it
+   - [x] Update examples/game to load one texture-like resource and use it
      through godot:godot only.
-   - [ ] Keep the example deterministic in headless CI.
-   - [ ] Preserve existing method, property, signal, virtual callback, scene,
+   - [x] Keep the example deterministic in headless CI.
+   - [x] Preserve existing method, property, signal, virtual callback, scene,
      physics, and UI coverage.
 
 6. Improve generated resource reporting.
-   - [ ] Refine report categories for texture, audio, theme/font/stylebox,
+   - [x] Refine report categories for texture, audio, theme/font/stylebox,
      threaded loading, duplicate, and cache-related blockers.
-   - [ ] Use the report to choose the next asset batch instead of manually
+   - [x] Use the report to choose the next asset batch instead of manually
      patching generated files.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm normal examples still import only godot:godot.
-   - [ ] Confirm generated reports explain remaining resource and asset skips.
-   - [ ] Confirm no hidden ownership transfer or raw offset poking was added.
+   - [x] Run make ci.
+   - [x] Confirm normal examples still import only godot:godot.
+   - [x] Confirm generated reports explain remaining resource and asset skips.
+   - [x] Confirm no hidden ownership transfer or raw offset poking was added.
 
 ## Planned next iterations
 

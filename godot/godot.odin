@@ -143,6 +143,8 @@ Side :: gclass.Side
 HorizontalAlignment :: gclass.HorizontalAlignment
 VerticalAlignment :: gclass.VerticalAlignment
 Resource :: gclass.Resource
+Texture2D :: gclass.Texture2D
+ImageTexture :: gclass.ImageTexture
 // Resource loading policy: ResourceLoader.load returns a Resource through a
 // Variant call in focused helpers. The helper retains the borrowed Resource into
 // OwnedResource before freeing the temporary Variant, so callers always receive
@@ -399,11 +401,24 @@ init_class_bindings :: gclass.init_class_bindings
 ref_counted_as_object :: gclass.ref_counted_as_object
 resource_as_ref_counted :: gclass.resource_as_ref_counted
 resource_as_object :: gclass.resource_as_object
+texture2d_as_resource :: gclass.texture2d_as_resource
+texture2d_as_ref_counted :: gclass.texture2d_as_ref_counted
+texture2d_as_object :: gclass.texture2d_as_object
+image_texture_as_texture2d :: gclass.image_texture_as_texture2d
+image_texture_as_resource :: gclass.image_texture_as_resource
+image_texture_as_ref_counted :: gclass.image_texture_as_ref_counted
+image_texture_as_object :: gclass.image_texture_as_object
 ref_counted_get_reference_count :: gclass.ref_counted_get_reference_count
 resource_get_path :: gclass.resource_get_path
 resource_get_rid :: gclass.resource_get_rid
 resource_set_local_to_scene :: gclass.resource_set_local_to_scene
 resource_is_local_to_scene :: gclass.resource_is_local_to_scene
+texture2d_get_mipmap_count :: gclass.texture2d_get_mipmap_count
+texture2d_get_width :: gclass.texture2d_get_width
+texture2d_get_height :: gclass.texture2d_get_height
+texture2d_get_size :: gclass.texture2d_get_size
+texture2d_has_alpha :: gclass.texture2d_has_alpha
+texture2d_has_mipmaps :: gclass.texture2d_has_mipmaps
 node_as_object :: gclass.node_as_object
 node_get_parent :: gclass.node_get_parent
 node_get_tree :: gclass.node_get_tree
@@ -549,6 +564,8 @@ control_grab_focus_default :: gclass.control_grab_focus_default
 control_release_focus :: gclass.control_release_focus
 control_set_mouse_filter :: gclass.control_set_mouse_filter
 control_get_mouse_filter :: gclass.control_get_mouse_filter
+sprite2d_set_texture :: gclass.sprite2d_set_texture
+sprite2d_get_texture :: gclass.sprite2d_get_texture
 sprite2d_set_centered :: gclass.sprite2d_set_centered
 sprite2d_is_centered :: gclass.sprite2d_is_centered
 sprite2d_set_offset :: gclass.sprite2d_set_offset
@@ -644,6 +661,8 @@ button_set_vertical_icon_alignment :: gclass.button_set_vertical_icon_alignment
 button_get_vertical_icon_alignment :: gclass.button_get_vertical_icon_alignment
 button_set_expand_icon :: gclass.button_set_expand_icon
 button_is_expand_icon :: gclass.button_is_expand_icon
+texture_rect_set_texture :: gclass.texture_rect_set_texture
+texture_rect_get_texture :: gclass.texture_rect_get_texture
 texture_rect_set_expand_mode :: gclass.texture_rect_set_expand_mode
 texture_rect_get_expand_mode :: gclass.texture_rect_get_expand_mode
 texture_rect_set_flip_h :: gclass.texture_rect_set_flip_h
@@ -692,6 +711,16 @@ object_is_ref_counted :: gclass.object_is_ref_counted
 object_try_as_ref_counted :: gclass.object_try_as_ref_counted
 object_is_resource :: gclass.object_is_resource
 object_try_as_resource :: gclass.object_try_as_resource
+object_is_texture2d :: gclass.object_is_texture2d
+object_try_as_texture2d :: gclass.object_try_as_texture2d
+object_is_image_texture :: gclass.object_is_image_texture
+object_try_as_image_texture :: gclass.object_try_as_image_texture
+resource_is_texture2d :: gclass.resource_is_texture2d
+resource_try_as_texture2d :: gclass.resource_try_as_texture2d
+resource_is_image_texture :: gclass.resource_is_image_texture
+resource_try_as_image_texture :: gclass.resource_try_as_image_texture
+texture2d_is_image_texture :: gclass.texture2d_is_image_texture
+texture2d_try_as_image_texture :: gclass.texture2d_try_as_image_texture
 object_is_node :: gclass.object_is_node
 object_try_as_node :: gclass.object_try_as_node
 object_is_canvas_item :: gclass.object_is_canvas_item
@@ -1041,6 +1070,14 @@ resource_is_nil :: proc "contextless" (self: Resource) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+texture2d_is_nil :: proc "contextless" (self: Texture2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+image_texture_is_nil :: proc "contextless" (self: ImageTexture) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 node_is_nil :: proc "contextless" (self: Node) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -1371,6 +1408,30 @@ owned_resource_handle :: proc "contextless" (self: OwnedResource) -> Resource {
 	return Resource(ObjectPtr(owned_ref_counted_handle(self.ref)))
 }
 
+// The returned Texture2D is a borrowed view of the owned resource. Keep the
+// OwnedResource alive for as long as Godot may use the texture handle.
+owned_resource_try_as_texture2d :: proc "contextless" (
+	self: OwnedResource,
+) -> (
+	texture: Texture2D,
+	ok: bool,
+) {
+	if owned_resource_is_nil(self) do return {}, false
+	return resource_try_as_texture2d(owned_resource_handle(self))
+}
+
+// The returned ImageTexture is a borrowed view of the owned resource. Keep the
+// OwnedResource alive for as long as Godot may use the image texture handle.
+owned_resource_try_as_image_texture :: proc "contextless" (
+	self: OwnedResource,
+) -> (
+	texture: ImageTexture,
+	ok: bool,
+) {
+	if owned_resource_is_nil(self) do return {}, false
+	return resource_try_as_image_texture(owned_resource_handle(self))
+}
+
 owned_resource_init_owned :: proc "contextless" (
 	handle: Resource,
 ) -> (
@@ -1440,13 +1501,15 @@ init_resource_loader_load :: proc "contextless" () {
 	resource_loader_load_initialized = true
 }
 
-// resource_loader_load_owned_checked loads a path through a Variant call, retains
-// the returned Resource into OwnedResource, then destroys the temporary Variant.
-// The caller owns the returned wrapper and must call owned_resource_destroy or
-// owned_resource_release. The ResourceLoader handle itself is borrowed.
-resource_loader_load_owned_checked :: proc "contextless" (
+// resource_loader_load_owned_with_cache_mode_checked loads a path through a
+// Variant call and stores the returned Resource in an OwnedResource. The caller
+// owns the returned wrapper and must call owned_resource_destroy or
+// owned_resource_release.
+resource_loader_load_owned_with_cache_mode_checked :: proc "contextless" (
 	self: ResourceLoader,
 	path: ^String,
+	cache_mode: ResourceLoaderCacheMode,
+	take_returned_reference: bool,
 ) -> (
 	owned: OwnedResource,
 	err: CallError,
@@ -1458,7 +1521,7 @@ resource_loader_load_owned_checked :: proc "contextless" (
 	path_variant := variant_from_string(path)
 	type_hint := string_from_utf8("")
 	type_hint_variant := variant_from_string(&type_hint)
-	cache_mode_variant := variant_from_int(i64(ResourceLoaderCacheMode.cache_mode_reuse))
+	cache_mode_variant := variant_from_int(i64(cache_mode))
 	args := [3]ConstVariantPtr {
 		const_variant_ptr(&path_variant),
 		const_variant_ptr(&type_hint_variant),
@@ -1486,8 +1549,25 @@ resource_loader_load_owned_checked :: proc "contextless" (
 	if !object_ok || object == nil do return {}, err, false
 	resource, resource_ok := object_ptr_try_as_resource(object)
 	if !resource_ok do return {}, err, false
+	if take_returned_reference {
+		owned_resource, owned_ok := owned_resource_init_owned(resource)
+		return owned_resource, err, owned_ok
+	}
 	retained, retained_ok := owned_resource_retain(resource)
 	return retained, err, retained_ok
+}
+
+// resource_loader_load_owned_checked keeps the default Godot cache reuse policy.
+// Use typed helpers when the borrow must be tied to a specific OwnedResource.
+resource_loader_load_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	err: CallError,
+	ok: bool,
+) {
+	return resource_loader_load_owned_with_cache_mode_checked(self, path, .cache_mode_reuse, false)
 }
 
 resource_loader_load_owned :: proc "contextless" (
@@ -1498,6 +1578,99 @@ resource_loader_load_owned :: proc "contextless" (
 	require_call_ok(&err)
 	if !ok do gcore._trap_nil_godot_function()
 	return owned
+}
+
+// resource_loader_load_texture2d_owned_checked loads a resource and returns a
+// borrowed Texture2D view tied to the returned OwnedResource. Destroy the owned
+// wrapper after Godot no longer needs the texture handle.
+resource_loader_load_texture2d_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	texture: Texture2D,
+	err: CallError,
+	ok: bool,
+) {
+	owned, err, ok = resource_loader_load_owned_with_cache_mode_checked(
+		self,
+		path,
+		.cache_mode_ignore,
+		true,
+	)
+	if !call_error_ok(&err) || !ok do return {}, {}, err, false
+
+	texture_ok: bool
+	texture, texture_ok = owned_resource_try_as_texture2d(owned)
+	if !texture_ok {
+		owned_resource_destroy(&owned)
+		return {}, {}, err, false
+	}
+	return owned, texture, err, true
+}
+
+resource_loader_load_texture2d_owned :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	texture: Texture2D,
+) {
+	checked_err: CallError
+	checked_ok: bool
+	owned, texture, checked_err, checked_ok = resource_loader_load_texture2d_owned_checked(
+		self,
+		path,
+	)
+	require_call_ok(&checked_err)
+	if !checked_ok do gcore._trap_nil_godot_function()
+	return owned, texture
+}
+
+// resource_loader_load_image_texture_owned_checked is the ImageTexture variant
+// of resource_loader_load_texture2d_owned_checked.
+resource_loader_load_image_texture_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	texture: ImageTexture,
+	err: CallError,
+	ok: bool,
+) {
+	owned, err, ok = resource_loader_load_owned_with_cache_mode_checked(
+		self,
+		path,
+		.cache_mode_ignore,
+		true,
+	)
+	if !call_error_ok(&err) || !ok do return {}, {}, err, false
+
+	texture_ok: bool
+	texture, texture_ok = owned_resource_try_as_image_texture(owned)
+	if !texture_ok {
+		owned_resource_destroy(&owned)
+		return {}, {}, err, false
+	}
+	return owned, texture, err, true
+}
+
+resource_loader_load_image_texture_owned :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	texture: ImageTexture,
+) {
+	checked_err: CallError
+	checked_ok: bool
+	owned, texture, checked_err, checked_ok = resource_loader_load_image_texture_owned_checked(
+		self,
+		path,
+	)
+	require_call_ok(&checked_err)
+	if !checked_ok do gcore._trap_nil_godot_function()
+	return owned, texture
 }
 
 packed_scene_instantiate_class_name_data: StaticStringName
@@ -1689,6 +1862,14 @@ packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+texture2d_object_ptr :: proc "contextless" (self: Texture2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+image_texture_object_ptr :: proc "contextless" (self: ImageTexture) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 resource_loader_object_ptr :: proc "contextless" (self: ResourceLoader) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -1714,6 +1895,26 @@ object_ptr_try_as_ref_counted :: proc "contextless" (
 object_ptr_try_as_resource :: proc "contextless" (self: ObjectPtr) -> (value: Resource, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_resource(Object(self))
+}
+
+object_ptr_try_as_texture2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: Texture2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_texture2d(Object(self))
+}
+
+object_ptr_try_as_image_texture :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: ImageTexture,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_image_texture(Object(self))
 }
 
 object_ptr_try_as_node :: proc "contextless" (self: ObjectPtr) -> (value: Node, ok: bool) {
