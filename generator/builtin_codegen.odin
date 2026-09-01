@@ -1930,22 +1930,24 @@ class_method_input_viewport_blocker_kind :: proc(
 ) -> string {
 	if class_method_is_input_event_report_class(class_name) do return "input-event"
 	if class_name == "Viewport" || class_name == "Window" {
+		if method.name == "push_input" || method.name == "push_unhandled_input" {
+			return "event-construction"
+		}
 		if method.name == "get_texture" ||
+		   method.name == "set_world_2d" ||
 		   method.name == "get_world_2d" ||
 		   method.name == "find_world_2d" ||
-		   method.name == "set_world_2d" ||
+		   method.name == "set_world_3d" ||
 		   method.name == "get_world_3d" ||
 		   method.name == "find_world_3d" ||
-		   method.name == "set_world_3d" ||
 		   method.name == "get_camera_2d" ||
 		   method.name == "get_camera_3d" ||
 		   method.name == "get_audio_listener_2d" ||
 		   method.name == "get_audio_listener_3d" ||
-		   method.name == "get_embedded_subwindows" {
-			return "viewport-resource"
-		}
-		if method.name == "push_input" || method.name == "push_unhandled_input" {
-			return "event-construction"
+		   method.name == "get_embedded_subwindows" ||
+		   method.name == "set_vrs_texture" ||
+		   method.name == "get_vrs_texture" {
+			return "viewport-ownership"
 		}
 		return "viewport"
 	}
@@ -2829,6 +2831,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&viewport_blockers)
 	viewport_resource_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&viewport_resource_blockers)
+	viewport_ownership_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&viewport_ownership_blockers)
 	event_construction_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&event_construction_blockers)
 
@@ -2862,6 +2866,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	input_event_blocker_count := 0
 	viewport_blocker_count := 0
 	viewport_resource_blocker_count := 0
+	viewport_ownership_blocker_count := 0
 	event_construction_blocker_count := 0
 
 	for class_name in selected_class_names {
@@ -3059,6 +3064,15 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 						reason,
 					)
 					viewport_resource_blocker_count += 1
+				} else if input_viewport_kind == "viewport-ownership" {
+					emit_class_method_blocker_line(
+						&viewport_ownership_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					viewport_ownership_blocker_count += 1
 				} else if input_viewport_kind == "event-construction" {
 					emit_class_method_blocker_line(
 						&event_construction_blockers,
@@ -3247,6 +3261,15 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 						reason,
 					)
 					viewport_resource_blocker_count += 1
+				} else if input_viewport_kind == "viewport-ownership" {
+					emit_class_method_blocker_line(
+						&viewport_ownership_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					viewport_ownership_blocker_count += 1
 				} else if input_viewport_kind == "event-construction" {
 					emit_class_method_blocker_line(
 						&event_construction_blockers,
@@ -3313,6 +3336,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- InputEvent blockers: %d\n", input_event_blocker_count)
 	fmt.sbprintf(&b, "- Viewport blockers: %d\n", viewport_blocker_count)
 	fmt.sbprintf(&b, "- Viewport resource blockers: %d\n", viewport_resource_blocker_count)
+	fmt.sbprintf(&b, "- Viewport ownership blockers: %d\n", viewport_ownership_blocker_count)
 	fmt.sbprintf(&b, "- Event construction blockers: %d\n", event_construction_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
@@ -3367,6 +3391,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(viewport_blockers))
 	strings.write_string(&b, "\n## Viewport resource blockers\n\n")
 	strings.write_string(&b, strings.to_string(viewport_resource_blockers))
+	strings.write_string(&b, "\n## Viewport ownership blockers\n\n")
+	strings.write_string(&b, strings.to_string(viewport_ownership_blockers))
 	strings.write_string(&b, "\n## Event construction blockers\n\n")
 	strings.write_string(&b, strings.to_string(event_construction_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")

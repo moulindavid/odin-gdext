@@ -130,10 +130,10 @@ Viewport ownership-sensitive APIs until their lifetime rules are clear.
    - [x] Avoid tests that depend on real keyboard or mouse input from CI.
 
 6. Improve generated input and viewport reporting.
-   - [ ] Split blocker report categories for input events, viewport resources,
+   - [x] Split blocker report categories for input events, viewport resources,
      event construction, and ownership-sensitive viewport APIs where useful.
-   - [ ] Keep generated output deterministic.
-   - [ ] Use the report to choose the next input or viewport batch.
+   - [x] Keep generated output deterministic.
+   - [x] Use the report to choose the next input or viewport batch.
 
 7. Validate before moving to the next feature roadmap.
    - [ ] Run make ci.
