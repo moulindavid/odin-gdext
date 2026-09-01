@@ -1567,12 +1567,7 @@ resource_loader_load_owned_checked :: proc "contextless" (
 	err: CallError,
 	ok: bool,
 ) {
-	return resource_loader_load_owned_with_cache_mode_checked(
-		self,
-		path,
-		.cache_mode_reuse,
-		false,
-	)
+	return resource_loader_load_owned_with_cache_mode_checked(self, path, .cache_mode_reuse, false)
 }
 
 resource_loader_load_owned :: proc "contextless" (
@@ -1623,7 +1618,10 @@ resource_loader_load_texture2d_owned :: proc "contextless" (
 ) {
 	checked_err: CallError
 	checked_ok: bool
-	owned, texture, checked_err, checked_ok = resource_loader_load_texture2d_owned_checked(self, path)
+	owned, texture, checked_err, checked_ok = resource_loader_load_texture2d_owned_checked(
+		self,
+		path,
+	)
 	require_call_ok(&checked_err)
 	if !checked_ok do gcore._trap_nil_godot_function()
 	return owned, texture
@@ -1666,7 +1664,10 @@ resource_loader_load_image_texture_owned :: proc "contextless" (
 ) {
 	checked_err: CallError
 	checked_ok: bool
-	owned, texture, checked_err, checked_ok = resource_loader_load_image_texture_owned_checked(self, path)
+	owned, texture, checked_err, checked_ok = resource_loader_load_image_texture_owned_checked(
+		self,
+		path,
+	)
 	require_call_ok(&checked_err)
 	if !checked_ok do gcore._trap_nil_godot_function()
 	return owned, texture
@@ -1896,7 +1897,12 @@ object_ptr_try_as_resource :: proc "contextless" (self: ObjectPtr) -> (value: Re
 	return object_try_as_resource(Object(self))
 }
 
-object_ptr_try_as_texture2d :: proc "contextless" (self: ObjectPtr) -> (value: Texture2D, ok: bool) {
+object_ptr_try_as_texture2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: Texture2D,
+	ok: bool,
+) {
 	if self == nil do return {}, false
 	return object_try_as_texture2d(Object(self))
 }

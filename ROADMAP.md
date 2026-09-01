@@ -136,10 +136,10 @@ until each ownership transfer and lifetime rule is explicit.
      patching generated files.
 
 7. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm normal examples still import only godot:godot.
-   - [ ] Confirm generated reports explain remaining resource and asset skips.
-   - [ ] Confirm no hidden ownership transfer or raw offset poking was added.
+   - [x] Run make ci.
+   - [x] Confirm normal examples still import only godot:godot.
+   - [x] Confirm generated reports explain remaining resource and asset skips.
+   - [x] Confirm no hidden ownership transfer or raw offset poking was added.
 
 ## Planned next iterations
 
