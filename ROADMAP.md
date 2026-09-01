@@ -102,11 +102,11 @@ Viewport ownership-sensitive APIs until their lifetime rules are clear.
      ownership, and server-heavy APIs skipped with deterministic reasons.
 
 2. Add selected generated InputEvent handle coverage.
-   - [ ] Add selected InputEvent class handles and checked downcasts.
-   - [ ] Generate only borrowed-safe primitive, StringName, Vector2, and simple
+   - [x] Add selected InputEvent class handles and checked downcasts.
+   - [x] Generate only borrowed-safe primitive, StringName, Vector2, and simple
      boolean/query methods.
-   - [ ] Re-export selected handles and casts through godot:godot.
-   - [ ] Keep unchecked casts limited to explicit inheritance upcasts.
+   - [x] Re-export selected handles and casts through godot:godot.
+   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
 
 3. Add selected generated Viewport coverage.
    - [ ] Generate small borrowed-safe Viewport query wrappers needed by gameplay

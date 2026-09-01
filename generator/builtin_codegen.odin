@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 32
+Max_Selected_Class_Count :: 40
 
 selected_class_names := []string {
 	"Object",
@@ -1037,10 +1037,6 @@ selected_class_names := []string {
 	"PackedScene",
 	"ResourceLoader",
 	"Input",
-	"SceneTree",
-}
-
-candidate_class_names := []string {
 	"InputEvent",
 	"InputEventFromWindow",
 	"InputEventWithModifiers",
@@ -1048,6 +1044,10 @@ candidate_class_names := []string {
 	"InputEventMouse",
 	"InputEventMouseButton",
 	"InputEventMouseMotion",
+	"SceneTree",
+}
+
+candidate_class_names := []string {
 	"Viewport",
 	"Window",
 	"AudioStream",
@@ -1458,6 +1458,49 @@ selected_class_methods := []Selected_Class_Method {
 	{"Input", "set_use_accumulated_input"},
 	{"Input", "is_using_accumulated_input"},
 	{"Input", "flush_buffered_events"},
+	{"InputEvent", "get_device"},
+	{"InputEvent", "is_action"},
+	{"InputEvent", "is_action_pressed"},
+	{"InputEvent", "is_action_released"},
+	{"InputEvent", "get_action_strength"},
+	{"InputEvent", "is_canceled"},
+	{"InputEvent", "is_pressed"},
+	{"InputEvent", "is_released"},
+	{"InputEvent", "is_echo"},
+	{"InputEvent", "as_text"},
+	{"InputEvent", "is_match"},
+	{"InputEvent", "is_action_type"},
+	{"InputEventFromWindow", "get_window_id"},
+	{"InputEventWithModifiers", "is_command_or_control_autoremap"},
+	{"InputEventWithModifiers", "is_command_or_control_pressed"},
+	{"InputEventWithModifiers", "is_alt_pressed"},
+	{"InputEventWithModifiers", "is_shift_pressed"},
+	{"InputEventWithModifiers", "is_ctrl_pressed"},
+	{"InputEventWithModifiers", "is_meta_pressed"},
+	{"InputEventKey", "get_keycode"},
+	{"InputEventKey", "get_physical_keycode"},
+	{"InputEventKey", "get_key_label"},
+	{"InputEventKey", "get_unicode"},
+	{"InputEventKey", "get_location"},
+	{"InputEventKey", "get_keycode_with_modifiers"},
+	{"InputEventKey", "get_physical_keycode_with_modifiers"},
+	{"InputEventKey", "get_key_label_with_modifiers"},
+	{"InputEventKey", "as_text_keycode"},
+	{"InputEventKey", "as_text_physical_keycode"},
+	{"InputEventKey", "as_text_key_label"},
+	{"InputEventKey", "as_text_location"},
+	{"InputEventMouse", "get_position"},
+	{"InputEventMouse", "get_global_position"},
+	{"InputEventMouseButton", "get_factor"},
+	{"InputEventMouseButton", "get_button_index"},
+	{"InputEventMouseButton", "is_double_click"},
+	{"InputEventMouseMotion", "get_tilt"},
+	{"InputEventMouseMotion", "get_pressure"},
+	{"InputEventMouseMotion", "get_pen_inverted"},
+	{"InputEventMouseMotion", "get_relative"},
+	{"InputEventMouseMotion", "get_screen_relative"},
+	{"InputEventMouseMotion", "get_velocity"},
+	{"InputEventMouseMotion", "get_screen_velocity"},
 	{"SceneTree", "has_group"},
 	{"SceneTree", "is_accessibility_enabled"},
 	{"SceneTree", "is_accessibility_supported"},
