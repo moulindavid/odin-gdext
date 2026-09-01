@@ -124,10 +124,10 @@ Viewport ownership-sensitive APIs until their lifetime rules are clear.
      be retained after the callback.
 
 5. Exercise the input and viewport path in examples.
-   - [ ] Keep examples/game importing only godot:godot.
-   - [ ] Add compile or runtime coverage for selected InputEvent downcasts and
+   - [x] Keep examples/game importing only godot:godot.
+   - [x] Add compile or runtime coverage for selected InputEvent downcasts and
      Viewport queries that remains deterministic in headless CI.
-   - [ ] Avoid tests that depend on real keyboard or mouse input from CI.
+   - [x] Avoid tests that depend on real keyboard or mouse input from CI.
 
 6. Improve generated input and viewport reporting.
    - [ ] Split blocker report categories for input events, viewport resources,
