@@ -94,11 +94,11 @@ callback that supplied them, and do not expose broad input-event mutation or
 Viewport ownership-sensitive APIs until their lifetime rules are clear.
 
 1. Audit InputEvent and Viewport signatures.
-   - [ ] Inspect InputEvent, InputEventKey, InputEventMouseButton,
+   - [x] Inspect InputEvent, InputEventKey, InputEventMouseButton,
      InputEventMouseMotion, Viewport, Window, and related input/viewport methods.
-   - [ ] Classify methods by borrowed-safe signatures, explicit owned-wrapper
+   - [x] Classify methods by borrowed-safe signatures, explicit owned-wrapper
      needs, and unsupported event-lifetime-sensitive cases.
-   - [ ] Keep event storage, arbitrary event construction, Viewport texture
+   - [x] Keep event storage, arbitrary event construction, Viewport texture
      ownership, and server-heavy APIs skipped with deterministic reasons.
 
 2. Add selected generated InputEvent handle coverage.
