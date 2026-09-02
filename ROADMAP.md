@@ -140,10 +140,10 @@ stored beyond the callback.
      input when needed.
 
 6. Add facade and smoke coverage.
-   - [ ] Add compile checks for the public virtual callback descriptors.
-   - [ ] Keep smoke coverage exercising registration, instance binding,
+   - [x] Add compile checks for the public virtual callback descriptors.
+   - [x] Keep smoke coverage exercising registration, instance binding,
      generated class handles, properties, signals, and virtual callbacks.
-   - [ ] Confirm every temporary Variant and borrowed InputEvent path is cleaned
+   - [x] Confirm every temporary Variant and borrowed InputEvent path is cleaned
      up or bounded to the callback.
 
 7. Validate before moving to the next feature roadmap.

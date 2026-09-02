@@ -272,6 +272,19 @@ hello_ready :: proc(instance: gt.ClassInstancePtr, node: gt.Node, reversed: bool
 	_ = gt.node_enable_process_callback(node)
 }
 
+
+hello_input_event :: proc(
+	instance: gt.ClassInstancePtr,
+	node: gt.Node,
+	event: gt.InputEvent,
+) -> bool {
+	_ = instance
+	_ = node
+	_, _ = gt.input_event_key_code_checked(event)
+	_, _ = gt.input_event_mouse_position_checked(event)
+	return true
+}
+
 hello_process :: proc(
 	instance: gt.ClassInstancePtr,
 	node: gt.Node,
@@ -288,10 +301,15 @@ hello_process :: proc(
 	_ = gt.node_disable_process_callback(node)
 }
 
-hello_node_virtuals := gt.NodeVirtualCallbackDescriptor {
-	ready   = hello_ready,
+hello_node_virtuals := gt.node_virtual_callback_descriptor(
+	ready = hello_ready,
 	process = hello_process,
-}
+)
+
+hello_node_input_callbacks := gt.node_input_event_callback_descriptor(
+	input = hello_input_event,
+	unhandled_input = hello_input_event,
+)
 
 notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
@@ -301,6 +319,12 @@ notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reverse
 	node, node_ok := gt.object_ptr_try_as_node(self_.object)
 	if !node_ok do return
 	if gt.dispatch_node_virtual_descriptor(instance, node, what, reversed, &hello_node_virtuals) do return
+	_ = gt.dispatch_node_input_event_callback(
+		instance,
+		node,
+		gt.ObjectPtr(nil),
+		hello_node_input_callbacks.input,
+	)
 }
 
 // Method adapters.
