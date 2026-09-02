@@ -7,6 +7,8 @@ GameBrain :: distinct gt.ObjectPtr
 GameBrainData :: struct {
 	object:       gt.ObjectPtr,
 	difficulty:   gt.GodotReal,
+	process_tick: i64,
+	input_tick:   i64,
 	icon_texture: gt.OwnedResource,
 }
 
@@ -43,6 +45,79 @@ free_instance :: proc "c" (class_userdata: rawptr, instance: gt.ClassInstancePtr
 		gt.owned_resource_destroy(&self.icon_texture)
 	}
 	free(self)
+}
+
+game_ready :: proc(instance: gt.ClassInstancePtr, node: gt.Node, reversed: bool) {
+	_ = reversed
+	self, self_ok := gt.class_instance_data(instance, GameBrainData)
+	if !self_ok do return
+
+	_ = gt.node_enable_process_callback(node)
+	_ = gt.dispatch_node_input_event_callback(
+		instance,
+		node,
+		gt.ObjectPtr(nil),
+		game_input_callbacks.input,
+	)
+	gt.debug_print("[odin-gdext] GameBrain ready virtual callback")
+	gt.object_emit_signal_1_godot_real(self.object, damage_rolled_signal_name, self.difficulty)
+}
+
+game_process :: proc(
+	instance: gt.ClassInstancePtr,
+	node: gt.Node,
+	delta: gt.GodotReal,
+	reversed: bool,
+) {
+	_ = reversed
+	self, self_ok := gt.class_instance_data(instance, GameBrainData)
+	if !self_ok do return
+
+	self.process_tick += 1
+	self.difficulty += delta
+	if self.process_tick >= 1 {
+		_ = gt.node_disable_process_callback(node)
+	}
+}
+
+game_input_event :: proc(
+	instance: gt.ClassInstancePtr,
+	node: gt.Node,
+	event: gt.InputEvent,
+) -> bool {
+	_ = node
+	self, self_ok := gt.class_instance_data(instance, GameBrainData)
+	if !self_ok do return false
+
+	self.input_tick += 1
+	_, _ = gt.input_event_key_code_checked(event)
+	_, _ = gt.input_event_mouse_button_index_checked(event)
+	_, _ = gt.input_event_mouse_position_checked(event)
+	return true
+}
+
+game_unhandled_input_event :: proc(
+	instance: gt.ClassInstancePtr,
+	node: gt.Node,
+	event: gt.InputEvent,
+) -> bool {
+	return game_input_event(instance, node, event)
+}
+
+game_virtuals := gt.node_virtual_callback_descriptor(ready = game_ready, process = game_process)
+
+game_input_callbacks := gt.node_input_event_callback_descriptor(
+	input = game_input_event,
+	unhandled_input = game_unhandled_input_event,
+)
+
+notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
+	context = gt.godot_context()
+	self, self_ok := gt.class_instance_data(instance, GameBrainData)
+	if !self_ok do return
+	node, node_ok := gt.object_ptr_try_as_node(self.object)
+	if !node_ok do return
+	if gt.dispatch_node_virtual_descriptor(instance, node, what, reversed, &game_virtuals) do return
 }
 
 ensure_icon_texture :: proc "contextless" (
@@ -630,6 +705,7 @@ register_classes :: proc() {
 			parent_class_name = game_parent_name,
 			create_instance_func = create_instance,
 			free_instance_func = free_instance,
+			notification_func = notification_func,
 		},
 	)
 

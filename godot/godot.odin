@@ -27,6 +27,11 @@ CallError :: gcore.CallError
 ClassCreateInstance :: gcore.ClassCreateInstance
 ClassFreeInstance :: gcore.ClassFreeInstance
 ClassNotification :: gcore.ClassNotification
+ClassVirtualReady :: gcore.ClassVirtualReady
+ClassVirtualTree :: gcore.ClassVirtualTree
+ClassVirtualProcess :: gcore.ClassVirtualProcess
+ClassVirtualInputEvent :: gcore.ClassVirtualInputEvent
+ClassVirtualRawNotification :: gcore.ClassVirtualRawNotification
 ClassMethodCall :: gcore.ClassMethodCall
 ClassMethodPtrCall :: gcore.ClassMethodPtrCall
 ClassMethodArgumentMetadata :: gcore.ClassMethodArgumentMetadata
@@ -36,6 +41,11 @@ EditorVisibleClassDescriptor :: gcore.EditorVisibleClassDescriptor
 PropertyUsageStorage :: gcore.PropertyUsageStorage
 PropertyUsageEditor :: gcore.PropertyUsageEditor
 PropertyUsageDefault :: gcore.PropertyUsageDefault
+NodeNotificationEnterTree :: gcore.NodeNotificationEnterTree
+NodeNotificationExitTree :: gcore.NodeNotificationExitTree
+NodeNotificationReady :: gcore.NodeNotificationReady
+NodeNotificationPhysicsProcess :: gcore.NodeNotificationPhysicsProcess
+NodeNotificationProcess :: gcore.NodeNotificationProcess
 MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
 ClassMemberDefaults :: gcore.ClassMemberDefaults
 ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
@@ -46,6 +56,8 @@ OdinClassProperty :: gcore.OdinClassProperty
 OdinClassSignal :: gcore.OdinClassSignal
 ClassSignalStorage :: gcore.ClassSignalStorage
 OdinClassDescriptor :: gcore.OdinClassDescriptor
+ClassVirtualCallbacks :: gcore.ClassVirtualCallbacks
+ClassVirtualDescriptor :: gcore.ClassVirtualDescriptor
 ClassBuilder :: gcore.ClassBuilder
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
@@ -228,9 +240,11 @@ class_signal_0 :: gcore.class_signal_0
 class_signal_1_godot_real :: gcore.class_signal_1_godot_real
 class_signal_2_godot_real :: gcore.class_signal_2_godot_real
 class_builder_begin :: gcore.class_builder_begin
+class_virtual_descriptor :: gcore.class_virtual_descriptor
 class_builder_methods :: gcore.class_builder_methods
 class_builder_properties :: gcore.class_builder_properties
 class_builder_signals :: gcore.class_builder_signals
+class_builder_virtuals :: gcore.class_builder_virtuals
 class_builder_finalize :: gcore.class_builder_finalize
 class_builder_register :: gcore.class_builder_register
 class_builder_unregister :: gcore.class_builder_unregister
@@ -2294,6 +2308,63 @@ object_ptr_try_as_viewport :: proc "contextless" (self: ObjectPtr) -> (value: Vi
 	return object_try_as_viewport(Object(self))
 }
 
+// InputEvent callback handlers receive a borrowed InputEvent handle. The handle
+// is valid only for the callback that supplied it unless Godot explicitly gives
+// user code a longer-lived object through another API.
+InputEventCallbackHandler :: #type proc(instance: ClassInstancePtr, event: InputEvent) -> bool
+NodeInputEventCallbackHandler :: #type proc(
+	instance: ClassInstancePtr,
+	node: Node,
+	event: InputEvent,
+) -> bool
+
+InputEventCallbackDescriptor :: struct {
+	input:           InputEventCallbackHandler,
+	unhandled_input: InputEventCallbackHandler,
+}
+
+NodeInputEventCallbackDescriptor :: struct {
+	input:           NodeInputEventCallbackHandler,
+	unhandled_input: NodeInputEventCallbackHandler,
+}
+
+input_event_callback_descriptor :: proc "contextless" (
+	input: InputEventCallbackHandler = nil,
+	unhandled_input: InputEventCallbackHandler = nil,
+) -> InputEventCallbackDescriptor {
+	return InputEventCallbackDescriptor{input = input, unhandled_input = unhandled_input}
+}
+
+node_input_event_callback_descriptor :: proc "contextless" (
+	input: NodeInputEventCallbackHandler = nil,
+	unhandled_input: NodeInputEventCallbackHandler = nil,
+) -> NodeInputEventCallbackDescriptor {
+	return NodeInputEventCallbackDescriptor{input = input, unhandled_input = unhandled_input}
+}
+
+dispatch_input_event_callback :: proc(
+	instance: ClassInstancePtr,
+	event_object: ObjectPtr,
+	handler: InputEventCallbackHandler,
+) -> bool {
+	if handler == nil do return false
+	event, event_ok := object_ptr_try_as_input_event(event_object)
+	if !event_ok do return false
+	return handler(instance, event)
+}
+
+dispatch_node_input_event_callback :: proc(
+	instance: ClassInstancePtr,
+	node: Node,
+	event_object: ObjectPtr,
+	handler: NodeInputEventCallbackHandler,
+) -> bool {
+	if handler == nil || node_is_nil(node) do return false
+	event, event_ok := object_ptr_try_as_input_event(event_object)
+	if !event_ok do return false
+	return handler(instance, node, event)
+}
+
 // InputEvent handles are borrowed from Godot. Do not store them beyond the
 // callback or object storage that supplied them.
 input_event_try_key :: proc "contextless" (self: InputEvent) -> (value: InputEventKey, ok: bool) {
@@ -2726,6 +2797,24 @@ NodeVirtualCallbackDescriptor :: struct {
 	process:          NodeProcessVirtualHandler,
 	physics_process:  NodeProcessVirtualHandler,
 	raw_notification: NodeRawNotificationHandler,
+}
+
+node_virtual_callback_descriptor :: proc "contextless" (
+	ready: NodeVirtualHandler = nil,
+	enter_tree: NodeVirtualHandler = nil,
+	exit_tree: NodeVirtualHandler = nil,
+	process: NodeProcessVirtualHandler = nil,
+	physics_process: NodeProcessVirtualHandler = nil,
+	raw_notification: NodeRawNotificationHandler = nil,
+) -> NodeVirtualCallbackDescriptor {
+	return NodeVirtualCallbackDescriptor {
+		enter_tree = enter_tree,
+		exit_tree = exit_tree,
+		ready = ready,
+		process = process,
+		physics_process = physics_process,
+		raw_notification = raw_notification,
+	}
 }
 
 // dispatch_node_notification calls a typed handler for common Node lifecycle
