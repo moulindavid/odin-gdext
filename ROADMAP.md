@@ -108,12 +108,12 @@ stored beyond the callback.
    - [x] Document callback argument ownership near the helper APIs.
 
 2. Add typed dispatch helpers for common Node callbacks.
-   - [ ] Convert Godot notifications into typed Odin callbacks where the data is
+   - [x] Convert Godot notifications into typed Odin callbacks where the data is
      already available safely.
-   - [ ] Preserve explicit reversed handling.
-   - [ ] Keep process and physics-process delta sourcing through the verified
+   - [x] Preserve explicit reversed handling.
+   - [x] Keep process and physics-process delta sourcing through the verified
      Node process callback path, not guessed notification data.
-   - [ ] Trap or return checked errors consistently with existing callback
+   - [x] Trap or return checked errors consistently with existing callback
      helpers.
 
 3. Add InputEvent callback helpers.

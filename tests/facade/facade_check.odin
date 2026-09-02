@@ -1287,12 +1287,12 @@ facade_node_lifecycle := gt.NodeLifecycleCallbacks {
 	raw_notification = facade_raw_notification,
 }
 
-facade_node_virtual_descriptor := gt.NodeVirtualCallbackDescriptor {
-	ready            = facade_ready_virtual,
-	process          = facade_process_virtual,
-	physics_process  = facade_process_virtual,
+facade_node_virtual_descriptor := gt.node_virtual_callback_descriptor(
+	ready = facade_ready_virtual,
+	process = facade_process_virtual,
+	physics_process = facade_process_virtual,
 	raw_notification = facade_raw_notification,
-}
+)
 
 facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()

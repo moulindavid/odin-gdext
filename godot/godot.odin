@@ -2741,6 +2741,24 @@ NodeVirtualCallbackDescriptor :: struct {
 	raw_notification: NodeRawNotificationHandler,
 }
 
+node_virtual_callback_descriptor :: proc "contextless" (
+	ready: NodeVirtualHandler = nil,
+	enter_tree: NodeVirtualHandler = nil,
+	exit_tree: NodeVirtualHandler = nil,
+	process: NodeProcessVirtualHandler = nil,
+	physics_process: NodeProcessVirtualHandler = nil,
+	raw_notification: NodeRawNotificationHandler = nil,
+) -> NodeVirtualCallbackDescriptor {
+	return NodeVirtualCallbackDescriptor {
+		enter_tree = enter_tree,
+		exit_tree = exit_tree,
+		ready = ready,
+		process = process,
+		physics_process = physics_process,
+		raw_notification = raw_notification,
+	}
+}
+
 // dispatch_node_notification calls a typed handler for common Node lifecycle
 // notifications and returns true when a handler ran. Unknown notifications and
 // nil handlers are left to the caller so raw notification numbers remain usable.
