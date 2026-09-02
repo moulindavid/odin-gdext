@@ -101,11 +101,11 @@ cleanup. InputEvent handles passed to callbacks are borrowed and must not be
 stored beyond the callback.
 
 1. Define the virtual callback authoring shape.
-   - [ ] Choose a small public descriptor shape for user callbacks.
-   - [ ] Cover ready, enter tree, exit tree, process, physics process, input,
+   - [x] Choose a small public descriptor shape for user callbacks.
+   - [x] Cover ready, enter tree, exit tree, process, physics process, input,
      and unhandled input as the first target set.
-   - [ ] Keep raw notification fallback available for advanced use.
-   - [ ] Document callback argument ownership near the helper APIs.
+   - [x] Keep raw notification fallback available for advanced use.
+   - [x] Document callback argument ownership near the helper APIs.
 
 2. Add typed dispatch helpers for common Node callbacks.
    - [ ] Convert Godot notifications into typed Odin callbacks where the data is

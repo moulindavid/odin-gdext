@@ -27,6 +27,11 @@ CallError :: gcore.CallError
 ClassCreateInstance :: gcore.ClassCreateInstance
 ClassFreeInstance :: gcore.ClassFreeInstance
 ClassNotification :: gcore.ClassNotification
+ClassVirtualReady :: gcore.ClassVirtualReady
+ClassVirtualTree :: gcore.ClassVirtualTree
+ClassVirtualProcess :: gcore.ClassVirtualProcess
+ClassVirtualInputEvent :: gcore.ClassVirtualInputEvent
+ClassVirtualRawNotification :: gcore.ClassVirtualRawNotification
 ClassMethodCall :: gcore.ClassMethodCall
 ClassMethodPtrCall :: gcore.ClassMethodPtrCall
 ClassMethodArgumentMetadata :: gcore.ClassMethodArgumentMetadata
@@ -36,6 +41,11 @@ EditorVisibleClassDescriptor :: gcore.EditorVisibleClassDescriptor
 PropertyUsageStorage :: gcore.PropertyUsageStorage
 PropertyUsageEditor :: gcore.PropertyUsageEditor
 PropertyUsageDefault :: gcore.PropertyUsageDefault
+NodeNotificationEnterTree :: gcore.NodeNotificationEnterTree
+NodeNotificationExitTree :: gcore.NodeNotificationExitTree
+NodeNotificationReady :: gcore.NodeNotificationReady
+NodeNotificationPhysicsProcess :: gcore.NodeNotificationPhysicsProcess
+NodeNotificationProcess :: gcore.NodeNotificationProcess
 MethodPropertyDescriptor :: gcore.MethodPropertyDescriptor
 ClassMemberDefaults :: gcore.ClassMemberDefaults
 ClassPropertyDescriptor :: gcore.ClassPropertyDescriptor
@@ -46,6 +56,8 @@ OdinClassProperty :: gcore.OdinClassProperty
 OdinClassSignal :: gcore.OdinClassSignal
 ClassSignalStorage :: gcore.ClassSignalStorage
 OdinClassDescriptor :: gcore.OdinClassDescriptor
+ClassVirtualCallbacks :: gcore.ClassVirtualCallbacks
+ClassVirtualDescriptor :: gcore.ClassVirtualDescriptor
 ClassBuilder :: gcore.ClassBuilder
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
@@ -228,6 +240,7 @@ class_signal_0 :: gcore.class_signal_0
 class_signal_1_godot_real :: gcore.class_signal_1_godot_real
 class_signal_2_godot_real :: gcore.class_signal_2_godot_real
 class_builder_begin :: gcore.class_builder_begin
+class_virtual_descriptor :: gcore.class_virtual_descriptor
 class_builder_methods :: gcore.class_builder_methods
 class_builder_properties :: gcore.class_builder_properties
 class_builder_signals :: gcore.class_builder_signals

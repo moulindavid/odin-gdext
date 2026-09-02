@@ -686,6 +686,56 @@ class_signal_2_godot_real :: proc "contextless" (
 	}
 }
 
+NodeNotificationEnterTree :: i32(10)
+NodeNotificationExitTree :: i32(11)
+NodeNotificationReady :: i32(13)
+NodeNotificationPhysicsProcess :: i32(16)
+NodeNotificationProcess :: i32(17)
+
+ClassVirtualReady :: #type proc "contextless" (instance: ClassInstancePtr) -> bool
+ClassVirtualTree :: #type proc "contextless" (instance: ClassInstancePtr) -> bool
+ClassVirtualProcess :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	delta: GodotReal,
+) -> bool
+ClassVirtualInputEvent :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	event: ObjectPtr,
+) -> bool
+ClassVirtualRawNotification :: #type proc "contextless" (
+	instance: ClassInstancePtr,
+	what: i32,
+	reversed: bool,
+) -> bool
+
+ClassVirtualCallbacks :: struct {
+	ready:            ClassVirtualReady,
+	enter_tree:       ClassVirtualTree,
+	exit_tree:        ClassVirtualTree,
+	process:          ClassVirtualProcess,
+	physics_process:  ClassVirtualProcess,
+	input:            ClassVirtualInputEvent,
+	unhandled_input:  ClassVirtualInputEvent,
+	raw_notification: ClassVirtualRawNotification,
+}
+
+// ClassVirtualDescriptor borrows callback procedure pointers and optional user
+// data owned by the extension. InputEvent object pointers passed to input-style
+// callbacks are borrowed from Godot and must not be stored past the callback.
+// Process deltas are sourced only by helpers that have a verified Godot callback
+// path; notification-only dispatch must not invent delta values.
+ClassVirtualDescriptor :: struct {
+	callbacks: ClassVirtualCallbacks,
+	userdata:  rawptr,
+}
+
+class_virtual_descriptor :: proc "contextless" (
+	callbacks: ClassVirtualCallbacks,
+	userdata: rawptr = nil,
+) -> ClassVirtualDescriptor {
+	return ClassVirtualDescriptor{callbacks = callbacks, userdata = userdata}
+}
+
 OdinClassDescriptor :: struct {
 	class_name:           ConstStringNamePtr,
 	parent_class_name:    ConstStringNamePtr,
