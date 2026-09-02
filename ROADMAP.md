@@ -81,100 +81,115 @@ These slices are complete and were validated with make ci when merged:
      typed OwnedResource loading helpers, a safe texture consumer path,
      deterministic resource blocker reporting, and examples/game asset coverage.
 
-## Current goal: Input event and viewport APIs
+10. Input event and viewport APIs.
+   - Selected InputEvent, InputEventKey, InputEventMouseButton,
+     InputEventMouseMotion, and Viewport handles, checked casts, borrowed-safe
+     query wrappers, facade helpers, deterministic example coverage, and input
+     or viewport blocker reporting.
 
-Expose a small, useful input-event and viewport API surface for gameplay code
-while preserving the borrowed-handle and event-lifetime model. Existing input
-polling is useful, but real projects also need selected InputEvent subclasses
-and viewport queries for mouse, keyboard, UI, and camera-related systems.
+## Current goal: Virtual callback model for gameplay classes
 
-Keep this goal narrow. InputEvent handles are borrowed unless an explicit owned
-resource/reference wrapper is added. Do not store event handles beyond the Godot
-callback that supplied them, and do not expose broad input-event mutation or
-Viewport ownership-sensitive APIs until their lifetime rules are clear.
+Make custom Odin classes feel closer to godot-rust/gdext's everyday gameplay
+workflow while staying Odin-idiomatic and explicit. The target is not macro
+magic, but a small, safe authoring layer where users can define instance data and
+wire common Godot callbacks such as ready, process, physics process, input, and
+unhandled input without hand-writing raw notification dispatch each time.
 
-1. Audit InputEvent and Viewport signatures.
-   - [x] Inspect InputEvent, InputEventKey, InputEventMouseButton,
-     InputEventMouseMotion, Viewport, Window, and related input/viewport methods.
-   - [x] Classify methods by borrowed-safe signatures, explicit owned-wrapper
-     needs, and unsupported event-lifetime-sensitive cases.
-   - [x] Keep event storage, arbitrary event construction, Viewport texture
-     ownership, and server-heavy APIs skipped with deterministic reasons.
+Keep this goal narrow. Virtual callbacks must still use explicit registration,
+stable metadata storage, borrowed object handles, and explicit temporary value
+cleanup. InputEvent handles passed to callbacks are borrowed and must not be
+stored beyond the callback.
 
-2. Add selected generated InputEvent handle coverage.
-   - [x] Add selected InputEvent class handles and checked downcasts.
-   - [x] Generate only borrowed-safe primitive, StringName, Vector2, and simple
-     boolean/query methods.
-   - [x] Re-export selected handles and casts through godot:godot.
-   - [x] Keep unchecked casts limited to explicit inheritance upcasts.
+1. Define the virtual callback authoring shape.
+   - [ ] Choose a small public descriptor shape for user callbacks.
+   - [ ] Cover ready, enter tree, exit tree, process, physics process, input,
+     and unhandled input as the first target set.
+   - [ ] Keep raw notification fallback available for advanced use.
+   - [ ] Document callback argument ownership near the helper APIs.
 
-3. Add selected generated Viewport coverage.
-   - [x] Generate small borrowed-safe Viewport query wrappers needed by gameplay
-     and UI code.
-   - [x] Prefer methods returning primitives, Vector2, Rect2, or borrowed object
-     handles with clear nil behavior.
-   - [x] Defer ViewportTexture, render target, world, camera, and ownership-heavy
-     APIs until resource ownership rules are explicit.
+2. Add typed dispatch helpers for common Node callbacks.
+   - [ ] Convert Godot notifications into typed Odin callbacks where the data is
+     already available safely.
+   - [ ] Preserve explicit reversed handling.
+   - [ ] Keep process and physics-process delta sourcing through the verified
+     Node process callback path, not guessed notification data.
+   - [ ] Trap or return checked errors consistently with existing callback
+     helpers.
 
-4. Add public facade helpers for common input-event checks.
-   - [x] Provide nil-safe helpers for selected InputEvent subclasses.
-   - [x] Add checked helpers for common key, mouse button, mouse motion, and
-     action-style queries where generated names are too low-level.
-   - [x] Keep helpers borrowed by value and document that event handles must not
-     be retained after the callback.
+3. Add InputEvent callback helpers.
+   - [ ] Add a borrowed InputEvent callback adapter for _input-like methods.
+   - [ ] Add a borrowed InputEvent callback adapter for _unhandled_input-like
+     methods if the callback path is verified.
+   - [ ] Reuse the existing InputEvent downcasts and facade helpers.
+   - [ ] Do not allow storing event handles in extension-owned data without an
+     explicit owned/copy model.
 
-5. Exercise the input and viewport path in examples.
-   - [x] Keep examples/game importing only godot:godot.
-   - [x] Add compile or runtime coverage for selected InputEvent downcasts and
-     Viewport queries that remains deterministic in headless CI.
-   - [x] Avoid tests that depend on real keyboard or mouse input from CI.
+4. Integrate virtual descriptors into class registration helpers.
+   - [ ] Let class builder or registration metadata include the common virtual
+     callback descriptor.
+   - [ ] Keep create, free, method, property, signal, and unregister flows
+     explicit.
+   - [ ] Avoid broad code generation until the hand-written helper shape is
+     proven in examples.
 
-6. Improve generated input and viewport reporting.
-   - [x] Split blocker report categories for input events, viewport resources,
-     event construction, and ownership-sensitive viewport APIs where useful.
-   - [x] Keep generated output deterministic.
-   - [x] Use the report to choose the next input or viewport batch.
+5. Exercise the model in examples.
+   - [ ] Update examples/game with a small custom Odin gameplay class using
+     ready, process or physics process, input, a property, and a signal.
+   - [ ] Keep normal examples importing only godot:godot.
+   - [ ] Keep deterministic CI coverage separate from real keyboard or mouse
+     input when needed.
+
+6. Add facade and smoke coverage.
+   - [ ] Add compile checks for the public virtual callback descriptors.
+   - [ ] Keep smoke coverage exercising registration, instance binding,
+     generated class handles, properties, signals, and virtual callbacks.
+   - [ ] Confirm every temporary Variant and borrowed InputEvent path is cleaned
+     up or bounded to the callback.
 
 7. Validate before moving to the next feature roadmap.
-   - [x] Run make ci.
-   - [x] Confirm normal examples still import only godot:godot.
-   - [x] Confirm generated reports explain remaining input-event and viewport
-     skips.
-   - [x] Confirm no event handle storage, hidden ownership transfer, or raw
-     offset poking was added.
+   - [ ] Run make ci.
+   - [ ] Confirm examples/game and examples/hello import only godot:godot.
+   - [ ] Confirm no raw offset poking, hidden object ownership transfer, or event
+     handle retention was added.
+   - [ ] Update this roadmap and the generated-class roadmap with completed
+     status and the next feature candidate.
 
 ## Planned next iterations
 
-After the current input-event/viewport slice, pick one roadmap at a time:
+After the current virtual-callback slice, pick one feature roadmap at a time:
 
 1. Animation and tween APIs.
-   - AnimationPlayer, Tween, SceneTree tween creation, and callable/signal limits
-     needed for common gameplay animation.
+   - AnimationPlayer, Tween, SceneTree tween creation, and typed callable/signal
+     limits needed for common gameplay animation.
 
-2. More UI resource integration.
-   - Theme, Font, StyleBox, TextureButton, ProgressBar, and common Control APIs
-     once resource lifetimes are proven.
+2. More scene and resource workflows.
+   - Safer PackedScene instantiation, ResourceLoader coverage, selected resource
+     ownership-transfer APIs, and typed load helpers for common game assets.
 
 3. Broader 2D gameplay classes.
    - TileMap/TileMapLayer, RayCast2D, Marker2D, Camera2D, NavigationAgent2D, and
      small physics/resource-dependent batches.
 
-4. Higher-level class authoring code generation.
-   - Reduce method/property/signal registration boilerplate while preserving
-     explicit callbacks, metadata lifetime, and unregistering.
+4. More UI resource integration.
+   - Theme, Font, StyleBox, TextureButton, ProgressBar, and common Control APIs
+     once resource lifetimes are proven.
 
-5. Error handling and diagnostics polish.
+5. Higher-level class authoring code generation.
+   - Reduce method/property/signal/virtual registration boilerplate while
+     preserving explicit callbacks, metadata lifetime, and unregistering.
+
+6. Error handling and diagnostics polish.
    - More checked wrappers, clearer traps, generated support summaries, and
      better user-facing failure messages.
 
-6. Packaging and external project workflow.
+7. Packaging and external project workflow.
    - Template project, collection/LSP setup docs, release/versioning policy, and
      repeatable use from a separate Godot game repository.
 
 ## Deferred until the related safety model exists
 
 - broad singleton coverage beyond selected safe APIs
-- arbitrary input event storage or callbacks
+- arbitrary input event storage
 - broad ownership-sensitive scene-tree changes
 - broad generated Signal wrappers beyond fixed safe shapes
 - broad generated Callable wrappers
@@ -182,7 +197,7 @@ After the current input-event/viewport slice, pick one roadmap at a time:
 - broad typed container mutation APIs
 - broad Resource, PackedScene, texture, theme, font, and asset APIs
 - Resource.duplicate ownership-transfer wrappers
-- full generated virtual method bindings
+- broad generated virtual method bindings
 - full 1000+ class API generation
 
 ## Validation baseline
