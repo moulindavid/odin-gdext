@@ -87,102 +87,93 @@ These slices are complete and were validated with make ci when merged:
      query wrappers, facade helpers, deterministic example coverage, and input
      or viewport blocker reporting.
 
-## Current goal: Virtual callback model for gameplay classes
+11. Virtual callback model for gameplay classes.
+   - Public callback descriptors, typed Node notification dispatch, verified
+     process and physics-process delta sourcing, borrowed InputEvent callback
+     adapters, class-builder metadata integration, facade coverage, and
+     examples/game plus smoke coverage through godot:godot.
 
-Make custom Odin classes feel closer to godot-rust/gdext's everyday gameplay
-workflow while staying Odin-idiomatic and explicit. The target is not macro
-magic, but a small, safe authoring layer where users can define instance data and
-wire common Godot callbacks such as ready, process, physics process, input, and
-unhandled input without hand-writing raw notification dispatch each time.
+## Current goal: Animation and tween APIs
 
-Keep this goal narrow. Virtual callbacks must still use explicit registration,
-stable metadata storage, borrowed object handles, and explicit temporary value
-cleanup. InputEvent handles passed to callbacks are borrowed and must not be
-stored beyond the callback.
+Expose a small animation and tween API surface for common gameplay polish while
+preserving the existing Callable, Signal, Variant, object-handle, and resource
+ownership rules. This is the next practical feature gap after custom classes can
+run ready/process/input-style callbacks.
 
-1. Define the virtual callback authoring shape.
-   - [x] Choose a small public descriptor shape for user callbacks.
-   - [x] Cover ready, enter tree, exit tree, process, physics process, input,
-     and unhandled input as the first target set.
-   - [x] Keep raw notification fallback available for advanced use.
-   - [x] Document callback argument ownership near the helper APIs.
+Keep this goal narrow. Start with borrowed-safe AnimationPlayer queries and
+simple SceneTree/Tween creation or control paths only when ownership is clear.
+Do not expose broad tween callback binding, varargs, or animation resource
+mutation until the safety model is explicit.
 
-2. Add typed dispatch helpers for common Node callbacks.
-   - [x] Convert Godot notifications into typed Odin callbacks where the data is
-     already available safely.
-   - [x] Preserve explicit reversed handling.
-   - [x] Keep process and physics-process delta sourcing through the verified
-     Node process callback path, not guessed notification data.
-   - [x] Trap or return checked errors consistently with existing callback
-     helpers.
+1. Audit animation and tween APIs.
+   - [ ] Inspect AnimationPlayer, Tween, SceneTree tween creation, and common
+     callback or signal shapes.
+   - [ ] Classify borrowed-safe methods separately from resource-owned,
+     Callable-heavy, vararg, and lifetime-sensitive APIs.
+   - [ ] Add stable generated report categories for animation and tween blockers.
 
-3. Add InputEvent callback helpers.
-   - [x] Add a borrowed InputEvent callback adapter for _input-like methods.
-   - [x] Add a borrowed InputEvent callback adapter for _unhandled_input-like
-     methods if the callback path is verified.
-   - [x] Reuse the existing InputEvent downcasts and facade helpers.
-   - [x] Do not allow storing event handles in extension-owned data without an
-     explicit owned/copy model.
+2. Add selected AnimationPlayer generated coverage.
+   - [ ] Generate the AnimationPlayer handle, checked casts, and safe query or
+     primitive control methods.
+   - [ ] Re-export selected APIs through godot:godot.
+   - [ ] Defer Animation resource mutation and callback-heavy APIs.
 
-4. Integrate virtual descriptors into class registration helpers.
-   - [x] Let class builder or registration metadata include the common virtual
-     callback descriptor.
-   - [x] Keep create, free, method, property, signal, and unregister flows
-     explicit.
-   - [x] Avoid broad code generation until the hand-written helper shape is
-     proven in examples.
+3. Add selected Tween generated coverage.
+   - [ ] Generate the Tween handle and safe primitive control/query methods.
+   - [ ] Keep Tween handles borrowed unless a clear ownership path is proven.
+   - [ ] Defer broad tweener construction, Callable callbacks, and varargs.
 
-5. Exercise the model in examples.
-   - [x] Update examples/game with a small custom Odin gameplay class using
-     ready, process or physics process, input, a property, and a signal.
-   - [x] Keep normal examples importing only godot:godot.
-   - [x] Keep deterministic CI coverage separate from real keyboard or mouse
-     input when needed.
+4. Add small facade helpers for common animation usage.
+   - [ ] Add nil-safe helper procedures around selected AnimationPlayer and
+     Tween handles.
+   - [ ] Add checked helper names for common play/stop/running paths if generated
+     names are too low-level.
+   - [ ] Keep object/class handles borrowed by value.
 
-6. Add facade and smoke coverage.
-   - [x] Add compile checks for the public virtual callback descriptors.
-   - [x] Keep smoke coverage exercising registration, instance binding,
-     generated class handles, properties, signals, and virtual callbacks.
-   - [x] Confirm every temporary Variant and borrowed InputEvent path is cleaned
-     up or bounded to the callback.
+5. Exercise animation/tween APIs in examples.
+   - [ ] Update examples/game or smoke with deterministic animation/tween usage.
+   - [ ] Keep normal examples importing only godot:godot.
+   - [ ] Avoid CI behavior that depends on real frame timing beyond verified
+     headless-safe calls.
+
+6. Add facade and reporting coverage.
+   - [ ] Add compile checks for selected animation and tween APIs.
+   - [ ] Confirm generated reports explain remaining animation/tween skips.
+   - [ ] Keep generated output deterministic.
 
 7. Validate before moving to the next feature roadmap.
    - [ ] Run make ci.
    - [ ] Confirm examples/game and examples/hello import only godot:godot.
-   - [ ] Confirm no raw offset poking, hidden object ownership transfer, or event
-     handle retention was added.
+   - [ ] Confirm no hidden ownership transfer, temporary Variant leak, broad
+     Callable binding, or raw offset poking was added.
    - [ ] Update this roadmap and the generated-class roadmap with completed
      status and the next feature candidate.
 
 ## Planned next iterations
 
-After the current virtual-callback slice, pick one feature roadmap at a time:
+After the current animation/tween slice, pick one feature roadmap at a time:
 
-1. Animation and tween APIs.
-   - AnimationPlayer, Tween, SceneTree tween creation, and typed callable/signal
-     limits needed for common gameplay animation.
-
-2. More scene and resource workflows.
+1. More scene and resource workflows.
    - Safer PackedScene instantiation, ResourceLoader coverage, selected resource
      ownership-transfer APIs, and typed load helpers for common game assets.
 
-3. Broader 2D gameplay classes.
+2. Broader 2D gameplay classes.
    - TileMap/TileMapLayer, RayCast2D, Marker2D, Camera2D, NavigationAgent2D, and
      small physics/resource-dependent batches.
 
-4. More UI resource integration.
+3. More UI resource integration.
    - Theme, Font, StyleBox, TextureButton, ProgressBar, and common Control APIs
      once resource lifetimes are proven.
 
-5. Higher-level class authoring code generation.
+4. Higher-level class authoring code generation.
    - Reduce method/property/signal/virtual registration boilerplate while
      preserving explicit callbacks, metadata lifetime, and unregistering.
 
-6. Error handling and diagnostics polish.
+5. Error handling and diagnostics polish.
    - More checked wrappers, clearer traps, generated support summaries, and
      better user-facing failure messages.
 
-7. Packaging and external project workflow.
+6. Packaging and external project workflow.
    - Template project, collection/LSP setup docs, release/versioning policy, and
      repeatable use from a separate Godot game repository.
 
