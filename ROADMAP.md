@@ -133,10 +133,10 @@ stored beyond the callback.
      proven in examples.
 
 5. Exercise the model in examples.
-   - [ ] Update examples/game with a small custom Odin gameplay class using
+   - [x] Update examples/game with a small custom Odin gameplay class using
      ready, process or physics process, input, a property, and a signal.
-   - [ ] Keep normal examples importing only godot:godot.
-   - [ ] Keep deterministic CI coverage separate from real keyboard or mouse
+   - [x] Keep normal examples importing only godot:godot.
+   - [x] Keep deterministic CI coverage separate from real keyboard or mouse
      input when needed.
 
 6. Add facade and smoke coverage.
