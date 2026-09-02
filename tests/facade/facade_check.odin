@@ -829,6 +829,16 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.input_event_action_pressed(input_event, meta_name)
 	_ = gt.input_event_action_released(input_event, meta_name)
 	_ = gt.input_event_action_strength(input_event, meta_name)
+	input_callback_desc := gt.input_event_callback_descriptor(
+		input = facade_input_event_callback,
+		unhandled_input = facade_input_event_callback,
+	)
+	node_input_callback_desc := gt.node_input_event_callback_descriptor(
+		input = facade_node_input_event_callback,
+		unhandled_input = facade_node_input_event_callback,
+	)
+	_ = input_callback_desc
+	_ = node_input_callback_desc
 	_, _ = gt.input_event_key_code_checked(input_event)
 	_, _ = gt.input_event_mouse_button_index_checked(input_event)
 	_, _ = gt.input_event_mouse_position_checked(input_event)
@@ -1258,6 +1268,24 @@ facade_ready_virtual :: proc(instance: gt.ClassInstancePtr, node: gt.Node, rever
 	_ = reversed
 }
 
+
+facade_input_event_callback :: proc(instance: gt.ClassInstancePtr, event: gt.InputEvent) -> bool {
+	_ = instance
+	_ = gt.input_event_object_ptr(event)
+	return true
+}
+
+facade_node_input_event_callback :: proc(
+	instance: gt.ClassInstancePtr,
+	node: gt.Node,
+	event: gt.InputEvent,
+) -> bool {
+	_ = instance
+	_ = gt.node_object_ptr(node)
+	_ = gt.input_event_object_ptr(event)
+	return true
+}
+
 facade_process_virtual :: proc(
 	instance: gt.ClassInstancePtr,
 	node: gt.Node,
@@ -1309,6 +1337,13 @@ facade_notification :: proc "c" (instance: gt.ClassInstancePtr, what: i32, rever
 	_ = gt.node_disable_process_callback(gt.Node(nil))
 	_ = gt.node_enable_physics_process_callback(gt.Node(nil))
 	_ = gt.node_disable_physics_process_callback(gt.Node(nil))
+	_ = gt.dispatch_input_event_callback(instance, gt.ObjectPtr(nil), facade_input_event_callback)
+	_ = gt.dispatch_node_input_event_callback(
+		instance,
+		gt.Node(nil),
+		gt.ObjectPtr(nil),
+		facade_node_input_event_callback,
+	)
 	if gt.dispatch_node_notification(instance, what, reversed, &facade_node_notifications) do return
 	if what == gt.node_notification_ready {
 		_ = what

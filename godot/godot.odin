@@ -2307,6 +2307,63 @@ object_ptr_try_as_viewport :: proc "contextless" (self: ObjectPtr) -> (value: Vi
 	return object_try_as_viewport(Object(self))
 }
 
+// InputEvent callback handlers receive a borrowed InputEvent handle. The handle
+// is valid only for the callback that supplied it unless Godot explicitly gives
+// user code a longer-lived object through another API.
+InputEventCallbackHandler :: #type proc(instance: ClassInstancePtr, event: InputEvent) -> bool
+NodeInputEventCallbackHandler :: #type proc(
+	instance: ClassInstancePtr,
+	node: Node,
+	event: InputEvent,
+) -> bool
+
+InputEventCallbackDescriptor :: struct {
+	input:           InputEventCallbackHandler,
+	unhandled_input: InputEventCallbackHandler,
+}
+
+NodeInputEventCallbackDescriptor :: struct {
+	input:           NodeInputEventCallbackHandler,
+	unhandled_input: NodeInputEventCallbackHandler,
+}
+
+input_event_callback_descriptor :: proc "contextless" (
+	input: InputEventCallbackHandler = nil,
+	unhandled_input: InputEventCallbackHandler = nil,
+) -> InputEventCallbackDescriptor {
+	return InputEventCallbackDescriptor{input = input, unhandled_input = unhandled_input}
+}
+
+node_input_event_callback_descriptor :: proc "contextless" (
+	input: NodeInputEventCallbackHandler = nil,
+	unhandled_input: NodeInputEventCallbackHandler = nil,
+) -> NodeInputEventCallbackDescriptor {
+	return NodeInputEventCallbackDescriptor{input = input, unhandled_input = unhandled_input}
+}
+
+dispatch_input_event_callback :: proc(
+	instance: ClassInstancePtr,
+	event_object: ObjectPtr,
+	handler: InputEventCallbackHandler,
+) -> bool {
+	if handler == nil do return false
+	event, event_ok := object_ptr_try_as_input_event(event_object)
+	if !event_ok do return false
+	return handler(instance, event)
+}
+
+dispatch_node_input_event_callback :: proc(
+	instance: ClassInstancePtr,
+	node: Node,
+	event_object: ObjectPtr,
+	handler: NodeInputEventCallbackHandler,
+) -> bool {
+	if handler == nil || node_is_nil(node) do return false
+	event, event_ok := object_ptr_try_as_input_event(event_object)
+	if !event_ok do return false
+	return handler(instance, node, event)
+}
+
 // InputEvent handles are borrowed from Godot. Do not store them beyond the
 // callback or object storage that supplied them.
 input_event_try_key :: proc "contextless" (self: InputEvent) -> (value: InputEventKey, ok: bool) {

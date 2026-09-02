@@ -117,11 +117,11 @@ stored beyond the callback.
      helpers.
 
 3. Add InputEvent callback helpers.
-   - [ ] Add a borrowed InputEvent callback adapter for _input-like methods.
-   - [ ] Add a borrowed InputEvent callback adapter for _unhandled_input-like
+   - [x] Add a borrowed InputEvent callback adapter for _input-like methods.
+   - [x] Add a borrowed InputEvent callback adapter for _unhandled_input-like
      methods if the callback path is verified.
-   - [ ] Reuse the existing InputEvent downcasts and facade helpers.
-   - [ ] Do not allow storing event handles in extension-owned data without an
+   - [x] Reuse the existing InputEvent downcasts and facade helpers.
+   - [x] Do not allow storing event handles in extension-owned data without an
      explicit owned/copy model.
 
 4. Integrate virtual descriptors into class registration helpers.
