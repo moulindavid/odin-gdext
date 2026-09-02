@@ -244,6 +244,7 @@ class_virtual_descriptor :: gcore.class_virtual_descriptor
 class_builder_methods :: gcore.class_builder_methods
 class_builder_properties :: gcore.class_builder_properties
 class_builder_signals :: gcore.class_builder_signals
+class_builder_virtuals :: gcore.class_builder_virtuals
 class_builder_finalize :: gcore.class_builder_finalize
 class_builder_register :: gcore.class_builder_register
 class_builder_unregister :: gcore.class_builder_unregister

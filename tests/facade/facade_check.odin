@@ -118,6 +118,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.class_builder_methods(&builder, nil)
 	gt.class_builder_properties(&builder, nil)
 	gt.class_builder_signals(&builder, nil)
+	virtual_desc := gt.class_virtual_descriptor(gt.ClassVirtualCallbacks{})
+	gt.class_builder_virtuals(&builder, virtual_desc)
 	_ = gt.class_builder_finalize(&builder)
 	method_info: gt.ClassMethodInfo
 	method_storage: gt.ClassFixedMethodStorage

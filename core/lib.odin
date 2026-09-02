@@ -743,6 +743,7 @@ OdinClassDescriptor :: struct {
 	free_instance_func:   ClassFreeInstance,
 	notification_func:    ClassNotification,
 	class_userdata:       rawptr,
+	virtuals:             ClassVirtualDescriptor,
 	methods:              []OdinClassMethod,
 	properties:           []OdinClassProperty,
 	signals:              []OdinClassSignal,
@@ -794,6 +795,14 @@ class_builder_properties :: proc "contextless" (
 class_builder_signals :: proc "contextless" (builder: ^ClassBuilder, signals: []OdinClassSignal) {
 	if builder == nil do _trap_nil_godot_function()
 	builder.desc.signals = signals
+}
+
+class_builder_virtuals :: proc "contextless" (
+	builder: ^ClassBuilder,
+	virtuals: ClassVirtualDescriptor,
+) {
+	if builder == nil do _trap_nil_godot_function()
+	builder.desc.virtuals = virtuals
 }
 
 class_builder_finalize :: proc "contextless" (builder: ^ClassBuilder) -> OdinClassDescriptor {

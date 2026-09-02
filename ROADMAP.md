@@ -125,11 +125,11 @@ stored beyond the callback.
      explicit owned/copy model.
 
 4. Integrate virtual descriptors into class registration helpers.
-   - [ ] Let class builder or registration metadata include the common virtual
+   - [x] Let class builder or registration metadata include the common virtual
      callback descriptor.
-   - [ ] Keep create, free, method, property, signal, and unregister flows
+   - [x] Keep create, free, method, property, signal, and unregister flows
      explicit.
-   - [ ] Avoid broad code generation until the hand-written helper shape is
+   - [x] Avoid broad code generation until the hand-written helper shape is
      proven in examples.
 
 5. Exercise the model in examples.
