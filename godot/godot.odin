@@ -199,6 +199,7 @@ InputEventMouseMotion :: gclass.InputEventMouseMotion
 Viewport :: gclass.Viewport
 SceneTree :: gclass.SceneTree
 AnimationPlayer :: gclass.AnimationPlayer
+Tween :: gclass.Tween
 
 // --- Core functions ---
 init :: gcore.init
@@ -1380,6 +1381,36 @@ animation_player_set_method_call_mode :: gclass.animation_player_set_method_call
 animation_player_get_method_call_mode :: gclass.animation_player_get_method_call_mode
 animation_player_set_root :: gclass.animation_player_set_root
 animation_player_get_root :: gclass.animation_player_get_root
+
+scene_tree_create_tween :: gclass.scene_tree_create_tween
+tween_as_ref_counted :: gclass.tween_as_ref_counted
+tween_as_object :: gclass.tween_as_object
+object_try_as_tween :: gclass.object_try_as_tween
+ref_counted_try_as_tween :: gclass.ref_counted_try_as_tween
+tween_custom_step :: gclass.tween_custom_step
+tween_stop :: gclass.tween_stop
+tween_pause :: gclass.tween_pause
+tween_play :: gclass.tween_play
+tween_kill :: gclass.tween_kill
+tween_get_total_elapsed_time :: gclass.tween_get_total_elapsed_time
+tween_has_tweeners :: gclass.tween_has_tweeners
+tween_is_running :: gclass.tween_is_running
+tween_is_valid :: gclass.tween_is_valid
+tween_bind_node :: gclass.tween_bind_node
+tween_set_process_mode :: gclass.tween_set_process_mode
+tween_set_pause_mode :: gclass.tween_set_pause_mode
+tween_set_ignore_time_scale :: gclass.tween_set_ignore_time_scale
+tween_set_ignore_time_scale_default :: gclass.tween_set_ignore_time_scale_default
+tween_set_parallel :: gclass.tween_set_parallel
+tween_set_parallel_default :: gclass.tween_set_parallel_default
+tween_set_loops :: gclass.tween_set_loops
+tween_set_loops_default :: gclass.tween_set_loops_default
+tween_get_loops_left :: gclass.tween_get_loops_left
+tween_set_speed_scale :: gclass.tween_set_speed_scale
+tween_set_trans :: gclass.tween_set_trans
+tween_set_ease :: gclass.tween_set_ease
+tween_parallel :: gclass.tween_parallel
+tween_chain :: gclass.tween_chain
 
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
@@ -2800,6 +2831,10 @@ InputCursorShape :: gclass.InputCursorShape
 SceneTreeGroupCallFlags :: gclass.SceneTreeGroupCallFlags
 AnimationPlayerAnimationProcessCallback :: gclass.AnimationPlayerAnimationProcessCallback
 AnimationPlayerAnimationMethodCallMode :: gclass.AnimationPlayerAnimationMethodCallMode
+TweenTweenProcessMode :: gclass.TweenTweenProcessMode
+TweenTweenPauseMode :: gclass.TweenTweenPauseMode
+TweenTransitionType :: gclass.TweenTransitionType
+TweenEaseType :: gclass.TweenEaseType
 object_notification_postinitialize :: gclass.object_notification_postinitialize
 object_notification_predelete :: gclass.object_notification_predelete
 object_notification_extension_reloaded :: gclass.object_notification_extension_reloaded

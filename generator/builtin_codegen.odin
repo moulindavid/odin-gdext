@@ -1047,10 +1047,10 @@ selected_class_names := []string {
 	"Viewport",
 	"SceneTree",
 	"AnimationPlayer",
+	"Tween",
 }
 
 candidate_class_names := []string {
-	"Tween",
 	"Window",
 	"AudioStream",
 	"AudioStreamPlayer",
@@ -1605,6 +1605,28 @@ selected_class_methods := []Selected_Class_Method {
 	{"AnimationPlayer", "get_method_call_mode"},
 	{"AnimationPlayer", "set_root"},
 	{"AnimationPlayer", "get_root"},
+	{"SceneTree", "create_tween"},
+	{"Tween", "custom_step"},
+	{"Tween", "stop"},
+	{"Tween", "pause"},
+	{"Tween", "play"},
+	{"Tween", "kill"},
+	{"Tween", "get_total_elapsed_time"},
+	{"Tween", "has_tweeners"},
+	{"Tween", "is_running"},
+	{"Tween", "is_valid"},
+	{"Tween", "bind_node"},
+	{"Tween", "set_process_mode"},
+	{"Tween", "set_pause_mode"},
+	{"Tween", "set_ignore_time_scale"},
+	{"Tween", "set_parallel"},
+	{"Tween", "set_loops"},
+	{"Tween", "get_loops_left"},
+	{"Tween", "set_speed_scale"},
+	{"Tween", "set_trans"},
+	{"Tween", "set_ease"},
+	{"Tween", "parallel"},
+	{"Tween", "chain"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
