@@ -248,6 +248,60 @@ configure_physics_nodes :: proc "contextless" (parent: gt.Node, damage: gt.Godot
 }
 
 
+configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.GodotReal) {
+	camera_object := gt.construct_object(camera2d_class_name)
+	if camera, camera_ok := gt.object_ptr_try_as_camera2d(camera_object); camera_ok {
+		gt.camera2d_set_enabled(camera, true)
+		gt.camera2d_set_zoom(camera, gt.Vector2{1.25, 1.25})
+		gt.camera2d_set_position_smoothing_enabled(camera, true)
+		gt.camera2d_set_position_smoothing_speed(camera, 4)
+		gt.camera2d_set_offset(camera, gt.Vector2{f32(damage), f32(-damage * 0.25)})
+		_ = gt.camera2d_get_zoom(camera)
+		_ = gt.camera2d_get_offset(camera)
+		_ = gt.camera2d_is_enabled(camera)
+		_ = gt.camera2d_get_screen_center_position(camera)
+		if !gt.node_add_child_checked(parent, gt.camera2d_as_node(camera)) {
+			_ = gt.object_destroy_checked(gt.camera2d_object_ptr(camera))
+		}
+	} else if camera_object != nil {
+		_ = gt.object_destroy_checked(camera_object)
+	}
+
+	marker_object := gt.construct_object(marker2d_class_name)
+	if marker, marker_ok := gt.object_ptr_try_as_marker2d(marker_object); marker_ok {
+		marker_node := gt.marker2d_as_node2d(marker)
+		gt.node2d_set_position(marker_node, gt.Vector2{f32(damage * 2), f32(damage)})
+		gt.marker2d_set_gizmo_extents(marker, 12)
+		_ = gt.marker2d_get_gizmo_extents(marker)
+		if !gt.node_add_child_checked(parent, gt.marker2d_as_node(marker)) {
+			_ = gt.object_destroy_checked(gt.marker2d_object_ptr(marker))
+		}
+	} else if marker_object != nil {
+		_ = gt.object_destroy_checked(marker_object)
+	}
+
+	raycast_object := gt.construct_object(ray_cast2d_class_name)
+	if raycast, raycast_ok := gt.object_ptr_try_as_ray_cast2d(raycast_object); raycast_ok {
+		gt.ray_cast2d_set_enabled(raycast, true)
+		gt.ray_cast2d_set_target_position(raycast, gt.Vector2{0, 96})
+		gt.ray_cast2d_set_collision_mask(raycast, 1)
+		gt.ray_cast2d_set_collide_with_bodies(raycast, true)
+		gt.ray_cast2d_set_collide_with_areas(raycast, true)
+		gt.ray_cast2d_force_raycast_update(raycast)
+		_ = gt.ray_cast2d_get_target_position(raycast)
+		_ = gt.ray_cast2d_is_colliding(raycast)
+		_ = gt.ray_cast2d_get_collision_point(raycast)
+		_ = gt.ray_cast2d_get_collision_normal(raycast)
+		collider_rid := gt.ray_cast2d_get_collider_rid(raycast)
+		gt.rid_free(&collider_rid)
+		if !gt.node_add_child_checked(parent, gt.ray_cast2d_as_node(raycast)) {
+			_ = gt.object_destroy_checked(gt.ray_cast2d_object_ptr(raycast))
+		}
+	} else if raycast_object != nil {
+		_ = gt.object_destroy_checked(raycast_object)
+	}
+}
+
 configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: gt.GodotReal) {
 	animation_object := gt.construct_object(animation_player_class_name)
 	if player, player_ok := gt.object_ptr_try_as_animation_player(animation_object); player_ok {
@@ -471,6 +525,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 		texture, texture_loaded := ensure_icon_texture(self)
 		configure_ui_nodes(parent, label, damage, texture, texture_loaded)
 		configure_physics_nodes(parent, damage)
+		configure_2d_gameplay_nodes(parent, damage)
 		configure_animation_tween_nodes(parent, damage)
 
 		area_path := gt.node_path_from_utf8("DamageArea")
@@ -486,7 +541,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 
 	_ = gt.label_set_text_utf8_checked(
 		label,
-		"Odin updated UI nodes, loaded resources, spawned a scene, armed a Timer, configured physics nodes, and exercised animation/tween APIs.",
+		"Odin updated UI nodes, loaded resources, spawned a scene, armed a Timer, configured physics and 2D gameplay nodes, and exercised animation/tween APIs.",
 	)
 	gt.label_set_horizontal_alignment(label, .horizontal_alignment_center)
 	gt.label_set_visible_ratio(label, 1)
@@ -523,6 +578,9 @@ character_body2d_class_name_data: gt.ClassName
 rigid_body2d_class_name_data: gt.ClassName
 static_body2d_class_name_data: gt.ClassName
 collision_shape2d_class_name_data: gt.ClassName
+camera2d_class_name_data: gt.ClassName
+marker2d_class_name_data: gt.ClassName
+ray_cast2d_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name := gt.class_name_ptr(&game_name_data)
 game_parent_name := gt.class_name_ptr(&game_parent_name_data)
@@ -530,6 +588,9 @@ character_body2d_class_name := gt.class_name_ptr(&character_body2d_class_name_da
 rigid_body2d_class_name := gt.class_name_ptr(&rigid_body2d_class_name_data)
 static_body2d_class_name := gt.class_name_ptr(&static_body2d_class_name_data)
 collision_shape2d_class_name := gt.class_name_ptr(&collision_shape2d_class_name_data)
+camera2d_class_name := gt.class_name_ptr(&camera2d_class_name_data)
+marker2d_class_name := gt.class_name_ptr(&marker2d_class_name_data)
+ray_cast2d_class_name := gt.class_name_ptr(&ray_cast2d_class_name_data)
 animation_player_class_name := gt.class_name_ptr(&animation_player_class_name_data)
 
 empty_name_data: gt.StaticStringName
@@ -752,6 +813,9 @@ register_classes :: proc() {
 		&collision_shape2d_class_name_data,
 		cstring("CollisionShape2D"),
 	)
+	gt.class_name_init_latin1_cstring(&camera2d_class_name_data, cstring("Camera2D"))
+	gt.class_name_init_latin1_cstring(&marker2d_class_name_data, cstring("Marker2D"))
+	gt.class_name_init_latin1_cstring(&ray_cast2d_class_name_data, cstring("RayCast2D"))
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,
 		cstring("AnimationPlayer"),
