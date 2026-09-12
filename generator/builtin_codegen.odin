@@ -1058,6 +1058,15 @@ candidate_class_names := []string {
 	"Font",
 	"StyleBox",
 	"TextureButton",
+	"Camera2D",
+	"Marker2D",
+	"RayCast2D",
+	"TileMap",
+	"TileMapLayer",
+	"NavigationAgent2D",
+	"Path2D",
+	"PathFollow2D",
+	"VisibleOnScreenNotifier2D",
 }
 
 Selected_Class_Method :: struct {
@@ -1999,6 +2008,20 @@ class_method_is_physics_report_class :: proc(class_name: string) -> bool {
 	)
 }
 
+class_method_is_2d_gameplay_report_class :: proc(class_name: string) -> bool {
+	return(
+		class_name == "Camera2D" ||
+		class_name == "Marker2D" ||
+		class_name == "RayCast2D" ||
+		class_name == "TileMap" ||
+		class_name == "TileMapLayer" ||
+		class_name == "NavigationAgent2D" ||
+		class_name == "Path2D" ||
+		class_name == "PathFollow2D" ||
+		class_name == "VisibleOnScreenNotifier2D" \
+	)
+}
+
 class_method_is_ui_report_class :: proc(class_name: string) -> bool {
 	return(
 		class_name == "Control" ||
@@ -2936,6 +2959,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&scene_workflow_blockers)
 	physics_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&physics_blockers)
+	gameplay_2d_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&gameplay_2d_blockers)
 	ui_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&ui_blockers)
 	texture_blockers := strings.builder_make(context.allocator)
@@ -2987,6 +3012,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	scene_instantiation_blocker_count := 0
 	scene_workflow_blocker_count := 0
 	physics_blocker_count := 0
+	gameplay_2d_blocker_count := 0
 	ui_blocker_count := 0
 	texture_blocker_count := 0
 	audio_blocker_count := 0
@@ -3286,6 +3312,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					emit_class_method_report_signature(&physics_blockers, class.name, method)
 					fmt.sbprintf(&physics_blockers, ": %s\n", reason)
 					physics_blocker_count += 1
+				} else if class_method_is_2d_gameplay_report_class(class.name) {
+					strings.write_string(&gameplay_2d_blockers, "- ")
+					emit_class_method_report_signature(&gameplay_2d_blockers, class.name, method)
+					fmt.sbprintf(&gameplay_2d_blockers, ": %s\n", reason)
+					gameplay_2d_blocker_count += 1
 				} else if class_method_is_ui_report_class(class.name) {
 					strings.write_string(&ui_blockers, "- ")
 					emit_class_method_report_signature(&ui_blockers, class.name, method)
@@ -3491,6 +3522,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					)
 					tween_blocker_count += 1
 				}
+				if class_method_is_2d_gameplay_report_class(class.name) {
+					strings.write_string(&gameplay_2d_blockers, "- candidate ")
+					emit_class_method_report_signature(&gameplay_2d_blockers, class.name, method)
+					fmt.sbprintf(&gameplay_2d_blockers, ": %s\n", reason)
+					gameplay_2d_blocker_count += 1
+				}
 				if class_method_is_ui_report_class(class.name) {
 					strings.write_string(&ui_blockers, "- candidate ")
 					emit_class_method_report_signature(&ui_blockers, class.name, method)
@@ -3539,6 +3576,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Scene-instantiation blockers: %d\n", scene_instantiation_blocker_count)
 	fmt.sbprintf(&b, "- Scene workflow blockers: %d\n", scene_workflow_blocker_count)
 	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
+	fmt.sbprintf(&b, "- 2D gameplay blockers: %d\n", gameplay_2d_blocker_count)
 	fmt.sbprintf(&b, "- UI blockers: %d\n", ui_blocker_count)
 	fmt.sbprintf(&b, "- Texture blockers: %d\n", texture_blocker_count)
 	fmt.sbprintf(&b, "- Audio blockers: %d\n", audio_blocker_count)
@@ -3590,6 +3628,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(scene_workflow_blockers))
 	strings.write_string(&b, "\n## Physics blockers\n\n")
 	strings.write_string(&b, strings.to_string(physics_blockers))
+	strings.write_string(&b, "\n## 2D gameplay blockers\n\n")
+	strings.write_string(&b, strings.to_string(gameplay_2d_blockers))
 	strings.write_string(&b, "\n## UI blockers\n\n")
 	strings.write_string(&b, strings.to_string(ui_blockers))
 	strings.write_string(&b, "\n## Texture blockers\n\n")
