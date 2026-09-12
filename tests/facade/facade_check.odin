@@ -81,6 +81,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	rigid_body2d: gt.RigidBody2D,
 	static_body2d: gt.StaticBody2D,
 	collision_shape2d: gt.CollisionShape2D,
+	camera2d: gt.Camera2D,
+	marker2d: gt.Marker2D,
+	ray_cast2d: gt.RayCast2D,
 	packed_scene: gt.PackedScene,
 	resource_loader: gt.ResourceLoader,
 	input: gt.Input,
@@ -999,6 +1002,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.node_is_nil(node)
 	_ = gt.canvas_item_is_nil(canvas_item)
 	_ = gt.node2d_is_nil(node2d)
+	_ = gt.camera2d_is_nil(camera2d)
+	_ = gt.marker2d_is_nil(marker2d)
+	_ = gt.ray_cast2d_is_nil(ray_cast2d)
 	_ = gt.control_is_nil(control)
 	_ = gt.sprite2d_is_nil(sprite2d)
 	_ = gt.label_is_nil(label)
@@ -1245,6 +1251,12 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_static_body2d(object)
 	_ = gt.object_is_collision_shape2d(object)
 	_, _ = gt.object_try_as_collision_shape2d(object)
+	_ = gt.object_is_camera2d(object)
+	_, _ = gt.object_try_as_camera2d(object)
+	_ = gt.object_is_marker2d(object)
+	_, _ = gt.object_try_as_marker2d(object)
+	_ = gt.object_is_ray_cast2d(object)
+	_, _ = gt.object_try_as_ray_cast2d(object)
 	_, _ = gt.object_ptr_try_as_physics_body2d(gt.physics_body2d_object_ptr(physics_body2d))
 	_, _ = gt.object_ptr_try_as_character_body2d(gt.character_body2d_object_ptr(character_body2d))
 	_, _ = gt.object_ptr_try_as_rigid_body2d(gt.rigid_body2d_object_ptr(rigid_body2d))
@@ -1252,6 +1264,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_collision_shape2d(
 		gt.collision_shape2d_object_ptr(collision_shape2d),
 	)
+	_, _ = gt.object_ptr_try_as_camera2d(gt.camera2d_object_ptr(camera2d))
+	_, _ = gt.object_ptr_try_as_marker2d(gt.marker2d_object_ptr(marker2d))
+	_, _ = gt.object_ptr_try_as_ray_cast2d(gt.ray_cast2d_object_ptr(ray_cast2d))
 	physics_body_array := gt.physics_body2d_get_collision_exceptions(physics_body2d)
 	_, _ = gt.typed_array_get_physics_body2d(&physics_body_array, 0)
 	gt.typed_array_free(&physics_body_array)
@@ -1271,10 +1286,22 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.physics_body2d_try_as_static_body2d(physics_body2d)
 	_ = gt.node_is_collision_shape2d(node)
 	_, _ = gt.node_try_as_collision_shape2d(node)
+	_ = gt.node_is_camera2d(node)
+	_, _ = gt.node_try_as_camera2d(node)
+	_ = gt.node_is_marker2d(node)
+	_, _ = gt.node_try_as_marker2d(node)
+	_ = gt.node_is_ray_cast2d(node)
+	_, _ = gt.node_try_as_ray_cast2d(node)
 	_ = gt.canvas_item_is_collision_shape2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_collision_shape2d(canvas_item)
 	_ = gt.node2d_is_collision_shape2d(node2d)
 	_, _ = gt.node2d_try_as_collision_shape2d(node2d)
+	_ = gt.node2d_is_camera2d(node2d)
+	_, _ = gt.node2d_try_as_camera2d(node2d)
+	_ = gt.node2d_is_marker2d(node2d)
+	_, _ = gt.node2d_try_as_marker2d(node2d)
+	_ = gt.node2d_is_ray_cast2d(node2d)
+	_, _ = gt.node2d_try_as_ray_cast2d(node2d)
 	_ = gt.object_is_packed_scene(object)
 	_, _ = gt.object_try_as_packed_scene(object)
 	_ = gt.object_is_resource_loader(object)
