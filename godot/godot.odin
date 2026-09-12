@@ -1561,6 +1561,14 @@ scene_tree_is_nil :: proc "contextless" (self: SceneTree) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+animation_player_is_nil :: proc "contextless" (self: AnimationPlayer) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+tween_is_nil :: proc "contextless" (self: Tween) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 node_get_node_checked :: proc "contextless" (
 	self: Node,
 	path: ^NodePath,
@@ -1749,6 +1757,69 @@ node_get_node_as_timer :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Timer(nil), false
 	return node_try_as_timer(node)
+}
+
+node_get_node_as_animation_player :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: AnimationPlayer,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return AnimationPlayer(nil), false
+	return node_try_as_animation_player(node)
+}
+
+animation_player_play_checked :: proc "contextless" (
+	self: AnimationPlayer,
+	name: ^StringName,
+) -> bool {
+	if animation_player_is_nil(self) || name == nil do return false
+	animation_player_play(self, name, -1, 1, false)
+	return true
+}
+
+animation_player_stop_checked :: proc "contextless" (
+	self: AnimationPlayer,
+	keep_state := false,
+) -> bool {
+	if animation_player_is_nil(self) do return false
+	animation_player_stop(self, keep_state)
+	return true
+}
+
+animation_player_playing_checked :: proc "contextless" (
+	self: AnimationPlayer,
+) -> (
+	playing: bool,
+	ok: bool,
+) {
+	if animation_player_is_nil(self) do return false, false
+	return animation_player_is_playing(self), true
+}
+
+scene_tree_create_tween_checked :: proc "contextless" (
+	self: SceneTree,
+) -> (
+	value: Tween,
+	ok: bool,
+) {
+	if scene_tree_is_nil(self) do return Tween(nil), false
+	value = scene_tree_create_tween(self)
+	if tween_is_nil(value) do return Tween(nil), false
+	return value, true
+}
+
+tween_running_checked :: proc "contextless" (self: Tween) -> (running: bool, ok: bool) {
+	if tween_is_nil(self) do return false, false
+	return tween_is_running(self), true
+}
+
+tween_stop_checked :: proc "contextless" (self: Tween) -> bool {
+	if tween_is_nil(self) do return false
+	tween_stop(self)
+	return true
 }
 
 node_get_node_as_collision_object2d :: proc "contextless" (
@@ -2794,6 +2865,21 @@ object_ptr_try_as_scene_tree :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_scene_tree(Object(self))
+}
+
+object_ptr_try_as_animation_player :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: AnimationPlayer,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_animation_player(Object(self))
+}
+
+object_ptr_try_as_tween :: proc "contextless" (self: ObjectPtr) -> (value: Tween, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_tween(Object(self))
 }
 
 // --- Class enums and constants ---
