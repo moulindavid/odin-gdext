@@ -117,63 +117,59 @@ These slices are complete and were validated with make ci when merged:
      methods, deterministic UI resource blocker reporting, examples/game coverage,
      facade checks, and full make ci validation.
 
-## Current goal: Higher-level class authoring code generation
+16. Higher-level class authoring code generation.
+   - Added class authoring audit notes, a compact caller-owned
+     ClassAuthoringDescriptor layer, simple GodotReal method and property
+     shortcut storage, hello example coverage through godot:godot, facade
+     compile checks, and full make ci validation.
 
-Reduce repetitive Odin class registration boilerplate while preserving explicit
-metadata lifetime, callback ownership, and unregister behavior. This should move
-normal gameplay classes closer to a godot-rust-like authoring experience without
-hiding unsafe GDExtension details that still need explicit control.
+## Current goal: Error handling and diagnostics polish
 
-Keep this goal narrow. Start with helper-built descriptors for simple methods,
-properties, signals, and common virtual callbacks. Do not add macros or broad
-reflection-style automation until the explicit helper path is stable.
+Make failures easier to diagnose without weakening the safety model. Prefer
+checked helpers and deterministic diagnostic text around already-supported API
+paths. Do not add broad exception-style handling or hide Godot CallError values
+behind implicit global state.
 
-1. Audit current class authoring boilerplate.
-   - [ ] Inspect examples/hello, examples/game, tests/facade, and godot/godot.odin
-     for repeated registration metadata patterns.
-   - [ ] Identify which repeated pieces can be described by stable helper data
-     without hiding create/free/notification callbacks.
-   - [ ] Keep unregistering explicit and visible.
+1. Audit current checked and trapping helper coverage.
+   - [ ] Inspect object construction, method bind lookup, Variant call, signal
+     emission, resource loading, scene instantiation, and class registration
+     helpers.
+   - [ ] Identify places where callers only get `false` or a trap without enough
+     context to debug the failed Godot operation.
+   - [ ] Keep trap behavior for impossible nil function pointers and required
+     method binds.
 
-2. Add a small class authoring descriptor layer.
-   - [ ] Provide a descriptor or builder for a simple Odin class with methods,
-     properties, signals, and virtual callbacks.
-   - [ ] Store method names, property names, signal names, hint strings, and
-     argument metadata in caller-owned stable storage.
-   - [ ] Preserve explicit callback function pointers and metadata lifetime rules.
+2. Add small diagnostic descriptors for common checked paths.
+   - [ ] Provide compact operation/context strings for selected checked helpers.
+   - [ ] Keep descriptors caller-owned or static and allocation-free.
+   - [ ] Preserve returned `CallError` values where the current API exposes them.
 
-3. Add simple registration shortcuts where they reduce real boilerplate.
-   - [ ] Add typed shortcuts only for already-supported simple signatures.
-   - [ ] Keep unsupported signatures explicit rather than adding unsafe generic
-     adapters.
-   - [ ] Avoid hidden Variant allocation or object lifetime changes.
+3. Improve selected checked helper failure messages.
+   - [ ] Start with resource loading, scene instantiation, object construction,
+     and signal emission paths used by examples.
+   - [ ] Avoid logging noisy success-path messages.
+   - [ ] Do not introduce hidden Variant ownership changes.
 
-4. Update one normal example to use the new authoring layer.
-   - [ ] Prefer examples/hello for a beginner-readable path.
-   - [ ] Keep examples importing only godot:godot.
-   - [ ] Keep class unregister cleanup explicit in deinitialization.
+4. Add facade coverage for diagnostics helpers.
+   - [ ] Compile-check public diagnostic descriptor and checked helper APIs from
+     tests/facade.
+   - [ ] Keep normal examples importing only godot:godot.
 
-5. Add facade coverage for the authoring layer.
-   - [ ] Compile-check public descriptor and shortcut helpers from tests/facade.
-   - [ ] Confirm low-level core helpers remain available but unnecessary for the
-     selected common path.
+5. Exercise one diagnostic path in examples or smoke coverage.
+   - [ ] Prefer deterministic missing-resource or nil-object paths.
+   - [ ] Keep runtime output concise and useful.
 
 6. Validate before moving to the next feature roadmap.
    - [ ] Run make ci.
-   - [ ] Confirm normal examples import only godot:godot.
    - [ ] Confirm no hidden ownership transfer, temporary Variant leak, broad
      Resource lifetime change, or raw offset poking was added.
    - [ ] Update this roadmap with completed status and the next feature candidate.
 
 ## Planned next iterations
 
-After the current class authoring slice, pick one feature roadmap at a time:
+After the current diagnostics slice, pick one feature roadmap at a time:
 
-1. Error handling and diagnostics polish.
-   - More checked wrappers, clearer traps, generated support summaries, and
-     better user-facing failure messages.
-
-2. Packaging and external project workflow.
+1. Packaging and external project workflow.
    - Template project, collection/LSP setup docs, release/versioning policy, and
      repeatable use from a separate Godot game repository.
 
