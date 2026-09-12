@@ -1049,6 +1049,8 @@ selected_class_names := []string {
 }
 
 candidate_class_names := []string {
+	"AnimationPlayer",
+	"Tween",
 	"Window",
 	"AudioStream",
 	"AudioStreamPlayer",
@@ -1974,6 +1976,33 @@ class_method_has_type :: proc(method: ExtensionApiClassMethod, type_name: string
 	return false
 }
 
+
+class_method_animation_tween_blocker_kind :: proc(
+	class_name: string,
+	method: ExtensionApiClassMethod,
+) -> string {
+	if class_name == "AnimationPlayer" {
+		if class_method_has_type(method, "Animation") ||
+		   class_method_has_type(method, "AnimationLibrary") {
+			return "animation-resource"
+		}
+		if class_method_uses_callable_or_signal(method) do return "animation-callback"
+		return "animation"
+	}
+	if class_name == "Tween" ||
+	   class_method_has_type(method, "Tween") ||
+	   strings.has_suffix(method.return_value.type, "Tweener") {
+		if class_method_uses_callable_or_signal(method) do return "tween-callback"
+		if method.name == "tween_property" ||
+		   method.name == "tween_method" ||
+		   method.name == "interpolate_value" {
+			return "tween-variant"
+		}
+		return "tween"
+	}
+	return ""
+}
+
 class_method_resource_asset_blocker_kind :: proc(
 	class_name: string,
 	method: ExtensionApiClassMethod,
@@ -2835,6 +2864,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&viewport_ownership_blockers)
 	event_construction_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&event_construction_blockers)
+	animation_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&animation_blockers)
+	tween_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&tween_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2868,6 +2901,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	viewport_resource_blocker_count := 0
 	viewport_ownership_blocker_count := 0
 	event_construction_blocker_count := 0
+	animation_blocker_count := 0
+	tween_blocker_count := 0
 
 	for class_name in selected_class_names {
 		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
@@ -3083,6 +3118,23 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					)
 					event_construction_blocker_count += 1
 				}
+				animation_tween_kind := class_method_animation_tween_blocker_kind(
+					class.name,
+					method,
+				)
+				if strings.has_prefix(animation_tween_kind, "animation") {
+					emit_class_method_blocker_line(
+						&animation_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					animation_blocker_count += 1
+				} else if strings.has_prefix(animation_tween_kind, "tween") {
+					emit_class_method_blocker_line(&tween_blockers, "", class.name, method, reason)
+					tween_blocker_count += 1
+				}
 				if class.name == "Input" {
 					strings.write_string(&input_blockers, "- ")
 					emit_class_method_report_signature(&input_blockers, class.name, method)
@@ -3280,6 +3332,29 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					)
 					event_construction_blocker_count += 1
 				}
+				animation_tween_kind := class_method_animation_tween_blocker_kind(
+					class.name,
+					method,
+				)
+				if strings.has_prefix(animation_tween_kind, "animation") {
+					emit_class_method_blocker_line(
+						&animation_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					animation_blocker_count += 1
+				} else if strings.has_prefix(animation_tween_kind, "tween") {
+					emit_class_method_blocker_line(
+						&tween_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					tween_blocker_count += 1
+				}
 				if class_method_is_ui_report_class(class.name) {
 					strings.write_string(&ui_blockers, "- candidate ")
 					emit_class_method_report_signature(&ui_blockers, class.name, method)
@@ -3338,6 +3413,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Viewport resource blockers: %d\n", viewport_resource_blocker_count)
 	fmt.sbprintf(&b, "- Viewport ownership blockers: %d\n", viewport_ownership_blocker_count)
 	fmt.sbprintf(&b, "- Event construction blockers: %d\n", event_construction_blocker_count)
+	fmt.sbprintf(&b, "- Animation blockers: %d\n", animation_blocker_count)
+	fmt.sbprintf(&b, "- Tween blockers: %d\n", tween_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -3395,6 +3472,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(viewport_ownership_blockers))
 	strings.write_string(&b, "\n## Event construction blockers\n\n")
 	strings.write_string(&b, strings.to_string(event_construction_blockers))
+	strings.write_string(&b, "\n## Animation blockers\n\n")
+	strings.write_string(&b, strings.to_string(animation_blockers))
+	strings.write_string(&b, "\n## Tween blockers\n\n")
+	strings.write_string(&b, strings.to_string(tween_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 
