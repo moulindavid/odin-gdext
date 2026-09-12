@@ -390,6 +390,57 @@ configure_ui_nodes :: proc "contextless" (
 	}
 }
 
+
+configure_ui_resource_nodes :: proc "contextless" (
+	parent: gt.Node,
+	damage: gt.GodotReal,
+	texture: gt.Texture2D,
+	texture_loaded: bool,
+) {
+	progress_object := gt.construct_object(progress_bar_class_name)
+	if progress, progress_ok := gt.object_ptr_try_as_progress_bar(progress_object); progress_ok {
+		range_handle := gt.progress_bar_as_range(progress)
+		gt.range_set_min(range_handle, 0)
+		gt.range_set_max(range_handle, 100)
+		gt.range_set_step(range_handle, 1)
+		gt.range_set_value(range_handle, damage)
+		gt.range_set_use_rounded_values(range_handle, true)
+		gt.progress_bar_set_show_percentage(progress, true)
+		gt.progress_bar_set_indeterminate(progress, false)
+		gt.progress_bar_set_fill_mode(progress, i64(gt.ProgressBarFillMode.fill_begin_to_end))
+		_ = gt.range_get_value(range_handle)
+		_ = gt.range_get_as_ratio(range_handle)
+		_ = gt.range_is_using_rounded_values(range_handle)
+		_ = gt.progress_bar_get_fill_mode(progress)
+		_ = gt.progress_bar_is_percentage_shown(progress)
+		_ = gt.object_destroy_checked(gt.progress_bar_object_ptr(progress))
+	} else if progress_object != nil {
+		_ = gt.object_destroy_checked(progress_object)
+	}
+
+	texture_button_object := gt.construct_object(texture_button_class_name)
+	if texture_button, texture_button_ok := gt.object_ptr_try_as_texture_button(
+		texture_button_object,
+	); texture_button_ok {
+		gt.texture_button_set_ignore_texture_size(texture_button, false)
+		gt.texture_button_set_stretch_mode(texture_button, .stretch_keep_aspect_centered)
+		gt.texture_button_set_flip_h(texture_button, damage > 25)
+		gt.texture_button_set_flip_v(texture_button, false)
+		if texture_loaded {
+			gt.texture_button_set_texture_normal(texture_button, texture)
+			gt.texture_button_set_texture_hover(texture_button, texture)
+			_ = gt.texture_button_get_texture_normal(texture_button)
+			_ = gt.texture_button_get_texture_hover(texture_button)
+		}
+		_ = gt.texture_button_get_ignore_texture_size(texture_button)
+		_ = gt.texture_button_get_stretch_mode(texture_button)
+		_ = gt.texture_button_is_flipped_h(texture_button)
+		_ = gt.object_destroy_checked(gt.texture_button_object_ptr(texture_button))
+	} else if texture_button_object != nil {
+		_ = gt.object_destroy_checked(texture_button_object)
+	}
+}
+
 roll_damage_adapter_method :: proc "contextless" (
 	instance: gt.ClassInstancePtr,
 ) -> (
@@ -525,6 +576,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 
 		texture, texture_loaded := ensure_icon_texture(self)
 		configure_ui_nodes(parent, label, damage, texture, texture_loaded)
+		configure_ui_resource_nodes(parent, damage, texture, texture_loaded)
 		configure_physics_nodes(parent, damage)
 		configure_2d_gameplay_nodes(parent, damage)
 		configure_animation_tween_nodes(parent, damage)
@@ -542,7 +594,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 
 	_ = gt.label_set_text_utf8_checked(
 		label,
-		"Odin updated UI nodes, loaded resources, spawned a scene, armed a Timer, configured physics and 2D gameplay nodes, and exercised animation/tween APIs.",
+		"Odin updated UI nodes, loaded resources, spawned a scene, armed a Timer, configured physics, 2D gameplay, and UI resource nodes, and exercised animation/tween APIs.",
 	)
 	gt.label_set_horizontal_alignment(label, .horizontal_alignment_center)
 	gt.label_set_visible_ratio(label, 1)
@@ -582,6 +634,8 @@ collision_shape2d_class_name_data: gt.ClassName
 camera2d_class_name_data: gt.ClassName
 marker2d_class_name_data: gt.ClassName
 ray_cast2d_class_name_data: gt.ClassName
+texture_button_class_name_data: gt.ClassName
+progress_bar_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name := gt.class_name_ptr(&game_name_data)
 game_parent_name := gt.class_name_ptr(&game_parent_name_data)
@@ -592,6 +646,8 @@ collision_shape2d_class_name := gt.class_name_ptr(&collision_shape2d_class_name_
 camera2d_class_name := gt.class_name_ptr(&camera2d_class_name_data)
 marker2d_class_name := gt.class_name_ptr(&marker2d_class_name_data)
 ray_cast2d_class_name := gt.class_name_ptr(&ray_cast2d_class_name_data)
+texture_button_class_name := gt.class_name_ptr(&texture_button_class_name_data)
+progress_bar_class_name := gt.class_name_ptr(&progress_bar_class_name_data)
 animation_player_class_name := gt.class_name_ptr(&animation_player_class_name_data)
 
 empty_name_data: gt.StaticStringName
@@ -817,6 +873,8 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&camera2d_class_name_data, cstring("Camera2D"))
 	gt.class_name_init_latin1_cstring(&marker2d_class_name_data, cstring("Marker2D"))
 	gt.class_name_init_latin1_cstring(&ray_cast2d_class_name_data, cstring("RayCast2D"))
+	gt.class_name_init_latin1_cstring(&texture_button_class_name_data, cstring("TextureButton"))
+	gt.class_name_init_latin1_cstring(&progress_bar_class_name_data, cstring("ProgressBar"))
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,
 		cstring("AnimationPlayer"),
