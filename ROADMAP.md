@@ -111,72 +111,69 @@ These slices are complete and were validated with make ci when merged:
      deterministic 2D gameplay blocker reporting, examples/game coverage, facade
      checks, and full make ci validation.
 
-## Current goal: More UI resource integration
+15. More UI resource integration.
+   - Selected TextureButton, Range, and ProgressBar generated handles, checked
+     casts, borrowed Texture2D consumer methods, primitive Range and ProgressBar
+     methods, deterministic UI resource blocker reporting, examples/game coverage,
+     facade checks, and full make ci validation.
 
-Expand selected UI and resource-facing APIs that are common in real Godot UI
-work while preserving explicit Resource ownership and borrowed object handles.
-This should make Odin UI code less dependent on hand-written GDScript glue for
-texture buttons, progress/status UI, theme resources, fonts, and style boxes.
+## Current goal: Higher-level class authoring code generation
 
-Keep this goal narrow. Prefer safe consumer/query paths first. Do not expose
-broad Theme, Font, StyleBox, texture, or Resource mutation APIs until returned
-resource ownership and long-lived editor/runtime storage are explicit.
+Reduce repetitive Odin class registration boilerplate while preserving explicit
+metadata lifetime, callback ownership, and unregister behavior. This should move
+normal gameplay classes closer to a godot-rust-like authoring experience without
+hiding unsafe GDExtension details that still need explicit control.
 
-1. Audit UI resource API gaps.
-   - [ ] Inspect TextureButton, ProgressBar, Range, Theme, Font, StyleBox, and
-     related common UI classes.
-   - [ ] Classify borrowed-safe primitive/query/consumer methods separately from
-     resource-returning, theme-mutation, font-data, stylebox-data, and
-     ownership-sensitive APIs.
-   - [ ] Add or refine generated report categories for UI resource blockers.
+Keep this goal narrow. Start with helper-built descriptors for simple methods,
+properties, signals, and common virtual callbacks. Do not add macros or broad
+reflection-style automation until the explicit helper path is stable.
 
-2. Add selected generated UI resource coverage.
-   - [ ] Add a small safe class batch, starting with TextureButton, Range, and
-     ProgressBar if their selected methods fit current type rules.
-   - [ ] Generate primitive, enum, vector, borrowed-object, and borrowed-resource
-     consumer methods only where ownership stays explicit.
-   - [ ] Keep Theme, Font, StyleBox, and broad texture/resource returns skipped
-     until owned-wrapper helpers are designed.
+1. Audit current class authoring boilerplate.
+   - [ ] Inspect examples/hello, examples/game, tests/facade, and godot/godot.odin
+     for repeated registration metadata patterns.
+   - [ ] Identify which repeated pieces can be described by stable helper data
+     without hiding create/free/notification callbacks.
+   - [ ] Keep unregistering explicit and visible.
 
-3. Add facade helpers for common UI usage.
-   - [ ] Add nil-safe helpers where generated names are too low-level for common
-     UI control setup.
-   - [ ] Keep Texture2D, Theme, Font, StyleBox, and Resource handles borrowed
-     unless wrapped in OwnedResource.
-   - [ ] Avoid hidden retain, unref, or destroy behavior.
+2. Add a small class authoring descriptor layer.
+   - [ ] Provide a descriptor or builder for a simple Odin class with methods,
+     properties, signals, and virtual callbacks.
+   - [ ] Store method names, property names, signal names, hint strings, and
+     argument metadata in caller-owned stable storage.
+   - [ ] Preserve explicit callback function pointers and metadata lifetime rules.
 
-4. Exercise selected APIs in examples.
-   - [ ] Update examples/game with deterministic UI resource usage through
-     godot:godot only.
-   - [ ] Avoid editor-only assumptions and headless-unstable rendering checks.
-   - [ ] Keep resource cleanup explicit.
+3. Add simple registration shortcuts where they reduce real boilerplate.
+   - [ ] Add typed shortcuts only for already-supported simple signatures.
+   - [ ] Keep unsupported signatures explicit rather than adding unsafe generic
+     adapters.
+   - [ ] Avoid hidden Variant allocation or object lifetime changes.
 
-5. Add facade and reporting coverage.
-   - [ ] Add compile checks for selected generated UI resource APIs and helpers.
-   - [ ] Confirm generated reports explain remaining UI resource skips.
-   - [ ] Keep generated output deterministic.
+4. Update one normal example to use the new authoring layer.
+   - [ ] Prefer examples/hello for a beginner-readable path.
+   - [ ] Keep examples importing only godot:godot.
+   - [ ] Keep class unregister cleanup explicit in deinitialization.
+
+5. Add facade coverage for the authoring layer.
+   - [ ] Compile-check public descriptor and shortcut helpers from tests/facade.
+   - [ ] Confirm low-level core helpers remain available but unnecessary for the
+     selected common path.
 
 6. Validate before moving to the next feature roadmap.
    - [ ] Run make ci.
-   - [ ] Confirm examples/game and examples/hello import only godot:godot.
+   - [ ] Confirm normal examples import only godot:godot.
    - [ ] Confirm no hidden ownership transfer, temporary Variant leak, broad
      Resource lifetime change, or raw offset poking was added.
-   - [ ] Update this roadmap and the generated-class roadmap with completed
-     status and the next feature candidate.
+   - [ ] Update this roadmap with completed status and the next feature candidate.
 
 ## Planned next iterations
 
-After the current UI resource integration slice, pick one feature roadmap at a time:
+After the current class authoring slice, pick one feature roadmap at a time:
 
-1. Higher-level class authoring code generation.
-   - Reduce method/property/signal/virtual registration boilerplate while
-     preserving explicit callbacks, metadata lifetime, and unregistering.
-
-2. Error handling and diagnostics polish.
+1. Error handling and diagnostics polish.
    - More checked wrappers, clearer traps, generated support summaries, and
      better user-facing failure messages.
 
-3. Packaging and external project workflow.
+2. Packaging and external project workflow.
    - Template project, collection/LSP setup docs, release/versioning policy, and
      repeatable use from a separate Godot game repository.
 

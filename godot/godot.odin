@@ -173,6 +173,11 @@ Node2D :: gclass.Node2D
 Control :: gclass.Control
 BaseButton :: gclass.BaseButton
 Button :: gclass.Button
+TextureButton :: gclass.TextureButton
+Range :: gclass.Range
+ProgressBar :: gclass.ProgressBar
+TextureButtonStretchMode :: gclass.TextureButtonStretchMode
+ProgressBarFillMode :: gclass.ProgressBarFillMode
 TextureRect :: gclass.TextureRect
 Panel :: gclass.Panel
 Container :: gclass.Container
@@ -720,6 +725,69 @@ button_set_vertical_icon_alignment :: gclass.button_set_vertical_icon_alignment
 button_get_vertical_icon_alignment :: gclass.button_get_vertical_icon_alignment
 button_set_expand_icon :: gclass.button_set_expand_icon
 button_is_expand_icon :: gclass.button_is_expand_icon
+texture_button_as_base_button :: gclass.texture_button_as_base_button
+texture_button_as_control :: gclass.texture_button_as_control
+texture_button_as_canvas_item :: gclass.texture_button_as_canvas_item
+texture_button_as_node :: gclass.texture_button_as_node
+texture_button_as_object :: gclass.texture_button_as_object
+texture_button_set_texture_normal :: gclass.texture_button_set_texture_normal
+texture_button_set_texture_pressed :: gclass.texture_button_set_texture_pressed
+texture_button_set_texture_hover :: gclass.texture_button_set_texture_hover
+texture_button_set_texture_disabled :: gclass.texture_button_set_texture_disabled
+texture_button_set_texture_focused :: gclass.texture_button_set_texture_focused
+texture_button_set_ignore_texture_size :: gclass.texture_button_set_ignore_texture_size
+texture_button_get_ignore_texture_size :: gclass.texture_button_get_ignore_texture_size
+texture_button_set_stretch_mode :: gclass.texture_button_set_stretch_mode
+texture_button_get_stretch_mode :: gclass.texture_button_get_stretch_mode
+texture_button_set_flip_h :: gclass.texture_button_set_flip_h
+texture_button_is_flipped_h :: gclass.texture_button_is_flipped_h
+texture_button_set_flip_v :: gclass.texture_button_set_flip_v
+texture_button_is_flipped_v :: gclass.texture_button_is_flipped_v
+texture_button_get_texture_normal :: gclass.texture_button_get_texture_normal
+texture_button_get_texture_pressed :: gclass.texture_button_get_texture_pressed
+texture_button_get_texture_hover :: gclass.texture_button_get_texture_hover
+texture_button_get_texture_disabled :: gclass.texture_button_get_texture_disabled
+texture_button_get_texture_focused :: gclass.texture_button_get_texture_focused
+range_as_control :: gclass.range_as_control
+range_as_canvas_item :: gclass.range_as_canvas_item
+range_as_node :: gclass.range_as_node
+range_as_object :: gclass.range_as_object
+range_get_value :: gclass.range_get_value
+range_get_min :: gclass.range_get_min
+range_get_max :: gclass.range_get_max
+range_get_step :: gclass.range_get_step
+range_get_page :: gclass.range_get_page
+range_get_as_ratio :: gclass.range_get_as_ratio
+range_set_value :: gclass.range_set_value
+range_set_value_no_signal :: gclass.range_set_value_no_signal
+range_set_min :: gclass.range_set_min
+range_set_max :: gclass.range_set_max
+range_set_step :: gclass.range_set_step
+range_set_page :: gclass.range_set_page
+range_set_as_ratio :: gclass.range_set_as_ratio
+range_set_use_rounded_values :: gclass.range_set_use_rounded_values
+range_is_using_rounded_values :: gclass.range_is_using_rounded_values
+range_set_exp_ratio :: gclass.range_set_exp_ratio
+range_is_ratio_exp :: gclass.range_is_ratio_exp
+range_set_allow_greater :: gclass.range_set_allow_greater
+range_is_greater_allowed :: gclass.range_is_greater_allowed
+range_set_allow_lesser :: gclass.range_set_allow_lesser
+range_is_lesser_allowed :: gclass.range_is_lesser_allowed
+progress_bar_as_range :: gclass.progress_bar_as_range
+progress_bar_as_control :: gclass.progress_bar_as_control
+progress_bar_as_canvas_item :: gclass.progress_bar_as_canvas_item
+progress_bar_as_node :: gclass.progress_bar_as_node
+progress_bar_as_object :: gclass.progress_bar_as_object
+progress_bar_set_fill_mode :: gclass.progress_bar_set_fill_mode
+progress_bar_get_fill_mode :: gclass.progress_bar_get_fill_mode
+progress_bar_set_show_percentage :: gclass.progress_bar_set_show_percentage
+progress_bar_is_percentage_shown :: gclass.progress_bar_is_percentage_shown
+progress_bar_set_indeterminate :: gclass.progress_bar_set_indeterminate
+progress_bar_is_indeterminate :: gclass.progress_bar_is_indeterminate
+progress_bar_set_editor_preview_indeterminate ::
+	gclass.progress_bar_set_editor_preview_indeterminate
+progress_bar_is_editor_preview_indeterminate_enabled ::
+	gclass.progress_bar_is_editor_preview_indeterminate_enabled
 texture_rect_set_texture :: gclass.texture_rect_set_texture
 texture_rect_get_texture :: gclass.texture_rect_get_texture
 texture_rect_set_expand_mode :: gclass.texture_rect_set_expand_mode
@@ -796,6 +864,12 @@ object_is_base_button :: gclass.object_is_base_button
 object_try_as_base_button :: gclass.object_try_as_base_button
 object_is_button :: gclass.object_is_button
 object_try_as_button :: gclass.object_try_as_button
+object_is_texture_button :: gclass.object_is_texture_button
+object_try_as_texture_button :: gclass.object_try_as_texture_button
+object_is_range :: gclass.object_is_range
+object_try_as_range :: gclass.object_try_as_range
+object_is_progress_bar :: gclass.object_is_progress_bar
+object_try_as_progress_bar :: gclass.object_try_as_progress_bar
 object_is_texture_rect :: gclass.object_is_texture_rect
 object_try_as_texture_rect :: gclass.object_try_as_texture_rect
 object_is_panel :: gclass.object_is_panel
@@ -952,6 +1026,12 @@ node_is_base_button :: gclass.node_is_base_button
 node_try_as_base_button :: gclass.node_try_as_base_button
 node_is_button :: gclass.node_is_button
 node_try_as_button :: gclass.node_try_as_button
+node_is_texture_button :: gclass.node_is_texture_button
+node_try_as_texture_button :: gclass.node_try_as_texture_button
+node_is_range :: gclass.node_is_range
+node_try_as_range :: gclass.node_try_as_range
+node_is_progress_bar :: gclass.node_is_progress_bar
+node_try_as_progress_bar :: gclass.node_try_as_progress_bar
 node_is_texture_rect :: gclass.node_is_texture_rect
 node_try_as_texture_rect :: gclass.node_try_as_texture_rect
 node_is_panel :: gclass.node_is_panel
@@ -982,6 +1062,12 @@ canvas_item_is_base_button :: gclass.canvas_item_is_base_button
 canvas_item_try_as_base_button :: gclass.canvas_item_try_as_base_button
 canvas_item_is_button :: gclass.canvas_item_is_button
 canvas_item_try_as_button :: gclass.canvas_item_try_as_button
+canvas_item_is_texture_button :: gclass.canvas_item_is_texture_button
+canvas_item_try_as_texture_button :: gclass.canvas_item_try_as_texture_button
+canvas_item_is_range :: gclass.canvas_item_is_range
+canvas_item_try_as_range :: gclass.canvas_item_try_as_range
+canvas_item_is_progress_bar :: gclass.canvas_item_is_progress_bar
+canvas_item_try_as_progress_bar :: gclass.canvas_item_try_as_progress_bar
 canvas_item_is_texture_rect :: gclass.canvas_item_is_texture_rect
 canvas_item_try_as_texture_rect :: gclass.canvas_item_try_as_texture_rect
 canvas_item_is_panel :: gclass.canvas_item_is_panel
@@ -1034,6 +1120,12 @@ control_is_base_button :: gclass.control_is_base_button
 control_try_as_base_button :: gclass.control_try_as_base_button
 control_is_button :: gclass.control_is_button
 control_try_as_button :: gclass.control_try_as_button
+control_is_texture_button :: gclass.control_is_texture_button
+control_try_as_texture_button :: gclass.control_try_as_texture_button
+control_is_range :: gclass.control_is_range
+control_try_as_range :: gclass.control_try_as_range
+control_is_progress_bar :: gclass.control_is_progress_bar
+control_try_as_progress_bar :: gclass.control_try_as_progress_bar
 control_is_texture_rect :: gclass.control_is_texture_rect
 control_try_as_texture_rect :: gclass.control_try_as_texture_rect
 control_is_panel :: gclass.control_is_panel
@@ -1042,6 +1134,10 @@ control_is_container :: gclass.control_is_container
 control_try_as_container :: gclass.control_try_as_container
 base_button_is_button :: gclass.base_button_is_button
 base_button_try_as_button :: gclass.base_button_try_as_button
+base_button_is_texture_button :: gclass.base_button_is_texture_button
+base_button_try_as_texture_button :: gclass.base_button_try_as_texture_button
+range_is_progress_bar :: gclass.range_is_progress_bar
+range_try_as_progress_bar :: gclass.range_try_as_progress_bar
 timer_as_node :: gclass.timer_as_node
 timer_as_object :: gclass.timer_as_object
 timer_set_wait_time :: gclass.timer_set_wait_time
@@ -1614,6 +1710,18 @@ button_is_nil :: proc "contextless" (self: Button) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+texture_button_is_nil :: proc "contextless" (self: TextureButton) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+range_is_nil :: proc "contextless" (self: Range) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+progress_bar_is_nil :: proc "contextless" (self: ProgressBar) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 texture_rect_is_nil :: proc "contextless" (self: TextureRect) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -1806,6 +1914,42 @@ node_get_node_as_button :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Button(nil), false
 	return node_try_as_button(node)
+}
+
+node_get_node_as_texture_button :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: TextureButton,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return TextureButton(nil), false
+	return node_try_as_texture_button(node)
+}
+
+node_get_node_as_range :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Range,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Range(nil), false
+	return node_try_as_range(node)
+}
+
+node_get_node_as_progress_bar :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: ProgressBar,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return ProgressBar(nil), false
+	return node_try_as_progress_bar(node)
 }
 
 node_get_node_as_texture_rect :: proc "contextless" (
@@ -2575,6 +2719,18 @@ button_object_ptr :: proc "contextless" (self: Button) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+texture_button_object_ptr :: proc "contextless" (self: TextureButton) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+range_object_ptr :: proc "contextless" (self: Range) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+progress_bar_object_ptr :: proc "contextless" (self: ProgressBar) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 texture_rect_object_ptr :: proc "contextless" (self: TextureRect) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3027,6 +3183,31 @@ object_ptr_try_as_sprite2d :: proc "contextless" (self: ObjectPtr) -> (value: Sp
 object_ptr_try_as_label :: proc "contextless" (self: ObjectPtr) -> (value: Label, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_label(Object(self))
+}
+
+object_ptr_try_as_texture_button :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: TextureButton,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_texture_button(Object(self))
+}
+
+object_ptr_try_as_range :: proc "contextless" (self: ObjectPtr) -> (value: Range, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_range(Object(self))
+}
+
+object_ptr_try_as_progress_bar :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: ProgressBar,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_progress_bar(Object(self))
 }
 
 object_ptr_try_as_timer :: proc "contextless" (self: ObjectPtr) -> (value: Timer, ok: bool) {

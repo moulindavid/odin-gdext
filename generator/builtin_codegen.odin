@@ -1021,6 +1021,9 @@ selected_class_names := []string {
 	"Control",
 	"BaseButton",
 	"Button",
+	"TextureButton",
+	"Range",
+	"ProgressBar",
 	"TextureRect",
 	"Panel",
 	"Container",
@@ -1060,7 +1063,7 @@ candidate_class_names := []string {
 	"Theme",
 	"Font",
 	"StyleBox",
-	"TextureButton",
+	"TextureProgressBar",
 	"TileMap",
 	"TileMapLayer",
 	"NavigationAgent2D",
@@ -1354,6 +1357,53 @@ selected_class_methods := []Selected_Class_Method {
 	{"Button", "get_vertical_icon_alignment"},
 	{"Button", "set_expand_icon"},
 	{"Button", "is_expand_icon"},
+	{"TextureButton", "set_texture_normal"},
+	{"TextureButton", "set_texture_pressed"},
+	{"TextureButton", "set_texture_hover"},
+	{"TextureButton", "set_texture_disabled"},
+	{"TextureButton", "set_texture_focused"},
+	{"TextureButton", "set_ignore_texture_size"},
+	{"TextureButton", "get_ignore_texture_size"},
+	{"TextureButton", "set_stretch_mode"},
+	{"TextureButton", "get_stretch_mode"},
+	{"TextureButton", "set_flip_h"},
+	{"TextureButton", "is_flipped_h"},
+	{"TextureButton", "set_flip_v"},
+	{"TextureButton", "is_flipped_v"},
+	{"TextureButton", "get_texture_normal"},
+	{"TextureButton", "get_texture_pressed"},
+	{"TextureButton", "get_texture_hover"},
+	{"TextureButton", "get_texture_disabled"},
+	{"TextureButton", "get_texture_focused"},
+	{"Range", "get_value"},
+	{"Range", "get_min"},
+	{"Range", "get_max"},
+	{"Range", "get_step"},
+	{"Range", "get_page"},
+	{"Range", "get_as_ratio"},
+	{"Range", "set_value"},
+	{"Range", "set_value_no_signal"},
+	{"Range", "set_min"},
+	{"Range", "set_max"},
+	{"Range", "set_step"},
+	{"Range", "set_page"},
+	{"Range", "set_as_ratio"},
+	{"Range", "set_use_rounded_values"},
+	{"Range", "is_using_rounded_values"},
+	{"Range", "set_exp_ratio"},
+	{"Range", "is_ratio_exp"},
+	{"Range", "set_allow_greater"},
+	{"Range", "is_greater_allowed"},
+	{"Range", "set_allow_lesser"},
+	{"Range", "is_lesser_allowed"},
+	{"ProgressBar", "set_fill_mode"},
+	{"ProgressBar", "get_fill_mode"},
+	{"ProgressBar", "set_show_percentage"},
+	{"ProgressBar", "is_percentage_shown"},
+	{"ProgressBar", "set_indeterminate"},
+	{"ProgressBar", "is_indeterminate"},
+	{"ProgressBar", "set_editor_preview_indeterminate"},
+	{"ProgressBar", "is_editor_preview_indeterminate_enabled"},
 	{"TextureRect", "set_expand_mode"},
 	{"TextureRect", "get_expand_mode"},
 	{"TextureRect", "set_flip_h"},
@@ -2114,6 +2164,18 @@ class_method_is_ui_report_class :: proc(class_name: string) -> bool {
 		class_name == "HBoxContainer" ||
 		class_name == "VBoxContainer" ||
 		class_name == "MarginContainer" \
+	)
+}
+
+class_method_is_ui_resource_report_class :: proc(class_name: string) -> bool {
+	return(
+		class_name == "TextureButton" ||
+		class_name == "Range" ||
+		class_name == "ProgressBar" ||
+		class_name == "TextureProgressBar" ||
+		class_name == "Theme" ||
+		class_name == "Font" ||
+		class_name == "StyleBox" \
 	)
 }
 
@@ -3043,6 +3105,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&gameplay_2d_blockers)
 	ui_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&ui_blockers)
+	ui_resource_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&ui_resource_blockers)
 	texture_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&texture_blockers)
 	audio_blockers := strings.builder_make(context.allocator)
@@ -3094,6 +3158,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	physics_blocker_count := 0
 	gameplay_2d_blocker_count := 0
 	ui_blocker_count := 0
+	ui_resource_blocker_count := 0
 	texture_blocker_count := 0
 	audio_blocker_count := 0
 	theme_font_stylebox_blocker_count := 0
@@ -3403,6 +3468,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&ui_blockers, ": %s\n", reason)
 					ui_blocker_count += 1
 				}
+				if class_method_is_ui_resource_report_class(class.name) {
+					strings.write_string(&ui_resource_blockers, "- ")
+					emit_class_method_report_signature(&ui_resource_blockers, class.name, method)
+					fmt.sbprintf(&ui_resource_blockers, ": %s\n", reason)
+					ui_resource_blocker_count += 1
+				}
 			}
 		}
 	}
@@ -3614,6 +3685,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&ui_blockers, ": %s\n", reason)
 					ui_blocker_count += 1
 				}
+				if class_method_is_ui_resource_report_class(class.name) {
+					strings.write_string(&ui_resource_blockers, "- candidate ")
+					emit_class_method_report_signature(&ui_resource_blockers, class.name, method)
+					fmt.sbprintf(&ui_resource_blockers, ": %s\n", reason)
+					ui_resource_blocker_count += 1
+				}
 			}
 		}
 		strings.write_byte(&candidate_analysis, '\n')
@@ -3658,6 +3735,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
 	fmt.sbprintf(&b, "- 2D gameplay blockers: %d\n", gameplay_2d_blocker_count)
 	fmt.sbprintf(&b, "- UI blockers: %d\n", ui_blocker_count)
+	fmt.sbprintf(&b, "- UI resource blockers: %d\n", ui_resource_blocker_count)
 	fmt.sbprintf(&b, "- Texture blockers: %d\n", texture_blocker_count)
 	fmt.sbprintf(&b, "- Audio blockers: %d\n", audio_blocker_count)
 	fmt.sbprintf(&b, "- Theme/Font/StyleBox blockers: %d\n", theme_font_stylebox_blocker_count)
@@ -3712,6 +3790,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(gameplay_2d_blockers))
 	strings.write_string(&b, "\n## UI blockers\n\n")
 	strings.write_string(&b, strings.to_string(ui_blockers))
+	strings.write_string(&b, "\n## UI resource blockers\n\n")
+	strings.write_string(&b, strings.to_string(ui_resource_blockers))
 	strings.write_string(&b, "\n## Texture blockers\n\n")
 	strings.write_string(&b, strings.to_string(texture_blockers))
 	strings.write_string(&b, "\n## Audio blockers\n\n")
