@@ -1331,7 +1331,9 @@ scene_tree_is_multiplayer_poll_enabled :: gclass.scene_tree_is_multiplayer_poll_
 
 animation_player_as_node :: gclass.animation_player_as_node
 animation_player_as_object :: gclass.animation_player_as_object
+object_is_animation_player :: gclass.object_is_animation_player
 object_try_as_animation_player :: gclass.object_try_as_animation_player
+node_is_animation_player :: gclass.node_is_animation_player
 node_try_as_animation_player :: gclass.node_try_as_animation_player
 animation_player_animation_set_next :: gclass.animation_player_animation_set_next
 animation_player_animation_get_next :: gclass.animation_player_animation_get_next
@@ -1385,7 +1387,9 @@ animation_player_get_root :: gclass.animation_player_get_root
 scene_tree_create_tween :: gclass.scene_tree_create_tween
 tween_as_ref_counted :: gclass.tween_as_ref_counted
 tween_as_object :: gclass.tween_as_object
+object_is_tween :: gclass.object_is_tween
 object_try_as_tween :: gclass.object_try_as_tween
+ref_counted_is_tween :: gclass.ref_counted_is_tween
 ref_counted_try_as_tween :: gclass.ref_counted_try_as_tween
 tween_custom_step :: gclass.tween_custom_step
 tween_stop :: gclass.tween_stop
@@ -2381,6 +2385,14 @@ viewport_object_ptr :: proc "contextless" (self: Viewport) -> ObjectPtr {
 }
 
 scene_tree_object_ptr :: proc "contextless" (self: SceneTree) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+animation_player_object_ptr :: proc "contextless" (self: AnimationPlayer) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+tween_object_ptr :: proc "contextless" (self: Tween) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
