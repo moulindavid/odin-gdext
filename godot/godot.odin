@@ -186,6 +186,11 @@ CharacterBody2D :: gclass.CharacterBody2D
 RigidBody2D :: gclass.RigidBody2D
 StaticBody2D :: gclass.StaticBody2D
 CollisionShape2D :: gclass.CollisionShape2D
+Camera2D :: gclass.Camera2D
+Marker2D :: gclass.Marker2D
+RayCast2D :: gclass.RayCast2D
+Camera2DAnchorMode :: gclass.Camera2DAnchorMode
+Camera2DProcessCallback :: gclass.Camera2DCamera2DprocessCallback
 PackedScene :: gclass.PackedScene
 ResourceLoader :: gclass.ResourceLoader
 Input :: gclass.Input
@@ -813,6 +818,12 @@ object_is_static_body2d :: gclass.object_is_static_body2d
 object_try_as_static_body2d :: gclass.object_try_as_static_body2d
 object_is_collision_shape2d :: gclass.object_is_collision_shape2d
 object_try_as_collision_shape2d :: gclass.object_try_as_collision_shape2d
+object_is_camera2d :: gclass.object_is_camera2d
+object_try_as_camera2d :: gclass.object_try_as_camera2d
+object_is_marker2d :: gclass.object_is_marker2d
+object_try_as_marker2d :: gclass.object_try_as_marker2d
+object_is_ray_cast2d :: gclass.object_is_ray_cast2d
+object_try_as_ray_cast2d :: gclass.object_try_as_ray_cast2d
 object_is_packed_scene :: gclass.object_is_packed_scene
 object_try_as_packed_scene :: gclass.object_try_as_packed_scene
 object_is_resource_loader :: gclass.object_is_resource_loader
@@ -953,6 +964,12 @@ node_is_collision_object2d :: gclass.node_is_collision_object2d
 node_try_as_collision_object2d :: gclass.node_try_as_collision_object2d
 node_is_area2d :: gclass.node_is_area2d
 node_try_as_area2d :: gclass.node_try_as_area2d
+node_is_camera2d :: gclass.node_is_camera2d
+node_try_as_camera2d :: gclass.node_try_as_camera2d
+node_is_marker2d :: gclass.node_is_marker2d
+node_try_as_marker2d :: gclass.node_try_as_marker2d
+node_is_ray_cast2d :: gclass.node_is_ray_cast2d
+node_try_as_ray_cast2d :: gclass.node_try_as_ray_cast2d
 canvas_item_is_node2d :: gclass.canvas_item_is_node2d
 canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
@@ -1005,6 +1022,12 @@ canvas_item_is_collision_shape2d :: gclass.canvas_item_is_collision_shape2d
 canvas_item_try_as_collision_shape2d :: gclass.canvas_item_try_as_collision_shape2d
 node2d_is_collision_shape2d :: gclass.node2d_is_collision_shape2d
 node2d_try_as_collision_shape2d :: gclass.node2d_try_as_collision_shape2d
+node2d_is_camera2d :: gclass.node2d_is_camera2d
+node2d_try_as_camera2d :: gclass.node2d_try_as_camera2d
+node2d_is_marker2d :: gclass.node2d_is_marker2d
+node2d_try_as_marker2d :: gclass.node2d_try_as_marker2d
+node2d_is_ray_cast2d :: gclass.node2d_is_ray_cast2d
+node2d_try_as_ray_cast2d :: gclass.node2d_try_as_ray_cast2d
 control_is_label :: gclass.control_is_label
 control_try_as_label :: gclass.control_try_as_label
 control_is_base_button :: gclass.control_is_base_button
@@ -1161,6 +1184,98 @@ collision_shape2d_get_one_way_collision_direction ::
 	gclass.collision_shape2d_get_one_way_collision_direction
 collision_shape2d_set_debug_color :: gclass.collision_shape2d_set_debug_color
 collision_shape2d_get_debug_color :: gclass.collision_shape2d_get_debug_color
+camera2d_as_node2d :: gclass.camera2d_as_node2d
+camera2d_as_canvas_item :: gclass.camera2d_as_canvas_item
+camera2d_as_node :: gclass.camera2d_as_node
+camera2d_as_object :: gclass.camera2d_as_object
+camera2d_set_offset :: gclass.camera2d_set_offset
+camera2d_get_offset :: gclass.camera2d_get_offset
+camera2d_set_anchor_mode :: gclass.camera2d_set_anchor_mode
+camera2d_get_anchor_mode :: gclass.camera2d_get_anchor_mode
+camera2d_set_ignore_rotation :: gclass.camera2d_set_ignore_rotation
+camera2d_is_ignoring_rotation :: gclass.camera2d_is_ignoring_rotation
+camera2d_set_process_callback :: gclass.camera2d_set_process_callback
+camera2d_get_process_callback :: gclass.camera2d_get_process_callback
+camera2d_set_enabled :: gclass.camera2d_set_enabled
+camera2d_is_enabled :: gclass.camera2d_is_enabled
+camera2d_make_current :: gclass.camera2d_make_current
+camera2d_is_current :: gclass.camera2d_is_current
+camera2d_set_limit_enabled :: gclass.camera2d_set_limit_enabled
+camera2d_is_limit_enabled :: gclass.camera2d_is_limit_enabled
+camera2d_set_limit :: gclass.camera2d_set_limit
+camera2d_get_limit :: gclass.camera2d_get_limit
+camera2d_set_limit_smoothing_enabled :: gclass.camera2d_set_limit_smoothing_enabled
+camera2d_is_limit_smoothing_enabled :: gclass.camera2d_is_limit_smoothing_enabled
+camera2d_set_drag_vertical_enabled :: gclass.camera2d_set_drag_vertical_enabled
+camera2d_is_drag_vertical_enabled :: gclass.camera2d_is_drag_vertical_enabled
+camera2d_set_drag_horizontal_enabled :: gclass.camera2d_set_drag_horizontal_enabled
+camera2d_is_drag_horizontal_enabled :: gclass.camera2d_is_drag_horizontal_enabled
+camera2d_set_drag_vertical_offset :: gclass.camera2d_set_drag_vertical_offset
+camera2d_get_drag_vertical_offset :: gclass.camera2d_get_drag_vertical_offset
+camera2d_set_drag_horizontal_offset :: gclass.camera2d_set_drag_horizontal_offset
+camera2d_get_drag_horizontal_offset :: gclass.camera2d_get_drag_horizontal_offset
+camera2d_set_drag_margin :: gclass.camera2d_set_drag_margin
+camera2d_get_drag_margin :: gclass.camera2d_get_drag_margin
+camera2d_get_target_position :: gclass.camera2d_get_target_position
+camera2d_get_screen_center_position :: gclass.camera2d_get_screen_center_position
+camera2d_get_screen_rotation :: gclass.camera2d_get_screen_rotation
+camera2d_set_zoom :: gclass.camera2d_set_zoom
+camera2d_get_zoom :: gclass.camera2d_get_zoom
+camera2d_set_position_smoothing_speed :: gclass.camera2d_set_position_smoothing_speed
+camera2d_get_position_smoothing_speed :: gclass.camera2d_get_position_smoothing_speed
+camera2d_set_position_smoothing_enabled :: gclass.camera2d_set_position_smoothing_enabled
+camera2d_is_position_smoothing_enabled :: gclass.camera2d_is_position_smoothing_enabled
+camera2d_set_rotation_smoothing_enabled :: gclass.camera2d_set_rotation_smoothing_enabled
+camera2d_is_rotation_smoothing_enabled :: gclass.camera2d_is_rotation_smoothing_enabled
+camera2d_set_rotation_smoothing_speed :: gclass.camera2d_set_rotation_smoothing_speed
+camera2d_get_rotation_smoothing_speed :: gclass.camera2d_get_rotation_smoothing_speed
+camera2d_force_update_scroll :: gclass.camera2d_force_update_scroll
+camera2d_reset_smoothing :: gclass.camera2d_reset_smoothing
+camera2d_align :: gclass.camera2d_align
+camera2d_set_screen_drawing_enabled :: gclass.camera2d_set_screen_drawing_enabled
+camera2d_is_screen_drawing_enabled :: gclass.camera2d_is_screen_drawing_enabled
+camera2d_set_limit_drawing_enabled :: gclass.camera2d_set_limit_drawing_enabled
+camera2d_is_limit_drawing_enabled :: gclass.camera2d_is_limit_drawing_enabled
+camera2d_set_margin_drawing_enabled :: gclass.camera2d_set_margin_drawing_enabled
+camera2d_is_margin_drawing_enabled :: gclass.camera2d_is_margin_drawing_enabled
+marker2d_as_node2d :: gclass.marker2d_as_node2d
+marker2d_as_canvas_item :: gclass.marker2d_as_canvas_item
+marker2d_as_node :: gclass.marker2d_as_node
+marker2d_as_object :: gclass.marker2d_as_object
+marker2d_set_gizmo_extents :: gclass.marker2d_set_gizmo_extents
+marker2d_get_gizmo_extents :: gclass.marker2d_get_gizmo_extents
+ray_cast2d_as_node2d :: gclass.ray_cast2d_as_node2d
+ray_cast2d_as_canvas_item :: gclass.ray_cast2d_as_canvas_item
+ray_cast2d_as_node :: gclass.ray_cast2d_as_node
+ray_cast2d_as_object :: gclass.ray_cast2d_as_object
+ray_cast2d_set_enabled :: gclass.ray_cast2d_set_enabled
+ray_cast2d_is_enabled :: gclass.ray_cast2d_is_enabled
+ray_cast2d_set_target_position :: gclass.ray_cast2d_set_target_position
+ray_cast2d_get_target_position :: gclass.ray_cast2d_get_target_position
+ray_cast2d_is_colliding :: gclass.ray_cast2d_is_colliding
+ray_cast2d_force_raycast_update :: gclass.ray_cast2d_force_raycast_update
+ray_cast2d_get_collider :: gclass.ray_cast2d_get_collider
+ray_cast2d_get_collider_rid :: gclass.ray_cast2d_get_collider_rid
+ray_cast2d_get_collider_shape :: gclass.ray_cast2d_get_collider_shape
+ray_cast2d_get_collision_point :: gclass.ray_cast2d_get_collision_point
+ray_cast2d_get_collision_normal :: gclass.ray_cast2d_get_collision_normal
+ray_cast2d_add_exception_rid :: gclass.ray_cast2d_add_exception_rid
+ray_cast2d_add_exception :: gclass.ray_cast2d_add_exception
+ray_cast2d_remove_exception_rid :: gclass.ray_cast2d_remove_exception_rid
+ray_cast2d_remove_exception :: gclass.ray_cast2d_remove_exception
+ray_cast2d_clear_exceptions :: gclass.ray_cast2d_clear_exceptions
+ray_cast2d_set_collision_mask :: gclass.ray_cast2d_set_collision_mask
+ray_cast2d_get_collision_mask :: gclass.ray_cast2d_get_collision_mask
+ray_cast2d_set_collision_mask_value :: gclass.ray_cast2d_set_collision_mask_value
+ray_cast2d_get_collision_mask_value :: gclass.ray_cast2d_get_collision_mask_value
+ray_cast2d_set_exclude_parent_body :: gclass.ray_cast2d_set_exclude_parent_body
+ray_cast2d_get_exclude_parent_body :: gclass.ray_cast2d_get_exclude_parent_body
+ray_cast2d_set_collide_with_areas :: gclass.ray_cast2d_set_collide_with_areas
+ray_cast2d_is_collide_with_areas_enabled :: gclass.ray_cast2d_is_collide_with_areas_enabled
+ray_cast2d_set_collide_with_bodies :: gclass.ray_cast2d_set_collide_with_bodies
+ray_cast2d_is_collide_with_bodies_enabled :: gclass.ray_cast2d_is_collide_with_bodies_enabled
+ray_cast2d_set_hit_from_inside :: gclass.ray_cast2d_set_hit_from_inside
+ray_cast2d_is_hit_from_inside_enabled :: gclass.ray_cast2d_is_hit_from_inside_enabled
 packed_scene_as_resource :: gclass.packed_scene_as_resource
 packed_scene_as_ref_counted :: gclass.packed_scene_as_ref_counted
 packed_scene_as_object :: gclass.packed_scene_as_object
@@ -1551,6 +1666,18 @@ collision_shape2d_is_nil :: proc "contextless" (self: CollisionShape2D) -> bool 
 	return ObjectPtr(self) == nil
 }
 
+camera2d_is_nil :: proc "contextless" (self: Camera2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+marker2d_is_nil :: proc "contextless" (self: Marker2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+ray_cast2d_is_nil :: proc "contextless" (self: RayCast2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 packed_scene_is_nil :: proc "contextless" (self: PackedScene) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -1739,6 +1866,42 @@ node_get_node_as_label :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Label(nil), false
 	return node_try_as_label(node)
+}
+
+node_get_node_as_camera2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Camera2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Camera2D(nil), false
+	return node_try_as_camera2d(node)
+}
+
+node_get_node_as_marker2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: Marker2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return Marker2D(nil), false
+	return node_try_as_marker2d(node)
+}
+
+node_get_node_as_ray_cast2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: RayCast2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return RayCast2D(nil), false
+	return node_try_as_ray_cast2d(node)
 }
 
 label_set_text_utf8_checked :: proc "contextless" (self: Label, text: string) -> bool {
@@ -2464,6 +2627,18 @@ collision_shape2d_object_ptr :: proc "contextless" (self: CollisionShape2D) -> O
 	return ObjectPtr(self)
 }
 
+camera2d_object_ptr :: proc "contextless" (self: Camera2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+marker2d_object_ptr :: proc "contextless" (self: Marker2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+ray_cast2d_object_ptr :: proc "contextless" (self: RayCast2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -2970,6 +3145,26 @@ object_ptr_try_as_collision_shape2d :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_collision_shape2d(Object(self))
+}
+
+object_ptr_try_as_camera2d :: proc "contextless" (self: ObjectPtr) -> (value: Camera2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_camera2d(Object(self))
+}
+
+object_ptr_try_as_marker2d :: proc "contextless" (self: ObjectPtr) -> (value: Marker2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_marker2d(Object(self))
+}
+
+object_ptr_try_as_ray_cast2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: RayCast2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_ray_cast2d(Object(self))
 }
 
 typed_array_get_physics_body2d :: proc "contextless" (

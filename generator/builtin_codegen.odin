@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 40
+Max_Selected_Class_Count :: 45
 
 selected_class_names := []string {
 	"Object",
@@ -1034,6 +1034,9 @@ selected_class_names := []string {
 	"RigidBody2D",
 	"StaticBody2D",
 	"CollisionShape2D",
+	"Camera2D",
+	"Marker2D",
+	"RayCast2D",
 	"PackedScene",
 	"ResourceLoader",
 	"Input",
@@ -1058,6 +1061,12 @@ candidate_class_names := []string {
 	"Font",
 	"StyleBox",
 	"TextureButton",
+	"TileMap",
+	"TileMapLayer",
+	"NavigationAgent2D",
+	"Path2D",
+	"PathFollow2D",
+	"VisibleOnScreenNotifier2D",
 }
 
 Selected_Class_Method :: struct {
@@ -1457,6 +1466,86 @@ selected_class_methods := []Selected_Class_Method {
 	{"CollisionShape2D", "get_one_way_collision_direction"},
 	{"CollisionShape2D", "set_debug_color"},
 	{"CollisionShape2D", "get_debug_color"},
+	{"Camera2D", "set_offset"},
+	{"Camera2D", "get_offset"},
+	{"Camera2D", "set_anchor_mode"},
+	{"Camera2D", "get_anchor_mode"},
+	{"Camera2D", "set_ignore_rotation"},
+	{"Camera2D", "is_ignoring_rotation"},
+	{"Camera2D", "set_process_callback"},
+	{"Camera2D", "get_process_callback"},
+	{"Camera2D", "set_enabled"},
+	{"Camera2D", "is_enabled"},
+	{"Camera2D", "make_current"},
+	{"Camera2D", "is_current"},
+	{"Camera2D", "set_limit_enabled"},
+	{"Camera2D", "is_limit_enabled"},
+	{"Camera2D", "set_limit"},
+	{"Camera2D", "get_limit"},
+	{"Camera2D", "set_limit_smoothing_enabled"},
+	{"Camera2D", "is_limit_smoothing_enabled"},
+	{"Camera2D", "set_drag_vertical_enabled"},
+	{"Camera2D", "is_drag_vertical_enabled"},
+	{"Camera2D", "set_drag_horizontal_enabled"},
+	{"Camera2D", "is_drag_horizontal_enabled"},
+	{"Camera2D", "set_drag_vertical_offset"},
+	{"Camera2D", "get_drag_vertical_offset"},
+	{"Camera2D", "set_drag_horizontal_offset"},
+	{"Camera2D", "get_drag_horizontal_offset"},
+	{"Camera2D", "set_drag_margin"},
+	{"Camera2D", "get_drag_margin"},
+	{"Camera2D", "get_target_position"},
+	{"Camera2D", "get_screen_center_position"},
+	{"Camera2D", "get_screen_rotation"},
+	{"Camera2D", "set_zoom"},
+	{"Camera2D", "get_zoom"},
+	{"Camera2D", "set_position_smoothing_speed"},
+	{"Camera2D", "get_position_smoothing_speed"},
+	{"Camera2D", "set_position_smoothing_enabled"},
+	{"Camera2D", "is_position_smoothing_enabled"},
+	{"Camera2D", "set_rotation_smoothing_enabled"},
+	{"Camera2D", "is_rotation_smoothing_enabled"},
+	{"Camera2D", "set_rotation_smoothing_speed"},
+	{"Camera2D", "get_rotation_smoothing_speed"},
+	{"Camera2D", "force_update_scroll"},
+	{"Camera2D", "reset_smoothing"},
+	{"Camera2D", "align"},
+	{"Camera2D", "set_screen_drawing_enabled"},
+	{"Camera2D", "is_screen_drawing_enabled"},
+	{"Camera2D", "set_limit_drawing_enabled"},
+	{"Camera2D", "is_limit_drawing_enabled"},
+	{"Camera2D", "set_margin_drawing_enabled"},
+	{"Camera2D", "is_margin_drawing_enabled"},
+	{"Marker2D", "set_gizmo_extents"},
+	{"Marker2D", "get_gizmo_extents"},
+	{"RayCast2D", "set_enabled"},
+	{"RayCast2D", "is_enabled"},
+	{"RayCast2D", "set_target_position"},
+	{"RayCast2D", "get_target_position"},
+	{"RayCast2D", "is_colliding"},
+	{"RayCast2D", "force_raycast_update"},
+	{"RayCast2D", "get_collider"},
+	{"RayCast2D", "get_collider_rid"},
+	{"RayCast2D", "get_collider_shape"},
+	{"RayCast2D", "get_collision_point"},
+	{"RayCast2D", "get_collision_normal"},
+	{"RayCast2D", "add_exception_rid"},
+	{"RayCast2D", "add_exception"},
+	{"RayCast2D", "remove_exception_rid"},
+	{"RayCast2D", "remove_exception"},
+	{"RayCast2D", "clear_exceptions"},
+	{"RayCast2D", "set_collision_mask"},
+	{"RayCast2D", "get_collision_mask"},
+	{"RayCast2D", "set_collision_mask_value"},
+	{"RayCast2D", "get_collision_mask_value"},
+	{"RayCast2D", "set_exclude_parent_body"},
+	{"RayCast2D", "get_exclude_parent_body"},
+	{"RayCast2D", "set_collide_with_areas"},
+	{"RayCast2D", "is_collide_with_areas_enabled"},
+	{"RayCast2D", "set_collide_with_bodies"},
+	{"RayCast2D", "is_collide_with_bodies_enabled"},
+	{"RayCast2D", "set_hit_from_inside"},
+	{"RayCast2D", "is_hit_from_inside_enabled"},
 	{"PackedScene", "pack"},
 	{"PackedScene", "can_instantiate"},
 	{"Texture2D", "get_mipmap_count"},
@@ -1996,6 +2085,20 @@ class_method_is_physics_report_class :: proc(class_name: string) -> bool {
 		class_name == "RigidBody2D" ||
 		class_name == "StaticBody2D" ||
 		class_name == "CollisionShape2D" \
+	)
+}
+
+class_method_is_2d_gameplay_report_class :: proc(class_name: string) -> bool {
+	return(
+		class_name == "Camera2D" ||
+		class_name == "Marker2D" ||
+		class_name == "RayCast2D" ||
+		class_name == "TileMap" ||
+		class_name == "TileMapLayer" ||
+		class_name == "NavigationAgent2D" ||
+		class_name == "Path2D" ||
+		class_name == "PathFollow2D" ||
+		class_name == "VisibleOnScreenNotifier2D" \
 	)
 }
 
@@ -2936,6 +3039,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&scene_workflow_blockers)
 	physics_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&physics_blockers)
+	gameplay_2d_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&gameplay_2d_blockers)
 	ui_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&ui_blockers)
 	texture_blockers := strings.builder_make(context.allocator)
@@ -2987,6 +3092,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	scene_instantiation_blocker_count := 0
 	scene_workflow_blocker_count := 0
 	physics_blocker_count := 0
+	gameplay_2d_blocker_count := 0
 	ui_blocker_count := 0
 	texture_blocker_count := 0
 	audio_blocker_count := 0
@@ -3286,6 +3392,11 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					emit_class_method_report_signature(&physics_blockers, class.name, method)
 					fmt.sbprintf(&physics_blockers, ": %s\n", reason)
 					physics_blocker_count += 1
+				} else if class_method_is_2d_gameplay_report_class(class.name) {
+					strings.write_string(&gameplay_2d_blockers, "- ")
+					emit_class_method_report_signature(&gameplay_2d_blockers, class.name, method)
+					fmt.sbprintf(&gameplay_2d_blockers, ": %s\n", reason)
+					gameplay_2d_blocker_count += 1
 				} else if class_method_is_ui_report_class(class.name) {
 					strings.write_string(&ui_blockers, "- ")
 					emit_class_method_report_signature(&ui_blockers, class.name, method)
@@ -3491,6 +3602,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					)
 					tween_blocker_count += 1
 				}
+				if class_method_is_2d_gameplay_report_class(class.name) {
+					strings.write_string(&gameplay_2d_blockers, "- candidate ")
+					emit_class_method_report_signature(&gameplay_2d_blockers, class.name, method)
+					fmt.sbprintf(&gameplay_2d_blockers, ": %s\n", reason)
+					gameplay_2d_blocker_count += 1
+				}
 				if class_method_is_ui_report_class(class.name) {
 					strings.write_string(&ui_blockers, "- candidate ")
 					emit_class_method_report_signature(&ui_blockers, class.name, method)
@@ -3539,6 +3656,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Scene-instantiation blockers: %d\n", scene_instantiation_blocker_count)
 	fmt.sbprintf(&b, "- Scene workflow blockers: %d\n", scene_workflow_blocker_count)
 	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
+	fmt.sbprintf(&b, "- 2D gameplay blockers: %d\n", gameplay_2d_blocker_count)
 	fmt.sbprintf(&b, "- UI blockers: %d\n", ui_blocker_count)
 	fmt.sbprintf(&b, "- Texture blockers: %d\n", texture_blocker_count)
 	fmt.sbprintf(&b, "- Audio blockers: %d\n", audio_blocker_count)
@@ -3590,6 +3708,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(scene_workflow_blockers))
 	strings.write_string(&b, "\n## Physics blockers\n\n")
 	strings.write_string(&b, strings.to_string(physics_blockers))
+	strings.write_string(&b, "\n## 2D gameplay blockers\n\n")
+	strings.write_string(&b, strings.to_string(gameplay_2d_blockers))
 	strings.write_string(&b, "\n## UI blockers\n\n")
 	strings.write_string(&b, strings.to_string(ui_blockers))
 	strings.write_string(&b, "\n## Texture blockers\n\n")
