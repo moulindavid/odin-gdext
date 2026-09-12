@@ -826,6 +826,58 @@ class_builder_unregister :: proc "contextless" (builder: ^ClassBuilder) {
 	unregister_odin_class(desc)
 }
 
+// ClassAuthoringDescriptor is the public, compact descriptor for a normal
+// Odin-backed class. It borrows all names, callback pointers, member slices, and
+// metadata from caller-owned storage. Create/free/notification callbacks remain
+// explicit, and callers still unregister explicitly during deinitialization.
+ClassAuthoringDescriptor :: struct {
+	class_name:           ConstStringNamePtr,
+	parent_class_name:    ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func:   ClassFreeInstance,
+	notification_func:    ClassNotification,
+	class_userdata:       rawptr,
+	virtuals:             ClassVirtualDescriptor,
+	methods:              []OdinClassMethod,
+	properties:           []OdinClassProperty,
+	signals:              []OdinClassSignal,
+}
+
+class_authoring_descriptor :: proc "contextless" (
+	desc: ClassAuthoringDescriptor,
+) -> OdinClassDescriptor {
+	if desc.class_name == nil ||
+	   desc.parent_class_name == nil ||
+	   desc.create_instance_func == nil ||
+	   desc.free_instance_func == nil {
+		_trap_nil_godot_function()
+	}
+	return OdinClassDescriptor {
+		class_name = desc.class_name,
+		parent_class_name = desc.parent_class_name,
+		create_instance_func = desc.create_instance_func,
+		free_instance_func = desc.free_instance_func,
+		notification_func = desc.notification_func,
+		class_userdata = desc.class_userdata,
+		virtuals = desc.virtuals,
+		methods = desc.methods,
+		properties = desc.properties,
+		signals = desc.signals,
+	}
+}
+
+class_authoring_builder :: proc "contextless" (desc: ClassAuthoringDescriptor) -> ClassBuilder {
+	return ClassBuilder{desc = class_authoring_descriptor(desc)}
+}
+
+class_authoring_register :: proc "contextless" (desc: ClassAuthoringDescriptor) {
+	register_odin_class(class_authoring_descriptor(desc))
+}
+
+class_authoring_unregister :: proc "contextless" (desc: ClassAuthoringDescriptor) {
+	unregister_odin_class(class_authoring_descriptor(desc))
+}
+
 // register_odin_class registers one Odin-backed class and its member metadata.
 // The descriptor is consumed immediately; Godot-facing names, PropertyInfo,
 // ClassMethodInfo, adapters, and callback data must be caller-owned stable
@@ -1049,6 +1101,21 @@ ClassFixedMethodStorage :: struct {
 	argument_metadata: [2]ClassMethodArgumentMetadata,
 }
 
+ClassGetGodotRealMethodStorage :: struct {
+	method:  ClassFixedMethodStorage,
+	adapter: ClassMethodGetGodotRealAdapter,
+}
+
+ClassSetGodotRealMethodStorage :: struct {
+	method:  ClassFixedMethodStorage,
+	adapter: ClassMethodSetGodotRealAdapter,
+}
+
+ClassGodotReal2ToGodotRealMethodStorage :: struct {
+	method:  ClassFixedMethodStorage,
+	adapter: ClassMethodGodotReal2ToGodotRealAdapter,
+}
+
 class_method_void :: proc "contextless" (
 	info: ^ClassMethodInfo,
 	name: StringNamePtr,
@@ -1158,6 +1225,55 @@ class_method_godot_real2_to_godot_real :: proc "contextless" (
 	}
 }
 
+class_method_get_godot_real_proc :: proc "contextless" (
+	storage: ^ClassGetGodotRealMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	method: ClassMethodGetGodotReal,
+) -> OdinClassMethod {
+	if storage == nil || method == nil do _trap_nil_godot_function()
+	storage.adapter.method = method
+	return class_method_get_godot_real(&storage.method, defaults, name, &storage.adapter)
+}
+
+class_method_set_godot_real_proc :: proc "contextless" (
+	storage: ^ClassSetGodotRealMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	argument_name: StringNamePtr,
+	method: ClassMethodSetGodotReal,
+) -> OdinClassMethod {
+	if storage == nil || method == nil do _trap_nil_godot_function()
+	storage.adapter.method = method
+	return class_method_set_godot_real(
+		&storage.method,
+		defaults,
+		name,
+		argument_name,
+		&storage.adapter,
+	)
+}
+
+class_method_godot_real2_to_godot_real_proc :: proc "contextless" (
+	storage: ^ClassGodotReal2ToGodotRealMethodStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	argument_a_name: StringNamePtr,
+	argument_b_name: StringNamePtr,
+	method: ClassMethodGodotReal2ToGodotReal,
+) -> OdinClassMethod {
+	if storage == nil || method == nil do _trap_nil_godot_function()
+	storage.adapter.method = method
+	return class_method_godot_real2_to_godot_real(
+		&storage.method,
+		defaults,
+		name,
+		argument_a_name,
+		argument_b_name,
+		&storage.adapter,
+	)
+}
+
 ClassPrimitivePropertyStorage :: struct {
 	property_info:      PropertyInfo,
 	getter_return_info: PropertyInfo,
@@ -1165,6 +1281,12 @@ ClassPrimitivePropertyStorage :: struct {
 	setter_arg_meta:    [1]ClassMethodArgumentMetadata,
 	getter_method_info: ClassMethodInfo,
 	setter_method_info: ClassMethodInfo,
+}
+
+ClassGodotRealPropertyStorage :: struct {
+	property:       ClassPrimitivePropertyStorage,
+	getter_adapter: ClassMethodGetGodotRealAdapter,
+	setter_adapter: ClassMethodSetGodotRealAdapter,
 }
 
 ClassTypedPropertyDescriptor :: struct {
@@ -1213,6 +1335,27 @@ class_property_godot_real :: proc "contextless" (
 		class_method_get_godot_real_ptrcall,
 		class_method_set_godot_real_call,
 		class_method_set_godot_real_ptrcall,
+	)
+}
+
+class_property_godot_real_proc :: proc "contextless" (
+	storage: ^ClassGodotRealPropertyStorage,
+	defaults: ClassMemberDefaults,
+	name: StringNamePtr,
+	getter_name: StringNamePtr,
+	setter_name: StringNamePtr,
+	getter: ClassMethodGetGodotReal,
+	setter: ClassMethodSetGodotReal,
+	usage: u32 = PropertyUsageDefault,
+) -> ClassTypedProperty {
+	if storage == nil || getter == nil || setter == nil do _trap_nil_godot_function()
+	storage.getter_adapter.method = getter
+	storage.setter_adapter.method = setter
+	return class_property_godot_real(
+		&storage.property,
+		class_typed_property_descriptor(defaults, .Float, name, getter_name, setter_name, usage),
+		&storage.getter_adapter,
+		&storage.setter_adapter,
 	)
 }
 
