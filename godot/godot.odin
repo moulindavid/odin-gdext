@@ -59,6 +59,7 @@ OdinClassDescriptor :: gcore.OdinClassDescriptor
 ClassVirtualCallbacks :: gcore.ClassVirtualCallbacks
 ClassVirtualDescriptor :: gcore.ClassVirtualDescriptor
 ClassBuilder :: gcore.ClassBuilder
+ClassAuthoringDescriptor :: gcore.ClassAuthoringDescriptor
 ClassMethodGodotReal2ToGodotReal :: gcore.ClassMethodGodotReal2ToGodotReal
 ClassMethodGodotReal2ToGodotRealAdapter :: gcore.ClassMethodGodotReal2ToGodotRealAdapter
 ClassMethodVoid :: gcore.ClassMethodVoid
@@ -260,6 +261,10 @@ class_builder_virtuals :: gcore.class_builder_virtuals
 class_builder_finalize :: gcore.class_builder_finalize
 class_builder_register :: gcore.class_builder_register
 class_builder_unregister :: gcore.class_builder_unregister
+class_authoring_descriptor :: gcore.class_authoring_descriptor
+class_authoring_builder :: gcore.class_authoring_builder
+class_authoring_register :: gcore.class_authoring_register
+class_authoring_unregister :: gcore.class_authoring_unregister
 class_method_void :: gcore.class_method_void
 class_method_get_godot_real :: gcore.class_method_get_godot_real
 class_method_set_godot_real :: gcore.class_method_set_godot_real

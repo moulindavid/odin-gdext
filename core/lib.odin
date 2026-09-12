@@ -826,6 +826,58 @@ class_builder_unregister :: proc "contextless" (builder: ^ClassBuilder) {
 	unregister_odin_class(desc)
 }
 
+// ClassAuthoringDescriptor is the public, compact descriptor for a normal
+// Odin-backed class. It borrows all names, callback pointers, member slices, and
+// metadata from caller-owned storage. Create/free/notification callbacks remain
+// explicit, and callers still unregister explicitly during deinitialization.
+ClassAuthoringDescriptor :: struct {
+	class_name:           ConstStringNamePtr,
+	parent_class_name:    ConstStringNamePtr,
+	create_instance_func: ClassCreateInstance,
+	free_instance_func:   ClassFreeInstance,
+	notification_func:    ClassNotification,
+	class_userdata:       rawptr,
+	virtuals:             ClassVirtualDescriptor,
+	methods:              []OdinClassMethod,
+	properties:           []OdinClassProperty,
+	signals:              []OdinClassSignal,
+}
+
+class_authoring_descriptor :: proc "contextless" (
+	desc: ClassAuthoringDescriptor,
+) -> OdinClassDescriptor {
+	if desc.class_name == nil ||
+	   desc.parent_class_name == nil ||
+	   desc.create_instance_func == nil ||
+	   desc.free_instance_func == nil {
+		_trap_nil_godot_function()
+	}
+	return OdinClassDescriptor {
+		class_name = desc.class_name,
+		parent_class_name = desc.parent_class_name,
+		create_instance_func = desc.create_instance_func,
+		free_instance_func = desc.free_instance_func,
+		notification_func = desc.notification_func,
+		class_userdata = desc.class_userdata,
+		virtuals = desc.virtuals,
+		methods = desc.methods,
+		properties = desc.properties,
+		signals = desc.signals,
+	}
+}
+
+class_authoring_builder :: proc "contextless" (desc: ClassAuthoringDescriptor) -> ClassBuilder {
+	return ClassBuilder{desc = class_authoring_descriptor(desc)}
+}
+
+class_authoring_register :: proc "contextless" (desc: ClassAuthoringDescriptor) {
+	register_odin_class(class_authoring_descriptor(desc))
+}
+
+class_authoring_unregister :: proc "contextless" (desc: ClassAuthoringDescriptor) {
+	unregister_odin_class(class_authoring_descriptor(desc))
+}
+
 // register_odin_class registers one Odin-backed class and its member metadata.
 // The descriptor is consumed immediately; Godot-facing names, PropertyInfo,
 // ClassMethodInfo, adapters, and callback data must be caller-owned stable
