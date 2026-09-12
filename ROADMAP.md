@@ -105,73 +105,78 @@ These slices are complete and were validated with make ci when merged:
      instantiate-and-add helpers, deterministic resource/scene blocker reporting,
      examples/game workflow coverage, facade checks, and full make ci validation.
 
-## Current goal: Broader 2D gameplay classes
+14. Broader 2D gameplay classes.
+   - Selected Camera2D, Marker2D, and RayCast2D generated handles, checked casts,
+     borrowed-safe primitive/vector/enum/RID/object methods, facade helpers,
+     deterministic 2D gameplay blocker reporting, examples/game coverage, facade
+     checks, and full make ci validation.
 
-Expand selected generated coverage for common 2D gameplay nodes while preserving
-borrowed object handles and explicit ownership for resources and returned Godot
-values. This slice should make normal Odin gameplay code less dependent on raw
-Node2D plus physics basics.
+## Current goal: More UI resource integration
 
-Keep this goal narrow. Prefer small class batches with clear borrowed-safe
-methods. Defer broad resource-heavy, signal-heavy, pathfinding-lifetime, and
-scene-tree mutation APIs until their safety models are explicit.
+Expand selected UI and resource-facing APIs that are common in real Godot UI
+work while preserving explicit Resource ownership and borrowed object handles.
+This should make Odin UI code less dependent on hand-written GDScript glue for
+texture buttons, progress/status UI, theme resources, fonts, and style boxes.
 
-1. Audit 2D gameplay class gaps.
-   - [ ] Inspect Camera2D, Marker2D, RayCast2D, TileMap/TileMapLayer,
-     NavigationAgent2D, and related common 2D gameplay classes.
-   - [ ] Classify borrowed-safe transform/query/control methods separately from
-     resource-heavy, typed-container mutation, signal-heavy, and
-     lifetime-sensitive APIs.
-   - [ ] Add or refine generated report categories for 2D gameplay blockers.
+Keep this goal narrow. Prefer safe consumer/query paths first. Do not expose
+broad Theme, Font, StyleBox, texture, or Resource mutation APIs until returned
+resource ownership and long-lived editor/runtime storage are explicit.
 
-2. Add selected generated 2D class coverage.
-   - [ ] Add a small set of class handles and checked casts for the safest
-     common classes first.
-   - [ ] Generate primitive, vector, enum, RID, and borrowed-object methods that
-     fit the current type mapping rules.
-   - [ ] Keep resource-owned and lifetime-sensitive methods skipped.
+1. Audit UI resource API gaps.
+   - [ ] Inspect TextureButton, ProgressBar, Range, Theme, Font, StyleBox, and
+     related common UI classes.
+   - [ ] Classify borrowed-safe primitive/query/consumer methods separately from
+     resource-returning, theme-mutation, font-data, stylebox-data, and
+     ownership-sensitive APIs.
+   - [ ] Add or refine generated report categories for UI resource blockers.
 
-3. Add facade helpers for common 2D usage.
+2. Add selected generated UI resource coverage.
+   - [ ] Add a small safe class batch, starting with TextureButton, Range, and
+     ProgressBar if their selected methods fit current type rules.
+   - [ ] Generate primitive, enum, vector, borrowed-object, and borrowed-resource
+     consumer methods only where ownership stays explicit.
+   - [ ] Keep Theme, Font, StyleBox, and broad texture/resource returns skipped
+     until owned-wrapper helpers are designed.
+
+3. Add facade helpers for common UI usage.
    - [ ] Add nil-safe helpers where generated names are too low-level for common
-     camera, marker, or raycast usage.
-   - [ ] Keep object/class handles borrowed by value.
-   - [ ] Avoid hidden ownership transfers.
+     UI control setup.
+   - [ ] Keep Texture2D, Theme, Font, StyleBox, and Resource handles borrowed
+     unless wrapped in OwnedResource.
+   - [ ] Avoid hidden retain, unref, or destroy behavior.
 
-4. Exercise the selected APIs in examples.
-   - [ ] Update examples/game with deterministic 2D gameplay usage.
-   - [ ] Keep normal examples importing only godot:godot.
-   - [ ] Avoid headless-unstable timing or physics assumptions.
+4. Exercise selected APIs in examples.
+   - [ ] Update examples/game with deterministic UI resource usage through
+     godot:godot only.
+   - [ ] Avoid editor-only assumptions and headless-unstable rendering checks.
+   - [ ] Keep resource cleanup explicit.
 
 5. Add facade and reporting coverage.
-   - [ ] Add compile checks for selected generated 2D APIs and helpers.
-   - [ ] Confirm generated reports explain remaining 2D gameplay skips.
+   - [ ] Add compile checks for selected generated UI resource APIs and helpers.
+   - [ ] Confirm generated reports explain remaining UI resource skips.
    - [ ] Keep generated output deterministic.
 
 6. Validate before moving to the next feature roadmap.
    - [ ] Run make ci.
    - [ ] Confirm examples/game and examples/hello import only godot:godot.
    - [ ] Confirm no hidden ownership transfer, temporary Variant leak, broad
-     scene-tree lifetime change, or raw offset poking was added.
+     Resource lifetime change, or raw offset poking was added.
    - [ ] Update this roadmap and the generated-class roadmap with completed
      status and the next feature candidate.
 
 ## Planned next iterations
 
-After the current broader 2D gameplay slice, pick one feature roadmap at a time:
+After the current UI resource integration slice, pick one feature roadmap at a time:
 
-1. More UI resource integration.
-   - Theme, Font, StyleBox, TextureButton, ProgressBar, and common Control APIs
-     once resource lifetimes are proven.
-
-2. Higher-level class authoring code generation.
+1. Higher-level class authoring code generation.
    - Reduce method/property/signal/virtual registration boilerplate while
      preserving explicit callbacks, metadata lifetime, and unregistering.
 
-3. Error handling and diagnostics polish.
+2. Error handling and diagnostics polish.
    - More checked wrappers, clearer traps, generated support summaries, and
      better user-facing failure messages.
 
-4. Packaging and external project workflow.
+3. Packaging and external project workflow.
    - Template project, collection/LSP setup docs, release/versioning policy, and
      repeatable use from a separate Godot game repository.
 

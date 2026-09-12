@@ -287,14 +287,15 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		gt.ray_cast2d_set_collision_mask(raycast, 1)
 		gt.ray_cast2d_set_collide_with_bodies(raycast, true)
 		gt.ray_cast2d_set_collide_with_areas(raycast, true)
-		gt.ray_cast2d_force_raycast_update(raycast)
-		_ = gt.ray_cast2d_get_target_position(raycast)
-		_ = gt.ray_cast2d_is_colliding(raycast)
-		_ = gt.ray_cast2d_get_collision_point(raycast)
-		_ = gt.ray_cast2d_get_collision_normal(raycast)
-		collider_rid := gt.ray_cast2d_get_collider_rid(raycast)
-		gt.rid_free(&collider_rid)
-		if !gt.node_add_child_checked(parent, gt.ray_cast2d_as_node(raycast)) {
+		if gt.node_add_child_checked(parent, gt.ray_cast2d_as_node(raycast)) {
+			gt.ray_cast2d_force_raycast_update(raycast)
+			_ = gt.ray_cast2d_get_target_position(raycast)
+			_ = gt.ray_cast2d_is_colliding(raycast)
+			_ = gt.ray_cast2d_get_collision_point(raycast)
+			_ = gt.ray_cast2d_get_collision_normal(raycast)
+			collider_rid := gt.ray_cast2d_get_collider_rid(raycast)
+			gt.rid_free(&collider_rid)
+		} else {
 			_ = gt.object_destroy_checked(gt.ray_cast2d_object_ptr(raycast))
 		}
 	} else if raycast_object != nil {
