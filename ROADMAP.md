@@ -93,87 +93,84 @@ These slices are complete and were validated with make ci when merged:
      adapters, class-builder metadata integration, facade coverage, and
      examples/game plus smoke coverage through godot:godot.
 
-## Current goal: Animation and tween APIs
+12. Animation and tween APIs.
+   - Selected AnimationPlayer and Tween handles, borrowed-safe control/query
+     wrappers, SceneTree.create_tween as a borrowed returned handle, facade
+     helpers, deterministic blocker reporting, compile coverage, examples/game
+     coverage, and full make ci validation.
 
-Expose a small animation and tween API surface for common gameplay polish while
-preserving the existing Callable, Signal, Variant, object-handle, and resource
-ownership rules. This is the next practical feature gap after custom classes can
-run ready/process/input-style callbacks.
+## Current goal: More scene and resource workflows
 
-Keep this goal narrow. Start with borrowed-safe AnimationPlayer queries and
-simple SceneTree/Tween creation or control paths only when ownership is clear.
-Do not expose broad tween callback binding, varargs, or animation resource
-mutation until the safety model is explicit.
+Expand real gameplay workflows around loading and instantiating resources while
+preserving the borrowed-object default and explicit owned-resource rules. This
+slice should make common scene spawning and asset lookup more useful without
+opening broad ownership-transfer APIs.
 
-1. Audit animation and tween APIs.
-   - [ ] Inspect AnimationPlayer, Tween, SceneTree tween creation, and common
-     callback or signal shapes.
-   - [ ] Classify borrowed-safe methods separately from resource-owned,
-     Callable-heavy, vararg, and lifetime-sensitive APIs.
-   - [ ] Add stable generated report categories for animation and tween blockers.
+Keep this goal narrow. Prefer selected helper paths over broad generated
+coverage. Do not expose Resource.duplicate, broad PackedScene state mutation, or
+lifetime-sensitive scene-tree changes until ownership and destruction are clear.
 
-2. Add selected AnimationPlayer generated coverage.
-   - [ ] Generate the AnimationPlayer handle, checked casts, and safe query or
-     primitive control methods.
-   - [ ] Re-export selected APIs through godot:godot.
-   - [ ] Defer Animation resource mutation and callback-heavy APIs.
+1. Audit scene and resource workflow gaps.
+   - [ ] Inspect PackedScene, ResourceLoader, Resource, Node, and SceneTree
+     methods needed for common spawn/load workflows.
+   - [ ] Classify borrowed-safe methods separately from ownership-transfer,
+     cache, threaded-loading, duplicate, and scene-tree lifetime-sensitive APIs.
+   - [ ] Keep generated report categories stable for scene/resource blockers.
 
-3. Add selected Tween generated coverage.
-   - [ ] Generate the Tween handle and safe primitive control/query methods.
-   - [ ] Keep Tween handles borrowed unless a clear ownership path is proven.
-   - [ ] Defer broad tweener construction, Callable callbacks, and varargs.
+2. Add selected generated scene/resource coverage.
+   - [ ] Add only borrowed-safe query/control wrappers that fit the current
+     Resource and OwnedResource model.
+   - [ ] Keep PackedScene.instantiate routed through explicit checked facade
+     helpers until ownership transfer is fully documented.
+   - [ ] Keep Resource.duplicate and broad scene-state APIs deferred.
 
-4. Add small facade helpers for common animation usage.
-   - [ ] Add nil-safe helper procedures around selected AnimationPlayer and
-     Tween handles.
-   - [ ] Add checked helper names for common play/stop/running paths if generated
-     names are too low-level.
-   - [ ] Keep object/class handles borrowed by value.
+3. Improve facade helpers for common loading and spawning.
+   - [ ] Add or refine typed load helpers for selected Resource-derived handles.
+   - [ ] Add nil-safe checked spawn/add-child helper combinations for common
+     Node and Node2D workflows.
+   - [ ] Keep all returned object/class handles borrowed unless wrapped in
+     OwnedResource or another explicit owned type.
 
-5. Exercise animation/tween APIs in examples.
-   - [ ] Update examples/game or smoke with deterministic animation/tween usage.
+4. Exercise workflows in examples.
+   - [ ] Update examples/game with deterministic resource/scene workflow usage.
    - [ ] Keep normal examples importing only godot:godot.
-   - [ ] Avoid CI behavior that depends on real frame timing beyond verified
-     headless-safe calls.
+   - [ ] Avoid CI behavior that depends on editor-only asset import side effects.
 
-6. Add facade and reporting coverage.
-   - [ ] Add compile checks for selected animation and tween APIs.
-   - [ ] Confirm generated reports explain remaining animation/tween skips.
+5. Add facade and reporting coverage.
+   - [ ] Add compile checks for selected scene/resource helpers and generated
+     APIs.
+   - [ ] Confirm generated reports explain remaining scene/resource skips.
    - [ ] Keep generated output deterministic.
 
-7. Validate before moving to the next feature roadmap.
+6. Validate before moving to the next feature roadmap.
    - [ ] Run make ci.
    - [ ] Confirm examples/game and examples/hello import only godot:godot.
    - [ ] Confirm no hidden ownership transfer, temporary Variant leak, broad
-     Callable binding, or raw offset poking was added.
+     scene-tree lifetime change, or raw offset poking was added.
    - [ ] Update this roadmap and the generated-class roadmap with completed
      status and the next feature candidate.
 
 ## Planned next iterations
 
-After the current animation/tween slice, pick one feature roadmap at a time:
+After the current scene/resource workflow slice, pick one feature roadmap at a time:
 
-1. More scene and resource workflows.
-   - Safer PackedScene instantiation, ResourceLoader coverage, selected resource
-     ownership-transfer APIs, and typed load helpers for common game assets.
-
-2. Broader 2D gameplay classes.
+1. Broader 2D gameplay classes.
    - TileMap/TileMapLayer, RayCast2D, Marker2D, Camera2D, NavigationAgent2D, and
      small physics/resource-dependent batches.
 
-3. More UI resource integration.
+2. More UI resource integration.
    - Theme, Font, StyleBox, TextureButton, ProgressBar, and common Control APIs
      once resource lifetimes are proven.
 
-4. Higher-level class authoring code generation.
+3. Higher-level class authoring code generation.
    - Reduce method/property/signal/virtual registration boilerplate while
      preserving explicit callbacks, metadata lifetime, and unregistering.
 
-5. Error handling and diagnostics polish.
+4. Error handling and diagnostics polish.
    - More checked wrappers, clearer traps, generated support summaries, and
      better user-facing failure messages.
 
-6. Packaging and external project workflow.
+5. Packaging and external project workflow.
    - Template project, collection/LSP setup docs, release/versioning policy, and
      repeatable use from a separate Godot game repository.
 

@@ -198,6 +198,8 @@ InputEventMouseButton :: gclass.InputEventMouseButton
 InputEventMouseMotion :: gclass.InputEventMouseMotion
 Viewport :: gclass.Viewport
 SceneTree :: gclass.SceneTree
+AnimationPlayer :: gclass.AnimationPlayer
+Tween :: gclass.Tween
 
 // --- Core functions ---
 init :: gcore.init
@@ -1327,6 +1329,93 @@ scene_tree_get_node_count_in_group :: gclass.scene_tree_get_node_count_in_group
 scene_tree_get_current_scene :: gclass.scene_tree_get_current_scene
 scene_tree_is_multiplayer_poll_enabled :: gclass.scene_tree_is_multiplayer_poll_enabled
 
+animation_player_as_node :: gclass.animation_player_as_node
+animation_player_as_object :: gclass.animation_player_as_object
+object_is_animation_player :: gclass.object_is_animation_player
+object_try_as_animation_player :: gclass.object_try_as_animation_player
+node_is_animation_player :: gclass.node_is_animation_player
+node_try_as_animation_player :: gclass.node_try_as_animation_player
+animation_player_animation_set_next :: gclass.animation_player_animation_set_next
+animation_player_animation_get_next :: gclass.animation_player_animation_get_next
+animation_player_set_blend_time :: gclass.animation_player_set_blend_time
+animation_player_get_blend_time :: gclass.animation_player_get_blend_time
+animation_player_set_default_blend_time :: gclass.animation_player_set_default_blend_time
+animation_player_get_default_blend_time :: gclass.animation_player_get_default_blend_time
+animation_player_set_auto_capture :: gclass.animation_player_set_auto_capture
+animation_player_is_auto_capture :: gclass.animation_player_is_auto_capture
+animation_player_set_auto_capture_duration :: gclass.animation_player_set_auto_capture_duration
+animation_player_get_auto_capture_duration :: gclass.animation_player_get_auto_capture_duration
+animation_player_play :: gclass.animation_player_play
+animation_player_play_backwards :: gclass.animation_player_play_backwards
+animation_player_pause :: gclass.animation_player_pause
+animation_player_stop :: gclass.animation_player_stop
+animation_player_stop_default :: gclass.animation_player_stop_default
+animation_player_is_playing :: gclass.animation_player_is_playing
+animation_player_is_animation_active :: gclass.animation_player_is_animation_active
+animation_player_set_current_animation :: gclass.animation_player_set_current_animation
+animation_player_get_current_animation :: gclass.animation_player_get_current_animation
+animation_player_set_assigned_animation :: gclass.animation_player_set_assigned_animation
+animation_player_get_assigned_animation :: gclass.animation_player_get_assigned_animation
+animation_player_queue :: gclass.animation_player_queue
+animation_player_clear_queue :: gclass.animation_player_clear_queue
+animation_player_set_speed_scale :: gclass.animation_player_set_speed_scale
+animation_player_get_speed_scale :: gclass.animation_player_get_speed_scale
+animation_player_get_playing_speed :: gclass.animation_player_get_playing_speed
+animation_player_set_autoplay :: gclass.animation_player_set_autoplay
+animation_player_get_autoplay :: gclass.animation_player_get_autoplay
+animation_player_set_movie_quit_on_finish_enabled ::
+	gclass.animation_player_set_movie_quit_on_finish_enabled
+animation_player_is_movie_quit_on_finish_enabled ::
+	gclass.animation_player_is_movie_quit_on_finish_enabled
+animation_player_get_current_animation_position ::
+	gclass.animation_player_get_current_animation_position
+animation_player_get_current_animation_length ::
+	gclass.animation_player_get_current_animation_length
+animation_player_reset_section :: gclass.animation_player_reset_section
+animation_player_get_section_start_time :: gclass.animation_player_get_section_start_time
+animation_player_get_section_end_time :: gclass.animation_player_get_section_end_time
+animation_player_has_section :: gclass.animation_player_has_section
+animation_player_seek :: gclass.animation_player_seek
+animation_player_seek_default :: gclass.animation_player_seek_default
+animation_player_set_process_callback :: gclass.animation_player_set_process_callback
+animation_player_get_process_callback :: gclass.animation_player_get_process_callback
+animation_player_set_method_call_mode :: gclass.animation_player_set_method_call_mode
+animation_player_get_method_call_mode :: gclass.animation_player_get_method_call_mode
+animation_player_set_root :: gclass.animation_player_set_root
+animation_player_get_root :: gclass.animation_player_get_root
+
+scene_tree_create_tween :: gclass.scene_tree_create_tween
+tween_as_ref_counted :: gclass.tween_as_ref_counted
+tween_as_object :: gclass.tween_as_object
+object_is_tween :: gclass.object_is_tween
+object_try_as_tween :: gclass.object_try_as_tween
+ref_counted_is_tween :: gclass.ref_counted_is_tween
+ref_counted_try_as_tween :: gclass.ref_counted_try_as_tween
+tween_custom_step :: gclass.tween_custom_step
+tween_stop :: gclass.tween_stop
+tween_pause :: gclass.tween_pause
+tween_play :: gclass.tween_play
+tween_kill :: gclass.tween_kill
+tween_get_total_elapsed_time :: gclass.tween_get_total_elapsed_time
+tween_has_tweeners :: gclass.tween_has_tweeners
+tween_is_running :: gclass.tween_is_running
+tween_is_valid :: gclass.tween_is_valid
+tween_bind_node :: gclass.tween_bind_node
+tween_set_process_mode :: gclass.tween_set_process_mode
+tween_set_pause_mode :: gclass.tween_set_pause_mode
+tween_set_ignore_time_scale :: gclass.tween_set_ignore_time_scale
+tween_set_ignore_time_scale_default :: gclass.tween_set_ignore_time_scale_default
+tween_set_parallel :: gclass.tween_set_parallel
+tween_set_parallel_default :: gclass.tween_set_parallel_default
+tween_set_loops :: gclass.tween_set_loops
+tween_set_loops_default :: gclass.tween_set_loops_default
+tween_get_loops_left :: gclass.tween_get_loops_left
+tween_set_speed_scale :: gclass.tween_set_speed_scale
+tween_set_trans :: gclass.tween_set_trans
+tween_set_ease :: gclass.tween_set_ease
+tween_parallel :: gclass.tween_parallel
+tween_chain :: gclass.tween_chain
+
 // --- Borrowed object handle helpers ---
 object_ptr_is_nil :: proc "contextless" (self: ObjectPtr) -> bool {
 	return self == nil
@@ -1473,6 +1562,14 @@ viewport_is_nil :: proc "contextless" (self: Viewport) -> bool {
 }
 
 scene_tree_is_nil :: proc "contextless" (self: SceneTree) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+animation_player_is_nil :: proc "contextless" (self: AnimationPlayer) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+tween_is_nil :: proc "contextless" (self: Tween) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -1664,6 +1761,69 @@ node_get_node_as_timer :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Timer(nil), false
 	return node_try_as_timer(node)
+}
+
+node_get_node_as_animation_player :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: AnimationPlayer,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return AnimationPlayer(nil), false
+	return node_try_as_animation_player(node)
+}
+
+animation_player_play_checked :: proc "contextless" (
+	self: AnimationPlayer,
+	name: ^StringName,
+) -> bool {
+	if animation_player_is_nil(self) || name == nil do return false
+	animation_player_play(self, name, -1, 1, false)
+	return true
+}
+
+animation_player_stop_checked :: proc "contextless" (
+	self: AnimationPlayer,
+	keep_state := false,
+) -> bool {
+	if animation_player_is_nil(self) do return false
+	animation_player_stop(self, keep_state)
+	return true
+}
+
+animation_player_playing_checked :: proc "contextless" (
+	self: AnimationPlayer,
+) -> (
+	playing: bool,
+	ok: bool,
+) {
+	if animation_player_is_nil(self) do return false, false
+	return animation_player_is_playing(self), true
+}
+
+scene_tree_create_tween_checked :: proc "contextless" (
+	self: SceneTree,
+) -> (
+	value: Tween,
+	ok: bool,
+) {
+	if scene_tree_is_nil(self) do return Tween(nil), false
+	value = scene_tree_create_tween(self)
+	if tween_is_nil(value) do return Tween(nil), false
+	return value, true
+}
+
+tween_running_checked :: proc "contextless" (self: Tween) -> (running: bool, ok: bool) {
+	if tween_is_nil(self) do return false, false
+	return tween_is_running(self), true
+}
+
+tween_stop_checked :: proc "contextless" (self: Tween) -> bool {
+	if tween_is_nil(self) do return false
+	tween_stop(self)
+	return true
 }
 
 node_get_node_as_collision_object2d :: proc "contextless" (
@@ -2228,6 +2388,14 @@ scene_tree_object_ptr :: proc "contextless" (self: SceneTree) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+animation_player_object_ptr :: proc "contextless" (self: AnimationPlayer) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+tween_object_ptr :: proc "contextless" (self: Tween) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 object_ptr_try_as_ref_counted :: proc "contextless" (
 	self: ObjectPtr,
 ) -> (
@@ -2711,6 +2879,21 @@ object_ptr_try_as_scene_tree :: proc "contextless" (
 	return object_try_as_scene_tree(Object(self))
 }
 
+object_ptr_try_as_animation_player :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: AnimationPlayer,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_animation_player(Object(self))
+}
+
+object_ptr_try_as_tween :: proc "contextless" (self: ObjectPtr) -> (value: Tween, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_tween(Object(self))
+}
+
 // --- Class enums and constants ---
 ObjectConnectFlags :: gclass.ObjectConnectFlags
 ResourceDeepDuplicateMode :: gclass.ResourceDeepDuplicateMode
@@ -2744,6 +2927,12 @@ ControlMouseFilter :: gclass.ControlMouseFilter
 InputMouseMode :: gclass.InputMouseMode
 InputCursorShape :: gclass.InputCursorShape
 SceneTreeGroupCallFlags :: gclass.SceneTreeGroupCallFlags
+AnimationPlayerAnimationProcessCallback :: gclass.AnimationPlayerAnimationProcessCallback
+AnimationPlayerAnimationMethodCallMode :: gclass.AnimationPlayerAnimationMethodCallMode
+TweenTweenProcessMode :: gclass.TweenTweenProcessMode
+TweenTweenPauseMode :: gclass.TweenTweenPauseMode
+TweenTransitionType :: gclass.TweenTransitionType
+TweenEaseType :: gclass.TweenEaseType
 object_notification_postinitialize :: gclass.object_notification_postinitialize
 object_notification_predelete :: gclass.object_notification_predelete
 object_notification_extension_reloaded :: gclass.object_notification_extension_reloaded

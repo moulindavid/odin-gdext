@@ -1046,6 +1046,8 @@ selected_class_names := []string {
 	"InputEventMouseMotion",
 	"Viewport",
 	"SceneTree",
+	"AnimationPlayer",
+	"Tween",
 }
 
 candidate_class_names := []string {
@@ -1561,6 +1563,70 @@ selected_class_methods := []Selected_Class_Method {
 	{"SceneTree", "get_node_count_in_group"},
 	{"SceneTree", "get_current_scene"},
 	{"SceneTree", "is_multiplayer_poll_enabled"},
+	{"AnimationPlayer", "animation_set_next"},
+	{"AnimationPlayer", "animation_get_next"},
+	{"AnimationPlayer", "set_blend_time"},
+	{"AnimationPlayer", "get_blend_time"},
+	{"AnimationPlayer", "set_default_blend_time"},
+	{"AnimationPlayer", "get_default_blend_time"},
+	{"AnimationPlayer", "set_auto_capture"},
+	{"AnimationPlayer", "is_auto_capture"},
+	{"AnimationPlayer", "set_auto_capture_duration"},
+	{"AnimationPlayer", "get_auto_capture_duration"},
+	{"AnimationPlayer", "play"},
+	{"AnimationPlayer", "play_backwards"},
+	{"AnimationPlayer", "pause"},
+	{"AnimationPlayer", "stop"},
+	{"AnimationPlayer", "is_playing"},
+	{"AnimationPlayer", "is_animation_active"},
+	{"AnimationPlayer", "set_current_animation"},
+	{"AnimationPlayer", "get_current_animation"},
+	{"AnimationPlayer", "set_assigned_animation"},
+	{"AnimationPlayer", "get_assigned_animation"},
+	{"AnimationPlayer", "queue"},
+	{"AnimationPlayer", "clear_queue"},
+	{"AnimationPlayer", "set_speed_scale"},
+	{"AnimationPlayer", "get_speed_scale"},
+	{"AnimationPlayer", "get_playing_speed"},
+	{"AnimationPlayer", "set_autoplay"},
+	{"AnimationPlayer", "get_autoplay"},
+	{"AnimationPlayer", "set_movie_quit_on_finish_enabled"},
+	{"AnimationPlayer", "is_movie_quit_on_finish_enabled"},
+	{"AnimationPlayer", "get_current_animation_position"},
+	{"AnimationPlayer", "get_current_animation_length"},
+	{"AnimationPlayer", "reset_section"},
+	{"AnimationPlayer", "get_section_start_time"},
+	{"AnimationPlayer", "get_section_end_time"},
+	{"AnimationPlayer", "has_section"},
+	{"AnimationPlayer", "seek"},
+	{"AnimationPlayer", "set_process_callback"},
+	{"AnimationPlayer", "get_process_callback"},
+	{"AnimationPlayer", "set_method_call_mode"},
+	{"AnimationPlayer", "get_method_call_mode"},
+	{"AnimationPlayer", "set_root"},
+	{"AnimationPlayer", "get_root"},
+	{"SceneTree", "create_tween"},
+	{"Tween", "custom_step"},
+	{"Tween", "stop"},
+	{"Tween", "pause"},
+	{"Tween", "play"},
+	{"Tween", "kill"},
+	{"Tween", "get_total_elapsed_time"},
+	{"Tween", "has_tweeners"},
+	{"Tween", "is_running"},
+	{"Tween", "is_valid"},
+	{"Tween", "bind_node"},
+	{"Tween", "set_process_mode"},
+	{"Tween", "set_pause_mode"},
+	{"Tween", "set_ignore_time_scale"},
+	{"Tween", "set_parallel"},
+	{"Tween", "set_loops"},
+	{"Tween", "get_loops_left"},
+	{"Tween", "set_speed_scale"},
+	{"Tween", "set_trans"},
+	{"Tween", "set_ease"},
+	{"Tween", "parallel"},
+	{"Tween", "chain"},
 }
 
 is_selected_class :: proc(name: string) -> bool {
@@ -1972,6 +2038,33 @@ class_method_has_type :: proc(method: ExtensionApiClassMethod, type_name: string
 		if arg.type == type_name do return true
 	}
 	return false
+}
+
+
+class_method_animation_tween_blocker_kind :: proc(
+	class_name: string,
+	method: ExtensionApiClassMethod,
+) -> string {
+	if class_name == "AnimationPlayer" {
+		if class_method_has_type(method, "Animation") ||
+		   class_method_has_type(method, "AnimationLibrary") {
+			return "animation-resource"
+		}
+		if class_method_uses_callable_or_signal(method) do return "animation-callback"
+		return "animation"
+	}
+	if class_name == "Tween" ||
+	   class_method_has_type(method, "Tween") ||
+	   strings.has_suffix(method.return_value.type, "Tweener") {
+		if class_method_uses_callable_or_signal(method) do return "tween-callback"
+		if method.name == "tween_property" ||
+		   method.name == "tween_method" ||
+		   method.name == "interpolate_value" {
+			return "tween-variant"
+		}
+		return "tween"
+	}
+	return ""
 }
 
 class_method_resource_asset_blocker_kind :: proc(
@@ -2835,6 +2928,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&viewport_ownership_blockers)
 	event_construction_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&event_construction_blockers)
+	animation_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&animation_blockers)
+	tween_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&tween_blockers)
 
 	generated_count := 0
 	owned_wrapper_count := 0
@@ -2868,6 +2965,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	viewport_resource_blocker_count := 0
 	viewport_ownership_blocker_count := 0
 	event_construction_blocker_count := 0
+	animation_blocker_count := 0
+	tween_blocker_count := 0
 
 	for class_name in selected_class_names {
 		if singleton_name, singleton_ok := selected_singleton_for_class(root, class_name);
@@ -3083,6 +3182,23 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					)
 					event_construction_blocker_count += 1
 				}
+				animation_tween_kind := class_method_animation_tween_blocker_kind(
+					class.name,
+					method,
+				)
+				if strings.has_prefix(animation_tween_kind, "animation") {
+					emit_class_method_blocker_line(
+						&animation_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					animation_blocker_count += 1
+				} else if strings.has_prefix(animation_tween_kind, "tween") {
+					emit_class_method_blocker_line(&tween_blockers, "", class.name, method, reason)
+					tween_blocker_count += 1
+				}
 				if class.name == "Input" {
 					strings.write_string(&input_blockers, "- ")
 					emit_class_method_report_signature(&input_blockers, class.name, method)
@@ -3280,6 +3396,29 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					)
 					event_construction_blocker_count += 1
 				}
+				animation_tween_kind := class_method_animation_tween_blocker_kind(
+					class.name,
+					method,
+				)
+				if strings.has_prefix(animation_tween_kind, "animation") {
+					emit_class_method_blocker_line(
+						&animation_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					animation_blocker_count += 1
+				} else if strings.has_prefix(animation_tween_kind, "tween") {
+					emit_class_method_blocker_line(
+						&tween_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					tween_blocker_count += 1
+				}
 				if class_method_is_ui_report_class(class.name) {
 					strings.write_string(&ui_blockers, "- candidate ")
 					emit_class_method_report_signature(&ui_blockers, class.name, method)
@@ -3338,6 +3477,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Viewport resource blockers: %d\n", viewport_resource_blocker_count)
 	fmt.sbprintf(&b, "- Viewport ownership blockers: %d\n", viewport_ownership_blocker_count)
 	fmt.sbprintf(&b, "- Event construction blockers: %d\n", event_construction_blocker_count)
+	fmt.sbprintf(&b, "- Animation blockers: %d\n", animation_blocker_count)
+	fmt.sbprintf(&b, "- Tween blockers: %d\n", tween_blocker_count)
 	fmt.sbprintf(&b, "- Borrowed-safe candidate methods: %d\n", candidate_safe_count)
 	fmt.sbprintf(&b, "- Owned-wrapper candidate methods: %d\n", candidate_owned_wrapper_count)
 	fmt.sbprintf(&b, "- Skipped candidate methods: %d\n\n", candidate_skipped_count)
@@ -3395,6 +3536,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(viewport_ownership_blockers))
 	strings.write_string(&b, "\n## Event construction blockers\n\n")
 	strings.write_string(&b, strings.to_string(event_construction_blockers))
+	strings.write_string(&b, "\n## Animation blockers\n\n")
+	strings.write_string(&b, strings.to_string(animation_blockers))
+	strings.write_string(&b, "\n## Tween blockers\n\n")
+	strings.write_string(&b, strings.to_string(tween_blockers))
 	strings.write_string(&b, "\n## Candidate class analysis\n\n")
 	strings.write_string(&b, strings.to_string(candidate_analysis))
 

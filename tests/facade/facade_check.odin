@@ -93,6 +93,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	input_event_mouse_motion: gt.InputEventMouseMotion,
 	viewport: gt.Viewport,
 	scene_tree: gt.SceneTree,
+	animation_player: gt.AnimationPlayer,
+	tween: gt.Tween,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
@@ -825,6 +827,8 @@ class_facade_compile_smoke :: proc "contextless" (
 		gt.input_event_mouse_motion_object_ptr(input_event_mouse_motion),
 	)
 	_, _ = gt.object_ptr_try_as_viewport(gt.viewport_object_ptr(viewport))
+	_, _ = gt.object_ptr_try_as_animation_player(gt.animation_player_object_ptr(animation_player))
+	_, _ = gt.object_ptr_try_as_tween(gt.tween_object_ptr(tween))
 	_, _ = gt.input_event_try_key(input_event)
 	_, _ = gt.input_event_try_mouse_button(input_event)
 	_, _ = gt.input_event_try_mouse_motion(input_event)
@@ -870,6 +874,69 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.scene_tree_is_multiplayer_poll_enabled(scene_tree)
 	_ = gt.object_is_scene_tree(object)
 	_, _ = gt.object_try_as_scene_tree(object)
+	_ = gt.scene_tree_create_tween(scene_tree)
+	_, _ = gt.scene_tree_create_tween_checked(scene_tree)
+	_ = gt.animation_player_as_node(animation_player)
+	_ = gt.animation_player_as_object(animation_player)
+	_ = gt.object_is_animation_player(object)
+	_, _ = gt.object_try_as_animation_player(object)
+	_, _ = gt.node_try_as_animation_player(node)
+	gt.animation_player_set_default_blend_time(animation_player, 0.1)
+	_ = gt.animation_player_get_default_blend_time(animation_player)
+	gt.animation_player_set_auto_capture(animation_player, false)
+	_ = gt.animation_player_is_auto_capture(animation_player)
+	gt.animation_player_set_speed_scale(animation_player, 1)
+	_ = gt.animation_player_get_speed_scale(animation_player)
+	_ = gt.animation_player_get_playing_speed(animation_player)
+	gt.animation_player_pause(animation_player)
+	gt.animation_player_stop_default(animation_player)
+	_ = gt.animation_player_is_playing(animation_player)
+	_ = gt.animation_player_is_animation_active(animation_player)
+	gt.animation_player_seek_default(animation_player, 0)
+	gt.animation_player_set_process_callback(
+		animation_player,
+		gt.AnimationPlayerAnimationProcessCallback(0),
+	)
+	_ = gt.animation_player_get_process_callback(animation_player)
+	gt.animation_player_set_method_call_mode(
+		animation_player,
+		gt.AnimationPlayerAnimationMethodCallMode(0),
+	)
+	_ = gt.animation_player_get_method_call_mode(animation_player)
+	gt.animation_player_set_root(animation_player, &gt.NodePath{})
+	root_path := gt.animation_player_get_root(animation_player)
+	gt.node_path_free(&root_path)
+	_ = gt.animation_player_play_checked(animation_player, meta_name)
+	_ = gt.animation_player_stop_checked(animation_player)
+	_, _ = gt.animation_player_playing_checked(animation_player)
+	_, _ = gt.node_get_node_as_animation_player(node, &gt.NodePath{})
+	_ = gt.tween_as_ref_counted(tween)
+	_ = gt.tween_as_object(tween)
+	_, _ = gt.object_try_as_tween(object)
+	_, _ = gt.ref_counted_try_as_tween(ref_counted)
+	_ = gt.tween_custom_step(tween, 0)
+	gt.tween_stop(tween)
+	gt.tween_pause(tween)
+	gt.tween_play(tween)
+	gt.tween_kill(tween)
+	_ = gt.tween_get_total_elapsed_time(tween)
+	_ = gt.tween_has_tweeners(tween)
+	_ = gt.tween_is_running(tween)
+	_ = gt.tween_is_valid(tween)
+	_ = gt.tween_bind_node(tween, node)
+	_ = gt.tween_set_process_mode(tween, gt.TweenTweenProcessMode(0))
+	_ = gt.tween_set_pause_mode(tween, gt.TweenTweenPauseMode(0))
+	_ = gt.tween_set_ignore_time_scale_default(tween)
+	_ = gt.tween_set_parallel_default(tween)
+	_ = gt.tween_set_loops_default(tween)
+	_ = gt.tween_get_loops_left(tween)
+	_ = gt.tween_set_speed_scale(tween, 1)
+	_ = gt.tween_set_trans(tween, gt.TweenTransitionType(0))
+	_ = gt.tween_set_ease(tween, gt.TweenEaseType(0))
+	_ = gt.tween_parallel(tween)
+	_ = gt.tween_chain(tween)
+	_, _ = gt.tween_running_checked(tween)
+	_ = gt.tween_stop_checked(tween)
 
 	_ = gt.object_is_nil(object)
 	_ = gt.ref_counted_is_nil(ref_counted)
@@ -883,6 +950,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.object_ptr_is_nil(gt.node2d_object_ptr(node2d))
 	_ = gt.input_is_nil(input)
 	_ = gt.scene_tree_is_nil(scene_tree)
+	_ = gt.animation_player_is_nil(animation_player)
+	_ = gt.tween_is_nil(tween)
 	_ = gt.object_ptr_as_object(gt.node_object_ptr(node))
 	_ = gt.ref_counted_object_ptr(ref_counted)
 	_ = gt.resource_object_ptr(resource)
@@ -893,6 +962,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.timer_object_ptr(timer)
 	_ = gt.input_object_ptr(input)
 	_ = gt.scene_tree_object_ptr(scene_tree)
+	_ = gt.animation_player_object_ptr(animation_player)
+	_ = gt.tween_object_ptr(tween)
 	_ = gt.collision_object2d_object_ptr(collision_object2d)
 	_ = gt.area2d_object_ptr(area2d)
 	_ = gt.physics_body2d_object_ptr(physics_body2d)

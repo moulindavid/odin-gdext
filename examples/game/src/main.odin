@@ -248,6 +248,29 @@ configure_physics_nodes :: proc "contextless" (parent: gt.Node, damage: gt.Godot
 }
 
 
+configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: gt.GodotReal) {
+	animation_object := gt.construct_object(animation_player_class_name)
+	if player, player_ok := gt.object_ptr_try_as_animation_player(animation_object); player_ok {
+		gt.animation_player_set_default_blend_time(player, 0.05)
+		gt.animation_player_set_speed_scale(player, 1.0 + damage * 0.01)
+		gt.animation_player_set_auto_capture(player, false)
+		_ = gt.animation_player_get_default_blend_time(player)
+		_ = gt.animation_player_get_speed_scale(player)
+		_ = gt.animation_player_is_playing(player)
+		_ = gt.animation_player_stop_checked(player)
+		_ = gt.object_destroy_checked(gt.ObjectPtr(player))
+	} else if animation_object != nil {
+		_ = gt.object_destroy_checked(animation_object)
+	}
+
+	if !gt.scene_tree_is_nil(gt.node_get_tree(parent)) {
+		nil_tween := gt.Tween(nil)
+		_, _ = gt.tween_running_checked(nil_tween)
+		_ = gt.tween_stop_checked(nil_tween)
+	}
+}
+
+
 configure_ui_nodes :: proc "contextless" (
 	parent: gt.Node,
 	label: gt.Label,
@@ -419,6 +442,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 		texture, texture_loaded := ensure_icon_texture(self)
 		configure_ui_nodes(parent, label, damage, texture, texture_loaded)
 		configure_physics_nodes(parent, damage)
+		configure_animation_tween_nodes(parent, damage)
 
 		area_path := gt.node_path_from_utf8("DamageArea")
 		area, area_ok := gt.node_get_node_as_area2d(parent, &area_path)
@@ -433,7 +457,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 
 	_ = gt.label_set_text_utf8_checked(
 		label,
-		"Odin updated UI nodes, loaded a texture resource, armed a Timer, and configured physics nodes.",
+		"Odin updated UI nodes, loaded a texture resource, armed a Timer, configured physics nodes, and exercised animation/tween APIs.",
 	)
 	gt.label_set_horizontal_alignment(label, .horizontal_alignment_center)
 	gt.label_set_visible_ratio(label, 1)
@@ -470,12 +494,14 @@ character_body2d_class_name_data: gt.ClassName
 rigid_body2d_class_name_data: gt.ClassName
 static_body2d_class_name_data: gt.ClassName
 collision_shape2d_class_name_data: gt.ClassName
+animation_player_class_name_data: gt.ClassName
 game_class_name := gt.class_name_ptr(&game_name_data)
 game_parent_name := gt.class_name_ptr(&game_parent_name_data)
 character_body2d_class_name := gt.class_name_ptr(&character_body2d_class_name_data)
 rigid_body2d_class_name := gt.class_name_ptr(&rigid_body2d_class_name_data)
 static_body2d_class_name := gt.class_name_ptr(&static_body2d_class_name_data)
 collision_shape2d_class_name := gt.class_name_ptr(&collision_shape2d_class_name_data)
+animation_player_class_name := gt.class_name_ptr(&animation_player_class_name_data)
 
 empty_name_data: gt.StaticStringName
 empty_name := gt.const_static_string_name_ptr(&empty_name_data)
@@ -696,6 +722,10 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(
 		&collision_shape2d_class_name_data,
 		cstring("CollisionShape2D"),
+	)
+	gt.class_name_init_latin1_cstring(
+		&animation_player_class_name_data,
+		cstring("AnimationPlayer"),
 	)
 	gt.init_class_bindings()
 
