@@ -438,8 +438,18 @@ image_texture_as_object :: gclass.image_texture_as_object
 ref_counted_get_reference_count :: gclass.ref_counted_get_reference_count
 resource_get_path :: gclass.resource_get_path
 resource_get_rid :: gclass.resource_get_rid
+resource_set_name :: gclass.resource_set_name
+resource_get_name :: gclass.resource_get_name
 resource_set_local_to_scene :: gclass.resource_set_local_to_scene
 resource_is_local_to_scene :: gclass.resource_is_local_to_scene
+resource_get_local_scene :: gclass.resource_get_local_scene
+resource_set_id_for_path :: gclass.resource_set_id_for_path
+resource_get_id_for_path :: gclass.resource_get_id_for_path
+resource_is_built_in :: gclass.resource_is_built_in
+resource_generate_scene_unique_id :: gclass.resource_generate_scene_unique_id
+resource_set_scene_unique_id :: gclass.resource_set_scene_unique_id
+resource_get_scene_unique_id :: gclass.resource_get_scene_unique_id
+resource_emit_changed :: gclass.resource_emit_changed
 texture2d_get_mipmap_count :: gclass.texture2d_get_mipmap_count
 texture2d_get_width :: gclass.texture2d_get_width
 texture2d_get_height :: gclass.texture2d_get_height
@@ -458,19 +468,35 @@ node_get_child_count :: gclass.node_get_child_count
 node_get_child_count_default :: gclass.node_get_child_count_default
 node_get_child :: gclass.node_get_child
 node_get_child_default :: gclass.node_get_child_default
+node_get_children :: gclass.node_get_children
+node_get_children_default :: gclass.node_get_children_default
+node_find_child :: gclass.node_find_child
+node_find_child_default :: gclass.node_find_child_default
+node_find_children :: gclass.node_find_children
+node_find_children_default :: gclass.node_find_children_default
 node_is_inside_tree :: gclass.node_is_inside_tree
+node_is_part_of_edited_scene :: gclass.node_is_part_of_edited_scene
 node_get_path :: gclass.node_get_path
 node_is_ancestor_of :: gclass.node_is_ancestor_of
 node_get_path_to :: gclass.node_get_path_to
 node_get_path_to_default :: gclass.node_get_path_to_default
+node_add_to_group :: gclass.node_add_to_group
+node_add_to_group_default :: gclass.node_add_to_group_default
 node_remove_from_group :: gclass.node_remove_from_group
 node_is_in_group :: gclass.node_is_in_group
+node_get_tree_string :: gclass.node_get_tree_string
+node_get_tree_string_pretty :: gclass.node_get_tree_string_pretty
+node_set_scene_file_path :: gclass.node_set_scene_file_path
+node_get_scene_file_path :: gclass.node_get_scene_file_path
 node_set_process :: gclass.node_set_process
 node_is_processing :: gclass.node_is_processing
 node_get_process_delta_time :: gclass.node_get_process_delta_time
 node_set_physics_process :: gclass.node_set_physics_process
 node_is_physics_processing :: gclass.node_is_physics_processing
 node_get_physics_process_delta_time :: gclass.node_get_physics_process_delta_time
+node_set_scene_instance_load_placeholder :: gclass.node_set_scene_instance_load_placeholder
+node_get_scene_instance_load_placeholder :: gclass.node_get_scene_instance_load_placeholder
+node_is_node_ready :: gclass.node_is_node_ready
 canvas_item_set_visible :: gclass.canvas_item_set_visible
 canvas_item_is_visible :: gclass.canvas_item_is_visible
 canvas_item_is_visible_in_tree :: gclass.canvas_item_is_visible_in_tree
@@ -1144,6 +1170,14 @@ resource_loader_as_object :: gclass.resource_loader_as_object
 resource_loader_singleton_checked :: gclass.resource_loader_singleton_checked
 resource_loader_exists :: gclass.resource_loader_exists
 resource_loader_exists_default :: gclass.resource_loader_exists_default
+resource_loader_get_recognized_extensions_for_type ::
+	gclass.resource_loader_get_recognized_extensions_for_type
+resource_loader_set_abort_on_missing_resources ::
+	gclass.resource_loader_set_abort_on_missing_resources
+resource_loader_get_dependencies :: gclass.resource_loader_get_dependencies
+resource_loader_has_cached :: gclass.resource_loader_has_cached
+resource_loader_get_resource_uid :: gclass.resource_loader_get_resource_uid
+resource_loader_list_directory :: gclass.resource_loader_list_directory
 input_as_object :: gclass.input_as_object
 input_event_as_resource :: gclass.input_event_as_resource
 input_event_as_ref_counted :: gclass.input_event_as_ref_counted
@@ -1898,6 +1932,18 @@ owned_resource_try_as_image_texture :: proc "contextless" (
 	return resource_try_as_image_texture(owned_resource_handle(self))
 }
 
+// The returned PackedScene is a borrowed view of the owned resource. Keep the
+// OwnedResource alive while using the PackedScene handle.
+owned_resource_try_as_packed_scene :: proc "contextless" (
+	self: OwnedResource,
+) -> (
+	scene: PackedScene,
+	ok: bool,
+) {
+	if owned_resource_is_nil(self) do return {}, false
+	return resource_try_as_packed_scene(owned_resource_handle(self))
+}
+
 owned_resource_init_owned :: proc "contextless" (
 	handle: Resource,
 ) -> (
@@ -2139,6 +2185,52 @@ resource_loader_load_image_texture_owned :: proc "contextless" (
 	return owned, texture
 }
 
+// resource_loader_load_packed_scene_owned_checked loads a PackedScene and
+// returns a borrowed PackedScene view tied to the returned OwnedResource.
+resource_loader_load_packed_scene_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	scene: PackedScene,
+	err: CallError,
+	ok: bool,
+) {
+	owned, err, ok = resource_loader_load_owned_with_cache_mode_checked(
+		self,
+		path,
+		.cache_mode_reuse,
+		false,
+	)
+	if !call_error_ok(&err) || !ok do return {}, {}, err, false
+
+	scene_ok: bool
+	scene, scene_ok = owned_resource_try_as_packed_scene(owned)
+	if !scene_ok {
+		owned_resource_destroy(&owned)
+		return {}, {}, err, false
+	}
+	return owned, scene, err, true
+}
+
+resource_loader_load_packed_scene_owned :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	scene: PackedScene,
+) {
+	checked_err: CallError
+	checked_ok: bool
+	owned, scene, checked_err, checked_ok = resource_loader_load_packed_scene_owned_checked(
+		self,
+		path,
+	)
+	require_call_ok(&checked_err)
+	if !checked_ok do gcore._trap_nil_godot_function()
+	return owned, scene
+}
+
 packed_scene_instantiate_class_name_data: StaticStringName
 packed_scene_instantiate_method_name_data: StaticStringName
 packed_scene_instantiate_method_bind: gcore.MethodBindPtr
@@ -2206,6 +2298,46 @@ packed_scene_instantiate_node2d_checked :: proc "contextless" (
 	return
 }
 
+packed_scene_instantiate_child_checked :: proc "contextless" (
+	self: PackedScene,
+	parent: Node,
+) -> (
+	root: Node,
+	ok: bool,
+) {
+	if node_is_nil(parent) do return {}, false
+	root, ok = packed_scene_instantiate_node_checked(self)
+	if !ok do return {}, false
+	if !node_add_child_checked(parent, root) {
+		_ = object_destroy_checked(node_object_ptr(root))
+		return {}, false
+	}
+	return root, true
+}
+
+packed_scene_instantiate_child_as_node2d_checked :: proc "contextless" (
+	self: PackedScene,
+	parent: Node,
+) -> (
+	root: Node,
+	value: Node2D,
+	ok: bool,
+) {
+	if node_is_nil(parent) do return {}, {}, false
+	root, ok = packed_scene_instantiate_node_checked(self)
+	if !ok do return {}, {}, false
+	value, ok = node_try_as_node2d(root)
+	if !ok {
+		_ = object_destroy_checked(node_object_ptr(root))
+		return {}, {}, false
+	}
+	if !node_add_child_checked(parent, root) {
+		_ = object_destroy_checked(node_object_ptr(root))
+		return {}, {}, false
+	}
+	return root, value, true
+}
+
 node_add_child_class_name_data: StaticStringName
 node_add_child_method_name_data: StaticStringName
 node_add_child_method_bind: gcore.MethodBindPtr
@@ -2246,6 +2378,14 @@ node_add_child_checked :: proc "contextless" (parent: Node, child: Node) -> (ok:
 		cast(gcore.TypePtr)&internal,
 	)
 	return true
+}
+
+node_add_child_or_destroy_checked :: proc "contextless" (parent: Node, child: Node) -> bool {
+	if node_add_child_checked(parent, child) do return true
+	if !node_is_nil(child) {
+		_ = object_destroy_checked(node_object_ptr(child))
+	}
+	return false
 }
 
 node_object_ptr :: proc "contextless" (self: Node) -> ObjectPtr {

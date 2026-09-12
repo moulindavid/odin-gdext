@@ -99,47 +99,52 @@ These slices are complete and were validated with make ci when merged:
      helpers, deterministic blocker reporting, compile coverage, examples/game
      coverage, and full make ci validation.
 
-## Current goal: More scene and resource workflows
+13. More scene and resource workflows.
+   - Selected Resource, ResourceLoader, and Node scene/resource query wrappers,
+     explicit OwnedResource PackedScene loading helpers, checked scene
+     instantiate-and-add helpers, deterministic resource/scene blocker reporting,
+     examples/game workflow coverage, facade checks, and full make ci validation.
 
-Expand real gameplay workflows around loading and instantiating resources while
-preserving the borrowed-object default and explicit owned-resource rules. This
-slice should make common scene spawning and asset lookup more useful without
-opening broad ownership-transfer APIs.
+## Current goal: Broader 2D gameplay classes
 
-Keep this goal narrow. Prefer selected helper paths over broad generated
-coverage. Do not expose Resource.duplicate, broad PackedScene state mutation, or
-lifetime-sensitive scene-tree changes until ownership and destruction are clear.
+Expand selected generated coverage for common 2D gameplay nodes while preserving
+borrowed object handles and explicit ownership for resources and returned Godot
+values. This slice should make normal Odin gameplay code less dependent on raw
+Node2D plus physics basics.
 
-1. Audit scene and resource workflow gaps.
-   - [ ] Inspect PackedScene, ResourceLoader, Resource, Node, and SceneTree
-     methods needed for common spawn/load workflows.
-   - [ ] Classify borrowed-safe methods separately from ownership-transfer,
-     cache, threaded-loading, duplicate, and scene-tree lifetime-sensitive APIs.
-   - [ ] Keep generated report categories stable for scene/resource blockers.
+Keep this goal narrow. Prefer small class batches with clear borrowed-safe
+methods. Defer broad resource-heavy, signal-heavy, pathfinding-lifetime, and
+scene-tree mutation APIs until their safety models are explicit.
 
-2. Add selected generated scene/resource coverage.
-   - [ ] Add only borrowed-safe query/control wrappers that fit the current
-     Resource and OwnedResource model.
-   - [ ] Keep PackedScene.instantiate routed through explicit checked facade
-     helpers until ownership transfer is fully documented.
-   - [ ] Keep Resource.duplicate and broad scene-state APIs deferred.
+1. Audit 2D gameplay class gaps.
+   - [ ] Inspect Camera2D, Marker2D, RayCast2D, TileMap/TileMapLayer,
+     NavigationAgent2D, and related common 2D gameplay classes.
+   - [ ] Classify borrowed-safe transform/query/control methods separately from
+     resource-heavy, typed-container mutation, signal-heavy, and
+     lifetime-sensitive APIs.
+   - [ ] Add or refine generated report categories for 2D gameplay blockers.
 
-3. Improve facade helpers for common loading and spawning.
-   - [ ] Add or refine typed load helpers for selected Resource-derived handles.
-   - [ ] Add nil-safe checked spawn/add-child helper combinations for common
-     Node and Node2D workflows.
-   - [ ] Keep all returned object/class handles borrowed unless wrapped in
-     OwnedResource or another explicit owned type.
+2. Add selected generated 2D class coverage.
+   - [ ] Add a small set of class handles and checked casts for the safest
+     common classes first.
+   - [ ] Generate primitive, vector, enum, RID, and borrowed-object methods that
+     fit the current type mapping rules.
+   - [ ] Keep resource-owned and lifetime-sensitive methods skipped.
 
-4. Exercise workflows in examples.
-   - [ ] Update examples/game with deterministic resource/scene workflow usage.
+3. Add facade helpers for common 2D usage.
+   - [ ] Add nil-safe helpers where generated names are too low-level for common
+     camera, marker, or raycast usage.
+   - [ ] Keep object/class handles borrowed by value.
+   - [ ] Avoid hidden ownership transfers.
+
+4. Exercise the selected APIs in examples.
+   - [ ] Update examples/game with deterministic 2D gameplay usage.
    - [ ] Keep normal examples importing only godot:godot.
-   - [ ] Avoid CI behavior that depends on editor-only asset import side effects.
+   - [ ] Avoid headless-unstable timing or physics assumptions.
 
 5. Add facade and reporting coverage.
-   - [ ] Add compile checks for selected scene/resource helpers and generated
-     APIs.
-   - [ ] Confirm generated reports explain remaining scene/resource skips.
+   - [ ] Add compile checks for selected generated 2D APIs and helpers.
+   - [ ] Confirm generated reports explain remaining 2D gameplay skips.
    - [ ] Keep generated output deterministic.
 
 6. Validate before moving to the next feature roadmap.
@@ -152,25 +157,21 @@ lifetime-sensitive scene-tree changes until ownership and destruction are clear.
 
 ## Planned next iterations
 
-After the current scene/resource workflow slice, pick one feature roadmap at a time:
+After the current broader 2D gameplay slice, pick one feature roadmap at a time:
 
-1. Broader 2D gameplay classes.
-   - TileMap/TileMapLayer, RayCast2D, Marker2D, Camera2D, NavigationAgent2D, and
-     small physics/resource-dependent batches.
-
-2. More UI resource integration.
+1. More UI resource integration.
    - Theme, Font, StyleBox, TextureButton, ProgressBar, and common Control APIs
      once resource lifetimes are proven.
 
-3. Higher-level class authoring code generation.
+2. Higher-level class authoring code generation.
    - Reduce method/property/signal/virtual registration boilerplate while
      preserving explicit callbacks, metadata lifetime, and unregistering.
 
-4. Error handling and diagnostics polish.
+3. Error handling and diagnostics polish.
    - More checked wrappers, clearer traps, generated support summaries, and
      better user-facing failure messages.
 
-5. Packaging and external project workflow.
+4. Packaging and external project workflow.
    - Template project, collection/LSP setup docs, release/versioning policy, and
      repeatable use from a separate Godot game repository.
 

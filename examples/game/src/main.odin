@@ -405,25 +405,46 @@ roll_into_label_adapter_method :: proc "contextless" (
 		if loader, loader_ok := gt.resource_loader_singleton_checked(); loader_ok {
 			scene_path := gt.string_from_utf8("res://spawned_label.tscn")
 			defer gt.string_free(&scene_path)
-			loaded, _, loaded_ok := gt.resource_loader_load_owned_checked(loader, &scene_path)
+
+			_ = gt.resource_loader_exists_default(loader, &scene_path)
+			dependencies := gt.resource_loader_get_dependencies(loader, &scene_path)
+			gt.packed_string_array_free(&dependencies)
+			_ = gt.resource_loader_has_cached(loader, &scene_path)
+			_ = gt.resource_loader_get_resource_uid(loader, &scene_path)
+
+			res_dir := gt.string_from_utf8("res://")
+			directory_entries := gt.resource_loader_list_directory(loader, &res_dir)
+			gt.packed_string_array_free(&directory_entries)
+			gt.string_free(&res_dir)
+
+			loaded, packed, err, loaded_ok := gt.resource_loader_load_packed_scene_owned_checked(
+				loader,
+				&scene_path,
+			)
+			gt.require_call_ok(&err)
 			if loaded_ok {
 				defer gt.owned_resource_destroy(&loaded)
 				resource := gt.owned_resource_handle(loaded)
-				packed, packed_ok := gt.resource_try_as_packed_scene(resource)
-				if packed_ok && gt.packed_scene_can_instantiate(packed) {
-					spawned, spawned_ok := gt.packed_scene_instantiate_node_checked(packed)
+				resource_path := gt.resource_get_path(resource)
+				gt.string_free(&resource_path)
+				resource_name := gt.resource_get_name(resource)
+				gt.string_free(&resource_name)
+				_ = gt.resource_is_built_in(resource)
+				unique_id := gt.resource_get_scene_unique_id(resource)
+				gt.string_free(&unique_id)
+
+				if gt.packed_scene_can_instantiate(packed) {
+					spawned, spawned_ok := gt.packed_scene_instantiate_child_checked(
+						packed,
+						parent,
+					)
 					if spawned_ok {
-						if gt.node_add_child_checked(parent, spawned) {
-							if spawned_label, spawned_label_ok := gt.node_try_as_label(spawned);
-							   spawned_label_ok {
-								spawned_text := gt.string_from_utf8(
-									"Loaded and instantiated by Odin",
-								)
-								gt.label_set_text(spawned_label, &spawned_text)
-								gt.string_free(&spawned_text)
-							}
-						} else {
-							_ = gt.object_destroy_checked(gt.node_object_ptr(spawned))
+						if spawned_label, spawned_label_ok := gt.node_try_as_label(spawned);
+						   spawned_label_ok {
+							_ = gt.label_set_text_utf8_checked(
+								spawned_label,
+								"Loaded and instantiated by Odin helpers",
+							)
 						}
 					}
 				}
@@ -438,6 +459,14 @@ roll_into_label_adapter_method :: proc "contextless" (
 			gt.timer_set_one_shot(timer, true)
 			gt.timer_start_default(timer)
 		}
+
+		children := gt.node_get_children_default(parent)
+		gt.typed_array_free(&children)
+		tree_string := gt.node_get_tree_string_pretty(parent)
+		gt.string_free(&tree_string)
+		scene_file_path := gt.node_get_scene_file_path(parent)
+		gt.string_free(&scene_file_path)
+		_ = gt.node_is_node_ready(parent)
 
 		texture, texture_loaded := ensure_icon_texture(self)
 		configure_ui_nodes(parent, label, damage, texture, texture_loaded)
@@ -457,7 +486,7 @@ roll_into_label_adapter_method :: proc "contextless" (
 
 	_ = gt.label_set_text_utf8_checked(
 		label,
-		"Odin updated UI nodes, loaded a texture resource, armed a Timer, configured physics nodes, and exercised animation/tween APIs.",
+		"Odin updated UI nodes, loaded resources, spawned a scene, armed a Timer, configured physics nodes, and exercised animation/tween APIs.",
 	)
 	gt.label_set_horizontal_alignment(label, .horizontal_alignment_center)
 	gt.label_set_visible_ratio(label, 1)
