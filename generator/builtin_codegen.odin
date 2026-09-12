@@ -2900,8 +2900,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&scene_tree_blockers)
 	resource_loading_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&resource_loading_blockers)
+	resource_ownership_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&resource_ownership_blockers)
 	scene_instantiation_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&scene_instantiation_blockers)
+	scene_workflow_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&scene_workflow_blockers)
 	physics_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&physics_blockers)
 	ui_blockers := strings.builder_make(context.allocator)
@@ -2951,7 +2955,9 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	input_blocker_count := 0
 	scene_tree_blocker_count := 0
 	resource_loading_blocker_count := 0
+	resource_ownership_blocker_count := 0
 	scene_instantiation_blocker_count := 0
+	scene_workflow_blocker_count := 0
 	physics_blocker_count := 0
 	ui_blocker_count := 0
 	texture_blocker_count := 0
@@ -3109,6 +3115,25 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 						reason,
 					)
 					resource_cache_blocker_count += 1
+				}
+				if asset_kind == "resource" {
+					emit_class_method_blocker_line(
+						&resource_ownership_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					resource_ownership_blocker_count += 1
+				} else if asset_kind == "scene" {
+					emit_class_method_blocker_line(
+						&scene_workflow_blockers,
+						"",
+						class.name,
+						method,
+						reason,
+					)
+					scene_workflow_blocker_count += 1
 				}
 				if class_method_has_default_arguments(method) {
 					strings.write_string(&default_argument_blockers, "- ")
@@ -3339,6 +3364,25 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					)
 					resource_cache_blocker_count += 1
 				}
+				if asset_kind == "resource" {
+					emit_class_method_blocker_line(
+						&resource_ownership_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					resource_ownership_blocker_count += 1
+				} else if asset_kind == "scene" {
+					emit_class_method_blocker_line(
+						&scene_workflow_blockers,
+						"candidate ",
+						class.name,
+						method,
+						reason,
+					)
+					scene_workflow_blocker_count += 1
+				}
 				if class_method_uses_callable_or_signal(method) {
 					strings.write_string(&signal_callable_blockers, "- candidate ")
 					emit_class_method_report_signature(
@@ -3463,7 +3507,9 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Input blockers: %d\n", input_blocker_count)
 	fmt.sbprintf(&b, "- SceneTree blockers: %d\n", scene_tree_blocker_count)
 	fmt.sbprintf(&b, "- Resource-loading blockers: %d\n", resource_loading_blocker_count)
+	fmt.sbprintf(&b, "- Resource ownership blockers: %d\n", resource_ownership_blocker_count)
 	fmt.sbprintf(&b, "- Scene-instantiation blockers: %d\n", scene_instantiation_blocker_count)
+	fmt.sbprintf(&b, "- Scene workflow blockers: %d\n", scene_workflow_blocker_count)
 	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
 	fmt.sbprintf(&b, "- UI blockers: %d\n", ui_blocker_count)
 	fmt.sbprintf(&b, "- Texture blockers: %d\n", texture_blocker_count)
@@ -3508,8 +3554,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(scene_tree_blockers))
 	strings.write_string(&b, "\n## Resource-loading blockers\n\n")
 	strings.write_string(&b, strings.to_string(resource_loading_blockers))
+	strings.write_string(&b, "\n## Resource ownership blockers\n\n")
+	strings.write_string(&b, strings.to_string(resource_ownership_blockers))
 	strings.write_string(&b, "\n## Scene-instantiation blockers\n\n")
 	strings.write_string(&b, strings.to_string(scene_instantiation_blockers))
+	strings.write_string(&b, "\n## Scene workflow blockers\n\n")
+	strings.write_string(&b, strings.to_string(scene_workflow_blockers))
 	strings.write_string(&b, "\n## Physics blockers\n\n")
 	strings.write_string(&b, strings.to_string(physics_blockers))
 	strings.write_string(&b, "\n## UI blockers\n\n")
