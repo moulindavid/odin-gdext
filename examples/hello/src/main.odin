@@ -18,10 +18,7 @@ empty_hint := gt.registration_string_mut_ptr(&empty_hint_data)
 
 roll_math_name_data: gt.RegistrationStringName
 roll_math_name := gt.registration_string_name_mut_ptr(&roll_math_name_data)
-roll_math_method_storage: gt.ClassFixedMethodStorage
-roll_math_method_adapter := gt.ClassMethodGetGodotRealAdapter {
-	method = roll_math_adapter_method,
-}
+roll_math_method_storage: gt.ClassGetGodotRealMethodStorage
 
 speed_name_data: gt.RegistrationStringName
 speed_getter_name_data: gt.RegistrationStringName
@@ -29,13 +26,7 @@ speed_setter_name_data: gt.RegistrationStringName
 speed_name := gt.registration_string_name_mut_ptr(&speed_name_data)
 speed_getter_name := gt.registration_string_name_mut_ptr(&speed_getter_name_data)
 speed_setter_name := gt.registration_string_name_mut_ptr(&speed_setter_name_data)
-speed_property_storage: gt.ClassPrimitivePropertyStorage
-get_speed_method_adapter := gt.ClassMethodGetGodotRealAdapter {
-	method = get_speed_adapter_method,
-}
-set_speed_method_adapter := gt.ClassMethodSetGodotRealAdapter {
-	method = set_speed_adapter_method,
-}
+speed_property_storage: gt.ClassGodotRealPropertyStorage
 
 speed_changed_name_data: gt.RegistrationStringName
 speed_changed_value_name_data: gt.RegistrationStringName
@@ -169,23 +160,20 @@ register_classes :: proc() {
 	init_registration_metadata()
 
 	defaults := gt.class_member_defaults(empty_name, empty_hint)
-	roll_math_method := gt.class_method_get_godot_real(
+	roll_math_method := gt.class_method_get_godot_real_proc(
 		&roll_math_method_storage,
 		defaults,
 		roll_math_name,
-		&roll_math_method_adapter,
+		roll_math_adapter_method,
 	)
-	speed_property := gt.class_property_godot_real(
+	speed_property := gt.class_property_godot_real_proc(
 		&speed_property_storage,
-		gt.class_typed_property_descriptor(
-			defaults,
-			.Float,
-			speed_name,
-			speed_getter_name,
-			speed_setter_name,
-		),
-		&get_speed_method_adapter,
-		&set_speed_method_adapter,
+		defaults,
+		speed_name,
+		speed_getter_name,
+		speed_setter_name,
+		get_speed_adapter_method,
+		set_speed_adapter_method,
 	)
 	speed_changed_signal := gt.class_signal_1_godot_real(
 		&speed_changed_storage,
@@ -201,17 +189,18 @@ register_classes :: proc() {
 	}
 	properties := [1]gt.OdinClassProperty{speed_property.property}
 	signals := [1]gt.OdinClassSignal{speed_changed_signal}
-	builder := gt.class_builder_begin(
-		hello_class_name,
-		hello_parent_name,
-		create_instance,
-		free_instance,
-		notification_instance,
+	gt.class_authoring_register(
+		gt.ClassAuthoringDescriptor {
+			class_name = hello_class_name,
+			parent_class_name = hello_parent_name,
+			create_instance_func = create_instance,
+			free_instance_func = free_instance,
+			notification_func = notification_instance,
+			methods = methods[:],
+			properties = properties[:],
+			signals = signals[:],
+		},
 	)
-	gt.class_builder_methods(&builder, methods[:])
-	gt.class_builder_properties(&builder, properties[:])
-	gt.class_builder_signals(&builder, signals[:])
-	gt.class_builder_register(&builder)
 	gt.debug_print("[odin-gdext] HelloNode registered")
 }
 
