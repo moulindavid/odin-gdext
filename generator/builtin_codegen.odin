@@ -1061,6 +1061,9 @@ candidate_class_names := []string {
 	"Font",
 	"StyleBox",
 	"TextureButton",
+	"Range",
+	"ProgressBar",
+	"TextureProgressBar",
 	"TileMap",
 	"TileMapLayer",
 	"NavigationAgent2D",
@@ -2117,6 +2120,18 @@ class_method_is_ui_report_class :: proc(class_name: string) -> bool {
 	)
 }
 
+class_method_is_ui_resource_report_class :: proc(class_name: string) -> bool {
+	return(
+		class_name == "TextureButton" ||
+		class_name == "Range" ||
+		class_name == "ProgressBar" ||
+		class_name == "TextureProgressBar" ||
+		class_name == "Theme" ||
+		class_name == "Font" ||
+		class_name == "StyleBox" \
+	)
+}
+
 class_method_is_input_event_report_class :: proc(class_name: string) -> bool {
 	return strings.has_prefix(class_name, "InputEvent")
 }
@@ -3043,6 +3058,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	defer strings.builder_destroy(&gameplay_2d_blockers)
 	ui_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&ui_blockers)
+	ui_resource_blockers := strings.builder_make(context.allocator)
+	defer strings.builder_destroy(&ui_resource_blockers)
 	texture_blockers := strings.builder_make(context.allocator)
 	defer strings.builder_destroy(&texture_blockers)
 	audio_blockers := strings.builder_make(context.allocator)
@@ -3094,6 +3111,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	physics_blocker_count := 0
 	gameplay_2d_blocker_count := 0
 	ui_blocker_count := 0
+	ui_resource_blocker_count := 0
 	texture_blocker_count := 0
 	audio_blocker_count := 0
 	theme_font_stylebox_blocker_count := 0
@@ -3403,6 +3421,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&ui_blockers, ": %s\n", reason)
 					ui_blocker_count += 1
 				}
+				if class_method_is_ui_resource_report_class(class.name) {
+					strings.write_string(&ui_resource_blockers, "- ")
+					emit_class_method_report_signature(&ui_resource_blockers, class.name, method)
+					fmt.sbprintf(&ui_resource_blockers, ": %s\n", reason)
+					ui_resource_blocker_count += 1
+				}
 			}
 		}
 	}
@@ -3614,6 +3638,12 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 					fmt.sbprintf(&ui_blockers, ": %s\n", reason)
 					ui_blocker_count += 1
 				}
+				if class_method_is_ui_resource_report_class(class.name) {
+					strings.write_string(&ui_resource_blockers, "- candidate ")
+					emit_class_method_report_signature(&ui_resource_blockers, class.name, method)
+					fmt.sbprintf(&ui_resource_blockers, ": %s\n", reason)
+					ui_resource_blocker_count += 1
+				}
 			}
 		}
 		strings.write_byte(&candidate_analysis, '\n')
@@ -3658,6 +3688,7 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	fmt.sbprintf(&b, "- Physics blockers: %d\n", physics_blocker_count)
 	fmt.sbprintf(&b, "- 2D gameplay blockers: %d\n", gameplay_2d_blocker_count)
 	fmt.sbprintf(&b, "- UI blockers: %d\n", ui_blocker_count)
+	fmt.sbprintf(&b, "- UI resource blockers: %d\n", ui_resource_blocker_count)
 	fmt.sbprintf(&b, "- Texture blockers: %d\n", texture_blocker_count)
 	fmt.sbprintf(&b, "- Audio blockers: %d\n", audio_blocker_count)
 	fmt.sbprintf(&b, "- Theme/Font/StyleBox blockers: %d\n", theme_font_stylebox_blocker_count)
@@ -3712,6 +3743,8 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 	strings.write_string(&b, strings.to_string(gameplay_2d_blockers))
 	strings.write_string(&b, "\n## UI blockers\n\n")
 	strings.write_string(&b, strings.to_string(ui_blockers))
+	strings.write_string(&b, "\n## UI resource blockers\n\n")
+	strings.write_string(&b, strings.to_string(ui_resource_blockers))
 	strings.write_string(&b, "\n## Texture blockers\n\n")
 	strings.write_string(&b, strings.to_string(texture_blockers))
 	strings.write_string(&b, "\n## Audio blockers\n\n")
