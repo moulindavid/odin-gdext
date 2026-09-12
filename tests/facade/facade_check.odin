@@ -175,6 +175,30 @@ class_facade_compile_smoke :: proc "contextless" (
 		gt.registration_string_name_mut_ptr(registration_name),
 		&real2_adapter,
 	)
+	author_get_storage: gt.ClassGetGodotRealMethodStorage
+	author_set_storage: gt.ClassSetGodotRealMethodStorage
+	author_real2_storage: gt.ClassGodotReal2ToGodotRealMethodStorage
+	author_get_method := gt.class_method_get_godot_real_proc(
+		&author_get_storage,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		nil_method_get_real,
+	)
+	_ = gt.class_method_set_godot_real_proc(
+		&author_set_storage,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		nil_method_set_real,
+	)
+	_ = gt.class_method_godot_real2_to_godot_real_proc(
+		&author_real2_storage,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		nil_method_real2_real,
+	)
 	property_storage: gt.ClassPrimitivePropertyStorage
 	string_property_storage: gt.ClassPrimitivePropertyStorage
 	string_get_adapter := gt.ClassMethodGetStringAdapter {
@@ -195,6 +219,16 @@ class_facade_compile_smoke :: proc "contextless" (
 		property_desc,
 		&get_real_adapter,
 		&set_real_adapter,
+	)
+	author_property_storage: gt.ClassGodotRealPropertyStorage
+	author_property := gt.class_property_godot_real_proc(
+		&author_property_storage,
+		defaults,
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		gt.registration_string_name_mut_ptr(registration_name),
+		nil_method_get_real,
+		nil_method_set_real,
 	)
 	string_property_desc := gt.class_typed_property_descriptor(
 		defaults,
@@ -225,6 +259,24 @@ class_facade_compile_smoke :: proc "contextless" (
 		gt.registration_string_name_mut_ptr(registration_name),
 		gt.registration_string_name_mut_ptr(registration_name),
 	)
+	author_methods := [1]gt.OdinClassMethod{author_get_method}
+	author_properties := [1]gt.OdinClassProperty{author_property.property}
+	author_signals := [1]gt.OdinClassSignal {
+		gt.class_signal_0(gt.registration_string_name_ptr(registration_name)),
+	}
+	author_desc := gt.ClassAuthoringDescriptor {
+		class_name           = gt.class_registration_class_name(registration_names),
+		parent_class_name    = gt.class_registration_parent_name(registration_names),
+		create_instance_func = nil_proc_create_instance,
+		free_instance_func   = nil_proc_free_instance,
+		methods              = author_methods[:],
+		properties           = author_properties[:],
+		signals              = author_signals[:],
+	}
+	_ = gt.class_authoring_descriptor(author_desc)
+	_ = gt.class_authoring_builder(author_desc)
+	_ = gt.class_authoring_register
+	_ = gt.class_authoring_unregister
 	instance_data := FacadeInstanceData {
 		object = gt.ObjectPtr(object),
 	}
