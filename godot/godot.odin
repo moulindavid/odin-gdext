@@ -1932,6 +1932,18 @@ owned_resource_try_as_image_texture :: proc "contextless" (
 	return resource_try_as_image_texture(owned_resource_handle(self))
 }
 
+// The returned PackedScene is a borrowed view of the owned resource. Keep the
+// OwnedResource alive while using the PackedScene handle.
+owned_resource_try_as_packed_scene :: proc "contextless" (
+	self: OwnedResource,
+) -> (
+	scene: PackedScene,
+	ok: bool,
+) {
+	if owned_resource_is_nil(self) do return {}, false
+	return resource_try_as_packed_scene(owned_resource_handle(self))
+}
+
 owned_resource_init_owned :: proc "contextless" (
 	handle: Resource,
 ) -> (
@@ -2173,6 +2185,52 @@ resource_loader_load_image_texture_owned :: proc "contextless" (
 	return owned, texture
 }
 
+// resource_loader_load_packed_scene_owned_checked loads a PackedScene and
+// returns a borrowed PackedScene view tied to the returned OwnedResource.
+resource_loader_load_packed_scene_owned_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	scene: PackedScene,
+	err: CallError,
+	ok: bool,
+) {
+	owned, err, ok = resource_loader_load_owned_with_cache_mode_checked(
+		self,
+		path,
+		.cache_mode_reuse,
+		false,
+	)
+	if !call_error_ok(&err) || !ok do return {}, {}, err, false
+
+	scene_ok: bool
+	scene, scene_ok = owned_resource_try_as_packed_scene(owned)
+	if !scene_ok {
+		owned_resource_destroy(&owned)
+		return {}, {}, err, false
+	}
+	return owned, scene, err, true
+}
+
+resource_loader_load_packed_scene_owned :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+) -> (
+	owned: OwnedResource,
+	scene: PackedScene,
+) {
+	checked_err: CallError
+	checked_ok: bool
+	owned, scene, checked_err, checked_ok = resource_loader_load_packed_scene_owned_checked(
+		self,
+		path,
+	)
+	require_call_ok(&checked_err)
+	if !checked_ok do gcore._trap_nil_godot_function()
+	return owned, scene
+}
+
 packed_scene_instantiate_class_name_data: StaticStringName
 packed_scene_instantiate_method_name_data: StaticStringName
 packed_scene_instantiate_method_bind: gcore.MethodBindPtr
@@ -2240,6 +2298,46 @@ packed_scene_instantiate_node2d_checked :: proc "contextless" (
 	return
 }
 
+packed_scene_instantiate_child_checked :: proc "contextless" (
+	self: PackedScene,
+	parent: Node,
+) -> (
+	root: Node,
+	ok: bool,
+) {
+	if node_is_nil(parent) do return {}, false
+	root, ok = packed_scene_instantiate_node_checked(self)
+	if !ok do return {}, false
+	if !node_add_child_checked(parent, root) {
+		_ = object_destroy_checked(node_object_ptr(root))
+		return {}, false
+	}
+	return root, true
+}
+
+packed_scene_instantiate_child_as_node2d_checked :: proc "contextless" (
+	self: PackedScene,
+	parent: Node,
+) -> (
+	root: Node,
+	value: Node2D,
+	ok: bool,
+) {
+	if node_is_nil(parent) do return {}, {}, false
+	root, ok = packed_scene_instantiate_node_checked(self)
+	if !ok do return {}, {}, false
+	value, ok = node_try_as_node2d(root)
+	if !ok {
+		_ = object_destroy_checked(node_object_ptr(root))
+		return {}, {}, false
+	}
+	if !node_add_child_checked(parent, root) {
+		_ = object_destroy_checked(node_object_ptr(root))
+		return {}, {}, false
+	}
+	return root, value, true
+}
+
 node_add_child_class_name_data: StaticStringName
 node_add_child_method_name_data: StaticStringName
 node_add_child_method_bind: gcore.MethodBindPtr
@@ -2280,6 +2378,14 @@ node_add_child_checked :: proc "contextless" (parent: Node, child: Node) -> (ok:
 		cast(gcore.TypePtr)&internal,
 	)
 	return true
+}
+
+node_add_child_or_destroy_checked :: proc "contextless" (parent: Node, child: Node) -> bool {
+	if node_add_child_checked(parent, child) do return true
+	if !node_is_nil(child) {
+		_ = object_destroy_checked(node_object_ptr(child))
+	}
+	return false
 }
 
 node_object_ptr :: proc "contextless" (self: Node) -> ObjectPtr {
