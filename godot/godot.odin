@@ -438,8 +438,18 @@ image_texture_as_object :: gclass.image_texture_as_object
 ref_counted_get_reference_count :: gclass.ref_counted_get_reference_count
 resource_get_path :: gclass.resource_get_path
 resource_get_rid :: gclass.resource_get_rid
+resource_set_name :: gclass.resource_set_name
+resource_get_name :: gclass.resource_get_name
 resource_set_local_to_scene :: gclass.resource_set_local_to_scene
 resource_is_local_to_scene :: gclass.resource_is_local_to_scene
+resource_get_local_scene :: gclass.resource_get_local_scene
+resource_set_id_for_path :: gclass.resource_set_id_for_path
+resource_get_id_for_path :: gclass.resource_get_id_for_path
+resource_is_built_in :: gclass.resource_is_built_in
+resource_generate_scene_unique_id :: gclass.resource_generate_scene_unique_id
+resource_set_scene_unique_id :: gclass.resource_set_scene_unique_id
+resource_get_scene_unique_id :: gclass.resource_get_scene_unique_id
+resource_emit_changed :: gclass.resource_emit_changed
 texture2d_get_mipmap_count :: gclass.texture2d_get_mipmap_count
 texture2d_get_width :: gclass.texture2d_get_width
 texture2d_get_height :: gclass.texture2d_get_height
@@ -458,19 +468,35 @@ node_get_child_count :: gclass.node_get_child_count
 node_get_child_count_default :: gclass.node_get_child_count_default
 node_get_child :: gclass.node_get_child
 node_get_child_default :: gclass.node_get_child_default
+node_get_children :: gclass.node_get_children
+node_get_children_default :: gclass.node_get_children_default
+node_find_child :: gclass.node_find_child
+node_find_child_default :: gclass.node_find_child_default
+node_find_children :: gclass.node_find_children
+node_find_children_default :: gclass.node_find_children_default
 node_is_inside_tree :: gclass.node_is_inside_tree
+node_is_part_of_edited_scene :: gclass.node_is_part_of_edited_scene
 node_get_path :: gclass.node_get_path
 node_is_ancestor_of :: gclass.node_is_ancestor_of
 node_get_path_to :: gclass.node_get_path_to
 node_get_path_to_default :: gclass.node_get_path_to_default
+node_add_to_group :: gclass.node_add_to_group
+node_add_to_group_default :: gclass.node_add_to_group_default
 node_remove_from_group :: gclass.node_remove_from_group
 node_is_in_group :: gclass.node_is_in_group
+node_get_tree_string :: gclass.node_get_tree_string
+node_get_tree_string_pretty :: gclass.node_get_tree_string_pretty
+node_set_scene_file_path :: gclass.node_set_scene_file_path
+node_get_scene_file_path :: gclass.node_get_scene_file_path
 node_set_process :: gclass.node_set_process
 node_is_processing :: gclass.node_is_processing
 node_get_process_delta_time :: gclass.node_get_process_delta_time
 node_set_physics_process :: gclass.node_set_physics_process
 node_is_physics_processing :: gclass.node_is_physics_processing
 node_get_physics_process_delta_time :: gclass.node_get_physics_process_delta_time
+node_set_scene_instance_load_placeholder :: gclass.node_set_scene_instance_load_placeholder
+node_get_scene_instance_load_placeholder :: gclass.node_get_scene_instance_load_placeholder
+node_is_node_ready :: gclass.node_is_node_ready
 canvas_item_set_visible :: gclass.canvas_item_set_visible
 canvas_item_is_visible :: gclass.canvas_item_is_visible
 canvas_item_is_visible_in_tree :: gclass.canvas_item_is_visible_in_tree
@@ -1144,6 +1170,14 @@ resource_loader_as_object :: gclass.resource_loader_as_object
 resource_loader_singleton_checked :: gclass.resource_loader_singleton_checked
 resource_loader_exists :: gclass.resource_loader_exists
 resource_loader_exists_default :: gclass.resource_loader_exists_default
+resource_loader_get_recognized_extensions_for_type ::
+	gclass.resource_loader_get_recognized_extensions_for_type
+resource_loader_set_abort_on_missing_resources ::
+	gclass.resource_loader_set_abort_on_missing_resources
+resource_loader_get_dependencies :: gclass.resource_loader_get_dependencies
+resource_loader_has_cached :: gclass.resource_loader_has_cached
+resource_loader_get_resource_uid :: gclass.resource_loader_get_resource_uid
+resource_loader_list_directory :: gclass.resource_loader_list_directory
 input_as_object :: gclass.input_as_object
 input_event_as_resource :: gclass.input_event_as_resource
 input_event_as_ref_counted :: gclass.input_event_as_ref_counted
