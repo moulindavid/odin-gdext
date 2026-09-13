@@ -2368,6 +2368,7 @@ DiagnosticCode :: enum {
 	nil_resource_loader,
 	nil_packed_scene,
 	nil_path,
+	nil_signal_name,
 	call_error,
 	nil_return,
 	invalid_type,
@@ -2426,6 +2427,8 @@ diagnostic_code_text :: proc "contextless" (code: DiagnosticCode) -> string {
 		return "nil packed scene"
 	case .nil_path:
 		return "nil path"
+	case .nil_signal_name:
+		return "nil signal name"
 	case .call_error:
 		return "Godot call error"
 	case .nil_return:
@@ -2456,6 +2459,24 @@ import "core:fmt"
 
 debug_print :: proc(msg: string) {
 	fmt.println(msg)
+}
+
+debug_print_diagnostic :: proc(result: DiagnosticResult) {
+	if diagnostic_is_ok(result) do return
+	if result.descriptor.detail != "" {
+		fmt.printf(
+			"[odin-gdext] %s failed: %s (%s)\n",
+			result.descriptor.operation,
+			diagnostic_code_text(result.code),
+			result.descriptor.detail,
+		)
+		return
+	}
+	fmt.printf(
+		"[odin-gdext] %s failed: %s\n",
+		result.descriptor.operation,
+		diagnostic_code_text(result.code),
+	)
 }
 
 /*
