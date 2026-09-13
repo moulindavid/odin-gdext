@@ -869,6 +869,22 @@ class_facade_compile_smoke :: proc "contextless" (
 		&resource_load_path,
 	)
 	_ = gt.owned_resource_destroy(&loaded_resource)
+	diagnostic_desc := gt.diagnostic_descriptor("facade resource load", "compile smoke")
+	_ = gt.diagnostic_code_text(gt.DiagnosticCode.nil_return)
+	_ = gt.diagnostic_is_ok(gt.diagnostic_ok(diagnostic_desc))
+	_ = gt.diagnostic_failure(diagnostic_desc, .nil_path)
+	_, _, _, _ = gt.resource_loader_load_owned_with_cache_mode_diagnostic_checked(
+		resource_loader,
+		&resource_load_path,
+		.cache_mode_reuse,
+		false,
+		diagnostic_desc,
+	)
+	_, _, _, _, _ = gt.resource_loader_load_texture2d_owned_diagnostic_checked(
+		resource_loader,
+		&resource_load_path,
+		diagnostic_desc,
+	)
 	_ = gt.resource_loader_load_owned
 	_, _ = gt.owned_resource_try_as_packed_scene(gt.OwnedResource{})
 	loaded_scene_resource, loaded_scene, packed_err, packed_ok :=
@@ -878,8 +894,19 @@ class_facade_compile_smoke :: proc "contextless" (
 	if packed_ok {
 		gt.owned_resource_destroy(&loaded_scene_resource)
 	}
+	_, _, _, _, _ = gt.resource_loader_load_packed_scene_owned_diagnostic_checked(
+		resource_loader,
+		&resource_load_path,
+		diagnostic_desc,
+	)
 	_, _ = gt.resource_loader_load_packed_scene_owned(resource_loader, &resource_load_path)
+	_, _, _ = gt.packed_scene_instantiate_node_diagnostic_checked(packed_scene, diagnostic_desc)
 	_, _ = gt.packed_scene_instantiate_child_checked(packed_scene, node)
+	_, _, _ = gt.packed_scene_instantiate_child_diagnostic_checked(
+		packed_scene,
+		node,
+		diagnostic_desc,
+	)
 	_, _, _ = gt.packed_scene_instantiate_child_as_node2d_checked(packed_scene, node)
 	_ = gt.input_as_object(input)
 	_ = gt.input_is_anything_pressed(input)
@@ -2133,10 +2160,27 @@ signal_emission_facade_compile_smoke :: proc "contextless" (
 	signal_name: gt.ConstStringNamePtr,
 ) {
 	gt.init_signal_emission()
+	diagnostic_desc := gt.diagnostic_descriptor("facade signal emit")
 	err := gt.object_emit_signal_0_checked(object, signal_name)
 	_ = err
+	_, _, _ = gt.object_emit_signal_0_diagnostic_checked(object, signal_name, diagnostic_desc)
 	gt.object_emit_signal_0(object, signal_name)
 	err = gt.object_emit_signal_1_godot_real_checked(object, signal_name, 1.5)
 	_ = err
+	_, _, _ = gt.object_emit_signal_1_godot_real_diagnostic_checked(
+		object,
+		signal_name,
+		1.5,
+		diagnostic_desc,
+	)
+	_, signal_diag, _ := gt.object_emit_signal_2_godot_real_diagnostic_checked(
+		object,
+		signal_name,
+		1.5,
+		2.5,
+		diagnostic_desc,
+	)
+	_ = signal_diag
+	_ = gt.debug_print_diagnostic
 	gt.object_emit_signal_1_godot_real(object, signal_name, 1.5)
 }
