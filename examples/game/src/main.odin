@@ -60,6 +60,17 @@ game_ready :: proc(instance: gt.ClassInstancePtr, node: gt.Node, reversed: bool)
 		game_input_callbacks.input,
 	)
 	gt.debug_print("[odin-gdext] GameBrain ready virtual callback")
+	if loader, loader_ok := gt.resource_loader_singleton_checked(); loader_ok {
+		_, _, _, diagnostic, diagnostic_ok :=
+			gt.resource_loader_load_texture2d_owned_diagnostic_checked(
+				loader,
+				nil,
+				gt.diagnostic_descriptor("load optional texture", "nil path smoke"),
+			)
+		if !diagnostic_ok {
+			gt.debug_print_diagnostic(diagnostic)
+		}
+	}
 	gt.object_emit_signal_1_godot_real(self.object, damage_rolled_signal_name, self.difficulty)
 }
 
