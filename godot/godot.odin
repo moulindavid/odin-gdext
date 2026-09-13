@@ -139,6 +139,9 @@ PackedColorArrayStorage :: gcore.PackedColorArrayStorage
 PackedColorArray :: gcore.PackedColorArray
 StringRepr :: gcore.StringRepr
 GodotReal :: gcore.GodotReal
+DiagnosticCode :: gcore.DiagnosticCode
+DiagnosticDescriptor :: gcore.DiagnosticDescriptor
+DiagnosticResult :: gcore.DiagnosticResult
 Vector2 :: gcore.Vector2
 Vector3 :: gcore.Vector3
 Vector4 :: gcore.Vector4
@@ -220,6 +223,11 @@ Tween :: gclass.Tween
 init :: gcore.init
 construct_object :: gcore.construct_object
 debug_print :: gcore.debug_print
+diagnostic_descriptor :: gcore.diagnostic_descriptor
+diagnostic_ok :: gcore.diagnostic_ok
+diagnostic_failure :: gcore.diagnostic_failure
+diagnostic_is_ok :: gcore.diagnostic_is_ok
+diagnostic_code_text :: gcore.diagnostic_code_text
 is_nil :: gcore.is_nil
 global_get_singleton_checked :: gcore.global_get_singleton_checked
 global_get_singleton_or_trap :: gcore.global_get_singleton_or_trap
