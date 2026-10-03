@@ -2,8 +2,9 @@
 
 ## Long-term goal
 
-Build an Odin GDExtension library that feels close to godot-rust/gdext in
-capability while staying Odin-idiomatic:
+Build the Odin equivalent of [godot-rust/gdext](https://github.com/godot-rust/gdext):
+an idiomatic, safe, practical Godot 4 GDExtension library for real game
+development in Odin, while staying Odin-idiomatic and explicit about ownership.
 
 - safe low-level GDExtension bindings
 - explicit Godot value ownership and destruction rules
