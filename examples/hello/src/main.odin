@@ -8,30 +8,30 @@ HelloNodeData :: struct {
 }
 
 hello_names: gt.ClassRegistrationNames
-hello_class_name := gt.class_registration_class_name(&hello_names)
-hello_parent_name := gt.class_registration_parent_name(&hello_names)
+hello_class_name: gt.ConstStringNamePtr
+hello_parent_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.RegistrationStringName
-empty_name := gt.registration_string_name_mut_ptr(&empty_name_data)
+empty_name: gt.ConstStringNamePtr
 empty_hint_data: gt.RegistrationString
-empty_hint := gt.registration_string_mut_ptr(&empty_hint_data)
+empty_hint: gt.StringPtr
 
 roll_math_name_data: gt.RegistrationStringName
-roll_math_name := gt.registration_string_name_mut_ptr(&roll_math_name_data)
+roll_math_name: gt.ConstStringNamePtr
 roll_math_method_storage: gt.ClassGetGodotRealMethodStorage
 
 speed_name_data: gt.RegistrationStringName
 speed_getter_name_data: gt.RegistrationStringName
 speed_setter_name_data: gt.RegistrationStringName
-speed_name := gt.registration_string_name_mut_ptr(&speed_name_data)
-speed_getter_name := gt.registration_string_name_mut_ptr(&speed_getter_name_data)
-speed_setter_name := gt.registration_string_name_mut_ptr(&speed_setter_name_data)
+speed_name: gt.ConstStringNamePtr
+speed_getter_name: gt.ConstStringNamePtr
+speed_setter_name: gt.ConstStringNamePtr
 speed_property_storage: gt.ClassGodotRealPropertyStorage
 
 speed_changed_name_data: gt.RegistrationStringName
 speed_changed_value_name_data: gt.RegistrationStringName
-speed_changed_name := gt.registration_string_name_ptr(&speed_changed_name_data)
-speed_changed_value_name := gt.registration_string_name_mut_ptr(&speed_changed_value_name_data)
+speed_changed_name: gt.ConstStringNamePtr
+speed_changed_value_name: gt.ConstStringNamePtr
 speed_changed_storage: gt.ClassSignalStorage
 
 hello_instance_binding_callbacks := gt.InstanceBindingCallbacks{}
@@ -155,6 +155,17 @@ init_registration_metadata :: proc() {
 
 register_classes :: proc() {
 	context = gt.godot_context()
+	hello_class_name = gt.class_registration_class_name(&hello_names)
+	hello_parent_name = gt.class_registration_parent_name(&hello_names)
+	empty_name = gt.registration_string_name_mut_ptr(&empty_name_data)
+	empty_hint = gt.registration_string_mut_ptr(&empty_hint_data)
+	roll_math_name = gt.registration_string_name_mut_ptr(&roll_math_name_data)
+	speed_name = gt.registration_string_name_mut_ptr(&speed_name_data)
+	speed_getter_name = gt.registration_string_name_mut_ptr(&speed_getter_name_data)
+	speed_setter_name = gt.registration_string_name_mut_ptr(&speed_setter_name_data)
+	speed_changed_name = gt.registration_string_name_ptr(&speed_changed_name_data)
+	speed_changed_value_name = gt.registration_string_name_mut_ptr(&speed_changed_value_name_data)
+
 	gt.class_registration_names_init(&hello_names, cstring("HelloNode"), cstring("Node"))
 	gt.init_class_bindings()
 	init_registration_metadata()

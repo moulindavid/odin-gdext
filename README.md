@@ -13,7 +13,7 @@ via the *GDExtension* C API.
 
 ## Requirements
 
-- Odin compiler on `PATH` (currently validated with `dev-2026-07`).
+- Odin compiler on `PATH` (currently validated with `dev-2026-09`).
 - `odinfmt` on `PATH`.
 - Godot **4.7** on `PATH`.
 - Currently targets Godot 4.7's `float_64` API shape through `GodotReal`.

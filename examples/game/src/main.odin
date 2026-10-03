@@ -115,12 +115,15 @@ game_unhandled_input_event :: proc(
 	return game_input_event(instance, node, event)
 }
 
-game_virtuals := gt.node_virtual_callback_descriptor(ready = game_ready, process = game_process)
+game_virtuals := gt.NodeVirtualCallbackDescriptor {
+		ready   = game_ready,
+		process = game_process,
+	}
 
-game_input_callbacks := gt.node_input_event_callback_descriptor(
-	input = game_input_event,
-	unhandled_input = game_unhandled_input_event,
-)
+game_input_callbacks := gt.NodeInputEventCallbackDescriptor {
+		input           = game_input_event,
+		unhandled_input = game_unhandled_input_event,
+	}
 
 notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
@@ -648,32 +651,32 @@ ray_cast2d_class_name_data: gt.ClassName
 texture_button_class_name_data: gt.ClassName
 progress_bar_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
-game_class_name := gt.class_name_ptr(&game_name_data)
-game_parent_name := gt.class_name_ptr(&game_parent_name_data)
-character_body2d_class_name := gt.class_name_ptr(&character_body2d_class_name_data)
-rigid_body2d_class_name := gt.class_name_ptr(&rigid_body2d_class_name_data)
-static_body2d_class_name := gt.class_name_ptr(&static_body2d_class_name_data)
-collision_shape2d_class_name := gt.class_name_ptr(&collision_shape2d_class_name_data)
-camera2d_class_name := gt.class_name_ptr(&camera2d_class_name_data)
-marker2d_class_name := gt.class_name_ptr(&marker2d_class_name_data)
-ray_cast2d_class_name := gt.class_name_ptr(&ray_cast2d_class_name_data)
-texture_button_class_name := gt.class_name_ptr(&texture_button_class_name_data)
-progress_bar_class_name := gt.class_name_ptr(&progress_bar_class_name_data)
-animation_player_class_name := gt.class_name_ptr(&animation_player_class_name_data)
+game_class_name: gt.ConstStringNamePtr
+game_parent_name: gt.ConstStringNamePtr
+character_body2d_class_name: gt.ConstStringNamePtr
+rigid_body2d_class_name: gt.ConstStringNamePtr
+static_body2d_class_name: gt.ConstStringNamePtr
+collision_shape2d_class_name: gt.ConstStringNamePtr
+camera2d_class_name: gt.ConstStringNamePtr
+marker2d_class_name: gt.ConstStringNamePtr
+ray_cast2d_class_name: gt.ConstStringNamePtr
+texture_button_class_name: gt.ConstStringNamePtr
+progress_bar_class_name: gt.ConstStringNamePtr
+animation_player_class_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
-empty_name := gt.const_static_string_name_ptr(&empty_name_data)
+empty_name: gt.ConstStringNamePtr
 empty_str_data: gt.String
-empty_str := gt.const_string_ptr(&empty_str_data)
+empty_str: gt.ConstStringPtr
 
 roll_damage_method_name_data: gt.StaticStringName
-roll_damage_method_name := gt.const_static_string_name_ptr(&roll_damage_method_name_data)
+roll_damage_method_name: gt.ConstStringNamePtr
 roll_damage_return_info: gt.PropertyInfo
 roll_damage_method_info: gt.ClassMethodInfo
 roll_into_label_method_name_data: gt.StaticStringName
 roll_into_label_arg_name_data: gt.StaticStringName
-roll_into_label_method_name := gt.const_static_string_name_ptr(&roll_into_label_method_name_data)
-roll_into_label_arg_name := gt.const_static_string_name_ptr(&roll_into_label_arg_name_data)
+roll_into_label_method_name: gt.ConstStringNamePtr
+roll_into_label_arg_name: gt.ConstStringNamePtr
 roll_into_label_arg_info: gt.PropertyInfo
 roll_into_label_arg_meta := [1]gt.ClassMethodArgumentMetadata{.None}
 roll_into_label_method_info: gt.ClassMethodInfo
@@ -681,9 +684,9 @@ roll_into_label_method_info: gt.ClassMethodInfo
 difficulty_property_name_data: gt.StaticStringName
 difficulty_setter_name_data: gt.StaticStringName
 difficulty_getter_name_data: gt.StaticStringName
-difficulty_property_name := gt.const_static_string_name_ptr(&difficulty_property_name_data)
-difficulty_setter_name := gt.const_static_string_name_ptr(&difficulty_setter_name_data)
-difficulty_getter_name := gt.const_static_string_name_ptr(&difficulty_getter_name_data)
+difficulty_property_name: gt.ConstStringNamePtr
+difficulty_setter_name: gt.ConstStringNamePtr
+difficulty_getter_name: gt.ConstStringNamePtr
 difficulty_property_info: gt.PropertyInfo
 difficulty_get_return_info: gt.PropertyInfo
 difficulty_set_arg_info: gt.PropertyInfo
@@ -693,13 +696,24 @@ difficulty_set_method_info: gt.ClassMethodInfo
 
 damage_rolled_signal_name_data: gt.StaticStringName
 damage_rolled_arg_name_data: gt.StaticStringName
-damage_rolled_signal_name := gt.const_static_string_name_ptr(&damage_rolled_signal_name_data)
-damage_rolled_arg_name := gt.const_static_string_name_ptr(&damage_rolled_arg_name_data)
+damage_rolled_signal_name: gt.ConstStringNamePtr
+damage_rolled_arg_name: gt.ConstStringNamePtr
 damage_rolled_arg_info: gt.PropertyInfo
 
 game_instance_binding_callbacks := gt.InstanceBindingCallbacks{}
 
 register_methods :: proc() {
+	empty_name = gt.const_static_string_name_ptr(&empty_name_data)
+	empty_str = gt.const_string_ptr(&empty_str_data)
+	roll_damage_method_name = gt.const_static_string_name_ptr(&roll_damage_method_name_data)
+	roll_into_label_method_name = gt.const_static_string_name_ptr(
+		&roll_into_label_method_name_data,
+	)
+	roll_into_label_arg_name = gt.const_static_string_name_ptr(&roll_into_label_arg_name_data)
+	difficulty_property_name = gt.const_static_string_name_ptr(&difficulty_property_name_data)
+	difficulty_setter_name = gt.const_static_string_name_ptr(&difficulty_setter_name_data)
+	difficulty_getter_name = gt.const_static_string_name_ptr(&difficulty_getter_name_data)
+
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&roll_damage_method_name_data),
 		cstring("roll_damage"),
@@ -840,6 +854,9 @@ register_properties :: proc() {
 }
 
 register_signals :: proc() {
+	damage_rolled_signal_name = gt.const_static_string_name_ptr(&damage_rolled_signal_name_data)
+	damage_rolled_arg_name = gt.const_static_string_name_ptr(&damage_rolled_arg_name_data)
+
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&damage_rolled_signal_name_data),
 		cstring("damage_rolled"),
@@ -869,6 +886,19 @@ register_signals :: proc() {
 
 register_classes :: proc() {
 	context = gt.godot_context()
+	game_class_name = gt.class_name_ptr(&game_name_data)
+	game_parent_name = gt.class_name_ptr(&game_parent_name_data)
+	character_body2d_class_name = gt.class_name_ptr(&character_body2d_class_name_data)
+	rigid_body2d_class_name = gt.class_name_ptr(&rigid_body2d_class_name_data)
+	static_body2d_class_name = gt.class_name_ptr(&static_body2d_class_name_data)
+	collision_shape2d_class_name = gt.class_name_ptr(&collision_shape2d_class_name_data)
+	camera2d_class_name = gt.class_name_ptr(&camera2d_class_name_data)
+	marker2d_class_name = gt.class_name_ptr(&marker2d_class_name_data)
+	ray_cast2d_class_name = gt.class_name_ptr(&ray_cast2d_class_name_data)
+	texture_button_class_name = gt.class_name_ptr(&texture_button_class_name_data)
+	progress_bar_class_name = gt.class_name_ptr(&progress_bar_class_name_data)
+	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
+
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
 	gt.class_name_init_latin1_cstring(&game_parent_name_data, cstring("Node"))
 	gt.class_name_init_latin1_cstring(
