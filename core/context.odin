@@ -121,9 +121,6 @@ _allocator :: #force_inline proc "contextless" () -> (a: runtime.Allocator) {
 	return mem.Allocator{procedure = _allocator_proc}
 }
 
-@(private)
-_default_allocator := _allocator()
-
 // godot_context returns an Odin context whose persistent allocator is backed by
 // Godot. The temp allocator intentionally remains Odin's default thread-local
 // temp allocator; sharing one Godot-backed arena across callbacks is not safe.
@@ -131,6 +128,6 @@ _default_allocator := _allocator()
 // init/deinit, etc.).
 godot_context :: #force_inline proc "contextless" () -> (c: runtime.Context) {
 	c = runtime.default_context()
-	c.allocator = _default_allocator
+	c.allocator = _allocator()
 	return
 }

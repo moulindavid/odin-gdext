@@ -301,15 +301,15 @@ hello_process :: proc(
 	_ = gt.node_disable_process_callback(node)
 }
 
-hello_node_virtuals := gt.node_virtual_callback_descriptor(
-	ready = hello_ready,
+hello_node_virtuals := gt.NodeVirtualCallbackDescriptor {
+	ready   = hello_ready,
 	process = hello_process,
-)
+}
 
-hello_node_input_callbacks := gt.node_input_event_callback_descriptor(
-	input = hello_input_event,
+hello_node_input_callbacks := gt.NodeInputEventCallbackDescriptor {
+	input           = hello_input_event,
 	unhandled_input = hello_input_event,
-)
+}
 
 notification_func :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
@@ -418,32 +418,32 @@ set_speed_method_adapter := gt.ClassMethodSetGodotRealAdapter {
 }
 
 add_method_name_data: gt.StaticStringName
-add_method_name := gt.const_static_string_name_ptr(&add_method_name_data)
+add_method_name: gt.ConstStringNamePtr
 add_arg_info: [2]gt.PropertyInfo
 add_arg_meta := [2]gt.ClassMethodArgumentMetadata{.None, .None}
 add_return_info: gt.PropertyInfo
 add_method_info: gt.ClassMethodInfo
 
 add_arg_a_name_data: gt.StaticStringName
-add_arg_a_name := gt.const_static_string_name_ptr(&add_arg_a_name_data)
+add_arg_a_name: gt.ConstStringNamePtr
 add_arg_b_name_data: gt.StaticStringName
-add_arg_b_name := gt.const_static_string_name_ptr(&add_arg_b_name_data)
+add_arg_b_name: gt.ConstStringNamePtr
 roll_math_method_name_data: gt.StaticStringName
-roll_math_method_name := gt.const_static_string_name_ptr(&roll_math_method_name_data)
+roll_math_method_name: gt.ConstStringNamePtr
 roll_math_return_info: gt.PropertyInfo
 roll_math_method_info: gt.ClassMethodInfo
 
 empty_name_data: gt.StaticStringName
-empty_name := gt.const_static_string_name_ptr(&empty_name_data)
+empty_name: gt.ConstStringNamePtr
 empty_str_data: gt.String
-empty_str := gt.const_string_ptr(&empty_str_data)
+empty_str: gt.ConstStringPtr
 
 speed_property_name_data: gt.StaticStringName
 speed_setter_name_data: gt.StaticStringName
 speed_getter_name_data: gt.StaticStringName
-speed_property_name := gt.const_static_string_name_ptr(&speed_property_name_data)
-speed_setter_name := gt.const_static_string_name_ptr(&speed_setter_name_data)
-speed_getter_name := gt.const_static_string_name_ptr(&speed_getter_name_data)
+speed_property_name: gt.ConstStringNamePtr
+speed_setter_name: gt.ConstStringNamePtr
+speed_getter_name: gt.ConstStringNamePtr
 speed_property_info: gt.PropertyInfo
 speed_get_return_info: gt.PropertyInfo
 speed_set_arg_info: gt.PropertyInfo
@@ -452,14 +452,24 @@ speed_get_method_info: gt.ClassMethodInfo
 speed_set_method_info: gt.ClassMethodInfo
 
 pinged_signal_name_data: gt.StaticStringName
-pinged_signal_name := gt.const_static_string_name_ptr(&pinged_signal_name_data)
+pinged_signal_name: gt.ConstStringNamePtr
 speed_changed_signal_name_data: gt.StaticStringName
 speed_changed_arg_name_data: gt.StaticStringName
-speed_changed_signal_name := gt.const_static_string_name_ptr(&speed_changed_signal_name_data)
-speed_changed_arg_name := gt.const_static_string_name_ptr(&speed_changed_arg_name_data)
+speed_changed_signal_name: gt.ConstStringNamePtr
+speed_changed_arg_name: gt.ConstStringNamePtr
 speed_changed_arg_info: gt.PropertyInfo
 
 register_methods :: proc() {
+	add_method_name = gt.const_static_string_name_ptr(&add_method_name_data)
+	add_arg_a_name = gt.const_static_string_name_ptr(&add_arg_a_name_data)
+	add_arg_b_name = gt.const_static_string_name_ptr(&add_arg_b_name_data)
+	roll_math_method_name = gt.const_static_string_name_ptr(&roll_math_method_name_data)
+	empty_name = gt.const_static_string_name_ptr(&empty_name_data)
+	empty_str = gt.const_string_ptr(&empty_str_data)
+	speed_property_name = gt.const_static_string_name_ptr(&speed_property_name_data)
+	speed_setter_name = gt.const_static_string_name_ptr(&speed_setter_name_data)
+	speed_getter_name = gt.const_static_string_name_ptr(&speed_getter_name_data)
+
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&add_method_name_data),
 		cstring("add"),
@@ -627,6 +637,10 @@ register_properties :: proc() {
 }
 
 register_signals :: proc() {
+	pinged_signal_name = gt.const_static_string_name_ptr(&pinged_signal_name_data)
+	speed_changed_signal_name = gt.const_static_string_name_ptr(&speed_changed_signal_name_data)
+	speed_changed_arg_name = gt.const_static_string_name_ptr(&speed_changed_arg_name_data)
+
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&pinged_signal_name_data),
 		cstring("pinged"),
@@ -667,18 +681,18 @@ register_signals :: proc() {
 
 hello_name_data: gt.ClassName
 parent_name_data: gt.ClassName
-hello_class_name := gt.class_name_ptr(&hello_name_data)
-hello_parent_name := gt.class_name_ptr(&parent_name_data)
+hello_class_name: gt.ConstStringNamePtr
+hello_parent_name: gt.ConstStringNamePtr
 node_class_name_data: gt.ClassName
-node_class_name := gt.class_name_ptr(&node_class_name_data)
+node_class_name: gt.ConstStringNamePtr
 node2d_class_name_data: gt.ClassName
-node2d_class_name := gt.class_name_ptr(&node2d_class_name_data)
+node2d_class_name: gt.ConstStringNamePtr
 ref_counted_class_name_data: gt.ClassName
-ref_counted_class_name := gt.class_name_ptr(&ref_counted_class_name_data)
+ref_counted_class_name: gt.ConstStringNamePtr
 timer_class_name_data: gt.ClassName
-timer_class_name := gt.class_name_ptr(&timer_class_name_data)
+timer_class_name: gt.ConstStringNamePtr
 area2d_class_name_data: gt.ClassName
-area2d_class_name := gt.class_name_ptr(&area2d_class_name_data)
+area2d_class_name: gt.ConstStringNamePtr
 
 hello_instance_binding_callbacks := gt.InstanceBindingCallbacks {
 	create_callback    = nil,
@@ -689,6 +703,14 @@ hello_instance_binding_callbacks := gt.InstanceBindingCallbacks {
 register_classes :: proc() {
 	context = gt.godot_context()
 	gt.debug_print("[odin-gdext] Registering HelloNode...")
+
+	hello_class_name = gt.class_name_ptr(&hello_name_data)
+	hello_parent_name = gt.class_name_ptr(&parent_name_data)
+	node_class_name = gt.class_name_ptr(&node_class_name_data)
+	node2d_class_name = gt.class_name_ptr(&node2d_class_name_data)
+	ref_counted_class_name = gt.class_name_ptr(&ref_counted_class_name_data)
+	timer_class_name = gt.class_name_ptr(&timer_class_name_data)
+	area2d_class_name = gt.class_name_ptr(&area2d_class_name_data)
 
 	gt.class_name_init_latin1_cstring(&hello_name_data, cstring("HelloNode"))
 	gt.class_name_init_latin1_cstring(&parent_name_data, cstring("Node2D"))
