@@ -123,55 +123,65 @@ These slices are complete and were validated with make ci when merged:
      shortcut storage, hello example coverage through godot:godot, facade
      compile checks, and full make ci validation.
 
-## Current goal: Error handling and diagnostics polish
+17. Error handling and diagnostics polish.
+   - Added diagnostics audit notes, allocation-free diagnostic descriptors,
+     diagnostic variants for selected resource loading, scene instantiation, and
+     signal emission helpers, concise diagnostic printing, facade compile
+     coverage, examples/game diagnostic output, and full make ci validation.
 
-Make failures easier to diagnose without weakening the safety model. Prefer
-checked helpers and deterministic diagnostic text around already-supported API
-paths. Do not add broad exception-style handling or hide Godot CallError values
-behind implicit global state.
+## Current goal: Packaging and external project workflow
 
-1. Audit current checked and trapping helper coverage.
-   - [ ] Inspect object construction, method bind lookup, Variant call, signal
-     emission, resource loading, scene instantiation, and class registration
-     helpers.
-   - [ ] Identify places where callers only get `false` or a trap without enough
-     context to debug the failed Godot operation.
-   - [ ] Keep trap behavior for impossible nil function pointers and required
-     method binds.
+Make it easier to use odin-gdext from a separate Godot game repository. Focus on
+the practical local dependency workflow first: Odin collection setup, Zed/OLS
+configuration, a template Makefile, and a minimal external-project example. Do
+not add package-manager abstraction or release automation until the local path is
+stable.
 
-2. Add small diagnostic descriptors for common checked paths.
-   - [ ] Provide compact operation/context strings for selected checked helpers.
-   - [ ] Keep descriptors caller-owned or static and allocation-free.
-   - [ ] Preserve returned `CallError` values where the current API exposes them.
+1. Audit the current external project setup docs and examples.
+   - [ ] Review README, docs/USING_IN_GODOT.md, Makefile targets, and examples.
+   - [ ] Identify gaps for a separate `game` plus `game_odin` repository layout.
+   - [ ] Keep instructions aligned with `-collection:godot=/path/to/odin-gdext`.
 
-3. Improve selected checked helper failure messages.
-   - [ ] Start with resource loading, scene instantiation, object construction,
-     and signal emission paths used by examples.
-   - [ ] Avoid logging noisy success-path messages.
-   - [ ] Do not introduce hidden Variant ownership changes.
+2. Add a minimal external project template.
+   - [ ] Provide a small Odin source template with extension entrypoint, init,
+     deinit, and one simple class hook.
+   - [ ] Provide a Makefile template that builds a shared library into a Godot
+     project `bin/` directory.
+   - [ ] Keep generated `.gdextension` path conventions explicit.
 
-4. Add facade coverage for diagnostics helpers.
-   - [ ] Compile-check public diagnostic descriptor and checked helper APIs from
-     tests/facade.
-   - [ ] Keep normal examples importing only godot:godot.
+3. Document Zed/OLS collection setup.
+   - [ ] Explain how to make `import gt "godot:godot"` resolve in editor tooling.
+   - [ ] Include an `ols.json` or collection snippet suitable for a consumer
+     project.
+   - [ ] Avoid machine-specific paths except clearly marked examples.
 
-5. Exercise one diagnostic path in examples or smoke coverage.
-   - [ ] Prefer deterministic missing-resource or nil-object paths.
-   - [ ] Keep runtime output concise and useful.
+4. Add a repository-side validation target if useful.
+   - [ ] Add a Makefile target or script that checks the template compiles
+     against this checkout where practical.
+   - [ ] Keep CI impact reasonable and avoid requiring a second real repository.
+
+5. Update README and docs for current capabilities and limitations.
+   - [ ] Clarify what external users can build today.
+   - [ ] Document borrowed object handles, owned resources, and current missing
+     broad API areas at a high level.
 
 6. Validate before moving to the next feature roadmap.
    - [ ] Run make ci.
-   - [ ] Confirm no hidden ownership transfer, temporary Variant leak, broad
-     Resource lifetime change, or raw offset poking was added.
+   - [ ] Confirm normal examples import only godot:godot.
+   - [ ] Confirm no generated files or ignored template artifacts need to be
+     committed accidentally.
    - [ ] Update this roadmap with completed status and the next feature candidate.
 
 ## Planned next iterations
 
-After the current diagnostics slice, pick one feature roadmap at a time:
+After the current packaging slice, pick one feature roadmap at a time:
 
-1. Packaging and external project workflow.
-   - Template project, collection/LSP setup docs, release/versioning policy, and
-     repeatable use from a separate Godot game repository.
+1. Broader generated API coverage.
+   - Continue expanding selected safe Godot APIs based on real game needs.
+
+2. Release and versioning policy.
+   - Define supported Godot/Odin versions, generated API refresh cadence, and
+     changelog expectations.
 
 ## Deferred until the related safety model exists
 

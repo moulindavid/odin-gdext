@@ -280,6 +280,22 @@ object_emit_signal_0_checked :: proc "contextless" (
 	return object_emit_signal_variants_checked(object, signal_name, nil)
 }
 
+object_emit_signal_0_diagnostic_checked :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	desc: DiagnosticDescriptor,
+) -> (
+	err: CallError,
+	diagnostic: DiagnosticResult,
+	ok: bool,
+) {
+	if object == nil do return {}, diagnostic_failure(desc, .nil_object), false
+	if signal_name == nil do return {}, diagnostic_failure(desc, .nil_signal_name), false
+	err = object_emit_signal_0_checked(object, signal_name)
+	if !call_error_ok(&err) do return err, diagnostic_failure(desc, .call_error, err), false
+	return err, diagnostic_ok(desc), true
+}
+
 object_emit_signal_0 :: proc "contextless" (object: ObjectPtr, signal_name: ConstStringNamePtr) {
 	err := object_emit_signal_0_checked(object, signal_name)
 	require_call_ok(&err)
@@ -317,6 +333,23 @@ object_emit_signal_1_godot_real_checked :: proc "contextless" (
 	variant_free(&value_variant)
 	variant_free(&signal_variant)
 	return
+}
+
+object_emit_signal_1_godot_real_diagnostic_checked :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	value: GodotReal,
+	desc: DiagnosticDescriptor,
+) -> (
+	err: CallError,
+	diagnostic: DiagnosticResult,
+	ok: bool,
+) {
+	if object == nil do return {}, diagnostic_failure(desc, .nil_object), false
+	if signal_name == nil do return {}, diagnostic_failure(desc, .nil_signal_name), false
+	err = object_emit_signal_1_godot_real_checked(object, signal_name, value)
+	if !call_error_ok(&err) do return err, diagnostic_failure(desc, .call_error, err), false
+	return err, diagnostic_ok(desc), true
 }
 
 object_emit_signal_1_godot_real :: proc "contextless" (
@@ -365,6 +398,24 @@ object_emit_signal_2_godot_real_checked :: proc "contextless" (
 	variant_free(&a_variant)
 	variant_free(&signal_variant)
 	return
+}
+
+object_emit_signal_2_godot_real_diagnostic_checked :: proc "contextless" (
+	object: ObjectPtr,
+	signal_name: ConstStringNamePtr,
+	a: GodotReal,
+	b: GodotReal,
+	desc: DiagnosticDescriptor,
+) -> (
+	err: CallError,
+	diagnostic: DiagnosticResult,
+	ok: bool,
+) {
+	if object == nil do return {}, diagnostic_failure(desc, .nil_object), false
+	if signal_name == nil do return {}, diagnostic_failure(desc, .nil_signal_name), false
+	err = object_emit_signal_2_godot_real_checked(object, signal_name, a, b)
+	if !call_error_ok(&err) do return err, diagnostic_failure(desc, .call_error, err), false
+	return err, diagnostic_ok(desc), true
 }
 
 object_emit_signal_2_godot_real :: proc "contextless" (

@@ -2359,6 +2359,96 @@ check_version :: proc "contextless" (major, minor, patch: u32) -> bool {
 	return var.major > major || (var.major == major && var.minor >= minor)
 }
 
+// Diagnostics.
+
+DiagnosticCode :: enum {
+	ok,
+	nil_object,
+	nil_parent,
+	nil_resource_loader,
+	nil_packed_scene,
+	nil_path,
+	nil_signal_name,
+	call_error,
+	nil_return,
+	invalid_type,
+	retain_failed,
+	construct_failed,
+	add_child_failed,
+	emit_signal_failed,
+	unknown,
+}
+
+DiagnosticDescriptor :: struct {
+	operation: string,
+	detail:    string,
+}
+
+DiagnosticResult :: struct {
+	descriptor: DiagnosticDescriptor,
+	code:       DiagnosticCode,
+	call_error: CallError,
+}
+
+diagnostic_descriptor :: proc "contextless" (
+	operation: string,
+	detail: string = "",
+) -> DiagnosticDescriptor {
+	return DiagnosticDescriptor{operation = operation, detail = detail}
+}
+
+diagnostic_ok :: proc "contextless" (descriptor: DiagnosticDescriptor) -> DiagnosticResult {
+	return DiagnosticResult{descriptor = descriptor, code = .ok}
+}
+
+diagnostic_failure :: proc "contextless" (
+	descriptor: DiagnosticDescriptor,
+	code: DiagnosticCode,
+	call_error: CallError = {},
+) -> DiagnosticResult {
+	return DiagnosticResult{descriptor = descriptor, code = code, call_error = call_error}
+}
+
+diagnostic_is_ok :: proc "contextless" (result: DiagnosticResult) -> bool {
+	return result.code == .ok
+}
+
+diagnostic_code_text :: proc "contextless" (code: DiagnosticCode) -> string {
+	switch code {
+	case .ok:
+		return "ok"
+	case .nil_object:
+		return "nil object"
+	case .nil_parent:
+		return "nil parent"
+	case .nil_resource_loader:
+		return "nil resource loader"
+	case .nil_packed_scene:
+		return "nil packed scene"
+	case .nil_path:
+		return "nil path"
+	case .nil_signal_name:
+		return "nil signal name"
+	case .call_error:
+		return "Godot call error"
+	case .nil_return:
+		return "nil return"
+	case .invalid_type:
+		return "invalid type"
+	case .retain_failed:
+		return "retain failed"
+	case .construct_failed:
+		return "construct failed"
+	case .add_child_failed:
+		return "add child failed"
+	case .emit_signal_failed:
+		return "emit signal failed"
+	case .unknown:
+		return "unknown failure"
+	}
+	return "unknown failure"
+}
+
 // Logging.
 
 // Write a line to stdout. Avoids the ERROR:/WARNING: prefix that
@@ -2369,6 +2459,24 @@ import "core:fmt"
 
 debug_print :: proc(msg: string) {
 	fmt.println(msg)
+}
+
+debug_print_diagnostic :: proc(result: DiagnosticResult) {
+	if diagnostic_is_ok(result) do return
+	if result.descriptor.detail != "" {
+		fmt.printf(
+			"[odin-gdext] %s failed: %s (%s)\n",
+			result.descriptor.operation,
+			diagnostic_code_text(result.code),
+			result.descriptor.detail,
+		)
+		return
+	}
+	fmt.printf(
+		"[odin-gdext] %s failed: %s\n",
+		result.descriptor.operation,
+		diagnostic_code_text(result.code),
+	)
 }
 
 /*

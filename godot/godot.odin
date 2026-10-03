@@ -139,6 +139,9 @@ PackedColorArrayStorage :: gcore.PackedColorArrayStorage
 PackedColorArray :: gcore.PackedColorArray
 StringRepr :: gcore.StringRepr
 GodotReal :: gcore.GodotReal
+DiagnosticCode :: gcore.DiagnosticCode
+DiagnosticDescriptor :: gcore.DiagnosticDescriptor
+DiagnosticResult :: gcore.DiagnosticResult
 Vector2 :: gcore.Vector2
 Vector3 :: gcore.Vector3
 Vector4 :: gcore.Vector4
@@ -220,6 +223,12 @@ Tween :: gclass.Tween
 init :: gcore.init
 construct_object :: gcore.construct_object
 debug_print :: gcore.debug_print
+diagnostic_descriptor :: gcore.diagnostic_descriptor
+diagnostic_ok :: gcore.diagnostic_ok
+diagnostic_failure :: gcore.diagnostic_failure
+diagnostic_is_ok :: gcore.diagnostic_is_ok
+diagnostic_code_text :: gcore.diagnostic_code_text
+debug_print_diagnostic :: gcore.debug_print_diagnostic
 is_nil :: gcore.is_nil
 global_get_singleton_checked :: gcore.global_get_singleton_checked
 global_get_singleton_or_trap :: gcore.global_get_singleton_or_trap
@@ -322,10 +331,15 @@ owned_ref_counted_destroy :: gcore.owned_ref_counted_destroy
 variant_from_string_name_ptr :: gcore.variant_from_string_name_ptr
 init_signal_emission :: gcore.init_signal_emission
 object_emit_signal_0_checked :: gcore.object_emit_signal_0_checked
+object_emit_signal_0_diagnostic_checked :: gcore.object_emit_signal_0_diagnostic_checked
 object_emit_signal_0 :: gcore.object_emit_signal_0
 object_emit_signal_1_godot_real_checked :: gcore.object_emit_signal_1_godot_real_checked
+object_emit_signal_1_godot_real_diagnostic_checked ::
+	gcore.object_emit_signal_1_godot_real_diagnostic_checked
 object_emit_signal_1_godot_real :: gcore.object_emit_signal_1_godot_real
 object_emit_signal_2_godot_real_checked :: gcore.object_emit_signal_2_godot_real_checked
+object_emit_signal_2_godot_real_diagnostic_checked ::
+	gcore.object_emit_signal_2_godot_real_diagnostic_checked
 object_emit_signal_2_godot_real :: gcore.object_emit_signal_2_godot_real
 // --- Generated signal wrappers ---
 object_script_changed_signal_name :: gclass.object_script_changed_signal_name
@@ -2337,17 +2351,20 @@ init_resource_loader_load :: proc "contextless" () {
 // Variant call and stores the returned Resource in an OwnedResource. The caller
 // owns the returned wrapper and must call owned_resource_destroy or
 // owned_resource_release.
-resource_loader_load_owned_with_cache_mode_checked :: proc "contextless" (
+resource_loader_load_owned_with_cache_mode_diagnostic_checked :: proc "contextless" (
 	self: ResourceLoader,
 	path: ^String,
 	cache_mode: ResourceLoaderCacheMode,
 	take_returned_reference: bool,
+	desc: DiagnosticDescriptor,
 ) -> (
 	owned: OwnedResource,
 	err: CallError,
+	diagnostic: DiagnosticResult,
 	ok: bool,
 ) {
-	if resource_loader_is_nil(self) || path == nil do return {}, {}, false
+	if resource_loader_is_nil(self) do return {}, {}, diagnostic_failure(desc, .nil_resource_loader), false
+	if path == nil do return {}, {}, diagnostic_failure(desc, .nil_path), false
 	init_resource_loader_load()
 
 	path_variant := variant_from_string(path)
@@ -2374,19 +2391,42 @@ resource_loader_load_owned_with_cache_mode_checked :: proc "contextless" (
 	string_free(&type_hint)
 	variant_free(&path_variant)
 
-	if !call_error_ok(&err) do return {}, err, false
+	if !call_error_ok(&err) do return {}, err, diagnostic_failure(desc, .call_error, err), false
 	defer variant_free(&ret)
 
 	object, object_ok := variant_try_object(&ret)
-	if !object_ok || object == nil do return {}, err, false
+	if !object_ok || object == nil do return {}, err, diagnostic_failure(desc, .nil_return, err), false
 	resource, resource_ok := object_ptr_try_as_resource(object)
-	if !resource_ok do return {}, err, false
+	if !resource_ok do return {}, err, diagnostic_failure(desc, .invalid_type, err), false
 	if take_returned_reference {
 		owned_resource, owned_ok := owned_resource_init_owned(resource)
-		return owned_resource, err, owned_ok
+		if !owned_ok do return {}, err, diagnostic_failure(desc, .retain_failed, err), false
+		return owned_resource, err, diagnostic_ok(desc), true
 	}
 	retained, retained_ok := owned_resource_retain(resource)
-	return retained, err, retained_ok
+	if !retained_ok do return {}, err, diagnostic_failure(desc, .retain_failed, err), false
+	return retained, err, diagnostic_ok(desc), true
+}
+
+resource_loader_load_owned_with_cache_mode_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+	cache_mode: ResourceLoaderCacheMode,
+	take_returned_reference: bool,
+) -> (
+	owned: OwnedResource,
+	err: CallError,
+	ok: bool,
+) {
+	diagnostic: DiagnosticResult
+	owned, err, diagnostic, ok = resource_loader_load_owned_with_cache_mode_diagnostic_checked(
+		self,
+		path,
+		cache_mode,
+		take_returned_reference,
+		diagnostic_descriptor("ResourceLoader.load"),
+	)
+	return
 }
 
 // resource_loader_load_owned_checked keeps the default Godot cache reuse policy.
@@ -2439,6 +2479,35 @@ resource_loader_load_texture2d_owned_checked :: proc "contextless" (
 		return {}, {}, err, false
 	}
 	return owned, texture, err, true
+}
+
+resource_loader_load_texture2d_owned_diagnostic_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+	desc: DiagnosticDescriptor,
+) -> (
+	owned: OwnedResource,
+	texture: Texture2D,
+	err: CallError,
+	diagnostic: DiagnosticResult,
+	ok: bool,
+) {
+	owned, err, diagnostic, ok = resource_loader_load_owned_with_cache_mode_diagnostic_checked(
+		self,
+		path,
+		.cache_mode_ignore,
+		true,
+		desc,
+	)
+	if !ok do return {}, {}, err, diagnostic, false
+
+	texture_ok: bool
+	texture, texture_ok = owned_resource_try_as_texture2d(owned)
+	if !texture_ok {
+		owned_resource_destroy(&owned)
+		return {}, {}, err, diagnostic_failure(desc, .invalid_type, err), false
+	}
+	return owned, texture, err, diagnostic_ok(desc), true
 }
 
 resource_loader_load_texture2d_owned :: proc "contextless" (
@@ -2533,6 +2602,35 @@ resource_loader_load_packed_scene_owned_checked :: proc "contextless" (
 	return owned, scene, err, true
 }
 
+resource_loader_load_packed_scene_owned_diagnostic_checked :: proc "contextless" (
+	self: ResourceLoader,
+	path: ^String,
+	desc: DiagnosticDescriptor,
+) -> (
+	owned: OwnedResource,
+	scene: PackedScene,
+	err: CallError,
+	diagnostic: DiagnosticResult,
+	ok: bool,
+) {
+	owned, err, diagnostic, ok = resource_loader_load_owned_with_cache_mode_diagnostic_checked(
+		self,
+		path,
+		.cache_mode_reuse,
+		false,
+		desc,
+	)
+	if !ok do return {}, {}, err, diagnostic, false
+
+	scene_ok: bool
+	scene, scene_ok = owned_resource_try_as_packed_scene(owned)
+	if !scene_ok {
+		owned_resource_destroy(&owned)
+		return {}, {}, err, diagnostic_failure(desc, .invalid_type, err), false
+	}
+	return owned, scene, err, diagnostic_ok(desc), true
+}
+
 resource_loader_load_packed_scene_owned :: proc "contextless" (
 	self: ResourceLoader,
 	path: ^String,
@@ -2596,6 +2694,20 @@ packed_scene_instantiate_node_checked :: proc "contextless" (
 	return root, !node_is_nil(root)
 }
 
+packed_scene_instantiate_node_diagnostic_checked :: proc "contextless" (
+	self: PackedScene,
+	desc: DiagnosticDescriptor,
+) -> (
+	root: Node,
+	diagnostic: DiagnosticResult,
+	ok: bool,
+) {
+	if packed_scene_is_nil(self) do return {}, diagnostic_failure(desc, .nil_packed_scene), false
+	root, ok = packed_scene_instantiate_node_checked(self)
+	if !ok do return {}, diagnostic_failure(desc, .construct_failed), false
+	return root, diagnostic_ok(desc), true
+}
+
 packed_scene_instantiate_node :: proc "contextless" (self: PackedScene) -> Node {
 	root, ok := packed_scene_instantiate_node_checked(self)
 	if !ok do gcore._trap_nil_godot_function()
@@ -2616,6 +2728,25 @@ packed_scene_instantiate_node2d_checked :: proc "contextless" (
 	root = created_root
 	value, ok = node_try_as_node2d(root)
 	return
+}
+
+packed_scene_instantiate_child_diagnostic_checked :: proc "contextless" (
+	self: PackedScene,
+	parent: Node,
+	desc: DiagnosticDescriptor,
+) -> (
+	root: Node,
+	diagnostic: DiagnosticResult,
+	ok: bool,
+) {
+	if node_is_nil(parent) do return {}, diagnostic_failure(desc, .nil_parent), false
+	root, diagnostic, ok = packed_scene_instantiate_node_diagnostic_checked(self, desc)
+	if !ok do return {}, diagnostic, false
+	if !node_add_child_checked(parent, root) {
+		_ = object_destroy_checked(node_object_ptr(root))
+		return {}, diagnostic_failure(desc, .add_child_failed), false
+	}
+	return root, diagnostic_ok(desc), true
 }
 
 packed_scene_instantiate_child_checked :: proc "contextless" (
