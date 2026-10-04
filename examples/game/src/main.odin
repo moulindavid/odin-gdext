@@ -315,6 +315,46 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 	} else if raycast_object != nil {
 		_ = gt.object_destroy_checked(raycast_object)
 	}
+
+	path_follow_object := gt.construct_object(path_follow2d_class_name)
+	if path_follow, path_follow_ok := gt.object_ptr_try_as_path_follow2d(path_follow_object);
+	   path_follow_ok {
+		gt.path_follow2d_set_progress(path_follow, damage)
+		gt.path_follow2d_set_h_offset(path_follow, damage * 0.1)
+		gt.path_follow2d_set_v_offset(path_follow, -damage * 0.05)
+		gt.path_follow2d_set_rotates(path_follow, true)
+		gt.path_follow2d_set_cubic_interpolation(path_follow, false)
+		gt.path_follow2d_set_loop(path_follow, true)
+		_ = gt.path_follow2d_get_progress(path_follow)
+		_ = gt.path_follow2d_get_h_offset(path_follow)
+		_ = gt.path_follow2d_get_v_offset(path_follow)
+		_ = gt.path_follow2d_is_rotating(path_follow)
+		_ = gt.path_follow2d_get_cubic_interpolation(path_follow)
+		_ = gt.path_follow2d_has_loop(path_follow)
+		if !gt.node_add_child_checked(parent, gt.path_follow2d_as_node(path_follow)) {
+			_ = gt.object_destroy_checked(gt.path_follow2d_object_ptr(path_follow))
+		}
+	} else if path_follow_object != nil {
+		_ = gt.object_destroy_checked(path_follow_object)
+	}
+
+	notifier_object := gt.construct_object(visible_on_screen_notifier2d_class_name)
+	if notifier, notifier_ok := gt.object_ptr_try_as_visible_on_screen_notifier2d(notifier_object);
+	   notifier_ok {
+		gt.visible_on_screen_notifier2d_set_rect(
+			notifier,
+			gt.Rect2{position = gt.Vector2{-16, -16}, size = gt.Vector2{32, 32}},
+		)
+		gt.visible_on_screen_notifier2d_set_show_rect(notifier, true)
+		_ = gt.visible_on_screen_notifier2d_get_rect(notifier)
+		_ = gt.visible_on_screen_notifier2d_is_showing_rect(notifier)
+		_ = gt.visible_on_screen_notifier2d_is_on_screen(notifier)
+		if !gt.node_add_child_checked(parent, gt.visible_on_screen_notifier2d_as_node(notifier)) {
+			_ = gt.object_destroy_checked(gt.visible_on_screen_notifier2d_object_ptr(notifier))
+		}
+	} else if notifier_object != nil {
+		_ = gt.object_destroy_checked(notifier_object)
+	}
 }
 
 configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: gt.GodotReal) {
@@ -648,6 +688,8 @@ collision_shape2d_class_name_data: gt.ClassName
 camera2d_class_name_data: gt.ClassName
 marker2d_class_name_data: gt.ClassName
 ray_cast2d_class_name_data: gt.ClassName
+path_follow2d_class_name_data: gt.ClassName
+visible_on_screen_notifier2d_class_name_data: gt.ClassName
 texture_button_class_name_data: gt.ClassName
 progress_bar_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
@@ -660,6 +702,8 @@ collision_shape2d_class_name: gt.ConstStringNamePtr
 camera2d_class_name: gt.ConstStringNamePtr
 marker2d_class_name: gt.ConstStringNamePtr
 ray_cast2d_class_name: gt.ConstStringNamePtr
+path_follow2d_class_name: gt.ConstStringNamePtr
+visible_on_screen_notifier2d_class_name: gt.ConstStringNamePtr
 texture_button_class_name: gt.ConstStringNamePtr
 progress_bar_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
@@ -895,6 +939,10 @@ register_classes :: proc() {
 	camera2d_class_name = gt.class_name_ptr(&camera2d_class_name_data)
 	marker2d_class_name = gt.class_name_ptr(&marker2d_class_name_data)
 	ray_cast2d_class_name = gt.class_name_ptr(&ray_cast2d_class_name_data)
+	path_follow2d_class_name = gt.class_name_ptr(&path_follow2d_class_name_data)
+	visible_on_screen_notifier2d_class_name = gt.class_name_ptr(
+		&visible_on_screen_notifier2d_class_name_data,
+	)
 	texture_button_class_name = gt.class_name_ptr(&texture_button_class_name_data)
 	progress_bar_class_name = gt.class_name_ptr(&progress_bar_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
@@ -914,6 +962,11 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&camera2d_class_name_data, cstring("Camera2D"))
 	gt.class_name_init_latin1_cstring(&marker2d_class_name_data, cstring("Marker2D"))
 	gt.class_name_init_latin1_cstring(&ray_cast2d_class_name_data, cstring("RayCast2D"))
+	gt.class_name_init_latin1_cstring(&path_follow2d_class_name_data, cstring("PathFollow2D"))
+	gt.class_name_init_latin1_cstring(
+		&visible_on_screen_notifier2d_class_name_data,
+		cstring("VisibleOnScreenNotifier2D"),
+	)
 	gt.class_name_init_latin1_cstring(&texture_button_class_name_data, cstring("TextureButton"))
 	gt.class_name_init_latin1_cstring(&progress_bar_class_name_data, cstring("ProgressBar"))
 	gt.class_name_init_latin1_cstring(

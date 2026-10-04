@@ -144,44 +144,23 @@ These slices are complete and were validated with make ci when merged:
      lightweight changelog, aligned README and usage/template docs with CI, and
      validated with full make ci.
 
-## Current goal: Broader generated API coverage
+20. 2D utility generated APIs.
+   - Added selected generated `PathFollow2D` and `VisibleOnScreenNotifier2D`
+     handles, casts, upcasts, and borrowed-safe methods. Exposed the selected
+     surface through `godot:godot`, added facade compile coverage, exercised both
+     classes in examples/game, updated generated reporting and CHANGELOG, and
+     validated with full make ci.
 
-Continue expanding selected safe Godot APIs based on real game needs while
-preserving the safety model. Prefer small batches with deterministic support
-reporting, facade exports, compile coverage, and runtime example coverage. Do
-not pursue full 1000+ class generation or broad ownership-sensitive APIs until
-the related safety models exist.
+## Current goal: Awaiting next generated API slice
 
-1. Choose the next API batch from concrete gameplay needs.
-   - [ ] Review examples/game and current generated class report for missing APIs
-     that would unlock realistic gameplay or UI workflows.
-   - [ ] Pick a small class/method set with borrowed-safe signatures first.
-   - [ ] Keep unsupported signatures skipped with stable blocker reasons.
-
-2. Update generator support and facade exports.
-   - [ ] Add selected class handles, casts, methods, enums, or default wrappers.
-   - [ ] Expose only the safe selected surface through `godot:godot`.
-   - [ ] Preserve borrowed object handles and explicit owned value destruction.
-
-3. Add coverage.
-   - [ ] Extend facade compile checks for the new public APIs.
-   - [ ] Exercise at least one representative path in examples/game or smoke.
-   - [ ] Keep normal examples importing only godot:godot.
-
-4. Update generated reporting and docs where useful.
-   - [ ] Ensure support reports explain newly supported and still-skipped APIs.
-   - [ ] Mention meaningful new coverage in CHANGELOG.md.
-   - [ ] Avoid committing generated files or extension API dumps.
-
-5. Validate before moving to the next feature roadmap.
-   - [ ] Run make ci.
-   - [ ] Confirm generated files remain ignored.
-   - [ ] Update this roadmap with completed status and the next feature candidate.
+Pick the next small generated API batch from concrete gameplay needs. Continue
+expanding selected safe Godot APIs while preserving borrowed object handles,
+explicit owned value destruction, deterministic support reporting, facade
+exports, compile coverage, and runtime example coverage.
 
 ## Planned next iterations
 
-After the current generated API coverage slice, pick one feature roadmap at a
-time.
+Pick one generated API roadmap at a time.
 
 ## Deferred until the related safety model exists
 

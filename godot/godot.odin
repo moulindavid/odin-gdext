@@ -202,6 +202,8 @@ CollisionShape2D :: gclass.CollisionShape2D
 Camera2D :: gclass.Camera2D
 Marker2D :: gclass.Marker2D
 RayCast2D :: gclass.RayCast2D
+PathFollow2D :: gclass.PathFollow2D
+VisibleOnScreenNotifier2D :: gclass.VisibleOnScreenNotifier2D
 Camera2DAnchorMode :: gclass.Camera2DAnchorMode
 Camera2DProcessCallback :: gclass.Camera2DCamera2DprocessCallback
 PackedScene :: gclass.PackedScene
@@ -925,6 +927,10 @@ object_is_marker2d :: gclass.object_is_marker2d
 object_try_as_marker2d :: gclass.object_try_as_marker2d
 object_is_ray_cast2d :: gclass.object_is_ray_cast2d
 object_try_as_ray_cast2d :: gclass.object_try_as_ray_cast2d
+object_is_path_follow2d :: gclass.object_is_path_follow2d
+object_try_as_path_follow2d :: gclass.object_try_as_path_follow2d
+object_is_visible_on_screen_notifier2d :: gclass.object_is_visible_on_screen_notifier2d
+object_try_as_visible_on_screen_notifier2d :: gclass.object_try_as_visible_on_screen_notifier2d
 object_is_packed_scene :: gclass.object_is_packed_scene
 object_try_as_packed_scene :: gclass.object_try_as_packed_scene
 object_is_resource_loader :: gclass.object_is_resource_loader
@@ -1077,6 +1083,10 @@ node_is_marker2d :: gclass.node_is_marker2d
 node_try_as_marker2d :: gclass.node_try_as_marker2d
 node_is_ray_cast2d :: gclass.node_is_ray_cast2d
 node_try_as_ray_cast2d :: gclass.node_try_as_ray_cast2d
+node_is_path_follow2d :: gclass.node_is_path_follow2d
+node_try_as_path_follow2d :: gclass.node_try_as_path_follow2d
+node_is_visible_on_screen_notifier2d :: gclass.node_is_visible_on_screen_notifier2d
+node_try_as_visible_on_screen_notifier2d :: gclass.node_try_as_visible_on_screen_notifier2d
 canvas_item_is_node2d :: gclass.canvas_item_is_node2d
 canvas_item_try_as_node2d :: gclass.canvas_item_try_as_node2d
 canvas_item_is_control :: gclass.canvas_item_is_control
@@ -1105,12 +1115,21 @@ canvas_item_is_collision_object2d :: gclass.canvas_item_is_collision_object2d
 canvas_item_try_as_collision_object2d :: gclass.canvas_item_try_as_collision_object2d
 canvas_item_is_area2d :: gclass.canvas_item_is_area2d
 canvas_item_try_as_area2d :: gclass.canvas_item_try_as_area2d
+canvas_item_is_path_follow2d :: gclass.canvas_item_is_path_follow2d
+canvas_item_try_as_path_follow2d :: gclass.canvas_item_try_as_path_follow2d
+canvas_item_is_visible_on_screen_notifier2d :: gclass.canvas_item_is_visible_on_screen_notifier2d
+canvas_item_try_as_visible_on_screen_notifier2d ::
+	gclass.canvas_item_try_as_visible_on_screen_notifier2d
 node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
 node2d_is_collision_object2d :: gclass.node2d_is_collision_object2d
 node2d_try_as_collision_object2d :: gclass.node2d_try_as_collision_object2d
 node2d_is_area2d :: gclass.node2d_is_area2d
 node2d_try_as_area2d :: gclass.node2d_try_as_area2d
+node2d_is_path_follow2d :: gclass.node2d_is_path_follow2d
+node2d_try_as_path_follow2d :: gclass.node2d_try_as_path_follow2d
+node2d_is_visible_on_screen_notifier2d :: gclass.node2d_is_visible_on_screen_notifier2d
+node2d_try_as_visible_on_screen_notifier2d :: gclass.node2d_try_as_visible_on_screen_notifier2d
 collision_object2d_is_area2d :: gclass.collision_object2d_is_area2d
 collision_object2d_try_as_area2d :: gclass.collision_object2d_try_as_area2d
 collision_object2d_is_physics_body2d :: gclass.collision_object2d_is_physics_body2d
@@ -1399,6 +1418,33 @@ ray_cast2d_set_collide_with_bodies :: gclass.ray_cast2d_set_collide_with_bodies
 ray_cast2d_is_collide_with_bodies_enabled :: gclass.ray_cast2d_is_collide_with_bodies_enabled
 ray_cast2d_set_hit_from_inside :: gclass.ray_cast2d_set_hit_from_inside
 ray_cast2d_is_hit_from_inside_enabled :: gclass.ray_cast2d_is_hit_from_inside_enabled
+path_follow2d_as_node2d :: gclass.path_follow2d_as_node2d
+path_follow2d_as_canvas_item :: gclass.path_follow2d_as_canvas_item
+path_follow2d_as_node :: gclass.path_follow2d_as_node
+path_follow2d_as_object :: gclass.path_follow2d_as_object
+path_follow2d_set_progress :: gclass.path_follow2d_set_progress
+path_follow2d_get_progress :: gclass.path_follow2d_get_progress
+path_follow2d_set_h_offset :: gclass.path_follow2d_set_h_offset
+path_follow2d_get_h_offset :: gclass.path_follow2d_get_h_offset
+path_follow2d_set_v_offset :: gclass.path_follow2d_set_v_offset
+path_follow2d_get_v_offset :: gclass.path_follow2d_get_v_offset
+path_follow2d_set_progress_ratio :: gclass.path_follow2d_set_progress_ratio
+path_follow2d_get_progress_ratio :: gclass.path_follow2d_get_progress_ratio
+path_follow2d_set_rotates :: gclass.path_follow2d_set_rotates
+path_follow2d_is_rotating :: gclass.path_follow2d_is_rotating
+path_follow2d_set_cubic_interpolation :: gclass.path_follow2d_set_cubic_interpolation
+path_follow2d_get_cubic_interpolation :: gclass.path_follow2d_get_cubic_interpolation
+path_follow2d_set_loop :: gclass.path_follow2d_set_loop
+path_follow2d_has_loop :: gclass.path_follow2d_has_loop
+visible_on_screen_notifier2d_as_node2d :: gclass.visible_on_screen_notifier2d_as_node2d
+visible_on_screen_notifier2d_as_canvas_item :: gclass.visible_on_screen_notifier2d_as_canvas_item
+visible_on_screen_notifier2d_as_node :: gclass.visible_on_screen_notifier2d_as_node
+visible_on_screen_notifier2d_as_object :: gclass.visible_on_screen_notifier2d_as_object
+visible_on_screen_notifier2d_set_rect :: gclass.visible_on_screen_notifier2d_set_rect
+visible_on_screen_notifier2d_get_rect :: gclass.visible_on_screen_notifier2d_get_rect
+visible_on_screen_notifier2d_set_show_rect :: gclass.visible_on_screen_notifier2d_set_show_rect
+visible_on_screen_notifier2d_is_showing_rect :: gclass.visible_on_screen_notifier2d_is_showing_rect
+visible_on_screen_notifier2d_is_on_screen :: gclass.visible_on_screen_notifier2d_is_on_screen
 packed_scene_as_resource :: gclass.packed_scene_as_resource
 packed_scene_as_ref_counted :: gclass.packed_scene_as_ref_counted
 packed_scene_as_object :: gclass.packed_scene_as_object
@@ -1813,6 +1859,16 @@ ray_cast2d_is_nil :: proc "contextless" (self: RayCast2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+path_follow2d_is_nil :: proc "contextless" (self: PathFollow2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+visible_on_screen_notifier2d_is_nil :: proc "contextless" (
+	self: VisibleOnScreenNotifier2D,
+) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 packed_scene_is_nil :: proc "contextless" (self: PackedScene) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -2073,6 +2129,30 @@ node_get_node_as_ray_cast2d :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return RayCast2D(nil), false
 	return node_try_as_ray_cast2d(node)
+}
+
+node_get_node_as_path_follow2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: PathFollow2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return PathFollow2D(nil), false
+	return node_try_as_path_follow2d(node)
+}
+
+node_get_node_as_visible_on_screen_notifier2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: VisibleOnScreenNotifier2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return VisibleOnScreenNotifier2D(nil), false
+	return node_try_as_visible_on_screen_notifier2d(node)
 }
 
 label_set_text_utf8_checked :: proc "contextless" (self: Label, text: string) -> bool {
@@ -2939,6 +3019,16 @@ ray_cast2d_object_ptr :: proc "contextless" (self: RayCast2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+path_follow2d_object_ptr :: proc "contextless" (self: PathFollow2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+visible_on_screen_notifier2d_object_ptr :: proc "contextless" (
+	self: VisibleOnScreenNotifier2D,
+) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 packed_scene_object_ptr :: proc "contextless" (self: PackedScene) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3490,6 +3580,26 @@ object_ptr_try_as_ray_cast2d :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_ray_cast2d(Object(self))
+}
+
+object_ptr_try_as_path_follow2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: PathFollow2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_path_follow2d(Object(self))
+}
+
+object_ptr_try_as_visible_on_screen_notifier2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: VisibleOnScreenNotifier2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_visible_on_screen_notifier2d(Object(self))
 }
 
 typed_array_get_physics_body2d :: proc "contextless" (

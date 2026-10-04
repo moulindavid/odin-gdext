@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 45
+Max_Selected_Class_Count :: 46
 
 selected_class_names := []string {
 	"Object",
@@ -1054,6 +1054,8 @@ selected_class_names := []string {
 	"SceneTree",
 	"AnimationPlayer",
 	"Tween",
+	"PathFollow2D",
+	"VisibleOnScreenNotifier2D",
 }
 
 candidate_class_names := []string {
@@ -1068,8 +1070,6 @@ candidate_class_names := []string {
 	"TileMapLayer",
 	"NavigationAgent2D",
 	"Path2D",
-	"PathFollow2D",
-	"VisibleOnScreenNotifier2D",
 }
 
 Selected_Class_Method :: struct {
@@ -1596,6 +1596,25 @@ selected_class_methods := []Selected_Class_Method {
 	{"RayCast2D", "is_collide_with_bodies_enabled"},
 	{"RayCast2D", "set_hit_from_inside"},
 	{"RayCast2D", "is_hit_from_inside_enabled"},
+	{"PathFollow2D", "set_progress"},
+	{"PathFollow2D", "get_progress"},
+	{"PathFollow2D", "set_h_offset"},
+	{"PathFollow2D", "get_h_offset"},
+	{"PathFollow2D", "set_v_offset"},
+	{"PathFollow2D", "get_v_offset"},
+	{"PathFollow2D", "set_progress_ratio"},
+	{"PathFollow2D", "get_progress_ratio"},
+	{"PathFollow2D", "set_rotates"},
+	{"PathFollow2D", "is_rotating"},
+	{"PathFollow2D", "set_cubic_interpolation"},
+	{"PathFollow2D", "get_cubic_interpolation"},
+	{"PathFollow2D", "set_loop"},
+	{"PathFollow2D", "has_loop"},
+	{"VisibleOnScreenNotifier2D", "set_rect"},
+	{"VisibleOnScreenNotifier2D", "get_rect"},
+	{"VisibleOnScreenNotifier2D", "set_show_rect"},
+	{"VisibleOnScreenNotifier2D", "is_showing_rect"},
+	{"VisibleOnScreenNotifier2D", "is_on_screen"},
 	{"PackedScene", "pack"},
 	{"PackedScene", "can_instantiate"},
 	{"Texture2D", "get_mipmap_count"},
