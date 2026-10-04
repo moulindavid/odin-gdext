@@ -27,6 +27,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   coverage, and examples/game runtime coverage.
 - Added selected generated `Font` APIs with public facade exports, compile
   coverage, and examples/game runtime coverage.
+- Added selected generated `Theme` APIs with public facade exports, compile
+  coverage, and examples/game runtime coverage.
 
 ## Completed roadmap slices
 

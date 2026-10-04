@@ -171,6 +171,7 @@ ImageTexture :: gclass.ImageTexture
 AudioStream :: gclass.AudioStream
 StyleBox :: gclass.StyleBox
 Font :: gclass.Font
+Theme :: gclass.Theme
 // Resource loading policy: ResourceLoader.load returns a Resource through a
 // Variant call in focused helpers. The helper retains the borrowed Resource into
 // OwnedResource before freeing the temporary Variant, so callers always receive
@@ -535,6 +536,71 @@ font_is_script_supported :: gclass.font_is_script_supported
 font_get_supported_feature_list :: gclass.font_get_supported_feature_list
 font_get_supported_variation_list :: gclass.font_get_supported_variation_list
 font_get_face_count :: gclass.font_get_face_count
+theme_as_resource :: gclass.theme_as_resource
+theme_as_ref_counted :: gclass.theme_as_ref_counted
+theme_as_object :: gclass.theme_as_object
+theme_set_icon :: gclass.theme_set_icon
+theme_get_icon :: gclass.theme_get_icon
+theme_has_icon :: gclass.theme_has_icon
+theme_rename_icon :: gclass.theme_rename_icon
+theme_clear_icon :: gclass.theme_clear_icon
+theme_get_icon_list :: gclass.theme_get_icon_list
+theme_get_icon_type_list :: gclass.theme_get_icon_type_list
+theme_set_stylebox :: gclass.theme_set_stylebox
+theme_get_stylebox :: gclass.theme_get_stylebox
+theme_has_stylebox :: gclass.theme_has_stylebox
+theme_rename_stylebox :: gclass.theme_rename_stylebox
+theme_clear_stylebox :: gclass.theme_clear_stylebox
+theme_get_stylebox_list :: gclass.theme_get_stylebox_list
+theme_get_stylebox_type_list :: gclass.theme_get_stylebox_type_list
+theme_set_font :: gclass.theme_set_font
+theme_get_font :: gclass.theme_get_font
+theme_has_font :: gclass.theme_has_font
+theme_rename_font :: gclass.theme_rename_font
+theme_clear_font :: gclass.theme_clear_font
+theme_get_font_list :: gclass.theme_get_font_list
+theme_get_font_type_list :: gclass.theme_get_font_type_list
+theme_set_font_size :: gclass.theme_set_font_size
+theme_get_font_size :: gclass.theme_get_font_size
+theme_has_font_size :: gclass.theme_has_font_size
+theme_rename_font_size :: gclass.theme_rename_font_size
+theme_clear_font_size :: gclass.theme_clear_font_size
+theme_get_font_size_list :: gclass.theme_get_font_size_list
+theme_get_font_size_type_list :: gclass.theme_get_font_size_type_list
+theme_set_color :: gclass.theme_set_color
+theme_get_color :: gclass.theme_get_color
+theme_has_color :: gclass.theme_has_color
+theme_rename_color :: gclass.theme_rename_color
+theme_clear_color :: gclass.theme_clear_color
+theme_get_color_list :: gclass.theme_get_color_list
+theme_get_color_type_list :: gclass.theme_get_color_type_list
+theme_set_constant :: gclass.theme_set_constant
+theme_get_constant :: gclass.theme_get_constant
+theme_has_constant :: gclass.theme_has_constant
+theme_rename_constant :: gclass.theme_rename_constant
+theme_clear_constant :: gclass.theme_clear_constant
+theme_get_constant_list :: gclass.theme_get_constant_list
+theme_get_constant_type_list :: gclass.theme_get_constant_type_list
+theme_set_default_base_scale :: gclass.theme_set_default_base_scale
+theme_get_default_base_scale :: gclass.theme_get_default_base_scale
+theme_has_default_base_scale :: gclass.theme_has_default_base_scale
+theme_set_default_font :: gclass.theme_set_default_font
+theme_get_default_font :: gclass.theme_get_default_font
+theme_has_default_font :: gclass.theme_has_default_font
+theme_set_default_font_size :: gclass.theme_set_default_font_size
+theme_get_default_font_size :: gclass.theme_get_default_font_size
+theme_has_default_font_size :: gclass.theme_has_default_font_size
+theme_set_type_variation :: gclass.theme_set_type_variation
+theme_is_type_variation :: gclass.theme_is_type_variation
+theme_clear_type_variation :: gclass.theme_clear_type_variation
+theme_get_type_variation_base :: gclass.theme_get_type_variation_base
+theme_get_type_variation_list :: gclass.theme_get_type_variation_list
+theme_add_type :: gclass.theme_add_type
+theme_remove_type :: gclass.theme_remove_type
+theme_rename_type :: gclass.theme_rename_type
+theme_get_type_list :: gclass.theme_get_type_list
+theme_merge_with :: gclass.theme_merge_with
+theme_clear :: gclass.theme_clear
 audio_stream_get_length :: gclass.audio_stream_get_length
 audio_stream_is_monophonic :: gclass.audio_stream_is_monophonic
 audio_stream_can_be_sampled :: gclass.audio_stream_can_be_sampled
@@ -980,6 +1046,8 @@ object_is_style_box :: gclass.object_is_style_box
 object_try_as_style_box :: gclass.object_try_as_style_box
 object_is_font :: gclass.object_is_font
 object_try_as_font :: gclass.object_try_as_font
+object_is_theme :: gclass.object_is_theme
+object_try_as_theme :: gclass.object_try_as_theme
 resource_is_texture2d :: gclass.resource_is_texture2d
 resource_try_as_texture2d :: gclass.resource_try_as_texture2d
 resource_is_image_texture :: gclass.resource_is_image_texture
@@ -990,6 +1058,8 @@ resource_is_style_box :: gclass.resource_is_style_box
 resource_try_as_style_box :: gclass.resource_try_as_style_box
 resource_is_font :: gclass.resource_is_font
 resource_try_as_font :: gclass.resource_try_as_font
+resource_is_theme :: gclass.resource_is_theme
+resource_try_as_theme :: gclass.resource_try_as_theme
 texture2d_is_image_texture :: gclass.texture2d_is_image_texture
 texture2d_try_as_image_texture :: gclass.texture2d_try_as_image_texture
 object_is_node :: gclass.object_is_node
@@ -1086,6 +1156,8 @@ ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 ref_counted_is_packed_scene :: gclass.ref_counted_is_packed_scene
 ref_counted_try_as_packed_scene :: gclass.ref_counted_try_as_packed_scene
+ref_counted_is_theme :: gclass.ref_counted_is_theme
+ref_counted_try_as_theme :: gclass.ref_counted_try_as_theme
 resource_is_packed_scene :: gclass.resource_is_packed_scene
 resource_try_as_packed_scene :: gclass.resource_try_as_packed_scene
 ref_counted_is_input_event :: gclass.ref_counted_is_input_event
@@ -2194,6 +2266,10 @@ style_box_is_nil :: proc "contextless" (self: StyleBox) -> bool {
 }
 
 font_is_nil :: proc "contextless" (self: Font) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+theme_is_nil :: proc "contextless" (self: Theme) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -3595,6 +3671,10 @@ font_object_ptr :: proc "contextless" (self: Font) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+theme_object_ptr :: proc "contextless" (self: Theme) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 resource_loader_object_ptr :: proc "contextless" (self: ResourceLoader) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3717,6 +3797,11 @@ object_ptr_try_as_style_box :: proc "contextless" (
 object_ptr_try_as_font :: proc "contextless" (self: ObjectPtr) -> (value: Font, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_font(Object(self))
+}
+
+object_ptr_try_as_theme :: proc "contextless" (self: ObjectPtr) -> (value: Theme, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_theme(Object(self))
 }
 
 object_ptr_try_as_input_event :: proc "contextless" (
