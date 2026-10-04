@@ -8,10 +8,14 @@ This guide uses the current `examples/game` project as the reference shape.
 
 ## Requirements
 
-- Odin compiler on `PATH`.
-- `odinfmt` on `PATH` for formatting checks.
+- Odin compiler on `PATH` matching the version validated by CI.
+- OLS `odinfmt` on `PATH` for formatting checks. The repository expects the
+  `odinfmt -w -path:...` CLI.
 - Godot 4.7 on `PATH`.
 - `make` and a native toolchain that can build shared libraries.
+
+See [VERSIONING.md](VERSIONING.md) for the currently validated Odin, OLS, and
+Godot versions.
 
 ## Build the extension library
 
@@ -392,4 +396,6 @@ Good first uses are focused systems called by Godot:
 - small Odin-backed classes with simple methods, properties, and signals
 - systems where GDScript owns scene wiring and Odin owns the hot or typed logic
 
-For current limitations, see [ROADMAP.md](../ROADMAP.md) and the project README.
+For current limitations and compatibility policy, see
+[ROADMAP.md](../ROADMAP.md), [VERSIONING.md](VERSIONING.md), and the project
+README.

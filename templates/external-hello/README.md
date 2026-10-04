@@ -1,7 +1,8 @@
 # External hello template
 
 This is a minimal starter for using `odin-gdext` from a separate Odin extension
-folder next to a normal Godot project.
+folder next to a normal Godot project. Use the Odin, OLS `odinfmt`, and Godot
+versions documented in `odin-gdext/docs/VERSIONING.md`.
 
 Expected local layout:
 
