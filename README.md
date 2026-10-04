@@ -1,4 +1,4 @@
-# Odin bindings for Godot 4 ![Godot 4.7.0](https://img.shields.io/badge/Godot-4.7.0-478CBF?style=flat&logo=godotengine&logoColor=white)
+# Odin bindings for Godot 4 ![Godot 4.7](https://img.shields.io/badge/Godot-4.7-478CBF?style=flat&logo=godotengine&logoColor=white)
 
 **odin-gdext** provides Odin language bindings for [Godot 4](https://godotengine.org/)
 via the *GDExtension* C API.
@@ -14,10 +14,14 @@ via the *GDExtension* C API.
 ## Requirements
 
 - Odin compiler on `PATH` (currently validated with `dev-2026-09`).
-- `odinfmt` on `PATH`.
+- OLS `odinfmt` on `PATH` (currently validated from OLS `dev-2026-08`; the
+  Makefile expects the `odinfmt -w -path:...` CLI).
 - Godot **4.7** on `PATH`.
 - Currently targets Godot 4.7's `float_64` API shape through `GodotReal`.
 - `make` and a platform toolchain capable of building shared libraries.
+
+See [docs/VERSIONING.md](docs/VERSIONING.md) for the current compatibility and
+versioning policy.
 
 ## Quick start
 
@@ -68,10 +72,12 @@ It performs a clean validation pass in a fixed order:
 6. `make check-generator`
 7. `make check-bindings`
 8. `make check-godot`
-9. `make test-unit`
-10. `make test-smoke`
-11. `make test-hello`
-12. `make example-game`
+9. `make check-facade`
+10. `make check-template`
+11. `make test-unit`
+12. `make test-smoke`
+13. `make test-hello`
+14. `make example-game`
 
 `make test-unit` is the minimal Odin unit-test harness for focused tests that do
 not need to launch Godot. Odin's test runner allocates internally, so that target
@@ -79,10 +85,11 @@ keeps `-vet` and `-strict-style` but intentionally omits
 `-default-to-nil-allocator`. Runtime integration is still covered by
 `make test-smoke`, which keeps broad runtime coverage, plus the beginner `make example-game` workflow.
 
-The GitHub Actions workflow in `.github/workflows/ci.yml` installs Odin,
-downloads `odinfmt` from the OLS tooling releases, downloads Godot 4.7, and runs
-`make ci`. Generated bindings remain ignored by git; CI regenerates and checks
-them instead of requiring generated output commits.
+The GitHub Actions workflow in `.github/workflows/ci.yml` installs the validated
+Odin version, downloads `odinfmt` from the validated OLS tooling release,
+downloads Godot 4.7, and runs `make ci`. Generated bindings remain ignored by
+git; CI regenerates and checks them instead of requiring generated output
+commits.
 
 ## Imports
 
@@ -372,9 +379,11 @@ odin-gdext/
 | Properties/signals | Descriptors, registration helpers, and simple emission helpers | Partial |
 | Virtual callbacks | Notification dispatch helpers for common Node lifecycle callbacks | Partial |
 
-## Roadmap
+## Versioning and roadmap
 
-See [ROADMAP.md](ROADMAP.md) for the short plan.
+See [docs/VERSIONING.md](docs/VERSIONING.md) for the current compatibility
+policy, [CHANGELOG.md](CHANGELOG.md) for lightweight release notes, and
+[ROADMAP.md](ROADMAP.md) for the short plan.
 
 ## License
 
