@@ -316,6 +316,36 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		_ = gt.object_destroy_checked(raycast_object)
 	}
 
+	navigation_agent_object := gt.construct_object(navigation_agent2d_class_name)
+	if agent, agent_ok := gt.object_ptr_try_as_navigation_agent2d(navigation_agent_object);
+	   agent_ok {
+		gt.navigation_agent2d_set_radius(agent, 12)
+		gt.navigation_agent2d_set_max_speed(agent, 160)
+		gt.navigation_agent2d_set_path_desired_distance(agent, 8)
+		gt.navigation_agent2d_set_target_desired_distance(agent, 6)
+		gt.navigation_agent2d_set_navigation_layers(agent, 1)
+		gt.navigation_agent2d_set_navigation_layer_value(agent, 1, true)
+		gt.navigation_agent2d_set_target_position(agent, gt.Vector2{f32(damage), 64})
+		gt.navigation_agent2d_set_simplify_path(agent, true)
+		gt.navigation_agent2d_set_debug_enabled(agent, true)
+		gt.navigation_agent2d_set_debug_use_custom(agent, true)
+		gt.navigation_agent2d_set_debug_path_custom_color(agent, gt.Color{0.2, 1.0, 0.4, 1.0})
+		gt.navigation_agent2d_set_debug_path_custom_point_size(agent, 4)
+		gt.navigation_agent2d_set_debug_path_custom_line_width(agent, 2)
+		_ = gt.navigation_agent2d_get_radius(agent)
+		_ = gt.navigation_agent2d_get_max_speed(agent)
+		_ = gt.navigation_agent2d_get_path_desired_distance(agent)
+		_ = gt.navigation_agent2d_get_target_position(agent)
+		_ = gt.navigation_agent2d_get_navigation_layers(agent)
+		_ = gt.navigation_agent2d_get_debug_path_custom_color(agent)
+		_ = gt.navigation_agent2d_is_navigation_finished(agent)
+		if !gt.node_add_child_checked(parent, gt.navigation_agent2d_as_node(agent)) {
+			_ = gt.object_destroy_checked(gt.navigation_agent2d_object_ptr(agent))
+		}
+	} else if navigation_agent_object != nil {
+		_ = gt.object_destroy_checked(navigation_agent_object)
+	}
+
 	path_follow_object := gt.construct_object(path_follow2d_class_name)
 	if path_follow, path_follow_ok := gt.object_ptr_try_as_path_follow2d(path_follow_object);
 	   path_follow_ok {
@@ -688,6 +718,7 @@ collision_shape2d_class_name_data: gt.ClassName
 camera2d_class_name_data: gt.ClassName
 marker2d_class_name_data: gt.ClassName
 ray_cast2d_class_name_data: gt.ClassName
+navigation_agent2d_class_name_data: gt.ClassName
 path_follow2d_class_name_data: gt.ClassName
 visible_on_screen_notifier2d_class_name_data: gt.ClassName
 texture_button_class_name_data: gt.ClassName
@@ -702,6 +733,7 @@ collision_shape2d_class_name: gt.ConstStringNamePtr
 camera2d_class_name: gt.ConstStringNamePtr
 marker2d_class_name: gt.ConstStringNamePtr
 ray_cast2d_class_name: gt.ConstStringNamePtr
+navigation_agent2d_class_name: gt.ConstStringNamePtr
 path_follow2d_class_name: gt.ConstStringNamePtr
 visible_on_screen_notifier2d_class_name: gt.ConstStringNamePtr
 texture_button_class_name: gt.ConstStringNamePtr
@@ -939,6 +971,7 @@ register_classes :: proc() {
 	camera2d_class_name = gt.class_name_ptr(&camera2d_class_name_data)
 	marker2d_class_name = gt.class_name_ptr(&marker2d_class_name_data)
 	ray_cast2d_class_name = gt.class_name_ptr(&ray_cast2d_class_name_data)
+	navigation_agent2d_class_name = gt.class_name_ptr(&navigation_agent2d_class_name_data)
 	path_follow2d_class_name = gt.class_name_ptr(&path_follow2d_class_name_data)
 	visible_on_screen_notifier2d_class_name = gt.class_name_ptr(
 		&visible_on_screen_notifier2d_class_name_data,
@@ -962,6 +995,10 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&camera2d_class_name_data, cstring("Camera2D"))
 	gt.class_name_init_latin1_cstring(&marker2d_class_name_data, cstring("Marker2D"))
 	gt.class_name_init_latin1_cstring(&ray_cast2d_class_name_data, cstring("RayCast2D"))
+	gt.class_name_init_latin1_cstring(
+		&navigation_agent2d_class_name_data,
+		cstring("NavigationAgent2D"),
+	)
 	gt.class_name_init_latin1_cstring(&path_follow2d_class_name_data, cstring("PathFollow2D"))
 	gt.class_name_init_latin1_cstring(
 		&visible_on_screen_notifier2d_class_name_data,

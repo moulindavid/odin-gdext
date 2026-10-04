@@ -151,6 +151,14 @@ These slices are complete and were validated with make ci when merged:
      classes in examples/game, updated generated reporting and CHANGELOG, and
      validated with full make ci.
 
+21. NavigationAgent2D generated APIs.
+   - Added selected generated `NavigationAgent2D` handle, casts, and
+     borrowed-safe primitive, vector, color, RID, and packed-vector path query
+     methods while leaving enum/bitfield/result-return navigation APIs skipped.
+     Exposed the selected surface through `godot:godot`, added facade compile
+     coverage, exercised runtime configuration in examples/game, updated
+     generated reporting and CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
