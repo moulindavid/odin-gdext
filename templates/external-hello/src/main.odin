@@ -36,7 +36,9 @@ hello_ready :: proc(instance: gt.ClassInstancePtr, node: gt.Node, reversed: bool
 	gt.debug_print("HelloNode ready from external Odin template")
 }
 
-hello_virtuals := gt.NodeVirtualCallbackDescriptor{ready = hello_ready}
+hello_virtuals := gt.NodeVirtualCallbackDescriptor {
+	ready = hello_ready,
+}
 
 notification_instance :: proc "c" (instance: gt.ClassInstancePtr, what: i32, reversed: bool) {
 	context = gt.godot_context()
@@ -87,31 +89,37 @@ set_speed_adapter_method :: proc "contextless" (
 	return true
 }
 
-roll_math_method_adapter := gt.ClassMethodGetGodotRealAdapter{method = roll_math_adapter_method}
-get_speed_method_adapter := gt.ClassMethodGetGodotRealAdapter{method = get_speed_adapter_method}
-set_speed_method_adapter := gt.ClassMethodSetGodotRealAdapter{method = set_speed_adapter_method}
+roll_math_method_adapter := gt.ClassMethodGetGodotRealAdapter {
+	method = roll_math_adapter_method,
+}
+get_speed_method_adapter := gt.ClassMethodGetGodotRealAdapter {
+	method = get_speed_adapter_method,
+}
+set_speed_method_adapter := gt.ClassMethodSetGodotRealAdapter {
+	method = set_speed_adapter_method,
+}
 
 hello_name_data: gt.ClassName
 hello_parent_name_data: gt.ClassName
-hello_class_name := gt.class_name_ptr(&hello_name_data)
-hello_parent_name := gt.class_name_ptr(&hello_parent_name_data)
+hello_class_name: gt.ConstStringNamePtr
+hello_parent_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
-empty_name := gt.const_static_string_name_ptr(&empty_name_data)
+empty_name: gt.ConstStringNamePtr
 empty_str_data: gt.String
-empty_str := gt.const_string_ptr(&empty_str_data)
+empty_str: gt.ConstStringPtr
 
 roll_math_method_name_data: gt.StaticStringName
-roll_math_method_name := gt.const_static_string_name_ptr(&roll_math_method_name_data)
+roll_math_method_name: gt.ConstStringNamePtr
 roll_math_return_info: gt.PropertyInfo
 roll_math_method_info: gt.ClassMethodInfo
 
 speed_property_name_data: gt.StaticStringName
 speed_getter_name_data: gt.StaticStringName
 speed_setter_name_data: gt.StaticStringName
-speed_property_name := gt.const_static_string_name_ptr(&speed_property_name_data)
-speed_getter_name := gt.const_static_string_name_ptr(&speed_getter_name_data)
-speed_setter_name := gt.const_static_string_name_ptr(&speed_setter_name_data)
+speed_property_name: gt.ConstStringNamePtr
+speed_getter_name: gt.ConstStringNamePtr
+speed_setter_name: gt.ConstStringNamePtr
 speed_property_info: gt.PropertyInfo
 speed_get_return_info: gt.PropertyInfo
 speed_set_arg_info: gt.PropertyInfo
@@ -121,13 +129,20 @@ speed_set_method_info: gt.ClassMethodInfo
 
 speed_changed_signal_name_data: gt.StaticStringName
 speed_changed_arg_name_data: gt.StaticStringName
-speed_changed_signal_name := gt.const_static_string_name_ptr(&speed_changed_signal_name_data)
-speed_changed_arg_name := gt.const_static_string_name_ptr(&speed_changed_arg_name_data)
+speed_changed_signal_name: gt.ConstStringNamePtr
+speed_changed_arg_name: gt.ConstStringNamePtr
 speed_changed_arg_info: gt.PropertyInfo
 
 hello_instance_binding_callbacks := gt.InstanceBindingCallbacks{}
 
 register_methods :: proc() {
+	empty_name = gt.const_static_string_name_ptr(&empty_name_data)
+	empty_str = gt.const_string_ptr(&empty_str_data)
+	roll_math_method_name = gt.const_static_string_name_ptr(&roll_math_method_name_data)
+	speed_property_name = gt.const_static_string_name_ptr(&speed_property_name_data)
+	speed_getter_name = gt.const_static_string_name_ptr(&speed_getter_name_data)
+	speed_setter_name = gt.const_static_string_name_ptr(&speed_setter_name_data)
+
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&empty_name_data),
 		cstring(""),
@@ -152,7 +167,7 @@ register_methods :: proc() {
 
 	gt.init_method_property_info(
 		&roll_math_return_info,
-		gt.MethodPropertyDescriptor{
+		gt.MethodPropertyDescriptor {
 			type = .Float,
 			name = roll_math_method_name,
 			class_name = empty_name,
@@ -162,7 +177,7 @@ register_methods :: proc() {
 	gt.register_class_method_with_descriptor(
 		hello_class_name,
 		&roll_math_method_info,
-		gt.ClassMethodDescriptor{
+		gt.ClassMethodDescriptor {
 			name = roll_math_method_name,
 			method_userdata = &roll_math_method_adapter,
 			call_func = gt.class_method_get_godot_real_call,
@@ -174,7 +189,7 @@ register_methods :: proc() {
 
 	gt.init_method_property_info(
 		&speed_get_return_info,
-		gt.MethodPropertyDescriptor{
+		gt.MethodPropertyDescriptor {
 			type = .Float,
 			name = speed_property_name,
 			class_name = empty_name,
@@ -184,7 +199,7 @@ register_methods :: proc() {
 	gt.register_class_method_with_descriptor(
 		hello_class_name,
 		&speed_get_method_info,
-		gt.ClassMethodDescriptor{
+		gt.ClassMethodDescriptor {
 			name = speed_getter_name,
 			method_userdata = &get_speed_method_adapter,
 			call_func = gt.class_method_get_godot_real_call,
@@ -196,7 +211,7 @@ register_methods :: proc() {
 
 	gt.init_method_property_info(
 		&speed_set_arg_info,
-		gt.MethodPropertyDescriptor{
+		gt.MethodPropertyDescriptor {
 			type = .Float,
 			name = speed_property_name,
 			class_name = empty_name,
@@ -206,7 +221,7 @@ register_methods :: proc() {
 	gt.register_class_method_with_descriptor(
 		hello_class_name,
 		&speed_set_method_info,
-		gt.ClassMethodDescriptor{
+		gt.ClassMethodDescriptor {
 			name = speed_setter_name,
 			method_userdata = &set_speed_method_adapter,
 			call_func = gt.class_method_set_godot_real_call,
@@ -222,8 +237,8 @@ register_properties :: proc() {
 	gt.register_class_property_with_descriptor(
 		hello_class_name,
 		&speed_property_info,
-		gt.ClassPropertyDescriptor{
-			property = gt.MethodPropertyDescriptor{
+		gt.ClassPropertyDescriptor {
+			property = gt.MethodPropertyDescriptor {
 				type = .Float,
 				name = speed_property_name,
 				class_name = empty_name,
@@ -237,6 +252,9 @@ register_properties :: proc() {
 }
 
 register_signals :: proc() {
+	speed_changed_signal_name = gt.const_static_string_name_ptr(&speed_changed_signal_name_data)
+	speed_changed_arg_name = gt.const_static_string_name_ptr(&speed_changed_arg_name_data)
+
 	gt.static_string_name_init_latin1_cstring(
 		gt.uninitialized_static_string_name_ptr(&speed_changed_signal_name_data),
 		cstring("speed_changed"),
@@ -247,7 +265,7 @@ register_signals :: proc() {
 	)
 	gt.init_method_property_info(
 		&speed_changed_arg_info,
-		gt.MethodPropertyDescriptor{
+		gt.MethodPropertyDescriptor {
 			type = .Float,
 			name = speed_changed_arg_name,
 			class_name = empty_name,
@@ -256,7 +274,7 @@ register_signals :: proc() {
 	)
 	gt.register_class_signal_with_descriptor(
 		hello_class_name,
-		gt.ClassSignalDescriptor{
+		gt.ClassSignalDescriptor {
 			name = speed_changed_signal_name,
 			argument_info = &speed_changed_arg_info,
 			argument_count = 1,
@@ -266,12 +284,15 @@ register_signals :: proc() {
 
 register_classes :: proc() {
 	context = gt.godot_context()
+	hello_class_name = gt.class_name_ptr(&hello_name_data)
+	hello_parent_name = gt.class_name_ptr(&hello_parent_name_data)
+
 	gt.class_name_init_latin1_cstring(&hello_name_data, cstring("HelloNode"))
 	gt.class_name_init_latin1_cstring(&hello_parent_name_data, cstring("Node"))
 	gt.init_class_bindings()
 
 	gt.register_editor_visible_class(
-		gt.EditorVisibleClassDescriptor{
+		gt.EditorVisibleClassDescriptor {
 			class_name = hello_class_name,
 			parent_class_name = hello_parent_name,
 			create_instance_func = create_instance,
