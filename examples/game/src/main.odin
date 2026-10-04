@@ -175,6 +175,39 @@ exercise_input_viewport_helpers :: proc "contextless" (parent: gt.Node) {
 		_ = gt.viewport_get_mouse_position(viewport)
 		_ = gt.viewport_get_viewport_rid(viewport)
 		_ = gt.viewport_is_input_disabled(viewport)
+		if window, window_ok := gt.viewport_try_as_window(viewport); window_ok {
+			_ = gt.window_get_window_id(window)
+			_ = gt.window_get_size(window)
+			_ = gt.window_is_visible(window)
+		}
+	}
+
+	window := gt.node_get_window(parent)
+	if !gt.window_is_nil(window) {
+		title := gt.string_from_utf8("Odin GDExtension Game")
+		gt.window_set_title(window, &title)
+		gt.string_free(&title)
+		current_title := gt.window_get_title(window)
+		gt.string_free(&current_title)
+		_ = gt.window_get_current_screen(window)
+		_ = gt.window_get_position(window)
+		_ = gt.window_get_size(window)
+		_ = gt.window_get_position_with_decorations(window)
+		_ = gt.window_get_size_with_decorations(window)
+		_ = gt.window_get_contents_minimum_size(window)
+		_ = gt.window_get_content_scale_size(window)
+		_ = gt.window_get_content_scale_factor(window)
+		_ = gt.window_get_window_id(window)
+		_ = gt.window_is_embedded(window)
+		_ = gt.window_can_draw(window)
+	}
+
+	if tree := gt.node_get_tree(parent); !gt.scene_tree_is_nil(tree) {
+		root := gt.scene_tree_get_root(tree)
+		if !gt.window_is_nil(root) {
+			_ = gt.window_get_window_id(root)
+			_ = gt.window_get_size(root)
+		}
 	}
 
 	event := gt.InputEvent(nil)

@@ -218,6 +218,7 @@ InputEventMouse :: gclass.InputEventMouse
 InputEventMouseButton :: gclass.InputEventMouseButton
 InputEventMouseMotion :: gclass.InputEventMouseMotion
 Viewport :: gclass.Viewport
+Window :: gclass.Window
 SceneTree :: gclass.SceneTree
 AnimationPlayer :: gclass.AnimationPlayer
 Tween :: gclass.Tween
@@ -500,6 +501,7 @@ node_as_object :: gclass.node_as_object
 node_get_parent :: gclass.node_get_parent
 node_get_tree :: gclass.node_get_tree
 node_get_viewport :: gclass.node_get_viewport
+node_get_window :: gclass.node_get_window
 node_set_name :: gclass.node_set_name
 node_get_name :: gclass.node_get_name
 node_has_node :: gclass.node_has_node
@@ -956,6 +958,8 @@ object_is_input_event_mouse_motion :: gclass.object_is_input_event_mouse_motion
 object_try_as_input_event_mouse_motion :: gclass.object_try_as_input_event_mouse_motion
 object_is_viewport :: gclass.object_is_viewport
 object_try_as_viewport :: gclass.object_try_as_viewport
+object_is_window :: gclass.object_is_window
+object_try_as_window :: gclass.object_try_as_window
 object_is_scene_tree :: gclass.object_is_scene_tree
 object_try_as_scene_tree :: gclass.object_try_as_scene_tree
 ref_counted_is_resource :: gclass.ref_counted_is_resource
@@ -1155,6 +1159,10 @@ node_is_collision_shape2d :: gclass.node_is_collision_shape2d
 node_try_as_collision_shape2d :: gclass.node_try_as_collision_shape2d
 node_is_viewport :: gclass.node_is_viewport
 node_try_as_viewport :: gclass.node_try_as_viewport
+node_is_window :: gclass.node_is_window
+node_try_as_window :: gclass.node_try_as_window
+viewport_is_window :: gclass.viewport_is_window
+viewport_try_as_window :: gclass.viewport_try_as_window
 canvas_item_is_collision_shape2d :: gclass.canvas_item_is_collision_shape2d
 canvas_item_try_as_collision_shape2d :: gclass.canvas_item_try_as_collision_shape2d
 node2d_is_collision_shape2d :: gclass.node2d_is_collision_shape2d
@@ -1614,6 +1622,35 @@ input_event_mouse_motion_as_ref_counted :: gclass.input_event_mouse_motion_as_re
 input_event_mouse_motion_as_object :: gclass.input_event_mouse_motion_as_object
 viewport_as_node :: gclass.viewport_as_node
 viewport_as_object :: gclass.viewport_as_object
+window_as_viewport :: gclass.window_as_viewport
+window_as_node :: gclass.window_as_node
+window_as_object :: gclass.window_as_object
+window_notification_visibility_changed :: gclass.window_notification_visibility_changed
+window_notification_theme_changed :: gclass.window_notification_theme_changed
+window_set_title :: gclass.window_set_title
+window_get_title :: gclass.window_get_title
+window_get_current_screen :: gclass.window_get_current_screen
+window_get_position :: gclass.window_get_position
+window_get_size :: gclass.window_get_size
+window_get_position_with_decorations :: gclass.window_get_position_with_decorations
+window_get_size_with_decorations :: gclass.window_get_size_with_decorations
+window_get_max_size :: gclass.window_get_max_size
+window_get_min_size :: gclass.window_get_min_size
+window_is_hdr_output_requested :: gclass.window_is_hdr_output_requested
+window_get_output_max_linear_value :: gclass.window_get_output_max_linear_value
+window_is_maximize_allowed :: gclass.window_is_maximize_allowed
+window_is_visible :: gclass.window_is_visible
+window_can_draw :: gclass.window_can_draw
+window_has_focus :: gclass.window_has_focus
+window_is_embedded :: gclass.window_is_embedded
+window_get_contents_minimum_size :: gclass.window_get_contents_minimum_size
+window_get_content_scale_size :: gclass.window_get_content_scale_size
+window_get_content_scale_factor :: gclass.window_get_content_scale_factor
+window_get_window_id :: gclass.window_get_window_id
+window_get_focused_window :: gclass.window_get_focused_window
+window_is_layout_rtl :: gclass.window_is_layout_rtl
+window_is_auto_translating :: gclass.window_is_auto_translating
+window_is_using_font_oversampling :: gclass.window_is_using_font_oversampling
 input_singleton_checked :: gclass.input_singleton_checked
 input_is_anything_pressed :: gclass.input_is_anything_pressed
 input_is_action_pressed :: gclass.input_is_action_pressed
@@ -1747,6 +1784,7 @@ scene_tree_get_nodes_in_group :: gclass.scene_tree_get_nodes_in_group
 scene_tree_get_first_node_in_group :: gclass.scene_tree_get_first_node_in_group
 scene_tree_get_node_count_in_group :: gclass.scene_tree_get_node_count_in_group
 scene_tree_get_current_scene :: gclass.scene_tree_get_current_scene
+scene_tree_get_root :: gclass.scene_tree_get_root
 scene_tree_is_multiplayer_poll_enabled :: gclass.scene_tree_is_multiplayer_poll_enabled
 
 animation_player_as_node :: gclass.animation_player_as_node
@@ -2016,6 +2054,10 @@ input_event_mouse_motion_is_nil :: proc "contextless" (self: InputEventMouseMoti
 }
 
 viewport_is_nil :: proc "contextless" (self: Viewport) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+window_is_nil :: proc "contextless" (self: Window) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -3211,6 +3253,10 @@ viewport_object_ptr :: proc "contextless" (self: Viewport) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+window_object_ptr :: proc "contextless" (self: Window) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 scene_tree_object_ptr :: proc "contextless" (self: SceneTree) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3301,6 +3347,11 @@ object_ptr_try_as_input_event_mouse_motion :: proc "contextless" (
 object_ptr_try_as_viewport :: proc "contextless" (self: ObjectPtr) -> (value: Viewport, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_viewport(Object(self))
+}
+
+object_ptr_try_as_window :: proc "contextless" (self: ObjectPtr) -> (value: Window, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_window(Object(self))
 }
 
 // InputEvent callback handlers receive a borrowed InputEvent handle. The handle
