@@ -1,0 +1,10 @@
+[configuration]
+
+entry_symbol = "external_hello_library_init"
+compatibility_minimum = "4.7"
+
+[libraries]
+linuxbsd.x86_64 = "bin/external_hello.so"
+windows.x86_64 = "bin/external_hello.dll"
+macos.x86_64 = "bin/libexternal_hello.dylib"
+macos.arm64 = "bin/libexternal_hello.dylib"

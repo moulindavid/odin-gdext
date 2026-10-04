@@ -35,7 +35,7 @@ $(BUILTIN_STAMP): $(EXTENSION_API) $(CODEGEN)
 	@touch $(BUILTIN_STAMP)
 	@touch $(CLASSES_STAMP)
 
-.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot check-facade test-unit hello prepare-hello-cache test-hello smoke prepare-smoke-cache test-smoke game prepare-game-cache example-game ci clean
+.PHONY: codegen interface builtins extension-api fmt fmt-check check check-generator check-bindings check-godot check-facade check-template test-unit hello prepare-hello-cache test-hello smoke prepare-smoke-cache test-smoke game prepare-game-cache example-game ci clean
 
 codegen: $(CODEGEN)
 
@@ -58,6 +58,7 @@ fmt:
 	odinfmt -w -path:generator
 	odinfmt -w -path:godot
 	odinfmt -w -path:examples
+	odinfmt -w -path:templates
 	odinfmt -w -path:tests
 
 fmt-check:
@@ -80,6 +81,10 @@ check-godot: interface builtins
 # Type-check public facade usage without importing internal generated packages.
 check-facade: interface builtins
 	$(ODIN) check tests/facade -no-entry-point $(ODIN_CHECK_FLAGS)
+
+# Type-check the external consumer template against this checkout.
+check-template: interface builtins
+	$(ODIN) check templates/external-hello/src -no-entry-point $(ODIN_CHECK_FLAGS)
 
 # Run focused Odin unit tests that do not require launching Godot.
 # Odin's test runner allocates internally, so this target intentionally omits
@@ -147,6 +152,7 @@ ci:
 	$(MAKE) check-bindings
 	$(MAKE) check-godot
 	$(MAKE) check-facade
+	$(MAKE) check-template
 	$(MAKE) test-unit
 	$(MAKE) test-smoke
 	$(MAKE) test-hello
