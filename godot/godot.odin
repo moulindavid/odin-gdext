@@ -207,6 +207,7 @@ Camera2D :: gclass.Camera2D
 Marker2D :: gclass.Marker2D
 RayCast2D :: gclass.RayCast2D
 NavigationAgent2D :: gclass.NavigationAgent2D
+TileMapLayer :: gclass.TileMapLayer
 PathFollow2D :: gclass.PathFollow2D
 VisibleOnScreenNotifier2D :: gclass.VisibleOnScreenNotifier2D
 Camera2DAnchorMode :: gclass.Camera2DAnchorMode
@@ -1004,6 +1005,8 @@ object_is_ray_cast2d :: gclass.object_is_ray_cast2d
 object_try_as_ray_cast2d :: gclass.object_try_as_ray_cast2d
 object_is_navigation_agent2d :: gclass.object_is_navigation_agent2d
 object_try_as_navigation_agent2d :: gclass.object_try_as_navigation_agent2d
+object_is_tile_map_layer :: gclass.object_is_tile_map_layer
+object_try_as_tile_map_layer :: gclass.object_try_as_tile_map_layer
 object_is_path_follow2d :: gclass.object_is_path_follow2d
 object_try_as_path_follow2d :: gclass.object_try_as_path_follow2d
 object_is_visible_on_screen_notifier2d :: gclass.object_is_visible_on_screen_notifier2d
@@ -1168,6 +1171,8 @@ node_is_ray_cast2d :: gclass.node_is_ray_cast2d
 node_try_as_ray_cast2d :: gclass.node_try_as_ray_cast2d
 node_is_navigation_agent2d :: gclass.node_is_navigation_agent2d
 node_try_as_navigation_agent2d :: gclass.node_try_as_navigation_agent2d
+node_is_tile_map_layer :: gclass.node_is_tile_map_layer
+node_try_as_tile_map_layer :: gclass.node_try_as_tile_map_layer
 node_is_path_follow2d :: gclass.node_is_path_follow2d
 node_try_as_path_follow2d :: gclass.node_try_as_path_follow2d
 node_is_visible_on_screen_notifier2d :: gclass.node_is_visible_on_screen_notifier2d
@@ -1204,6 +1209,8 @@ canvas_item_is_area2d :: gclass.canvas_item_is_area2d
 canvas_item_try_as_area2d :: gclass.canvas_item_try_as_area2d
 canvas_item_is_path_follow2d :: gclass.canvas_item_is_path_follow2d
 canvas_item_try_as_path_follow2d :: gclass.canvas_item_try_as_path_follow2d
+canvas_item_is_tile_map_layer :: gclass.canvas_item_is_tile_map_layer
+canvas_item_try_as_tile_map_layer :: gclass.canvas_item_try_as_tile_map_layer
 canvas_item_is_visible_on_screen_notifier2d :: gclass.canvas_item_is_visible_on_screen_notifier2d
 canvas_item_try_as_visible_on_screen_notifier2d ::
 	gclass.canvas_item_try_as_visible_on_screen_notifier2d
@@ -1215,6 +1222,8 @@ node2d_is_area2d :: gclass.node2d_is_area2d
 node2d_try_as_area2d :: gclass.node2d_try_as_area2d
 node2d_is_path_follow2d :: gclass.node2d_is_path_follow2d
 node2d_try_as_path_follow2d :: gclass.node2d_try_as_path_follow2d
+node2d_is_tile_map_layer :: gclass.node2d_is_tile_map_layer
+node2d_try_as_tile_map_layer :: gclass.node2d_try_as_tile_map_layer
 node2d_is_visible_on_screen_notifier2d :: gclass.node2d_is_visible_on_screen_notifier2d
 node2d_try_as_visible_on_screen_notifier2d :: gclass.node2d_try_as_visible_on_screen_notifier2d
 collision_object2d_is_area2d :: gclass.collision_object2d_is_area2d
@@ -1636,6 +1645,59 @@ navigation_agent2d_set_debug_path_custom_line_width ::
 	gclass.navigation_agent2d_set_debug_path_custom_line_width
 navigation_agent2d_get_debug_path_custom_line_width ::
 	gclass.navigation_agent2d_get_debug_path_custom_line_width
+tile_map_layer_as_node2d :: gclass.tile_map_layer_as_node2d
+tile_map_layer_as_canvas_item :: gclass.tile_map_layer_as_canvas_item
+tile_map_layer_as_node :: gclass.tile_map_layer_as_node
+tile_map_layer_as_object :: gclass.tile_map_layer_as_object
+tile_map_layer_set_cell :: gclass.tile_map_layer_set_cell
+tile_map_layer_erase_cell :: gclass.tile_map_layer_erase_cell
+tile_map_layer_fix_invalid_tiles :: gclass.tile_map_layer_fix_invalid_tiles
+tile_map_layer_clear :: gclass.tile_map_layer_clear
+tile_map_layer_get_cell_source_id :: gclass.tile_map_layer_get_cell_source_id
+tile_map_layer_get_cell_atlas_coords :: gclass.tile_map_layer_get_cell_atlas_coords
+tile_map_layer_get_cell_alternative_tile :: gclass.tile_map_layer_get_cell_alternative_tile
+tile_map_layer_is_cell_flipped_h :: gclass.tile_map_layer_is_cell_flipped_h
+tile_map_layer_is_cell_flipped_v :: gclass.tile_map_layer_is_cell_flipped_v
+tile_map_layer_is_cell_transposed :: gclass.tile_map_layer_is_cell_transposed
+tile_map_layer_get_used_cells :: gclass.tile_map_layer_get_used_cells
+tile_map_layer_get_used_cells_by_id :: gclass.tile_map_layer_get_used_cells_by_id
+tile_map_layer_get_used_rect :: gclass.tile_map_layer_get_used_rect
+tile_map_layer_set_cells_terrain_connect :: gclass.tile_map_layer_set_cells_terrain_connect
+tile_map_layer_set_cells_terrain_connect_default ::
+	gclass.tile_map_layer_set_cells_terrain_connect_default
+tile_map_layer_set_cells_terrain_path :: gclass.tile_map_layer_set_cells_terrain_path
+tile_map_layer_set_cells_terrain_path_default ::
+	gclass.tile_map_layer_set_cells_terrain_path_default
+tile_map_layer_has_body_rid :: gclass.tile_map_layer_has_body_rid
+tile_map_layer_get_coords_for_body_rid :: gclass.tile_map_layer_get_coords_for_body_rid
+tile_map_layer_update_internals :: gclass.tile_map_layer_update_internals
+tile_map_layer_notify_runtime_tile_data_update ::
+	gclass.tile_map_layer_notify_runtime_tile_data_update
+tile_map_layer_get_surrounding_cells :: gclass.tile_map_layer_get_surrounding_cells
+tile_map_layer_map_to_local :: gclass.tile_map_layer_map_to_local
+tile_map_layer_local_to_map :: gclass.tile_map_layer_local_to_map
+tile_map_layer_set_tile_map_data_from_array :: gclass.tile_map_layer_set_tile_map_data_from_array
+tile_map_layer_get_tile_map_data_as_array :: gclass.tile_map_layer_get_tile_map_data_as_array
+tile_map_layer_set_enabled :: gclass.tile_map_layer_set_enabled
+tile_map_layer_is_enabled :: gclass.tile_map_layer_is_enabled
+tile_map_layer_set_y_sort_origin :: gclass.tile_map_layer_set_y_sort_origin
+tile_map_layer_get_y_sort_origin :: gclass.tile_map_layer_get_y_sort_origin
+tile_map_layer_set_x_draw_order_reversed :: gclass.tile_map_layer_set_x_draw_order_reversed
+tile_map_layer_is_x_draw_order_reversed :: gclass.tile_map_layer_is_x_draw_order_reversed
+tile_map_layer_set_rendering_quadrant_size :: gclass.tile_map_layer_set_rendering_quadrant_size
+tile_map_layer_get_rendering_quadrant_size :: gclass.tile_map_layer_get_rendering_quadrant_size
+tile_map_layer_set_collision_enabled :: gclass.tile_map_layer_set_collision_enabled
+tile_map_layer_is_collision_enabled :: gclass.tile_map_layer_is_collision_enabled
+tile_map_layer_set_use_kinematic_bodies :: gclass.tile_map_layer_set_use_kinematic_bodies
+tile_map_layer_is_using_kinematic_bodies :: gclass.tile_map_layer_is_using_kinematic_bodies
+tile_map_layer_set_physics_quadrant_size :: gclass.tile_map_layer_set_physics_quadrant_size
+tile_map_layer_get_physics_quadrant_size :: gclass.tile_map_layer_get_physics_quadrant_size
+tile_map_layer_set_occlusion_enabled :: gclass.tile_map_layer_set_occlusion_enabled
+tile_map_layer_is_occlusion_enabled :: gclass.tile_map_layer_is_occlusion_enabled
+tile_map_layer_set_navigation_enabled :: gclass.tile_map_layer_set_navigation_enabled
+tile_map_layer_is_navigation_enabled :: gclass.tile_map_layer_is_navigation_enabled
+tile_map_layer_set_navigation_map :: gclass.tile_map_layer_set_navigation_map
+tile_map_layer_get_navigation_map :: gclass.tile_map_layer_get_navigation_map
 path_follow2d_as_node2d :: gclass.path_follow2d_as_node2d
 path_follow2d_as_canvas_item :: gclass.path_follow2d_as_canvas_item
 path_follow2d_as_node :: gclass.path_follow2d_as_node
@@ -2127,6 +2189,10 @@ navigation_agent2d_is_nil :: proc "contextless" (self: NavigationAgent2D) -> boo
 	return ObjectPtr(self) == nil
 }
 
+tile_map_layer_is_nil :: proc "contextless" (self: TileMapLayer) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 path_follow2d_is_nil :: proc "contextless" (self: PathFollow2D) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -2425,6 +2491,18 @@ node_get_node_as_navigation_agent2d :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return NavigationAgent2D(nil), false
 	return node_try_as_navigation_agent2d(node)
+}
+
+node_get_node_as_tile_map_layer :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: TileMapLayer,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return TileMapLayer(nil), false
+	return node_try_as_tile_map_layer(node)
 }
 
 node_get_node_as_path_follow2d :: proc "contextless" (
@@ -3339,6 +3417,10 @@ navigation_agent2d_object_ptr :: proc "contextless" (self: NavigationAgent2D) ->
 	return ObjectPtr(self)
 }
 
+tile_map_layer_object_ptr :: proc "contextless" (self: TileMapLayer) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 path_follow2d_object_ptr :: proc "contextless" (self: PathFollow2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3967,6 +4049,16 @@ object_ptr_try_as_navigation_agent2d :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_navigation_agent2d(Object(self))
+}
+
+object_ptr_try_as_tile_map_layer :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: TileMapLayer,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_tile_map_layer(Object(self))
 }
 
 object_ptr_try_as_path_follow2d :: proc "contextless" (
