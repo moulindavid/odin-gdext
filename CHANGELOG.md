@@ -13,6 +13,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   coverage.
 - Added selected generated `NavigationAgent2D` APIs with public facade exports,
   compile coverage, and examples/game runtime coverage.
+- Added selected generated `Window` APIs plus `Node.get_window` and
+  `SceneTree.get_root` facade coverage for root window workflows.
 
 ## Completed roadmap slices
 

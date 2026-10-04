@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 47
+Max_Selected_Class_Count :: 48
 
 selected_class_names := []string {
 	"Object",
@@ -1052,6 +1052,7 @@ selected_class_names := []string {
 	"InputEventMouseButton",
 	"InputEventMouseMotion",
 	"Viewport",
+	"Window",
 	"SceneTree",
 	"AnimationPlayer",
 	"Tween",
@@ -1060,7 +1061,6 @@ selected_class_names := []string {
 }
 
 candidate_class_names := []string {
-	"Window",
 	"AudioStream",
 	"AudioStreamPlayer",
 	"Theme",
@@ -1127,6 +1127,7 @@ selected_class_methods := []Selected_Class_Method {
 	{"Node", "get_parent"},
 	{"Node", "get_tree"},
 	{"Node", "get_viewport"},
+	{"Node", "get_window"},
 	{"Node", "set_name"},
 	{"Node", "get_name"},
 	{"Node", "has_node"},
@@ -1821,6 +1822,7 @@ selected_class_methods := []Selected_Class_Method {
 	{"SceneTree", "get_first_node_in_group"},
 	{"SceneTree", "get_node_count_in_group"},
 	{"SceneTree", "get_current_scene"},
+	{"SceneTree", "get_root"},
 	{"SceneTree", "is_multiplayer_poll_enabled"},
 	{"AnimationPlayer", "animation_set_next"},
 	{"AnimationPlayer", "animation_get_next"},
@@ -1864,6 +1866,30 @@ selected_class_methods := []Selected_Class_Method {
 	{"AnimationPlayer", "get_method_call_mode"},
 	{"AnimationPlayer", "set_root"},
 	{"AnimationPlayer", "get_root"},
+	{"Window", "set_title"},
+	{"Window", "get_title"},
+	{"Window", "get_current_screen"},
+	{"Window", "get_position"},
+	{"Window", "get_size"},
+	{"Window", "get_position_with_decorations"},
+	{"Window", "get_size_with_decorations"},
+	{"Window", "get_max_size"},
+	{"Window", "get_min_size"},
+	{"Window", "is_hdr_output_requested"},
+	{"Window", "get_output_max_linear_value"},
+	{"Window", "is_maximize_allowed"},
+	{"Window", "is_visible"},
+	{"Window", "can_draw"},
+	{"Window", "has_focus"},
+	{"Window", "is_embedded"},
+	{"Window", "get_contents_minimum_size"},
+	{"Window", "get_content_scale_size"},
+	{"Window", "get_content_scale_factor"},
+	{"Window", "get_window_id"},
+	{"Window", "get_focused_window"},
+	{"Window", "is_layout_rtl"},
+	{"Window", "is_auto_translating"},
+	{"Window", "is_using_font_oversampling"},
 	{"SceneTree", "create_tween"},
 	{"Tween", "custom_step"},
 	{"Tween", "stop"},
