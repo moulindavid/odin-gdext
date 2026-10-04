@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 49
+Max_Selected_Class_Count :: 51
 
 selected_class_names := []string {
 	"Object",
@@ -1015,6 +1015,7 @@ selected_class_names := []string {
 	"Resource",
 	"Texture2D",
 	"ImageTexture",
+	"AudioStream",
 	"Node",
 	"CanvasItem",
 	"Node2D",
@@ -1059,18 +1060,10 @@ selected_class_names := []string {
 	"Tween",
 	"PathFollow2D",
 	"VisibleOnScreenNotifier2D",
+	"AudioStreamPlayer",
 }
 
-candidate_class_names := []string {
-	"AudioStream",
-	"AudioStreamPlayer",
-	"Theme",
-	"Font",
-	"StyleBox",
-	"TileMap",
-	"TileMapLayer",
-	"Path2D",
-}
+candidate_class_names := []string{"Theme", "Font", "StyleBox", "TileMap", "TileMapLayer", "Path2D"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1431,6 +1424,33 @@ selected_class_methods := []Selected_Class_Method {
 	{"TextureProgressBar", "get_stretch_margin"},
 	{"TextureProgressBar", "set_nine_patch_stretch"},
 	{"TextureProgressBar", "get_nine_patch_stretch"},
+	{"AudioStream", "get_length"},
+	{"AudioStream", "is_monophonic"},
+	{"AudioStream", "can_be_sampled"},
+	{"AudioStream", "is_meta_stream"},
+	{"AudioStreamPlayer", "set_stream"},
+	{"AudioStreamPlayer", "get_stream"},
+	{"AudioStreamPlayer", "set_volume_db"},
+	{"AudioStreamPlayer", "get_volume_db"},
+	{"AudioStreamPlayer", "set_volume_linear"},
+	{"AudioStreamPlayer", "get_volume_linear"},
+	{"AudioStreamPlayer", "set_pitch_scale"},
+	{"AudioStreamPlayer", "get_pitch_scale"},
+	{"AudioStreamPlayer", "play"},
+	{"AudioStreamPlayer", "seek"},
+	{"AudioStreamPlayer", "stop"},
+	{"AudioStreamPlayer", "is_playing"},
+	{"AudioStreamPlayer", "get_playback_position"},
+	{"AudioStreamPlayer", "set_bus"},
+	{"AudioStreamPlayer", "get_bus"},
+	{"AudioStreamPlayer", "set_autoplay"},
+	{"AudioStreamPlayer", "is_autoplay_enabled"},
+	{"AudioStreamPlayer", "set_playing"},
+	{"AudioStreamPlayer", "set_stream_paused"},
+	{"AudioStreamPlayer", "get_stream_paused"},
+	{"AudioStreamPlayer", "set_max_polyphony"},
+	{"AudioStreamPlayer", "get_max_polyphony"},
+	{"AudioStreamPlayer", "has_stream_playback"},
 	{"TextureRect", "set_expand_mode"},
 	{"TextureRect", "get_expand_mode"},
 	{"TextureRect", "set_flip_h"},

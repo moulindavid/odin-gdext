@@ -17,6 +17,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   `SceneTree.get_root` facade coverage for root window workflows.
 - Added selected generated `TextureProgressBar` APIs with public facade exports,
   compile coverage, and examples/game runtime coverage.
+- Added selected generated `AudioStream` and `AudioStreamPlayer` APIs with public
+  facade exports, compile coverage, and examples/game runtime coverage.
 
 ## Completed roadmap slices
 
