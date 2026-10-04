@@ -184,6 +184,7 @@ Button :: gclass.Button
 TextureButton :: gclass.TextureButton
 Range :: gclass.Range
 ProgressBar :: gclass.ProgressBar
+TextureProgressBar :: gclass.TextureProgressBar
 TextureButtonStretchMode :: gclass.TextureButtonStretchMode
 ProgressBarFillMode :: gclass.ProgressBarFillMode
 TextureRect :: gclass.TextureRect
@@ -820,6 +821,43 @@ progress_bar_set_editor_preview_indeterminate ::
 	gclass.progress_bar_set_editor_preview_indeterminate
 progress_bar_is_editor_preview_indeterminate_enabled ::
 	gclass.progress_bar_is_editor_preview_indeterminate_enabled
+texture_progress_bar_as_range :: gclass.texture_progress_bar_as_range
+texture_progress_bar_as_control :: gclass.texture_progress_bar_as_control
+texture_progress_bar_as_canvas_item :: gclass.texture_progress_bar_as_canvas_item
+texture_progress_bar_as_node :: gclass.texture_progress_bar_as_node
+texture_progress_bar_as_object :: gclass.texture_progress_bar_as_object
+texture_progress_bar_set_under_texture :: gclass.texture_progress_bar_set_under_texture
+texture_progress_bar_get_under_texture :: gclass.texture_progress_bar_get_under_texture
+texture_progress_bar_set_progress_texture :: gclass.texture_progress_bar_set_progress_texture
+texture_progress_bar_get_progress_texture :: gclass.texture_progress_bar_get_progress_texture
+texture_progress_bar_set_over_texture :: gclass.texture_progress_bar_set_over_texture
+texture_progress_bar_get_over_texture :: gclass.texture_progress_bar_get_over_texture
+texture_progress_bar_set_fill_mode :: gclass.texture_progress_bar_set_fill_mode
+texture_progress_bar_get_fill_mode :: gclass.texture_progress_bar_get_fill_mode
+texture_progress_bar_set_tint_under :: gclass.texture_progress_bar_set_tint_under
+texture_progress_bar_get_tint_under :: gclass.texture_progress_bar_get_tint_under
+texture_progress_bar_set_tint_progress :: gclass.texture_progress_bar_set_tint_progress
+texture_progress_bar_get_tint_progress :: gclass.texture_progress_bar_get_tint_progress
+texture_progress_bar_set_tint_over :: gclass.texture_progress_bar_set_tint_over
+texture_progress_bar_get_tint_over :: gclass.texture_progress_bar_get_tint_over
+texture_progress_bar_set_texture_progress_offset ::
+	gclass.texture_progress_bar_set_texture_progress_offset
+texture_progress_bar_get_texture_progress_offset ::
+	gclass.texture_progress_bar_get_texture_progress_offset
+texture_progress_bar_set_radial_initial_angle ::
+	gclass.texture_progress_bar_set_radial_initial_angle
+texture_progress_bar_get_radial_initial_angle ::
+	gclass.texture_progress_bar_get_radial_initial_angle
+texture_progress_bar_set_radial_center_offset ::
+	gclass.texture_progress_bar_set_radial_center_offset
+texture_progress_bar_get_radial_center_offset ::
+	gclass.texture_progress_bar_get_radial_center_offset
+texture_progress_bar_set_fill_degrees :: gclass.texture_progress_bar_set_fill_degrees
+texture_progress_bar_get_fill_degrees :: gclass.texture_progress_bar_get_fill_degrees
+texture_progress_bar_set_stretch_margin :: gclass.texture_progress_bar_set_stretch_margin
+texture_progress_bar_get_stretch_margin :: gclass.texture_progress_bar_get_stretch_margin
+texture_progress_bar_set_nine_patch_stretch :: gclass.texture_progress_bar_set_nine_patch_stretch
+texture_progress_bar_get_nine_patch_stretch :: gclass.texture_progress_bar_get_nine_patch_stretch
 texture_rect_set_texture :: gclass.texture_rect_set_texture
 texture_rect_get_texture :: gclass.texture_rect_get_texture
 texture_rect_set_expand_mode :: gclass.texture_rect_set_expand_mode
@@ -902,6 +940,8 @@ object_is_range :: gclass.object_is_range
 object_try_as_range :: gclass.object_try_as_range
 object_is_progress_bar :: gclass.object_is_progress_bar
 object_try_as_progress_bar :: gclass.object_try_as_progress_bar
+object_is_texture_progress_bar :: gclass.object_is_texture_progress_bar
+object_try_as_texture_progress_bar :: gclass.object_try_as_texture_progress_bar
 object_is_texture_rect :: gclass.object_is_texture_rect
 object_try_as_texture_rect :: gclass.object_try_as_texture_rect
 object_is_panel :: gclass.object_is_panel
@@ -1072,6 +1112,8 @@ node_is_range :: gclass.node_is_range
 node_try_as_range :: gclass.node_try_as_range
 node_is_progress_bar :: gclass.node_is_progress_bar
 node_try_as_progress_bar :: gclass.node_try_as_progress_bar
+node_is_texture_progress_bar :: gclass.node_is_texture_progress_bar
+node_try_as_texture_progress_bar :: gclass.node_try_as_texture_progress_bar
 node_is_texture_rect :: gclass.node_is_texture_rect
 node_try_as_texture_rect :: gclass.node_try_as_texture_rect
 node_is_panel :: gclass.node_is_panel
@@ -1114,6 +1156,8 @@ canvas_item_is_range :: gclass.canvas_item_is_range
 canvas_item_try_as_range :: gclass.canvas_item_try_as_range
 canvas_item_is_progress_bar :: gclass.canvas_item_is_progress_bar
 canvas_item_try_as_progress_bar :: gclass.canvas_item_try_as_progress_bar
+canvas_item_is_texture_progress_bar :: gclass.canvas_item_is_texture_progress_bar
+canvas_item_try_as_texture_progress_bar :: gclass.canvas_item_try_as_texture_progress_bar
 canvas_item_is_texture_rect :: gclass.canvas_item_is_texture_rect
 canvas_item_try_as_texture_rect :: gclass.canvas_item_try_as_texture_rect
 canvas_item_is_panel :: gclass.canvas_item_is_panel
@@ -1185,6 +1229,8 @@ control_is_range :: gclass.control_is_range
 control_try_as_range :: gclass.control_try_as_range
 control_is_progress_bar :: gclass.control_is_progress_bar
 control_try_as_progress_bar :: gclass.control_try_as_progress_bar
+control_is_texture_progress_bar :: gclass.control_is_texture_progress_bar
+control_try_as_texture_progress_bar :: gclass.control_try_as_texture_progress_bar
 control_is_texture_rect :: gclass.control_is_texture_rect
 control_try_as_texture_rect :: gclass.control_try_as_texture_rect
 control_is_panel :: gclass.control_is_panel
@@ -1197,6 +1243,8 @@ base_button_is_texture_button :: gclass.base_button_is_texture_button
 base_button_try_as_texture_button :: gclass.base_button_try_as_texture_button
 range_is_progress_bar :: gclass.range_is_progress_bar
 range_try_as_progress_bar :: gclass.range_try_as_progress_bar
+range_is_texture_progress_bar :: gclass.range_is_texture_progress_bar
+range_try_as_texture_progress_bar :: gclass.range_try_as_texture_progress_bar
 timer_as_node :: gclass.timer_as_node
 timer_as_object :: gclass.timer_as_object
 timer_set_wait_time :: gclass.timer_set_wait_time
@@ -1935,6 +1983,10 @@ progress_bar_is_nil :: proc "contextless" (self: ProgressBar) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+texture_progress_bar_is_nil :: proc "contextless" (self: TextureProgressBar) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 texture_rect_is_nil :: proc "contextless" (self: TextureRect) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -2181,6 +2233,18 @@ node_get_node_as_progress_bar :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return ProgressBar(nil), false
 	return node_try_as_progress_bar(node)
+}
+
+node_get_node_as_texture_progress_bar :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: TextureProgressBar,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return TextureProgressBar(nil), false
+	return node_try_as_texture_progress_bar(node)
 }
 
 node_get_node_as_texture_rect :: proc "contextless" (
@@ -3115,6 +3179,10 @@ progress_bar_object_ptr :: proc "contextless" (self: ProgressBar) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+texture_progress_bar_object_ptr :: proc "contextless" (self: TextureProgressBar) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 texture_rect_object_ptr :: proc "contextless" (self: TextureRect) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3615,6 +3683,16 @@ object_ptr_try_as_progress_bar :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_progress_bar(Object(self))
+}
+
+object_ptr_try_as_texture_progress_bar :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: TextureProgressBar,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_texture_progress_bar(Object(self))
 }
 
 object_ptr_try_as_timer :: proc "contextless" (self: ObjectPtr) -> (value: Timer, ok: bool) {

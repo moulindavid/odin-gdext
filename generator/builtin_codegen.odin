@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 48
+Max_Selected_Class_Count :: 49
 
 selected_class_names := []string {
 	"Object",
@@ -1024,6 +1024,7 @@ selected_class_names := []string {
 	"TextureButton",
 	"Range",
 	"ProgressBar",
+	"TextureProgressBar",
 	"TextureRect",
 	"Panel",
 	"Container",
@@ -1066,7 +1067,6 @@ candidate_class_names := []string {
 	"Theme",
 	"Font",
 	"StyleBox",
-	"TextureProgressBar",
 	"TileMap",
 	"TileMapLayer",
 	"Path2D",
@@ -1405,6 +1405,32 @@ selected_class_methods := []Selected_Class_Method {
 	{"ProgressBar", "is_indeterminate"},
 	{"ProgressBar", "set_editor_preview_indeterminate"},
 	{"ProgressBar", "is_editor_preview_indeterminate_enabled"},
+	{"TextureProgressBar", "set_under_texture"},
+	{"TextureProgressBar", "get_under_texture"},
+	{"TextureProgressBar", "set_progress_texture"},
+	{"TextureProgressBar", "get_progress_texture"},
+	{"TextureProgressBar", "set_over_texture"},
+	{"TextureProgressBar", "get_over_texture"},
+	{"TextureProgressBar", "set_fill_mode"},
+	{"TextureProgressBar", "get_fill_mode"},
+	{"TextureProgressBar", "set_tint_under"},
+	{"TextureProgressBar", "get_tint_under"},
+	{"TextureProgressBar", "set_tint_progress"},
+	{"TextureProgressBar", "get_tint_progress"},
+	{"TextureProgressBar", "set_tint_over"},
+	{"TextureProgressBar", "get_tint_over"},
+	{"TextureProgressBar", "set_texture_progress_offset"},
+	{"TextureProgressBar", "get_texture_progress_offset"},
+	{"TextureProgressBar", "set_radial_initial_angle"},
+	{"TextureProgressBar", "get_radial_initial_angle"},
+	{"TextureProgressBar", "set_radial_center_offset"},
+	{"TextureProgressBar", "get_radial_center_offset"},
+	{"TextureProgressBar", "set_fill_degrees"},
+	{"TextureProgressBar", "get_fill_degrees"},
+	{"TextureProgressBar", "set_stretch_margin"},
+	{"TextureProgressBar", "get_stretch_margin"},
+	{"TextureProgressBar", "set_nine_patch_stretch"},
+	{"TextureProgressBar", "get_nine_patch_stretch"},
 	{"TextureRect", "set_expand_mode"},
 	{"TextureRect", "get_expand_mode"},
 	{"TextureRect", "set_flip_h"},
