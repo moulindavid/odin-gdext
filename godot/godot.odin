@@ -202,6 +202,7 @@ CollisionShape2D :: gclass.CollisionShape2D
 Camera2D :: gclass.Camera2D
 Marker2D :: gclass.Marker2D
 RayCast2D :: gclass.RayCast2D
+NavigationAgent2D :: gclass.NavigationAgent2D
 PathFollow2D :: gclass.PathFollow2D
 VisibleOnScreenNotifier2D :: gclass.VisibleOnScreenNotifier2D
 Camera2DAnchorMode :: gclass.Camera2DAnchorMode
@@ -927,6 +928,8 @@ object_is_marker2d :: gclass.object_is_marker2d
 object_try_as_marker2d :: gclass.object_try_as_marker2d
 object_is_ray_cast2d :: gclass.object_is_ray_cast2d
 object_try_as_ray_cast2d :: gclass.object_try_as_ray_cast2d
+object_is_navigation_agent2d :: gclass.object_is_navigation_agent2d
+object_try_as_navigation_agent2d :: gclass.object_try_as_navigation_agent2d
 object_is_path_follow2d :: gclass.object_is_path_follow2d
 object_try_as_path_follow2d :: gclass.object_try_as_path_follow2d
 object_is_visible_on_screen_notifier2d :: gclass.object_is_visible_on_screen_notifier2d
@@ -1083,6 +1086,8 @@ node_is_marker2d :: gclass.node_is_marker2d
 node_try_as_marker2d :: gclass.node_try_as_marker2d
 node_is_ray_cast2d :: gclass.node_is_ray_cast2d
 node_try_as_ray_cast2d :: gclass.node_try_as_ray_cast2d
+node_is_navigation_agent2d :: gclass.node_is_navigation_agent2d
+node_try_as_navigation_agent2d :: gclass.node_try_as_navigation_agent2d
 node_is_path_follow2d :: gclass.node_is_path_follow2d
 node_try_as_path_follow2d :: gclass.node_try_as_path_follow2d
 node_is_visible_on_screen_notifier2d :: gclass.node_is_visible_on_screen_notifier2d
@@ -1418,6 +1423,103 @@ ray_cast2d_set_collide_with_bodies :: gclass.ray_cast2d_set_collide_with_bodies
 ray_cast2d_is_collide_with_bodies_enabled :: gclass.ray_cast2d_is_collide_with_bodies_enabled
 ray_cast2d_set_hit_from_inside :: gclass.ray_cast2d_set_hit_from_inside
 ray_cast2d_is_hit_from_inside_enabled :: gclass.ray_cast2d_is_hit_from_inside_enabled
+navigation_agent2d_as_node :: gclass.navigation_agent2d_as_node
+navigation_agent2d_as_object :: gclass.navigation_agent2d_as_object
+navigation_agent2d_get_rid :: gclass.navigation_agent2d_get_rid
+navigation_agent2d_set_avoidance_enabled :: gclass.navigation_agent2d_set_avoidance_enabled
+navigation_agent2d_get_avoidance_enabled :: gclass.navigation_agent2d_get_avoidance_enabled
+navigation_agent2d_set_path_desired_distance :: gclass.navigation_agent2d_set_path_desired_distance
+navigation_agent2d_get_path_desired_distance :: gclass.navigation_agent2d_get_path_desired_distance
+navigation_agent2d_set_target_desired_distance ::
+	gclass.navigation_agent2d_set_target_desired_distance
+navigation_agent2d_get_target_desired_distance ::
+	gclass.navigation_agent2d_get_target_desired_distance
+navigation_agent2d_set_radius :: gclass.navigation_agent2d_set_radius
+navigation_agent2d_get_radius :: gclass.navigation_agent2d_get_radius
+navigation_agent2d_set_neighbor_distance :: gclass.navigation_agent2d_set_neighbor_distance
+navigation_agent2d_get_neighbor_distance :: gclass.navigation_agent2d_get_neighbor_distance
+navigation_agent2d_set_max_neighbors :: gclass.navigation_agent2d_set_max_neighbors
+navigation_agent2d_get_max_neighbors :: gclass.navigation_agent2d_get_max_neighbors
+navigation_agent2d_set_time_horizon_agents :: gclass.navigation_agent2d_set_time_horizon_agents
+navigation_agent2d_get_time_horizon_agents :: gclass.navigation_agent2d_get_time_horizon_agents
+navigation_agent2d_set_time_horizon_obstacles ::
+	gclass.navigation_agent2d_set_time_horizon_obstacles
+navigation_agent2d_get_time_horizon_obstacles ::
+	gclass.navigation_agent2d_get_time_horizon_obstacles
+navigation_agent2d_set_max_speed :: gclass.navigation_agent2d_set_max_speed
+navigation_agent2d_get_max_speed :: gclass.navigation_agent2d_get_max_speed
+navigation_agent2d_set_path_max_distance :: gclass.navigation_agent2d_set_path_max_distance
+navigation_agent2d_get_path_max_distance :: gclass.navigation_agent2d_get_path_max_distance
+navigation_agent2d_set_navigation_layers :: gclass.navigation_agent2d_set_navigation_layers
+navigation_agent2d_get_navigation_layers :: gclass.navigation_agent2d_get_navigation_layers
+navigation_agent2d_set_navigation_layer_value ::
+	gclass.navigation_agent2d_set_navigation_layer_value
+navigation_agent2d_get_navigation_layer_value ::
+	gclass.navigation_agent2d_get_navigation_layer_value
+navigation_agent2d_set_navigation_map :: gclass.navigation_agent2d_set_navigation_map
+navigation_agent2d_get_navigation_map :: gclass.navigation_agent2d_get_navigation_map
+navigation_agent2d_set_target_position :: gclass.navigation_agent2d_set_target_position
+navigation_agent2d_get_target_position :: gclass.navigation_agent2d_get_target_position
+navigation_agent2d_set_simplify_path :: gclass.navigation_agent2d_set_simplify_path
+navigation_agent2d_get_simplify_path :: gclass.navigation_agent2d_get_simplify_path
+navigation_agent2d_set_simplify_epsilon :: gclass.navigation_agent2d_set_simplify_epsilon
+navigation_agent2d_get_simplify_epsilon :: gclass.navigation_agent2d_get_simplify_epsilon
+navigation_agent2d_set_path_return_max_length ::
+	gclass.navigation_agent2d_set_path_return_max_length
+navigation_agent2d_get_path_return_max_length ::
+	gclass.navigation_agent2d_get_path_return_max_length
+navigation_agent2d_set_path_return_max_radius ::
+	gclass.navigation_agent2d_set_path_return_max_radius
+navigation_agent2d_get_path_return_max_radius ::
+	gclass.navigation_agent2d_get_path_return_max_radius
+navigation_agent2d_set_path_search_max_polygons ::
+	gclass.navigation_agent2d_set_path_search_max_polygons
+navigation_agent2d_get_path_search_max_polygons ::
+	gclass.navigation_agent2d_get_path_search_max_polygons
+navigation_agent2d_set_path_search_max_distance ::
+	gclass.navigation_agent2d_set_path_search_max_distance
+navigation_agent2d_get_path_search_max_distance ::
+	gclass.navigation_agent2d_get_path_search_max_distance
+navigation_agent2d_get_path_length :: gclass.navigation_agent2d_get_path_length
+navigation_agent2d_get_next_path_position :: gclass.navigation_agent2d_get_next_path_position
+navigation_agent2d_set_velocity_forced :: gclass.navigation_agent2d_set_velocity_forced
+navigation_agent2d_set_velocity :: gclass.navigation_agent2d_set_velocity
+navigation_agent2d_get_velocity :: gclass.navigation_agent2d_get_velocity
+navigation_agent2d_distance_to_target :: gclass.navigation_agent2d_distance_to_target
+navigation_agent2d_get_current_navigation_path ::
+	gclass.navigation_agent2d_get_current_navigation_path
+navigation_agent2d_get_current_navigation_path_index ::
+	gclass.navigation_agent2d_get_current_navigation_path_index
+navigation_agent2d_is_target_reached :: gclass.navigation_agent2d_is_target_reached
+navigation_agent2d_is_target_reachable :: gclass.navigation_agent2d_is_target_reachable
+navigation_agent2d_is_navigation_finished :: gclass.navigation_agent2d_is_navigation_finished
+navigation_agent2d_get_final_position :: gclass.navigation_agent2d_get_final_position
+navigation_agent2d_set_avoidance_layers :: gclass.navigation_agent2d_set_avoidance_layers
+navigation_agent2d_get_avoidance_layers :: gclass.navigation_agent2d_get_avoidance_layers
+navigation_agent2d_set_avoidance_mask :: gclass.navigation_agent2d_set_avoidance_mask
+navigation_agent2d_get_avoidance_mask :: gclass.navigation_agent2d_get_avoidance_mask
+navigation_agent2d_set_avoidance_layer_value :: gclass.navigation_agent2d_set_avoidance_layer_value
+navigation_agent2d_get_avoidance_layer_value :: gclass.navigation_agent2d_get_avoidance_layer_value
+navigation_agent2d_set_avoidance_mask_value :: gclass.navigation_agent2d_set_avoidance_mask_value
+navigation_agent2d_get_avoidance_mask_value :: gclass.navigation_agent2d_get_avoidance_mask_value
+navigation_agent2d_set_avoidance_priority :: gclass.navigation_agent2d_set_avoidance_priority
+navigation_agent2d_get_avoidance_priority :: gclass.navigation_agent2d_get_avoidance_priority
+navigation_agent2d_set_debug_enabled :: gclass.navigation_agent2d_set_debug_enabled
+navigation_agent2d_get_debug_enabled :: gclass.navigation_agent2d_get_debug_enabled
+navigation_agent2d_set_debug_use_custom :: gclass.navigation_agent2d_set_debug_use_custom
+navigation_agent2d_get_debug_use_custom :: gclass.navigation_agent2d_get_debug_use_custom
+navigation_agent2d_set_debug_path_custom_color ::
+	gclass.navigation_agent2d_set_debug_path_custom_color
+navigation_agent2d_get_debug_path_custom_color ::
+	gclass.navigation_agent2d_get_debug_path_custom_color
+navigation_agent2d_set_debug_path_custom_point_size ::
+	gclass.navigation_agent2d_set_debug_path_custom_point_size
+navigation_agent2d_get_debug_path_custom_point_size ::
+	gclass.navigation_agent2d_get_debug_path_custom_point_size
+navigation_agent2d_set_debug_path_custom_line_width ::
+	gclass.navigation_agent2d_set_debug_path_custom_line_width
+navigation_agent2d_get_debug_path_custom_line_width ::
+	gclass.navigation_agent2d_get_debug_path_custom_line_width
 path_follow2d_as_node2d :: gclass.path_follow2d_as_node2d
 path_follow2d_as_canvas_item :: gclass.path_follow2d_as_canvas_item
 path_follow2d_as_node :: gclass.path_follow2d_as_node
@@ -1859,6 +1961,10 @@ ray_cast2d_is_nil :: proc "contextless" (self: RayCast2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+navigation_agent2d_is_nil :: proc "contextless" (self: NavigationAgent2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 path_follow2d_is_nil :: proc "contextless" (self: PathFollow2D) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -2129,6 +2235,18 @@ node_get_node_as_ray_cast2d :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return RayCast2D(nil), false
 	return node_try_as_ray_cast2d(node)
+}
+
+node_get_node_as_navigation_agent2d :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: NavigationAgent2D,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return NavigationAgent2D(nil), false
+	return node_try_as_navigation_agent2d(node)
 }
 
 node_get_node_as_path_follow2d :: proc "contextless" (
@@ -3019,6 +3137,10 @@ ray_cast2d_object_ptr :: proc "contextless" (self: RayCast2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+navigation_agent2d_object_ptr :: proc "contextless" (self: NavigationAgent2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 path_follow2d_object_ptr :: proc "contextless" (self: PathFollow2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3580,6 +3702,16 @@ object_ptr_try_as_ray_cast2d :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_ray_cast2d(Object(self))
+}
+
+object_ptr_try_as_navigation_agent2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: NavigationAgent2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_navigation_agent2d(Object(self))
 }
 
 object_ptr_try_as_path_follow2d :: proc "contextless" (

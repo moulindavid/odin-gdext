@@ -11,6 +11,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
 - Added selected generated `PathFollow2D` and `VisibleOnScreenNotifier2D` APIs
   with public facade exports, compile coverage, and examples/game runtime
   coverage.
+- Added selected generated `NavigationAgent2D` APIs with public facade exports,
+  compile coverage, and examples/game runtime coverage.
 
 ## Completed roadmap slices
 
