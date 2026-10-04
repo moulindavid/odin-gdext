@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 53
+Max_Selected_Class_Count :: 54
 
 selected_class_names := []string {
 	"Object",
@@ -1045,6 +1045,7 @@ selected_class_names := []string {
 	"RayCast2D",
 	"NavigationAgent2D",
 	"TileMapLayer",
+	"TileMap",
 	"PackedScene",
 	"ResourceLoader",
 	"Input",
@@ -1065,7 +1066,7 @@ selected_class_names := []string {
 	"AudioStreamPlayer",
 }
 
-candidate_class_names := []string{"Theme", "Font", "TileMap", "Path2D"}
+candidate_class_names := []string{"Theme", "Font", "Path2D"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1785,6 +1786,56 @@ selected_class_methods := []Selected_Class_Method {
 	{"TileMapLayer", "is_navigation_enabled"},
 	{"TileMapLayer", "set_navigation_map"},
 	{"TileMapLayer", "get_navigation_map"},
+	{"TileMap", "set_navigation_map"},
+	{"TileMap", "get_navigation_map"},
+	{"TileMap", "force_update"},
+	{"TileMap", "set_rendering_quadrant_size"},
+	{"TileMap", "get_rendering_quadrant_size"},
+	{"TileMap", "get_layers_count"},
+	{"TileMap", "add_layer"},
+	{"TileMap", "move_layer"},
+	{"TileMap", "remove_layer"},
+	{"TileMap", "set_layer_name"},
+	{"TileMap", "get_layer_name"},
+	{"TileMap", "set_layer_enabled"},
+	{"TileMap", "is_layer_enabled"},
+	{"TileMap", "set_layer_modulate"},
+	{"TileMap", "get_layer_modulate"},
+	{"TileMap", "set_layer_y_sort_enabled"},
+	{"TileMap", "is_layer_y_sort_enabled"},
+	{"TileMap", "set_layer_y_sort_origin"},
+	{"TileMap", "get_layer_y_sort_origin"},
+	{"TileMap", "set_layer_z_index"},
+	{"TileMap", "get_layer_z_index"},
+	{"TileMap", "set_layer_navigation_enabled"},
+	{"TileMap", "is_layer_navigation_enabled"},
+	{"TileMap", "set_layer_navigation_map"},
+	{"TileMap", "get_layer_navigation_map"},
+	{"TileMap", "set_collision_animatable"},
+	{"TileMap", "is_collision_animatable"},
+	{"TileMap", "set_cell"},
+	{"TileMap", "erase_cell"},
+	{"TileMap", "get_cell_source_id"},
+	{"TileMap", "get_cell_atlas_coords"},
+	{"TileMap", "get_cell_alternative_tile"},
+	{"TileMap", "is_cell_flipped_h"},
+	{"TileMap", "is_cell_flipped_v"},
+	{"TileMap", "is_cell_transposed"},
+	{"TileMap", "get_coords_for_body_rid"},
+	{"TileMap", "get_layer_for_body_rid"},
+	{"TileMap", "set_cells_terrain_connect"},
+	{"TileMap", "set_cells_terrain_path"},
+	{"TileMap", "fix_invalid_tiles"},
+	{"TileMap", "clear_layer"},
+	{"TileMap", "clear"},
+	{"TileMap", "update_internals"},
+	{"TileMap", "notify_runtime_tile_data_update"},
+	{"TileMap", "get_surrounding_cells"},
+	{"TileMap", "get_used_cells"},
+	{"TileMap", "get_used_cells_by_id"},
+	{"TileMap", "get_used_rect"},
+	{"TileMap", "map_to_local"},
+	{"TileMap", "local_to_map"},
 	{"VisibleOnScreenNotifier2D", "set_rect"},
 	{"VisibleOnScreenNotifier2D", "get_rect"},
 	{"VisibleOnScreenNotifier2D", "set_show_rect"},

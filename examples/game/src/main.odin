@@ -379,6 +379,23 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		_ = gt.object_destroy_checked(navigation_agent_object)
 	}
 
+	tile_map_object := gt.construct_object(tile_map_class_name)
+	if tile_map, tile_map_ok := gt.object_ptr_try_as_tile_map(tile_map_object); tile_map_ok {
+		gt.tile_map_set_rendering_quadrant_size(tile_map, 16)
+		gt.tile_map_set_collision_animatable(tile_map, false)
+		_ = gt.tile_map_get_rendering_quadrant_size(tile_map)
+		_ = gt.tile_map_is_collision_animatable(tile_map)
+		_ = gt.tile_map_get_layers_count(tile_map)
+		_ = gt.tile_map_get_used_rect(tile_map)
+		used_cells := gt.tile_map_get_used_cells(tile_map, 0)
+		gt.typed_array_free(&used_cells)
+		if !gt.node_add_child_checked(parent, gt.tile_map_as_node(tile_map)) {
+			_ = gt.object_destroy_checked(gt.tile_map_object_ptr(tile_map))
+		}
+	} else if tile_map_object != nil {
+		_ = gt.object_destroy_checked(tile_map_object)
+	}
+
 	tile_map_layer_object := gt.construct_object(tile_map_layer_class_name)
 	if tile_layer, tile_layer_ok := gt.object_ptr_try_as_tile_map_layer(tile_map_layer_object);
 	   tile_layer_ok {
@@ -866,6 +883,7 @@ marker2d_class_name_data: gt.ClassName
 ray_cast2d_class_name_data: gt.ClassName
 navigation_agent2d_class_name_data: gt.ClassName
 tile_map_layer_class_name_data: gt.ClassName
+tile_map_class_name_data: gt.ClassName
 path_follow2d_class_name_data: gt.ClassName
 visible_on_screen_notifier2d_class_name_data: gt.ClassName
 texture_button_class_name_data: gt.ClassName
@@ -885,6 +903,7 @@ marker2d_class_name: gt.ConstStringNamePtr
 ray_cast2d_class_name: gt.ConstStringNamePtr
 navigation_agent2d_class_name: gt.ConstStringNamePtr
 tile_map_layer_class_name: gt.ConstStringNamePtr
+tile_map_class_name: gt.ConstStringNamePtr
 path_follow2d_class_name: gt.ConstStringNamePtr
 visible_on_screen_notifier2d_class_name: gt.ConstStringNamePtr
 texture_button_class_name: gt.ConstStringNamePtr
@@ -1127,6 +1146,7 @@ register_classes :: proc() {
 	ray_cast2d_class_name = gt.class_name_ptr(&ray_cast2d_class_name_data)
 	navigation_agent2d_class_name = gt.class_name_ptr(&navigation_agent2d_class_name_data)
 	tile_map_layer_class_name = gt.class_name_ptr(&tile_map_layer_class_name_data)
+	tile_map_class_name = gt.class_name_ptr(&tile_map_class_name_data)
 	path_follow2d_class_name = gt.class_name_ptr(&path_follow2d_class_name_data)
 	visible_on_screen_notifier2d_class_name = gt.class_name_ptr(
 		&visible_on_screen_notifier2d_class_name_data,
@@ -1158,6 +1178,7 @@ register_classes :: proc() {
 		cstring("NavigationAgent2D"),
 	)
 	gt.class_name_init_latin1_cstring(&tile_map_layer_class_name_data, cstring("TileMapLayer"))
+	gt.class_name_init_latin1_cstring(&tile_map_class_name_data, cstring("TileMap"))
 	gt.class_name_init_latin1_cstring(&path_follow2d_class_name_data, cstring("PathFollow2D"))
 	gt.class_name_init_latin1_cstring(
 		&visible_on_screen_notifier2d_class_name_data,
