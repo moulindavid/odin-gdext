@@ -188,6 +188,15 @@ These slices are complete and were validated with make ci when merged:
      coverage, exercised runtime configuration in examples/game, updated
      generated reporting and CHANGELOG, and validated with full make ci.
 
+26. TileMapLayer generated APIs.
+   - Added selected generated `TileMapLayer` handle, casts, upcasts, and
+     borrowed-safe cell, layer configuration, coordinate, typed-array, packed
+     byte array, RID, and navigation/collision query methods while leaving
+     TileSet/TileData/pattern/debug-visibility APIs skipped. Exposed the selected
+     surface through `godot:godot`, added facade compile coverage, exercised
+     TileSet-independent runtime configuration in examples/game, updated
+     generated reporting and CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

@@ -379,6 +379,37 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		_ = gt.object_destroy_checked(navigation_agent_object)
 	}
 
+	tile_map_layer_object := gt.construct_object(tile_map_layer_class_name)
+	if tile_layer, tile_layer_ok := gt.object_ptr_try_as_tile_map_layer(tile_map_layer_object);
+	   tile_layer_ok {
+		gt.tile_map_layer_set_enabled(tile_layer, true)
+		gt.tile_map_layer_set_y_sort_origin(tile_layer, 0)
+		gt.tile_map_layer_set_x_draw_order_reversed(tile_layer, false)
+		gt.tile_map_layer_set_rendering_quadrant_size(tile_layer, 16)
+		gt.tile_map_layer_set_collision_enabled(tile_layer, false)
+		gt.tile_map_layer_set_use_kinematic_bodies(tile_layer, false)
+		gt.tile_map_layer_set_physics_quadrant_size(tile_layer, 16)
+		gt.tile_map_layer_set_occlusion_enabled(tile_layer, false)
+		gt.tile_map_layer_set_navigation_enabled(tile_layer, false)
+		_ = gt.tile_map_layer_is_enabled(tile_layer)
+		_ = gt.tile_map_layer_get_y_sort_origin(tile_layer)
+		_ = gt.tile_map_layer_is_x_draw_order_reversed(tile_layer)
+		_ = gt.tile_map_layer_get_rendering_quadrant_size(tile_layer)
+		_ = gt.tile_map_layer_is_collision_enabled(tile_layer)
+		_ = gt.tile_map_layer_is_using_kinematic_bodies(tile_layer)
+		_ = gt.tile_map_layer_get_physics_quadrant_size(tile_layer)
+		_ = gt.tile_map_layer_is_occlusion_enabled(tile_layer)
+		_ = gt.tile_map_layer_is_navigation_enabled(tile_layer)
+		used_cells := gt.tile_map_layer_get_used_cells(tile_layer)
+		gt.typed_array_free(&used_cells)
+		_ = gt.tile_map_layer_get_used_rect(tile_layer)
+		if !gt.node_add_child_checked(parent, gt.tile_map_layer_as_node(tile_layer)) {
+			_ = gt.object_destroy_checked(gt.tile_map_layer_object_ptr(tile_layer))
+		}
+	} else if tile_map_layer_object != nil {
+		_ = gt.object_destroy_checked(tile_map_layer_object)
+	}
+
 	path_follow_object := gt.construct_object(path_follow2d_class_name)
 	if path_follow, path_follow_ok := gt.object_ptr_try_as_path_follow2d(path_follow_object);
 	   path_follow_ok {
@@ -834,6 +865,7 @@ camera2d_class_name_data: gt.ClassName
 marker2d_class_name_data: gt.ClassName
 ray_cast2d_class_name_data: gt.ClassName
 navigation_agent2d_class_name_data: gt.ClassName
+tile_map_layer_class_name_data: gt.ClassName
 path_follow2d_class_name_data: gt.ClassName
 visible_on_screen_notifier2d_class_name_data: gt.ClassName
 texture_button_class_name_data: gt.ClassName
@@ -852,6 +884,7 @@ camera2d_class_name: gt.ConstStringNamePtr
 marker2d_class_name: gt.ConstStringNamePtr
 ray_cast2d_class_name: gt.ConstStringNamePtr
 navigation_agent2d_class_name: gt.ConstStringNamePtr
+tile_map_layer_class_name: gt.ConstStringNamePtr
 path_follow2d_class_name: gt.ConstStringNamePtr
 visible_on_screen_notifier2d_class_name: gt.ConstStringNamePtr
 texture_button_class_name: gt.ConstStringNamePtr
@@ -1093,6 +1126,7 @@ register_classes :: proc() {
 	marker2d_class_name = gt.class_name_ptr(&marker2d_class_name_data)
 	ray_cast2d_class_name = gt.class_name_ptr(&ray_cast2d_class_name_data)
 	navigation_agent2d_class_name = gt.class_name_ptr(&navigation_agent2d_class_name_data)
+	tile_map_layer_class_name = gt.class_name_ptr(&tile_map_layer_class_name_data)
 	path_follow2d_class_name = gt.class_name_ptr(&path_follow2d_class_name_data)
 	visible_on_screen_notifier2d_class_name = gt.class_name_ptr(
 		&visible_on_screen_notifier2d_class_name_data,
@@ -1123,6 +1157,7 @@ register_classes :: proc() {
 		&navigation_agent2d_class_name_data,
 		cstring("NavigationAgent2D"),
 	)
+	gt.class_name_init_latin1_cstring(&tile_map_layer_class_name_data, cstring("TileMapLayer"))
 	gt.class_name_init_latin1_cstring(&path_follow2d_class_name_data, cstring("PathFollow2D"))
 	gt.class_name_init_latin1_cstring(
 		&visible_on_screen_notifier2d_class_name_data,

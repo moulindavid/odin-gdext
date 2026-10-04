@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 52
+Max_Selected_Class_Count :: 53
 
 selected_class_names := []string {
 	"Object",
@@ -1044,6 +1044,7 @@ selected_class_names := []string {
 	"Marker2D",
 	"RayCast2D",
 	"NavigationAgent2D",
+	"TileMapLayer",
 	"PackedScene",
 	"ResourceLoader",
 	"Input",
@@ -1064,7 +1065,7 @@ selected_class_names := []string {
 	"AudioStreamPlayer",
 }
 
-candidate_class_names := []string{"Theme", "Font", "TileMap", "TileMapLayer", "Path2D"}
+candidate_class_names := []string{"Theme", "Font", "TileMap", "Path2D"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1740,6 +1741,50 @@ selected_class_methods := []Selected_Class_Method {
 	{"NavigationAgent2D", "get_debug_path_custom_point_size"},
 	{"NavigationAgent2D", "set_debug_path_custom_line_width"},
 	{"NavigationAgent2D", "get_debug_path_custom_line_width"},
+	{"TileMapLayer", "set_cell"},
+	{"TileMapLayer", "erase_cell"},
+	{"TileMapLayer", "fix_invalid_tiles"},
+	{"TileMapLayer", "clear"},
+	{"TileMapLayer", "get_cell_source_id"},
+	{"TileMapLayer", "get_cell_atlas_coords"},
+	{"TileMapLayer", "get_cell_alternative_tile"},
+	{"TileMapLayer", "is_cell_flipped_h"},
+	{"TileMapLayer", "is_cell_flipped_v"},
+	{"TileMapLayer", "is_cell_transposed"},
+	{"TileMapLayer", "get_used_cells"},
+	{"TileMapLayer", "get_used_cells_by_id"},
+	{"TileMapLayer", "get_used_rect"},
+	{"TileMapLayer", "set_cells_terrain_connect"},
+	{"TileMapLayer", "set_cells_terrain_path"},
+	{"TileMapLayer", "has_body_rid"},
+	{"TileMapLayer", "get_coords_for_body_rid"},
+	{"TileMapLayer", "update_internals"},
+	{"TileMapLayer", "notify_runtime_tile_data_update"},
+	{"TileMapLayer", "get_surrounding_cells"},
+	{"TileMapLayer", "map_to_local"},
+	{"TileMapLayer", "local_to_map"},
+	{"TileMapLayer", "set_tile_map_data_from_array"},
+	{"TileMapLayer", "get_tile_map_data_as_array"},
+	{"TileMapLayer", "set_enabled"},
+	{"TileMapLayer", "is_enabled"},
+	{"TileMapLayer", "set_y_sort_origin"},
+	{"TileMapLayer", "get_y_sort_origin"},
+	{"TileMapLayer", "set_x_draw_order_reversed"},
+	{"TileMapLayer", "is_x_draw_order_reversed"},
+	{"TileMapLayer", "set_rendering_quadrant_size"},
+	{"TileMapLayer", "get_rendering_quadrant_size"},
+	{"TileMapLayer", "set_collision_enabled"},
+	{"TileMapLayer", "is_collision_enabled"},
+	{"TileMapLayer", "set_use_kinematic_bodies"},
+	{"TileMapLayer", "is_using_kinematic_bodies"},
+	{"TileMapLayer", "set_physics_quadrant_size"},
+	{"TileMapLayer", "get_physics_quadrant_size"},
+	{"TileMapLayer", "set_occlusion_enabled"},
+	{"TileMapLayer", "is_occlusion_enabled"},
+	{"TileMapLayer", "set_navigation_enabled"},
+	{"TileMapLayer", "is_navigation_enabled"},
+	{"TileMapLayer", "set_navigation_map"},
+	{"TileMapLayer", "get_navigation_map"},
 	{"VisibleOnScreenNotifier2D", "set_rect"},
 	{"VisibleOnScreenNotifier2D", "get_rect"},
 	{"VisibleOnScreenNotifier2D", "set_show_rect"},
@@ -4014,6 +4059,10 @@ generate_class_api_report :: proc(root: ^ExtensionApiRoot) -> bool {
 }
 
 
+class_arg_name :: proc(arg: ExtensionApiMethodArg) -> string {
+	return odin_safe_snake_identifier(arg.name)
+}
+
 emit_class_method_default_wrapper :: proc(
 	b: ^strings.Builder,
 	method: ExtensionApiClassMethod,
@@ -4040,7 +4089,7 @@ emit_class_method_default_wrapper :: proc(
 	for arg in method.arguments[:explicit_count] {
 		param_type, param_ok := resolve_class_param_type(arg.type)
 		if !param_ok do return false
-		fmt.sbprintf(b, ", %s: %s", arg.name, param_type)
+		fmt.sbprintf(b, ", %s: %s", class_arg_name(arg), param_type)
 	}
 	if returns_void {
 		strings.write_string(b, ") {\n")
@@ -4058,7 +4107,7 @@ emit_class_method_default_wrapper :: proc(
 		fmt.sbprintf(b, "\treturn %s(self", proc_name)
 	}
 	for arg in method.arguments[:explicit_count] {
-		fmt.sbprintf(b, ", %s", arg.name)
+		fmt.sbprintf(b, ", %s", class_arg_name(arg))
 	}
 	for arg in method.arguments[explicit_count:] {
 		fmt.sbprintf(b, ", %s", class_default_arg_value_expr(arg))
@@ -4297,7 +4346,7 @@ emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 		for arg in method.arguments {
 			param_type, param_ok := resolve_class_param_type(arg.type)
 			if !param_ok do return false
-			fmt.sbprintf(b, ", %s: %s", arg.name, param_type)
+			fmt.sbprintf(b, ", %s: %s", class_arg_name(arg), param_type)
 		}
 		if returns_void {
 			strings.write_string(b, ") {\n")
@@ -4307,8 +4356,10 @@ emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 
 		for arg in method.arguments {
 			if arg.type == "Variant" do continue
+			if _, ok := typed_array_element_type(arg.type); ok do continue
 			if _, ok := completed_core_value_entry(arg.type); ok do continue
-			fmt.sbprintf(b, "\t_%s := %s\n", arg.name, arg.name)
+			arg_name := class_arg_name(arg)
+			fmt.sbprintf(b, "\t_%s := %s\n", arg_name, arg_name)
 		}
 
 		if returns_void {
@@ -4326,7 +4377,7 @@ emit_class_method_wrappers :: proc(b: ^strings.Builder, root: ^ExtensionApiRoot)
 			)
 		}
 		for arg in method.arguments {
-			fmt.sbprintf(b, ",\n\t\t%s", class_param_ptr_expr(arg.name, arg.type))
+			fmt.sbprintf(b, ",\n\t\t%s", class_param_ptr_expr(class_arg_name(arg), arg.type))
 		}
 		strings.write_string(b, ")\n")
 		strings.write_string(b, "}\n\n")
