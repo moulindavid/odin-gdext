@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 51
+Max_Selected_Class_Count :: 52
 
 selected_class_names := []string {
 	"Object",
@@ -1016,6 +1016,7 @@ selected_class_names := []string {
 	"Texture2D",
 	"ImageTexture",
 	"AudioStream",
+	"StyleBox",
 	"Node",
 	"CanvasItem",
 	"Node2D",
@@ -1063,7 +1064,7 @@ selected_class_names := []string {
 	"AudioStreamPlayer",
 }
 
-candidate_class_names := []string{"Theme", "Font", "StyleBox", "TileMap", "TileMapLayer", "Path2D"}
+candidate_class_names := []string{"Theme", "Font", "TileMap", "TileMapLayer", "Path2D"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1428,6 +1429,15 @@ selected_class_methods := []Selected_Class_Method {
 	{"AudioStream", "is_monophonic"},
 	{"AudioStream", "can_be_sampled"},
 	{"AudioStream", "is_meta_stream"},
+	{"StyleBox", "get_minimum_size"},
+	{"StyleBox", "set_content_margin"},
+	{"StyleBox", "set_content_margin_all"},
+	{"StyleBox", "get_content_margin"},
+	{"StyleBox", "get_margin"},
+	{"StyleBox", "get_offset"},
+	{"StyleBox", "draw"},
+	{"StyleBox", "get_current_item_drawn"},
+	{"StyleBox", "test_mask"},
 	{"AudioStreamPlayer", "set_stream"},
 	{"AudioStreamPlayer", "get_stream"},
 	{"AudioStreamPlayer", "set_volume_db"},

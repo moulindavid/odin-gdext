@@ -181,6 +181,13 @@ These slices are complete and were validated with make ci when merged:
      exercised non-playing runtime configuration in examples/game, updated
      generated reporting and CHANGELOG, and validated with full make ci.
 
+25. StyleBox generated APIs.
+   - Added selected generated `StyleBox` handle, casts, upcasts, and
+     borrowed-safe margin, minimum-size, offset, draw, and mask query methods.
+     Exposed the selected surface through `godot:godot`, added facade compile
+     coverage, exercised runtime configuration in examples/game, updated
+     generated reporting and CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
