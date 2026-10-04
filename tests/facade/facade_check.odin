@@ -111,6 +111,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	texture_progress_bar: gt.TextureProgressBar,
 	audio_stream: gt.AudioStream,
 	style_box: gt.StyleBox,
+	font: gt.Font,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
 	meta_name: ^gt.StringName,
@@ -1330,6 +1331,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.visible_on_screen_notifier2d_object_ptr(visible_on_screen_notifier2d)
 	_ = gt.audio_stream_object_ptr(audio_stream)
 	_ = gt.style_box_object_ptr(style_box)
+	_ = gt.font_object_ptr(font)
 	_ = gt.audio_stream_player_object_ptr(audio_stream_player)
 	_ = gt.packed_scene_object_ptr(packed_scene)
 	_ = gt.resource_loader_object_ptr(resource_loader)
@@ -1344,6 +1346,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_timer(gt.timer_object_ptr(timer))
 	_, _ = gt.object_ptr_try_as_audio_stream(gt.audio_stream_object_ptr(audio_stream))
 	_, _ = gt.object_ptr_try_as_style_box(gt.style_box_object_ptr(style_box))
+	_, _ = gt.object_ptr_try_as_font(gt.font_object_ptr(font))
 	_, _ = gt.object_ptr_try_as_audio_stream_player(
 		gt.audio_stream_player_object_ptr(audio_stream_player),
 	)
@@ -1367,12 +1370,16 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.style_box_as_resource(style_box)
 	_ = gt.style_box_as_ref_counted(style_box)
 	_ = gt.style_box_as_object(style_box)
+	_ = gt.font_as_resource(font)
+	_ = gt.font_as_ref_counted(font)
+	_ = gt.font_as_object(font)
 	_ = gt.audio_stream_player_as_node(audio_stream_player)
 	_ = gt.audio_stream_player_as_object(audio_stream_player)
 
 	_ = gt.timer_is_nil(timer)
 	_ = gt.audio_stream_is_nil(audio_stream)
 	_ = gt.style_box_is_nil(style_box)
+	_ = gt.font_is_nil(font)
 	_ = gt.audio_stream_player_is_nil(audio_stream_player)
 	_ = gt.collision_object2d_is_nil(collision_object2d)
 	_ = gt.area2d_is_nil(area2d)
@@ -1411,6 +1418,78 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.style_box_draw(style_box, &style_box_canvas, gt.Rect2{})
 	_ = gt.style_box_get_current_item_drawn(style_box)
 	_ = gt.style_box_test_mask(style_box, gt.Vector2{}, gt.Rect2{})
+	font_fallbacks := gt.font_get_fallbacks(font)
+	gt.font_set_fallbacks(font, &font_fallbacks)
+	gt.typed_array_free(&font_fallbacks)
+	font_rids := gt.font_get_rids(font)
+	gt.typed_array_free(&font_rids)
+	variation_coordinates := gt.Dictionary{}
+	custom_colors := gt.PackedColorArray{}
+	font_variation_rid := gt.font_find_variation(
+		font,
+		&variation_coordinates,
+		0,
+		0,
+		gt.Transform2D{},
+		0,
+		0,
+		0,
+		0,
+		0,
+		0,
+		&custom_colors,
+	)
+	gt.rid_free(&font_variation_rid)
+	_ = gt.font_get_height(font, 16)
+	_ = gt.font_get_height_default(font)
+	_ = gt.font_get_ascent(font, 16)
+	_ = gt.font_get_ascent_default(font)
+	_ = gt.font_get_descent(font, 16)
+	_ = gt.font_get_descent_default(font)
+	_ = gt.font_get_underline_position(font, 16)
+	_ = gt.font_get_underline_position_default(font)
+	_ = gt.font_get_underline_thickness(font, 16)
+	_ = gt.font_get_underline_thickness_default(font)
+	font_name := gt.font_get_font_name(font)
+	gt.string_free(&font_name)
+	font_style_name := gt.font_get_font_style_name(font)
+	gt.string_free(&font_style_name)
+	ot_name_strings := gt.font_get_ot_name_strings(font)
+	gt.dictionary_free(&ot_name_strings)
+	_ = gt.font_get_font_weight(font)
+	_ = gt.font_get_font_stretch(font)
+	_ = gt.font_get_palette_count(font)
+	palette_name := gt.font_get_palette_name(font, 0)
+	gt.string_free(&palette_name)
+	palette_colors := gt.font_get_palette_colors(font, 0)
+	gt.packed_color_array_free(&palette_colors)
+	open_type_features := gt.font_get_opentype_features(font)
+	gt.dictionary_free(&open_type_features)
+	gt.font_set_cache_capacity(font, 32, 32)
+	_ = gt.font_get_char_size(font, i64('A'), 16)
+	font_canvas := gt.RID{}
+	_ = gt.font_draw_char(font, &font_canvas, gt.Vector2{}, i64('A'), 16, gt.Color{1, 1, 1, 1}, 0)
+	_ = gt.font_draw_char_outline(
+		font,
+		&font_canvas,
+		gt.Vector2{},
+		i64('A'),
+		16,
+		-1,
+		gt.Color{1, 1, 1, 1},
+		0,
+	)
+	_ = gt.font_has_char(font, i64('A'))
+	supported_chars := gt.font_get_supported_chars(font)
+	gt.string_free(&supported_chars)
+	font_language := gt.String{}
+	_ = gt.font_is_language_supported(font, &font_language)
+	_ = gt.font_is_script_supported(font, &font_language)
+	supported_features := gt.font_get_supported_feature_list(font)
+	gt.dictionary_free(&supported_features)
+	supported_variations := gt.font_get_supported_variation_list(font)
+	gt.dictionary_free(&supported_variations)
+	_ = gt.font_get_face_count(font)
 	gt.audio_stream_player_set_stream(audio_stream_player, audio_stream)
 	_ = gt.audio_stream_player_get_stream(audio_stream_player)
 	gt.audio_stream_player_set_volume_db(audio_stream_player, -6)
@@ -1595,6 +1674,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_audio_stream(object)
 	_ = gt.object_is_style_box(object)
 	_, _ = gt.object_try_as_style_box(object)
+	_ = gt.object_is_font(object)
+	_, _ = gt.object_try_as_font(object)
 	_ = gt.object_is_audio_stream_player(object)
 	_, _ = gt.object_try_as_audio_stream_player(object)
 	_ = gt.object_is_collision_object2d(object)
@@ -2235,6 +2316,8 @@ ref_counted_resource_borrowed_policy_compile_smoke :: proc "contextless" (
 	_, _ = gt.resource_try_as_audio_stream(resource)
 	_ = gt.resource_is_style_box(resource)
 	_, _ = gt.resource_try_as_style_box(resource)
+	_ = gt.resource_is_font(resource)
+	_, _ = gt.resource_try_as_font(resource)
 	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
 }
 

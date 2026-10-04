@@ -170,6 +170,7 @@ Texture2D :: gclass.Texture2D
 ImageTexture :: gclass.ImageTexture
 AudioStream :: gclass.AudioStream
 StyleBox :: gclass.StyleBox
+Font :: gclass.Font
 // Resource loading policy: ResourceLoader.load returns a Resource through a
 // Variant call in focused helpers. The helper retains the borrowed Resource into
 // OwnedResource before freeing the temporary Variant, so callers always receive
@@ -497,6 +498,43 @@ style_box_get_offset :: gclass.style_box_get_offset
 style_box_draw :: gclass.style_box_draw
 style_box_get_current_item_drawn :: gclass.style_box_get_current_item_drawn
 style_box_test_mask :: gclass.style_box_test_mask
+font_as_resource :: gclass.font_as_resource
+font_as_ref_counted :: gclass.font_as_ref_counted
+font_as_object :: gclass.font_as_object
+font_set_fallbacks :: gclass.font_set_fallbacks
+font_get_fallbacks :: gclass.font_get_fallbacks
+font_find_variation :: gclass.font_find_variation
+font_get_rids :: gclass.font_get_rids
+font_get_height :: gclass.font_get_height
+font_get_height_default :: gclass.font_get_height_default
+font_get_ascent :: gclass.font_get_ascent
+font_get_ascent_default :: gclass.font_get_ascent_default
+font_get_descent :: gclass.font_get_descent
+font_get_descent_default :: gclass.font_get_descent_default
+font_get_underline_position :: gclass.font_get_underline_position
+font_get_underline_position_default :: gclass.font_get_underline_position_default
+font_get_underline_thickness :: gclass.font_get_underline_thickness
+font_get_underline_thickness_default :: gclass.font_get_underline_thickness_default
+font_get_font_name :: gclass.font_get_font_name
+font_get_font_style_name :: gclass.font_get_font_style_name
+font_get_ot_name_strings :: gclass.font_get_ot_name_strings
+font_get_font_weight :: gclass.font_get_font_weight
+font_get_font_stretch :: gclass.font_get_font_stretch
+font_get_palette_count :: gclass.font_get_palette_count
+font_get_palette_name :: gclass.font_get_palette_name
+font_get_palette_colors :: gclass.font_get_palette_colors
+font_get_opentype_features :: gclass.font_get_opentype_features
+font_set_cache_capacity :: gclass.font_set_cache_capacity
+font_get_char_size :: gclass.font_get_char_size
+font_draw_char :: gclass.font_draw_char
+font_draw_char_outline :: gclass.font_draw_char_outline
+font_has_char :: gclass.font_has_char
+font_get_supported_chars :: gclass.font_get_supported_chars
+font_is_language_supported :: gclass.font_is_language_supported
+font_is_script_supported :: gclass.font_is_script_supported
+font_get_supported_feature_list :: gclass.font_get_supported_feature_list
+font_get_supported_variation_list :: gclass.font_get_supported_variation_list
+font_get_face_count :: gclass.font_get_face_count
 audio_stream_get_length :: gclass.audio_stream_get_length
 audio_stream_is_monophonic :: gclass.audio_stream_is_monophonic
 audio_stream_can_be_sampled :: gclass.audio_stream_can_be_sampled
@@ -940,6 +978,8 @@ object_is_audio_stream :: gclass.object_is_audio_stream
 object_try_as_audio_stream :: gclass.object_try_as_audio_stream
 object_is_style_box :: gclass.object_is_style_box
 object_try_as_style_box :: gclass.object_try_as_style_box
+object_is_font :: gclass.object_is_font
+object_try_as_font :: gclass.object_try_as_font
 resource_is_texture2d :: gclass.resource_is_texture2d
 resource_try_as_texture2d :: gclass.resource_try_as_texture2d
 resource_is_image_texture :: gclass.resource_is_image_texture
@@ -948,6 +988,8 @@ resource_is_audio_stream :: gclass.resource_is_audio_stream
 resource_try_as_audio_stream :: gclass.resource_try_as_audio_stream
 resource_is_style_box :: gclass.resource_is_style_box
 resource_try_as_style_box :: gclass.resource_try_as_style_box
+resource_is_font :: gclass.resource_is_font
+resource_try_as_font :: gclass.resource_try_as_font
 texture2d_is_image_texture :: gclass.texture2d_is_image_texture
 texture2d_try_as_image_texture :: gclass.texture2d_try_as_image_texture
 object_is_node :: gclass.object_is_node
@@ -2148,6 +2190,10 @@ audio_stream_is_nil :: proc "contextless" (self: AudioStream) -> bool {
 }
 
 style_box_is_nil :: proc "contextless" (self: StyleBox) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+font_is_nil :: proc "contextless" (self: Font) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -3545,6 +3591,10 @@ style_box_object_ptr :: proc "contextless" (self: StyleBox) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+font_object_ptr :: proc "contextless" (self: Font) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 resource_loader_object_ptr :: proc "contextless" (self: ResourceLoader) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3662,6 +3712,11 @@ object_ptr_try_as_style_box :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_style_box(Object(self))
+}
+
+object_ptr_try_as_font :: proc "contextless" (self: ObjectPtr) -> (value: Font, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_font(Object(self))
 }
 
 object_ptr_try_as_input_event :: proc "contextless" (

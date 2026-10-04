@@ -206,6 +206,16 @@ These slices are complete and were validated with make ci when merged:
      examples/game, updated generated reporting and CHANGELOG, and validated with
      full make ci.
 
+28. Font generated APIs.
+   - Added selected generated `Font` handle, casts, upcasts, and borrowed-safe
+     fallback, RID, metric, name, palette, OpenType, cache, character, language,
+     script, feature, variation, and face-count query methods while leaving
+     bitfield-heavy string layout/draw helpers skipped. Exposed the selected
+     surface through `godot:godot`, added facade compile coverage, exercised
+     concrete `FontFile` runtime queries in examples/game with explicit owned
+     resource cleanup, updated generated reporting and CHANGELOG, and validated
+     with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
