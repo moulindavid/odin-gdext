@@ -603,6 +603,20 @@ configure_ui_resource_nodes :: proc "contextless" (
 		_ = gt.object_destroy_checked(texture_progress_object)
 	}
 
+	style_box_object := gt.construct_object(style_box_class_name)
+	if style_box, style_box_ok := gt.object_ptr_try_as_style_box(style_box_object); style_box_ok {
+		gt.style_box_set_content_margin(style_box, .side_left, 4)
+		gt.style_box_set_content_margin_all(style_box, 2)
+		_ = gt.style_box_get_minimum_size(style_box)
+		_ = gt.style_box_get_content_margin(style_box, .side_left)
+		_ = gt.style_box_get_margin(style_box, .side_left)
+		_ = gt.style_box_get_offset(style_box)
+		_ = gt.style_box_test_mask(style_box, gt.Vector2{}, gt.Rect2{})
+		_ = gt.object_destroy_checked(gt.style_box_object_ptr(style_box))
+	} else if style_box_object != nil {
+		_ = gt.object_destroy_checked(style_box_object)
+	}
+
 	texture_button_object := gt.construct_object(texture_button_class_name)
 	if texture_button, texture_button_ok := gt.object_ptr_try_as_texture_button(
 		texture_button_object,
@@ -825,6 +839,7 @@ visible_on_screen_notifier2d_class_name_data: gt.ClassName
 texture_button_class_name_data: gt.ClassName
 progress_bar_class_name_data: gt.ClassName
 texture_progress_bar_class_name_data: gt.ClassName
+style_box_class_name_data: gt.ClassName
 audio_stream_player_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name: gt.ConstStringNamePtr
@@ -842,6 +857,7 @@ visible_on_screen_notifier2d_class_name: gt.ConstStringNamePtr
 texture_button_class_name: gt.ConstStringNamePtr
 progress_bar_class_name: gt.ConstStringNamePtr
 texture_progress_bar_class_name: gt.ConstStringNamePtr
+style_box_class_name: gt.ConstStringNamePtr
 audio_stream_player_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
 
@@ -1084,6 +1100,7 @@ register_classes :: proc() {
 	texture_button_class_name = gt.class_name_ptr(&texture_button_class_name_data)
 	progress_bar_class_name = gt.class_name_ptr(&progress_bar_class_name_data)
 	texture_progress_bar_class_name = gt.class_name_ptr(&texture_progress_bar_class_name_data)
+	style_box_class_name = gt.class_name_ptr(&style_box_class_name_data)
 	audio_stream_player_class_name = gt.class_name_ptr(&audio_stream_player_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
 
@@ -1117,6 +1134,7 @@ register_classes :: proc() {
 		&texture_progress_bar_class_name_data,
 		cstring("TextureProgressBar"),
 	)
+	gt.class_name_init_latin1_cstring(&style_box_class_name_data, cstring("StyleBox"))
 	gt.class_name_init_latin1_cstring(
 		&audio_stream_player_class_name_data,
 		cstring("AudioStreamPlayer"),

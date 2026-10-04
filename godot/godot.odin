@@ -169,6 +169,7 @@ Resource :: gclass.Resource
 Texture2D :: gclass.Texture2D
 ImageTexture :: gclass.ImageTexture
 AudioStream :: gclass.AudioStream
+StyleBox :: gclass.StyleBox
 // Resource loading policy: ResourceLoader.load returns a Resource through a
 // Variant call in focused helpers. The helper retains the borrowed Resource into
 // OwnedResource before freeing the temporary Variant, so callers always receive
@@ -482,6 +483,18 @@ image_texture_as_object :: gclass.image_texture_as_object
 audio_stream_as_resource :: gclass.audio_stream_as_resource
 audio_stream_as_ref_counted :: gclass.audio_stream_as_ref_counted
 audio_stream_as_object :: gclass.audio_stream_as_object
+style_box_as_resource :: gclass.style_box_as_resource
+style_box_as_ref_counted :: gclass.style_box_as_ref_counted
+style_box_as_object :: gclass.style_box_as_object
+style_box_get_minimum_size :: gclass.style_box_get_minimum_size
+style_box_set_content_margin :: gclass.style_box_set_content_margin
+style_box_set_content_margin_all :: gclass.style_box_set_content_margin_all
+style_box_get_content_margin :: gclass.style_box_get_content_margin
+style_box_get_margin :: gclass.style_box_get_margin
+style_box_get_offset :: gclass.style_box_get_offset
+style_box_draw :: gclass.style_box_draw
+style_box_get_current_item_drawn :: gclass.style_box_get_current_item_drawn
+style_box_test_mask :: gclass.style_box_test_mask
 audio_stream_get_length :: gclass.audio_stream_get_length
 audio_stream_is_monophonic :: gclass.audio_stream_is_monophonic
 audio_stream_can_be_sampled :: gclass.audio_stream_can_be_sampled
@@ -923,12 +936,16 @@ object_is_image_texture :: gclass.object_is_image_texture
 object_try_as_image_texture :: gclass.object_try_as_image_texture
 object_is_audio_stream :: gclass.object_is_audio_stream
 object_try_as_audio_stream :: gclass.object_try_as_audio_stream
+object_is_style_box :: gclass.object_is_style_box
+object_try_as_style_box :: gclass.object_try_as_style_box
 resource_is_texture2d :: gclass.resource_is_texture2d
 resource_try_as_texture2d :: gclass.resource_try_as_texture2d
 resource_is_image_texture :: gclass.resource_is_image_texture
 resource_try_as_image_texture :: gclass.resource_try_as_image_texture
 resource_is_audio_stream :: gclass.resource_is_audio_stream
 resource_try_as_audio_stream :: gclass.resource_try_as_audio_stream
+resource_is_style_box :: gclass.resource_is_style_box
+resource_try_as_style_box :: gclass.resource_try_as_style_box
 texture2d_is_image_texture :: gclass.texture2d_is_image_texture
 texture2d_try_as_image_texture :: gclass.texture2d_try_as_image_texture
 object_is_node :: gclass.object_is_node
@@ -1991,6 +2008,10 @@ image_texture_is_nil :: proc "contextless" (self: ImageTexture) -> bool {
 }
 
 audio_stream_is_nil :: proc "contextless" (self: AudioStream) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+style_box_is_nil :: proc "contextless" (self: StyleBox) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -3344,6 +3365,10 @@ audio_stream_object_ptr :: proc "contextless" (self: AudioStream) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+style_box_object_ptr :: proc "contextless" (self: StyleBox) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 resource_loader_object_ptr :: proc "contextless" (self: ResourceLoader) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3451,6 +3476,16 @@ object_ptr_try_as_audio_stream :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_audio_stream(Object(self))
+}
+
+object_ptr_try_as_style_box :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: StyleBox,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_style_box(Object(self))
 }
 
 object_ptr_try_as_input_event :: proc "contextless" (

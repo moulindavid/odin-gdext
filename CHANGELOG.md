@@ -19,6 +19,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   compile coverage, and examples/game runtime coverage.
 - Added selected generated `AudioStream` and `AudioStreamPlayer` APIs with public
   facade exports, compile coverage, and examples/game runtime coverage.
+- Added selected generated `StyleBox` APIs with public facade exports, compile
+  coverage, and examples/game runtime coverage.
 
 ## Completed roadmap slices
 
