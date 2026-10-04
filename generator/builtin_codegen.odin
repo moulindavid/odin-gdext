@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 54
+Max_Selected_Class_Count :: 55
 
 selected_class_names := []string {
 	"Object",
@@ -1046,6 +1046,7 @@ selected_class_names := []string {
 	"NavigationAgent2D",
 	"TileMapLayer",
 	"TileMap",
+	"Font",
 	"PackedScene",
 	"ResourceLoader",
 	"Input",
@@ -1066,7 +1067,7 @@ selected_class_names := []string {
 	"AudioStreamPlayer",
 }
 
-candidate_class_names := []string{"Theme", "Font", "Path2D"}
+candidate_class_names := []string{"Theme", "Path2D"}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1401,6 +1402,35 @@ selected_class_methods := []Selected_Class_Method {
 	{"ProgressBar", "is_indeterminate"},
 	{"ProgressBar", "set_editor_preview_indeterminate"},
 	{"ProgressBar", "is_editor_preview_indeterminate_enabled"},
+	{"Font", "set_fallbacks"},
+	{"Font", "get_fallbacks"},
+	{"Font", "find_variation"},
+	{"Font", "get_rids"},
+	{"Font", "get_height"},
+	{"Font", "get_ascent"},
+	{"Font", "get_descent"},
+	{"Font", "get_underline_position"},
+	{"Font", "get_underline_thickness"},
+	{"Font", "get_font_name"},
+	{"Font", "get_font_style_name"},
+	{"Font", "get_ot_name_strings"},
+	{"Font", "get_font_weight"},
+	{"Font", "get_font_stretch"},
+	{"Font", "get_palette_count"},
+	{"Font", "get_palette_name"},
+	{"Font", "get_palette_colors"},
+	{"Font", "get_opentype_features"},
+	{"Font", "set_cache_capacity"},
+	{"Font", "get_char_size"},
+	{"Font", "draw_char"},
+	{"Font", "draw_char_outline"},
+	{"Font", "has_char"},
+	{"Font", "get_supported_chars"},
+	{"Font", "is_language_supported"},
+	{"Font", "is_script_supported"},
+	{"Font", "get_supported_feature_list"},
+	{"Font", "get_supported_variation_list"},
+	{"Font", "get_face_count"},
 	{"TextureProgressBar", "set_under_texture"},
 	{"TextureProgressBar", "get_under_texture"},
 	{"TextureProgressBar", "set_progress_texture"},

@@ -379,6 +379,36 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		_ = gt.object_destroy_checked(navigation_agent_object)
 	}
 
+	font_file_object := gt.construct_object(font_file_class_name)
+	if font, font_ok := gt.object_ptr_try_as_font(font_file_object); font_ok {
+		owned_font, owned_font_ok := gt.owned_resource_init_owned(gt.font_as_resource(font))
+		if owned_font_ok {
+			_ = gt.font_get_height(font, 16)
+			_ = gt.font_get_height_default(font)
+			_ = gt.font_get_ascent(font, 16)
+			_ = gt.font_get_descent(font, 16)
+			_ = gt.font_get_underline_position(font, 16)
+			_ = gt.font_get_underline_thickness(font, 16)
+			font_name := gt.font_get_font_name(font)
+			gt.string_free(&font_name)
+			font_style_name := gt.font_get_font_style_name(font)
+			gt.string_free(&font_style_name)
+			_ = gt.font_get_font_weight(font)
+			_ = gt.font_get_font_stretch(font)
+			_ = gt.font_get_palette_count(font)
+			_ = gt.font_get_char_size(font, i64('A'), 16)
+			_ = gt.font_has_char(font, i64('A'))
+			supported_chars := gt.font_get_supported_chars(font)
+			gt.string_free(&supported_chars)
+			_ = gt.font_get_face_count(font)
+			_ = gt.owned_resource_destroy(&owned_font)
+		} else {
+			_ = gt.object_destroy_checked(gt.font_object_ptr(font))
+		}
+	} else if font_file_object != nil {
+		_ = gt.object_destroy_checked(font_file_object)
+	}
+
 	tile_map_object := gt.construct_object(tile_map_class_name)
 	if tile_map, tile_map_ok := gt.object_ptr_try_as_tile_map(tile_map_object); tile_map_ok {
 		gt.tile_map_set_rendering_quadrant_size(tile_map, 16)
@@ -882,6 +912,7 @@ camera2d_class_name_data: gt.ClassName
 marker2d_class_name_data: gt.ClassName
 ray_cast2d_class_name_data: gt.ClassName
 navigation_agent2d_class_name_data: gt.ClassName
+font_file_class_name_data: gt.ClassName
 tile_map_layer_class_name_data: gt.ClassName
 tile_map_class_name_data: gt.ClassName
 path_follow2d_class_name_data: gt.ClassName
@@ -902,6 +933,7 @@ camera2d_class_name: gt.ConstStringNamePtr
 marker2d_class_name: gt.ConstStringNamePtr
 ray_cast2d_class_name: gt.ConstStringNamePtr
 navigation_agent2d_class_name: gt.ConstStringNamePtr
+font_file_class_name: gt.ConstStringNamePtr
 tile_map_layer_class_name: gt.ConstStringNamePtr
 tile_map_class_name: gt.ConstStringNamePtr
 path_follow2d_class_name: gt.ConstStringNamePtr
@@ -1145,6 +1177,7 @@ register_classes :: proc() {
 	marker2d_class_name = gt.class_name_ptr(&marker2d_class_name_data)
 	ray_cast2d_class_name = gt.class_name_ptr(&ray_cast2d_class_name_data)
 	navigation_agent2d_class_name = gt.class_name_ptr(&navigation_agent2d_class_name_data)
+	font_file_class_name = gt.class_name_ptr(&font_file_class_name_data)
 	tile_map_layer_class_name = gt.class_name_ptr(&tile_map_layer_class_name_data)
 	tile_map_class_name = gt.class_name_ptr(&tile_map_class_name_data)
 	path_follow2d_class_name = gt.class_name_ptr(&path_follow2d_class_name_data)
@@ -1177,6 +1210,7 @@ register_classes :: proc() {
 		&navigation_agent2d_class_name_data,
 		cstring("NavigationAgent2D"),
 	)
+	gt.class_name_init_latin1_cstring(&font_file_class_name_data, cstring("FontFile"))
 	gt.class_name_init_latin1_cstring(&tile_map_layer_class_name_data, cstring("TileMapLayer"))
 	gt.class_name_init_latin1_cstring(&tile_map_class_name_data, cstring("TileMap"))
 	gt.class_name_init_latin1_cstring(&path_follow2d_class_name_data, cstring("PathFollow2D"))
