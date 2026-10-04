@@ -435,6 +435,35 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(animation_object)
 	}
 
+	audio_object := gt.construct_object(audio_stream_player_class_name)
+	if audio, audio_ok := gt.object_ptr_try_as_audio_stream_player(audio_object); audio_ok {
+		gt.audio_stream_player_set_volume_db(audio, -6)
+		gt.audio_stream_player_set_volume_linear(audio, 0.5)
+		gt.audio_stream_player_set_pitch_scale(audio, 1.0)
+		gt.audio_stream_player_set_autoplay(audio, false)
+		gt.audio_stream_player_set_stream_paused(audio, true)
+		gt.audio_stream_player_set_max_polyphony(audio, 1)
+		master_bus := gt.string_name_from_utf8_cstring(cstring("Master"))
+		gt.audio_stream_player_set_bus(audio, &master_bus)
+		gt.string_name_free(&master_bus)
+		_ = gt.audio_stream_player_get_volume_db(audio)
+		_ = gt.audio_stream_player_get_volume_linear(audio)
+		_ = gt.audio_stream_player_get_pitch_scale(audio)
+		_ = gt.audio_stream_player_is_autoplay_enabled(audio)
+		_ = gt.audio_stream_player_get_stream_paused(audio)
+		_ = gt.audio_stream_player_get_max_polyphony(audio)
+		_ = gt.audio_stream_player_is_playing(audio)
+		_ = gt.audio_stream_player_get_playback_position(audio)
+		_ = gt.audio_stream_player_has_stream_playback(audio)
+		bus := gt.audio_stream_player_get_bus(audio)
+		gt.string_name_free(&bus)
+		if !gt.node_add_child_checked(parent, gt.audio_stream_player_as_node(audio)) {
+			_ = gt.object_destroy_checked(gt.audio_stream_player_object_ptr(audio))
+		}
+	} else if audio_object != nil {
+		_ = gt.object_destroy_checked(audio_object)
+	}
+
 	if !gt.scene_tree_is_nil(gt.node_get_tree(parent)) {
 		nil_tween := gt.Tween(nil)
 		_, _ = gt.tween_running_checked(nil_tween)
@@ -796,6 +825,7 @@ visible_on_screen_notifier2d_class_name_data: gt.ClassName
 texture_button_class_name_data: gt.ClassName
 progress_bar_class_name_data: gt.ClassName
 texture_progress_bar_class_name_data: gt.ClassName
+audio_stream_player_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name: gt.ConstStringNamePtr
 game_parent_name: gt.ConstStringNamePtr
@@ -812,6 +842,7 @@ visible_on_screen_notifier2d_class_name: gt.ConstStringNamePtr
 texture_button_class_name: gt.ConstStringNamePtr
 progress_bar_class_name: gt.ConstStringNamePtr
 texture_progress_bar_class_name: gt.ConstStringNamePtr
+audio_stream_player_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
@@ -1053,6 +1084,7 @@ register_classes :: proc() {
 	texture_button_class_name = gt.class_name_ptr(&texture_button_class_name_data)
 	progress_bar_class_name = gt.class_name_ptr(&progress_bar_class_name_data)
 	texture_progress_bar_class_name = gt.class_name_ptr(&texture_progress_bar_class_name_data)
+	audio_stream_player_class_name = gt.class_name_ptr(&audio_stream_player_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
 
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
@@ -1084,6 +1116,10 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(
 		&texture_progress_bar_class_name_data,
 		cstring("TextureProgressBar"),
+	)
+	gt.class_name_init_latin1_cstring(
+		&audio_stream_player_class_name_data,
+		cstring("AudioStreamPlayer"),
 	)
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,

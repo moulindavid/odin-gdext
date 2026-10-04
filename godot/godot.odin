@@ -168,6 +168,7 @@ VerticalAlignment :: gclass.VerticalAlignment
 Resource :: gclass.Resource
 Texture2D :: gclass.Texture2D
 ImageTexture :: gclass.ImageTexture
+AudioStream :: gclass.AudioStream
 // Resource loading policy: ResourceLoader.load returns a Resource through a
 // Variant call in focused helpers. The helper retains the borrowed Resource into
 // OwnedResource before freeing the temporary Variant, so callers always receive
@@ -193,6 +194,7 @@ Container :: gclass.Container
 Sprite2D :: gclass.Sprite2D
 Label :: gclass.Label
 Timer :: gclass.Timer
+AudioStreamPlayer :: gclass.AudioStreamPlayer
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PhysicsBody2D :: gclass.PhysicsBody2D
@@ -477,6 +479,13 @@ image_texture_as_texture2d :: gclass.image_texture_as_texture2d
 image_texture_as_resource :: gclass.image_texture_as_resource
 image_texture_as_ref_counted :: gclass.image_texture_as_ref_counted
 image_texture_as_object :: gclass.image_texture_as_object
+audio_stream_as_resource :: gclass.audio_stream_as_resource
+audio_stream_as_ref_counted :: gclass.audio_stream_as_ref_counted
+audio_stream_as_object :: gclass.audio_stream_as_object
+audio_stream_get_length :: gclass.audio_stream_get_length
+audio_stream_is_monophonic :: gclass.audio_stream_is_monophonic
+audio_stream_can_be_sampled :: gclass.audio_stream_can_be_sampled
+audio_stream_is_meta_stream :: gclass.audio_stream_is_meta_stream
 ref_counted_get_reference_count :: gclass.ref_counted_get_reference_count
 resource_get_path :: gclass.resource_get_path
 resource_get_rid :: gclass.resource_get_rid
@@ -912,10 +921,14 @@ object_is_texture2d :: gclass.object_is_texture2d
 object_try_as_texture2d :: gclass.object_try_as_texture2d
 object_is_image_texture :: gclass.object_is_image_texture
 object_try_as_image_texture :: gclass.object_try_as_image_texture
+object_is_audio_stream :: gclass.object_is_audio_stream
+object_try_as_audio_stream :: gclass.object_try_as_audio_stream
 resource_is_texture2d :: gclass.resource_is_texture2d
 resource_try_as_texture2d :: gclass.resource_try_as_texture2d
 resource_is_image_texture :: gclass.resource_is_image_texture
 resource_try_as_image_texture :: gclass.resource_try_as_image_texture
+resource_is_audio_stream :: gclass.resource_is_audio_stream
+resource_try_as_audio_stream :: gclass.resource_try_as_audio_stream
 texture2d_is_image_texture :: gclass.texture2d_is_image_texture
 texture2d_try_as_image_texture :: gclass.texture2d_try_as_image_texture
 object_is_node :: gclass.object_is_node
@@ -950,6 +963,8 @@ object_is_container :: gclass.object_is_container
 object_try_as_container :: gclass.object_try_as_container
 object_is_timer :: gclass.object_is_timer
 object_try_as_timer :: gclass.object_try_as_timer
+object_is_audio_stream_player :: gclass.object_is_audio_stream_player
+object_try_as_audio_stream_player :: gclass.object_try_as_audio_stream_player
 object_is_collision_object2d :: gclass.object_is_collision_object2d
 object_try_as_collision_object2d :: gclass.object_try_as_collision_object2d
 object_is_area2d :: gclass.object_is_area2d
@@ -1122,6 +1137,8 @@ node_is_container :: gclass.node_is_container
 node_try_as_container :: gclass.node_try_as_container
 node_is_timer :: gclass.node_is_timer
 node_try_as_timer :: gclass.node_try_as_timer
+node_is_audio_stream_player :: gclass.node_is_audio_stream_player
+node_try_as_audio_stream_player :: gclass.node_try_as_audio_stream_player
 node_is_collision_object2d :: gclass.node_is_collision_object2d
 node_try_as_collision_object2d :: gclass.node_try_as_collision_object2d
 node_is_area2d :: gclass.node_is_area2d
@@ -1262,6 +1279,32 @@ timer_set_ignore_time_scale :: gclass.timer_set_ignore_time_scale
 timer_is_ignoring_time_scale :: gclass.timer_is_ignoring_time_scale
 timer_is_stopped :: gclass.timer_is_stopped
 timer_get_time_left :: gclass.timer_get_time_left
+audio_stream_player_as_node :: gclass.audio_stream_player_as_node
+audio_stream_player_as_object :: gclass.audio_stream_player_as_object
+audio_stream_player_set_stream :: gclass.audio_stream_player_set_stream
+audio_stream_player_get_stream :: gclass.audio_stream_player_get_stream
+audio_stream_player_set_volume_db :: gclass.audio_stream_player_set_volume_db
+audio_stream_player_get_volume_db :: gclass.audio_stream_player_get_volume_db
+audio_stream_player_set_volume_linear :: gclass.audio_stream_player_set_volume_linear
+audio_stream_player_get_volume_linear :: gclass.audio_stream_player_get_volume_linear
+audio_stream_player_set_pitch_scale :: gclass.audio_stream_player_set_pitch_scale
+audio_stream_player_get_pitch_scale :: gclass.audio_stream_player_get_pitch_scale
+audio_stream_player_play :: gclass.audio_stream_player_play
+audio_stream_player_play_default :: gclass.audio_stream_player_play_default
+audio_stream_player_seek :: gclass.audio_stream_player_seek
+audio_stream_player_stop :: gclass.audio_stream_player_stop
+audio_stream_player_is_playing :: gclass.audio_stream_player_is_playing
+audio_stream_player_get_playback_position :: gclass.audio_stream_player_get_playback_position
+audio_stream_player_set_bus :: gclass.audio_stream_player_set_bus
+audio_stream_player_get_bus :: gclass.audio_stream_player_get_bus
+audio_stream_player_set_autoplay :: gclass.audio_stream_player_set_autoplay
+audio_stream_player_is_autoplay_enabled :: gclass.audio_stream_player_is_autoplay_enabled
+audio_stream_player_set_playing :: gclass.audio_stream_player_set_playing
+audio_stream_player_set_stream_paused :: gclass.audio_stream_player_set_stream_paused
+audio_stream_player_get_stream_paused :: gclass.audio_stream_player_get_stream_paused
+audio_stream_player_set_max_polyphony :: gclass.audio_stream_player_set_max_polyphony
+audio_stream_player_get_max_polyphony :: gclass.audio_stream_player_get_max_polyphony
+audio_stream_player_has_stream_playback :: gclass.audio_stream_player_has_stream_playback
 collision_object2d_as_node2d :: gclass.collision_object2d_as_node2d
 collision_object2d_as_canvas_item :: gclass.collision_object2d_as_canvas_item
 collision_object2d_as_node :: gclass.collision_object2d_as_node
@@ -1947,6 +1990,10 @@ image_texture_is_nil :: proc "contextless" (self: ImageTexture) -> bool {
 	return ObjectPtr(self) == nil
 }
 
+audio_stream_is_nil :: proc "contextless" (self: AudioStream) -> bool {
+	return ObjectPtr(self) == nil
+}
+
 node_is_nil :: proc "contextless" (self: Node) -> bool {
 	return ObjectPtr(self) == nil
 }
@@ -2008,6 +2055,10 @@ label_is_nil :: proc "contextless" (self: Label) -> bool {
 }
 
 timer_is_nil :: proc "contextless" (self: Timer) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+audio_stream_player_is_nil :: proc "contextless" (self: AudioStreamPlayer) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -2433,6 +2484,18 @@ node_get_node_as_timer :: proc "contextless" (
 	node, node_ok := node_get_node_checked(self, path)
 	if !node_ok do return Timer(nil), false
 	return node_try_as_timer(node)
+}
+
+node_get_node_as_audio_stream_player :: proc "contextless" (
+	self: Node,
+	path: ^NodePath,
+) -> (
+	value: AudioStreamPlayer,
+	ok: bool,
+) {
+	node, node_ok := node_get_node_checked(self, path)
+	if !node_ok do return AudioStreamPlayer(nil), false
+	return node_try_as_audio_stream_player(node)
 }
 
 node_get_node_as_animation_player :: proc "contextless" (
@@ -3207,6 +3270,10 @@ timer_object_ptr :: proc "contextless" (self: Timer) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+audio_stream_player_object_ptr :: proc "contextless" (self: AudioStreamPlayer) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 collision_object2d_object_ptr :: proc "contextless" (self: CollisionObject2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3270,6 +3337,10 @@ texture2d_object_ptr :: proc "contextless" (self: Texture2D) -> ObjectPtr {
 }
 
 image_texture_object_ptr :: proc "contextless" (self: ImageTexture) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+audio_stream_object_ptr :: proc "contextless" (self: AudioStream) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
@@ -3370,6 +3441,16 @@ object_ptr_try_as_image_texture :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_image_texture(Object(self))
+}
+
+object_ptr_try_as_audio_stream :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: AudioStream,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_audio_stream(Object(self))
 }
 
 object_ptr_try_as_input_event :: proc "contextless" (
@@ -3698,6 +3779,16 @@ object_ptr_try_as_texture_progress_bar :: proc "contextless" (
 object_ptr_try_as_timer :: proc "contextless" (self: ObjectPtr) -> (value: Timer, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_timer(Object(self))
+}
+
+object_ptr_try_as_audio_stream_player :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: AudioStreamPlayer,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_audio_stream_player(Object(self))
 }
 
 object_ptr_try_as_collision_object2d :: proc "contextless" (
