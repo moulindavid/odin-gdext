@@ -166,6 +166,13 @@ These slices are complete and were validated with make ci when merged:
      coverage, exercised runtime root-window access in examples/game, updated
      generated reporting and CHANGELOG, and validated with full make ci.
 
+23. TextureProgressBar generated APIs.
+   - Added selected generated `TextureProgressBar` handle, casts, upcasts, and
+     borrowed-safe texture, tint, fill, radial, and stretch-margin methods.
+     Exposed the selected surface through `godot:godot`, added facade compile
+     coverage, exercised runtime configuration in examples/game, updated
+     generated reporting and CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

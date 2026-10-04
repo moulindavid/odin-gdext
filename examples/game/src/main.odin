@@ -535,6 +535,45 @@ configure_ui_resource_nodes :: proc "contextless" (
 		_ = gt.object_destroy_checked(progress_object)
 	}
 
+	texture_progress_object := gt.construct_object(texture_progress_bar_class_name)
+	if texture_progress, texture_progress_ok := gt.object_ptr_try_as_texture_progress_bar(
+		texture_progress_object,
+	); texture_progress_ok {
+		range_handle := gt.texture_progress_bar_as_range(texture_progress)
+		gt.range_set_min(range_handle, 0)
+		gt.range_set_max(range_handle, 100)
+		gt.range_set_value(range_handle, damage)
+		gt.texture_progress_bar_set_fill_mode(texture_progress, 0)
+		gt.texture_progress_bar_set_tint_under(texture_progress, gt.Color{1, 1, 1, 0.35})
+		gt.texture_progress_bar_set_tint_progress(texture_progress, gt.Color{0.2, 0.8, 1.0, 1.0})
+		gt.texture_progress_bar_set_tint_over(texture_progress, gt.Color{1, 1, 1, 0.75})
+		gt.texture_progress_bar_set_texture_progress_offset(texture_progress, gt.Vector2{1, 1})
+		gt.texture_progress_bar_set_radial_initial_angle(texture_progress, 0)
+		gt.texture_progress_bar_set_radial_center_offset(texture_progress, gt.Vector2{})
+		gt.texture_progress_bar_set_fill_degrees(texture_progress, 180)
+		gt.texture_progress_bar_set_stretch_margin(texture_progress, .side_left, 2)
+		gt.texture_progress_bar_set_nine_patch_stretch(texture_progress, true)
+		if texture_loaded {
+			gt.texture_progress_bar_set_under_texture(texture_progress, texture)
+			gt.texture_progress_bar_set_progress_texture(texture_progress, texture)
+			gt.texture_progress_bar_set_over_texture(texture_progress, texture)
+			_ = gt.texture_progress_bar_get_under_texture(texture_progress)
+			_ = gt.texture_progress_bar_get_progress_texture(texture_progress)
+			_ = gt.texture_progress_bar_get_over_texture(texture_progress)
+		}
+		_ = gt.texture_progress_bar_get_fill_mode(texture_progress)
+		_ = gt.texture_progress_bar_get_tint_progress(texture_progress)
+		_ = gt.texture_progress_bar_get_texture_progress_offset(texture_progress)
+		_ = gt.texture_progress_bar_get_radial_initial_angle(texture_progress)
+		_ = gt.texture_progress_bar_get_radial_center_offset(texture_progress)
+		_ = gt.texture_progress_bar_get_fill_degrees(texture_progress)
+		_ = gt.texture_progress_bar_get_stretch_margin(texture_progress, .side_left)
+		_ = gt.texture_progress_bar_get_nine_patch_stretch(texture_progress)
+		_ = gt.object_destroy_checked(gt.texture_progress_bar_object_ptr(texture_progress))
+	} else if texture_progress_object != nil {
+		_ = gt.object_destroy_checked(texture_progress_object)
+	}
+
 	texture_button_object := gt.construct_object(texture_button_class_name)
 	if texture_button, texture_button_ok := gt.object_ptr_try_as_texture_button(
 		texture_button_object,
@@ -756,6 +795,7 @@ path_follow2d_class_name_data: gt.ClassName
 visible_on_screen_notifier2d_class_name_data: gt.ClassName
 texture_button_class_name_data: gt.ClassName
 progress_bar_class_name_data: gt.ClassName
+texture_progress_bar_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name: gt.ConstStringNamePtr
 game_parent_name: gt.ConstStringNamePtr
@@ -771,6 +811,7 @@ path_follow2d_class_name: gt.ConstStringNamePtr
 visible_on_screen_notifier2d_class_name: gt.ConstStringNamePtr
 texture_button_class_name: gt.ConstStringNamePtr
 progress_bar_class_name: gt.ConstStringNamePtr
+texture_progress_bar_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
@@ -1011,6 +1052,7 @@ register_classes :: proc() {
 	)
 	texture_button_class_name = gt.class_name_ptr(&texture_button_class_name_data)
 	progress_bar_class_name = gt.class_name_ptr(&progress_bar_class_name_data)
+	texture_progress_bar_class_name = gt.class_name_ptr(&texture_progress_bar_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
 
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
@@ -1039,6 +1081,10 @@ register_classes :: proc() {
 	)
 	gt.class_name_init_latin1_cstring(&texture_button_class_name_data, cstring("TextureButton"))
 	gt.class_name_init_latin1_cstring(&progress_bar_class_name_data, cstring("ProgressBar"))
+	gt.class_name_init_latin1_cstring(
+		&texture_progress_bar_class_name_data,
+		cstring("TextureProgressBar"),
+	)
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,
 		cstring("AnimationPlayer"),
