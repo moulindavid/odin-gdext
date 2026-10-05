@@ -379,6 +379,42 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		_ = gt.object_destroy_checked(navigation_agent_object)
 	}
 
+	theme_object := gt.construct_object(theme_class_name)
+	if theme, theme_ok := gt.object_ptr_try_as_theme(theme_object); theme_ok {
+		owned_theme, owned_theme_ok := gt.owned_resource_init_owned(gt.theme_as_resource(theme))
+		if owned_theme_ok {
+			item_name := gt.string_name_from_utf8_cstring(cstring("value"))
+			type_name := gt.string_name_from_utf8_cstring(cstring("Label"))
+			type_string := gt.string_from_utf8("Label")
+			gt.theme_set_default_base_scale(theme, 1)
+			_ = gt.theme_get_default_base_scale(theme)
+			_ = gt.theme_has_default_base_scale(theme)
+			gt.theme_set_default_font_size(theme, 16)
+			_ = gt.theme_get_default_font_size(theme)
+			_ = gt.theme_has_default_font_size(theme)
+			gt.theme_set_color(theme, &item_name, &type_name, gt.Color{1, 1, 1, 1})
+			_ = gt.theme_get_color(theme, &item_name, &type_name)
+			_ = gt.theme_has_color(theme, &item_name, &type_name)
+			gt.theme_clear_color(theme, &item_name, &type_name)
+			gt.theme_set_constant(theme, &item_name, &type_name, 1)
+			_ = gt.theme_get_constant(theme, &item_name, &type_name)
+			_ = gt.theme_has_constant(theme, &item_name, &type_name)
+			gt.theme_clear_constant(theme, &item_name, &type_name)
+			theme_color_list := gt.theme_get_color_list(theme, &type_string)
+			gt.packed_string_array_free(&theme_color_list)
+			theme_type_list := gt.theme_get_type_list(theme)
+			gt.packed_string_array_free(&theme_type_list)
+			gt.string_free(&type_string)
+			gt.string_name_free(&type_name)
+			gt.string_name_free(&item_name)
+			_ = gt.owned_resource_destroy(&owned_theme)
+		} else {
+			_ = gt.object_destroy_checked(gt.theme_object_ptr(theme))
+		}
+	} else if theme_object != nil {
+		_ = gt.object_destroy_checked(theme_object)
+	}
+
 	font_file_object := gt.construct_object(font_file_class_name)
 	if font, font_ok := gt.object_ptr_try_as_font(font_file_object); font_ok {
 		owned_font, owned_font_ok := gt.owned_resource_init_owned(gt.font_as_resource(font))
@@ -912,6 +948,7 @@ camera2d_class_name_data: gt.ClassName
 marker2d_class_name_data: gt.ClassName
 ray_cast2d_class_name_data: gt.ClassName
 navigation_agent2d_class_name_data: gt.ClassName
+theme_class_name_data: gt.ClassName
 font_file_class_name_data: gt.ClassName
 tile_map_layer_class_name_data: gt.ClassName
 tile_map_class_name_data: gt.ClassName
@@ -933,6 +970,7 @@ camera2d_class_name: gt.ConstStringNamePtr
 marker2d_class_name: gt.ConstStringNamePtr
 ray_cast2d_class_name: gt.ConstStringNamePtr
 navigation_agent2d_class_name: gt.ConstStringNamePtr
+theme_class_name: gt.ConstStringNamePtr
 font_file_class_name: gt.ConstStringNamePtr
 tile_map_layer_class_name: gt.ConstStringNamePtr
 tile_map_class_name: gt.ConstStringNamePtr
@@ -1177,6 +1215,7 @@ register_classes :: proc() {
 	marker2d_class_name = gt.class_name_ptr(&marker2d_class_name_data)
 	ray_cast2d_class_name = gt.class_name_ptr(&ray_cast2d_class_name_data)
 	navigation_agent2d_class_name = gt.class_name_ptr(&navigation_agent2d_class_name_data)
+	theme_class_name = gt.class_name_ptr(&theme_class_name_data)
 	font_file_class_name = gt.class_name_ptr(&font_file_class_name_data)
 	tile_map_layer_class_name = gt.class_name_ptr(&tile_map_layer_class_name_data)
 	tile_map_class_name = gt.class_name_ptr(&tile_map_class_name_data)
@@ -1210,6 +1249,7 @@ register_classes :: proc() {
 		&navigation_agent2d_class_name_data,
 		cstring("NavigationAgent2D"),
 	)
+	gt.class_name_init_latin1_cstring(&theme_class_name_data, cstring("Theme"))
 	gt.class_name_init_latin1_cstring(&font_file_class_name_data, cstring("FontFile"))
 	gt.class_name_init_latin1_cstring(&tile_map_layer_class_name_data, cstring("TileMapLayer"))
 	gt.class_name_init_latin1_cstring(&tile_map_class_name_data, cstring("TileMap"))

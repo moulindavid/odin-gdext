@@ -216,6 +216,16 @@ These slices are complete and were validated with make ci when merged:
      resource cleanup, updated generated reporting and CHANGELOG, and validated
      with full make ci.
 
+29. Theme generated APIs.
+   - Added selected generated `Theme` handle, casts, upcasts, and borrowed-safe
+     icon, stylebox, font, font-size, color, constant, default, type variation,
+     type list, merge, and clear methods while leaving enum-based generic
+     theme-item APIs skipped. Exposed the selected surface through
+     `godot:godot`, added facade compile coverage, exercised concrete `Theme`
+     runtime queries/mutations in examples/game with explicit owned resource
+     cleanup, updated generated reporting and CHANGELOG, and validated with full
+     make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
