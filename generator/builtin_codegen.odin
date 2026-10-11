@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 56
+Max_Selected_Class_Count :: 58
 
 selected_class_names := []string {
 	"Object",
@@ -1020,6 +1020,7 @@ selected_class_names := []string {
 	"Node",
 	"CanvasItem",
 	"Node2D",
+	"Path2D",
 	"Control",
 	"BaseButton",
 	"Button",
@@ -1047,6 +1048,7 @@ selected_class_names := []string {
 	"TileMapLayer",
 	"TileMap",
 	"Font",
+	"Curve2D",
 	"Theme",
 	"PackedScene",
 	"ResourceLoader",
@@ -1068,7 +1070,7 @@ selected_class_names := []string {
 	"AudioStreamPlayer",
 }
 
-candidate_class_names := []string{"Path2D"}
+candidate_class_names := []string{}
 
 Selected_Class_Method :: struct {
 	class_name:  string,
@@ -1403,6 +1405,30 @@ selected_class_methods := []Selected_Class_Method {
 	{"ProgressBar", "is_indeterminate"},
 	{"ProgressBar", "set_editor_preview_indeterminate"},
 	{"ProgressBar", "is_editor_preview_indeterminate_enabled"},
+	{"Curve2D", "get_point_count"},
+	{"Curve2D", "set_point_count"},
+	{"Curve2D", "add_point"},
+	{"Curve2D", "set_point_position"},
+	{"Curve2D", "get_point_position"},
+	{"Curve2D", "set_point_in"},
+	{"Curve2D", "get_point_in"},
+	{"Curve2D", "set_point_out"},
+	{"Curve2D", "get_point_out"},
+	{"Curve2D", "remove_point"},
+	{"Curve2D", "clear_points"},
+	{"Curve2D", "sample"},
+	{"Curve2D", "samplef"},
+	{"Curve2D", "set_bake_interval"},
+	{"Curve2D", "get_bake_interval"},
+	{"Curve2D", "get_baked_length"},
+	{"Curve2D", "sample_baked"},
+	{"Curve2D", "sample_baked_with_rotation"},
+	{"Curve2D", "get_baked_points"},
+	{"Curve2D", "get_closest_point"},
+	{"Curve2D", "get_closest_offset"},
+	{"Curve2D", "tessellate"},
+	{"Curve2D", "tessellate_even_length"},
+	{"Path2D", "set_curve"},
 	{"Theme", "set_icon"},
 	{"Theme", "get_icon"},
 	{"Theme", "has_icon"},
@@ -2472,6 +2498,9 @@ class_method_deferred_reason :: proc(class_name, method_name: string) -> string 
 	}
 	if class_name == "Object" && (method_name == "set_script" || method_name == "get_script") {
 		return "object lifetime"
+	}
+	if class_name == "Path2D" && method_name == "get_curve" {
+		return "ref-counted return ownership"
 	}
 	return ""
 }

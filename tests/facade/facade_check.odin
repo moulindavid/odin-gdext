@@ -69,6 +69,7 @@ nil_method_set_string :: proc "contextless" (
 class_facade_compile_smoke :: proc "contextless" (
 	object: gt.Object,
 	node2d: gt.Node2D,
+	path2d: gt.Path2D,
 	canvas_item: gt.CanvasItem,
 	control: gt.Control,
 	sprite2d: gt.Sprite2D,
@@ -112,6 +113,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	audio_stream: gt.AudioStream,
 	style_box: gt.StyleBox,
 	font: gt.Font,
+	curve2d: gt.Curve2D,
 	theme: gt.Theme,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
@@ -1333,6 +1335,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.audio_stream_object_ptr(audio_stream)
 	_ = gt.style_box_object_ptr(style_box)
 	_ = gt.font_object_ptr(font)
+	_ = gt.curve2d_object_ptr(curve2d)
+	_ = gt.path2d_object_ptr(path2d)
 	_ = gt.theme_object_ptr(theme)
 	_ = gt.audio_stream_player_object_ptr(audio_stream_player)
 	_ = gt.packed_scene_object_ptr(packed_scene)
@@ -1349,6 +1353,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_audio_stream(gt.audio_stream_object_ptr(audio_stream))
 	_, _ = gt.object_ptr_try_as_style_box(gt.style_box_object_ptr(style_box))
 	_, _ = gt.object_ptr_try_as_font(gt.font_object_ptr(font))
+	_, _ = gt.object_ptr_try_as_curve2d(gt.curve2d_object_ptr(curve2d))
+	_, _ = gt.object_ptr_try_as_path2d(gt.path2d_object_ptr(path2d))
 	_, _ = gt.object_ptr_try_as_theme(gt.theme_object_ptr(theme))
 	_, _ = gt.object_ptr_try_as_audio_stream_player(
 		gt.audio_stream_player_object_ptr(audio_stream_player),
@@ -1376,6 +1382,13 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.font_as_resource(font)
 	_ = gt.font_as_ref_counted(font)
 	_ = gt.font_as_object(font)
+	_ = gt.curve2d_as_resource(curve2d)
+	_ = gt.curve2d_as_ref_counted(curve2d)
+	_ = gt.curve2d_as_object(curve2d)
+	_ = gt.path2d_as_node2d(path2d)
+	_ = gt.path2d_as_canvas_item(path2d)
+	_ = gt.path2d_as_node(path2d)
+	_ = gt.path2d_as_object(path2d)
 	_ = gt.theme_as_resource(theme)
 	_ = gt.theme_as_ref_counted(theme)
 	_ = gt.theme_as_object(theme)
@@ -1386,6 +1399,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.audio_stream_is_nil(audio_stream)
 	_ = gt.style_box_is_nil(style_box)
 	_ = gt.font_is_nil(font)
+	_ = gt.curve2d_is_nil(curve2d)
+	_ = gt.path2d_is_nil(path2d)
 	_ = gt.theme_is_nil(theme)
 	_ = gt.audio_stream_player_is_nil(audio_stream_player)
 	_ = gt.collision_object2d_is_nil(collision_object2d)
@@ -1497,6 +1512,39 @@ class_facade_compile_smoke :: proc "contextless" (
 	supported_variations := gt.font_get_supported_variation_list(font)
 	gt.dictionary_free(&supported_variations)
 	_ = gt.font_get_face_count(font)
+	gt.curve2d_set_point_count(curve2d, 2)
+	gt.curve2d_add_point(curve2d, gt.Vector2{0, 0}, gt.Vector2{}, gt.Vector2{}, -1)
+	_ = gt.curve2d_get_point_count(curve2d)
+	gt.curve2d_set_point_position(curve2d, 0, gt.Vector2{1, 2})
+	_ = gt.curve2d_get_point_position(curve2d, 0)
+	gt.curve2d_set_point_in(curve2d, 0, gt.Vector2{-1, 0})
+	_ = gt.curve2d_get_point_in(curve2d, 0)
+	gt.curve2d_set_point_out(curve2d, 0, gt.Vector2{1, 0})
+	_ = gt.curve2d_get_point_out(curve2d, 0)
+	gt.curve2d_remove_point(curve2d, 0)
+	gt.curve2d_clear_points(curve2d)
+	_ = gt.curve2d_sample(curve2d, 0, 0.5)
+	_ = gt.curve2d_samplef(curve2d, 0.5)
+	gt.curve2d_set_bake_interval(curve2d, 5)
+	_ = gt.curve2d_get_bake_interval(curve2d)
+	_ = gt.curve2d_get_baked_length(curve2d)
+	_ = gt.curve2d_sample_baked(curve2d, 0, true)
+	_ = gt.curve2d_sample_baked_default(curve2d)
+	_ = gt.curve2d_sample_baked_with_rotation(curve2d, 0, true)
+	_ = gt.curve2d_sample_baked_with_rotation_default(curve2d)
+	curve_baked_points := gt.curve2d_get_baked_points(curve2d)
+	gt.packed_vector2_array_free(&curve_baked_points)
+	_ = gt.curve2d_get_closest_point(curve2d, gt.Vector2{})
+	_ = gt.curve2d_get_closest_offset(curve2d, gt.Vector2{})
+	curve_tessellated := gt.curve2d_tessellate(curve2d, 5, 4)
+	gt.packed_vector2_array_free(&curve_tessellated)
+	curve_tessellated_default := gt.curve2d_tessellate_default(curve2d)
+	gt.packed_vector2_array_free(&curve_tessellated_default)
+	curve_even := gt.curve2d_tessellate_even_length(curve2d, 5, 20)
+	gt.packed_vector2_array_free(&curve_even)
+	curve_even_default := gt.curve2d_tessellate_even_length_default(curve2d)
+	gt.packed_vector2_array_free(&curve_even_default)
+	gt.path2d_set_curve(path2d, curve2d)
 	theme_item_name := meta_name
 	theme_item_old_name := meta_name
 	theme_type_name := meta_name
@@ -1764,6 +1812,10 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_style_box(object)
 	_ = gt.object_is_font(object)
 	_, _ = gt.object_try_as_font(object)
+	_ = gt.object_is_curve2d(object)
+	_, _ = gt.object_try_as_curve2d(object)
+	_ = gt.object_is_path2d(object)
+	_, _ = gt.object_try_as_path2d(object)
 	_ = gt.object_is_theme(object)
 	_, _ = gt.object_try_as_theme(object)
 	_ = gt.object_is_audio_stream_player(object)
@@ -2119,6 +2171,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_resource_loader(gt.resource_loader_object_ptr(resource_loader))
 	_ = gt.node_is_sprite2d(node)
 	_, _ = gt.node_try_as_sprite2d(node)
+	_ = gt.node_is_path2d(node)
+	_, _ = gt.node_try_as_path2d(node)
 	_ = gt.node_is_label(node)
 	_, _ = gt.node_try_as_label(node)
 	_ = gt.node_is_timer(node)
@@ -2127,6 +2181,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node_try_as_audio_stream_player(node)
 	_ = gt.canvas_item_is_sprite2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_sprite2d(canvas_item)
+	_ = gt.canvas_item_is_path2d(canvas_item)
+	_, _ = gt.canvas_item_try_as_path2d(canvas_item)
 	_ = gt.canvas_item_is_label(canvas_item)
 	_, _ = gt.canvas_item_try_as_label(canvas_item)
 	_ = gt.canvas_item_is_collision_object2d(canvas_item)
@@ -2135,6 +2191,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.canvas_item_try_as_area2d(canvas_item)
 	_ = gt.node2d_is_sprite2d(node2d)
 	_, _ = gt.node2d_try_as_sprite2d(node2d)
+	_ = gt.node2d_is_path2d(node2d)
+	_, _ = gt.node2d_try_as_path2d(node2d)
 	_ = gt.node2d_is_collision_object2d(node2d)
 	_, _ = gt.node2d_try_as_collision_object2d(node2d)
 	_ = gt.node2d_is_area2d(node2d)
@@ -2408,6 +2466,10 @@ ref_counted_resource_borrowed_policy_compile_smoke :: proc "contextless" (
 	_, _ = gt.resource_try_as_style_box(resource)
 	_ = gt.resource_is_font(resource)
 	_, _ = gt.resource_try_as_font(resource)
+	_ = gt.resource_is_curve2d(resource)
+	_, _ = gt.resource_try_as_curve2d(resource)
+	_ = gt.ref_counted_is_curve2d(ref_counted)
+	_, _ = gt.ref_counted_try_as_curve2d(ref_counted)
 	_ = gt.resource_is_theme(resource)
 	_, _ = gt.resource_try_as_theme(resource)
 	_ = gt.ref_counted_is_theme(ref_counted)
