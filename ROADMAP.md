@@ -226,6 +226,16 @@ These slices are complete and were validated with make ci when merged:
      cleanup, updated generated reporting and CHANGELOG, and validated with full
      make ci.
 
+30. Curve2D and Path2D generated APIs.
+   - Added selected generated `Curve2D` handle, casts, upcasts, point editing,
+     bake, sample, closest-point, and tessellation methods, plus safe
+     `Path2D.set_curve` coverage. Kept `Path2D.get_curve` skipped until
+     ref-counted class return ownership is explicit. Exposed the selected surface
+     through `godot:godot`, added facade compile coverage, exercised concrete
+     `Curve2D`/`Path2D` runtime coverage in examples/game with explicit owned
+     resource cleanup, updated generated reporting and CHANGELOG, and validated
+     with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

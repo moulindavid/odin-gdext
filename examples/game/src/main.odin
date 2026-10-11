@@ -493,6 +493,49 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		_ = gt.object_destroy_checked(tile_map_layer_object)
 	}
 
+	curve_object := gt.construct_object(curve2d_class_name)
+	path_object := gt.construct_object(path2d_class_name)
+	if curve, curve_ok := gt.object_ptr_try_as_curve2d(curve_object); curve_ok {
+		owned_curve, owned_curve_ok := gt.owned_resource_init_owned(gt.curve2d_as_resource(curve))
+		if owned_curve_ok {
+			gt.curve2d_add_point(curve, gt.Vector2{0, 0}, gt.Vector2{}, gt.Vector2{16, 0}, -1)
+			gt.curve2d_add_point(curve, gt.Vector2{64, 24}, gt.Vector2{-16, 0}, gt.Vector2{}, -1)
+			_ = gt.curve2d_get_point_count(curve)
+			_ = gt.curve2d_get_point_position(curve, 0)
+			gt.curve2d_set_bake_interval(curve, 8)
+			_ = gt.curve2d_get_bake_interval(curve)
+			_ = gt.curve2d_get_baked_length(curve)
+			_ = gt.curve2d_sample(curve, 0, 0.5)
+			_ = gt.curve2d_samplef(curve, 0.5)
+			_ = gt.curve2d_sample_baked(curve, 8, false)
+			_ = gt.curve2d_get_closest_point(curve, gt.Vector2{8, 8})
+			_ = gt.curve2d_get_closest_offset(curve, gt.Vector2{8, 8})
+			baked_points := gt.curve2d_get_baked_points(curve)
+			gt.packed_vector2_array_free(&baked_points)
+			if path, path_ok := gt.object_ptr_try_as_path2d(path_object); path_ok {
+				gt.path2d_set_curve(path, curve)
+				if !gt.node_add_child_checked(parent, gt.path2d_as_node(path)) {
+					_ = gt.object_destroy_checked(gt.path2d_object_ptr(path))
+				}
+			} else if path_object != nil {
+				_ = gt.object_destroy_checked(path_object)
+			}
+			_ = gt.owned_resource_destroy(&owned_curve)
+		} else {
+			_ = gt.object_destroy_checked(gt.curve2d_object_ptr(curve))
+			if path_object != nil {
+				_ = gt.object_destroy_checked(path_object)
+			}
+		}
+	} else {
+		if curve_object != nil {
+			_ = gt.object_destroy_checked(curve_object)
+		}
+		if path_object != nil {
+			_ = gt.object_destroy_checked(path_object)
+		}
+	}
+
 	path_follow_object := gt.construct_object(path_follow2d_class_name)
 	if path_follow, path_follow_ok := gt.object_ptr_try_as_path_follow2d(path_follow_object);
 	   path_follow_ok {
@@ -949,6 +992,8 @@ marker2d_class_name_data: gt.ClassName
 ray_cast2d_class_name_data: gt.ClassName
 navigation_agent2d_class_name_data: gt.ClassName
 theme_class_name_data: gt.ClassName
+curve2d_class_name_data: gt.ClassName
+path2d_class_name_data: gt.ClassName
 font_file_class_name_data: gt.ClassName
 tile_map_layer_class_name_data: gt.ClassName
 tile_map_class_name_data: gt.ClassName
@@ -971,6 +1016,8 @@ marker2d_class_name: gt.ConstStringNamePtr
 ray_cast2d_class_name: gt.ConstStringNamePtr
 navigation_agent2d_class_name: gt.ConstStringNamePtr
 theme_class_name: gt.ConstStringNamePtr
+curve2d_class_name: gt.ConstStringNamePtr
+path2d_class_name: gt.ConstStringNamePtr
 font_file_class_name: gt.ConstStringNamePtr
 tile_map_layer_class_name: gt.ConstStringNamePtr
 tile_map_class_name: gt.ConstStringNamePtr
@@ -1216,6 +1263,8 @@ register_classes :: proc() {
 	ray_cast2d_class_name = gt.class_name_ptr(&ray_cast2d_class_name_data)
 	navigation_agent2d_class_name = gt.class_name_ptr(&navigation_agent2d_class_name_data)
 	theme_class_name = gt.class_name_ptr(&theme_class_name_data)
+	curve2d_class_name = gt.class_name_ptr(&curve2d_class_name_data)
+	path2d_class_name = gt.class_name_ptr(&path2d_class_name_data)
 	font_file_class_name = gt.class_name_ptr(&font_file_class_name_data)
 	tile_map_layer_class_name = gt.class_name_ptr(&tile_map_layer_class_name_data)
 	tile_map_class_name = gt.class_name_ptr(&tile_map_class_name_data)
@@ -1250,6 +1299,8 @@ register_classes :: proc() {
 		cstring("NavigationAgent2D"),
 	)
 	gt.class_name_init_latin1_cstring(&theme_class_name_data, cstring("Theme"))
+	gt.class_name_init_latin1_cstring(&curve2d_class_name_data, cstring("Curve2D"))
+	gt.class_name_init_latin1_cstring(&path2d_class_name_data, cstring("Path2D"))
 	gt.class_name_init_latin1_cstring(&font_file_class_name_data, cstring("FontFile"))
 	gt.class_name_init_latin1_cstring(&tile_map_layer_class_name_data, cstring("TileMapLayer"))
 	gt.class_name_init_latin1_cstring(&tile_map_class_name_data, cstring("TileMap"))

@@ -171,6 +171,7 @@ ImageTexture :: gclass.ImageTexture
 AudioStream :: gclass.AudioStream
 StyleBox :: gclass.StyleBox
 Font :: gclass.Font
+Curve2D :: gclass.Curve2D
 Theme :: gclass.Theme
 // Resource loading policy: ResourceLoader.load returns a Resource through a
 // Variant call in focused helpers. The helper retains the borrowed Resource into
@@ -182,6 +183,7 @@ OwnedResource :: struct {
 Node :: gclass.Node
 CanvasItem :: gclass.CanvasItem
 Node2D :: gclass.Node2D
+Path2D :: gclass.Path2D
 Control :: gclass.Control
 BaseButton :: gclass.BaseButton
 Button :: gclass.Button
@@ -536,6 +538,41 @@ font_is_script_supported :: gclass.font_is_script_supported
 font_get_supported_feature_list :: gclass.font_get_supported_feature_list
 font_get_supported_variation_list :: gclass.font_get_supported_variation_list
 font_get_face_count :: gclass.font_get_face_count
+path2d_as_node2d :: gclass.path2d_as_node2d
+path2d_as_canvas_item :: gclass.path2d_as_canvas_item
+path2d_as_node :: gclass.path2d_as_node
+path2d_as_object :: gclass.path2d_as_object
+curve2d_as_resource :: gclass.curve2d_as_resource
+curve2d_as_ref_counted :: gclass.curve2d_as_ref_counted
+curve2d_as_object :: gclass.curve2d_as_object
+curve2d_get_point_count :: gclass.curve2d_get_point_count
+curve2d_set_point_count :: gclass.curve2d_set_point_count
+curve2d_add_point :: gclass.curve2d_add_point
+curve2d_set_point_position :: gclass.curve2d_set_point_position
+curve2d_get_point_position :: gclass.curve2d_get_point_position
+curve2d_set_point_in :: gclass.curve2d_set_point_in
+curve2d_get_point_in :: gclass.curve2d_get_point_in
+curve2d_set_point_out :: gclass.curve2d_set_point_out
+curve2d_get_point_out :: gclass.curve2d_get_point_out
+curve2d_remove_point :: gclass.curve2d_remove_point
+curve2d_clear_points :: gclass.curve2d_clear_points
+curve2d_sample :: gclass.curve2d_sample
+curve2d_samplef :: gclass.curve2d_samplef
+curve2d_set_bake_interval :: gclass.curve2d_set_bake_interval
+curve2d_get_bake_interval :: gclass.curve2d_get_bake_interval
+curve2d_get_baked_length :: gclass.curve2d_get_baked_length
+curve2d_sample_baked :: gclass.curve2d_sample_baked
+curve2d_sample_baked_default :: gclass.curve2d_sample_baked_default
+curve2d_sample_baked_with_rotation :: gclass.curve2d_sample_baked_with_rotation
+curve2d_sample_baked_with_rotation_default :: gclass.curve2d_sample_baked_with_rotation_default
+curve2d_get_baked_points :: gclass.curve2d_get_baked_points
+curve2d_get_closest_point :: gclass.curve2d_get_closest_point
+curve2d_get_closest_offset :: gclass.curve2d_get_closest_offset
+curve2d_tessellate :: gclass.curve2d_tessellate
+curve2d_tessellate_default :: gclass.curve2d_tessellate_default
+curve2d_tessellate_even_length :: gclass.curve2d_tessellate_even_length
+curve2d_tessellate_even_length_default :: gclass.curve2d_tessellate_even_length_default
+path2d_set_curve :: gclass.path2d_set_curve
 theme_as_resource :: gclass.theme_as_resource
 theme_as_ref_counted :: gclass.theme_as_ref_counted
 theme_as_object :: gclass.theme_as_object
@@ -1046,6 +1083,10 @@ object_is_style_box :: gclass.object_is_style_box
 object_try_as_style_box :: gclass.object_try_as_style_box
 object_is_font :: gclass.object_is_font
 object_try_as_font :: gclass.object_try_as_font
+object_is_curve2d :: gclass.object_is_curve2d
+object_try_as_curve2d :: gclass.object_try_as_curve2d
+object_is_path2d :: gclass.object_is_path2d
+object_try_as_path2d :: gclass.object_try_as_path2d
 object_is_theme :: gclass.object_is_theme
 object_try_as_theme :: gclass.object_try_as_theme
 resource_is_texture2d :: gclass.resource_is_texture2d
@@ -1058,6 +1099,8 @@ resource_is_style_box :: gclass.resource_is_style_box
 resource_try_as_style_box :: gclass.resource_try_as_style_box
 resource_is_font :: gclass.resource_is_font
 resource_try_as_font :: gclass.resource_try_as_font
+resource_is_curve2d :: gclass.resource_is_curve2d
+resource_try_as_curve2d :: gclass.resource_try_as_curve2d
 resource_is_theme :: gclass.resource_is_theme
 resource_try_as_theme :: gclass.resource_try_as_theme
 texture2d_is_image_texture :: gclass.texture2d_is_image_texture
@@ -1156,6 +1199,8 @@ ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 ref_counted_is_packed_scene :: gclass.ref_counted_is_packed_scene
 ref_counted_try_as_packed_scene :: gclass.ref_counted_try_as_packed_scene
+ref_counted_is_curve2d :: gclass.ref_counted_is_curve2d
+ref_counted_try_as_curve2d :: gclass.ref_counted_try_as_curve2d
 ref_counted_is_theme :: gclass.ref_counted_is_theme
 ref_counted_try_as_theme :: gclass.ref_counted_try_as_theme
 resource_is_packed_scene :: gclass.resource_is_packed_scene
@@ -1252,6 +1297,8 @@ node_is_control :: gclass.node_is_control
 node_try_as_control :: gclass.node_try_as_control
 node_is_sprite2d :: gclass.node_is_sprite2d
 node_try_as_sprite2d :: gclass.node_try_as_sprite2d
+node_is_path2d :: gclass.node_is_path2d
+node_try_as_path2d :: gclass.node_try_as_path2d
 node_is_label :: gclass.node_is_label
 node_try_as_label :: gclass.node_try_as_label
 node_is_base_button :: gclass.node_is_base_button
@@ -1302,6 +1349,8 @@ canvas_item_is_control :: gclass.canvas_item_is_control
 canvas_item_try_as_control :: gclass.canvas_item_try_as_control
 canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
 canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
+canvas_item_is_path2d :: gclass.canvas_item_is_path2d
+canvas_item_try_as_path2d :: gclass.canvas_item_try_as_path2d
 canvas_item_is_label :: gclass.canvas_item_is_label
 canvas_item_try_as_label :: gclass.canvas_item_try_as_label
 canvas_item_is_base_button :: gclass.canvas_item_is_base_button
@@ -1337,6 +1386,8 @@ canvas_item_try_as_visible_on_screen_notifier2d ::
 	gclass.canvas_item_try_as_visible_on_screen_notifier2d
 node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
+node2d_is_path2d :: gclass.node2d_is_path2d
+node2d_try_as_path2d :: gclass.node2d_try_as_path2d
 node2d_is_collision_object2d :: gclass.node2d_is_collision_object2d
 node2d_try_as_collision_object2d :: gclass.node2d_try_as_collision_object2d
 node2d_is_area2d :: gclass.node2d_is_area2d
@@ -2266,6 +2317,14 @@ style_box_is_nil :: proc "contextless" (self: StyleBox) -> bool {
 }
 
 font_is_nil :: proc "contextless" (self: Font) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+path2d_is_nil :: proc "contextless" (self: Path2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -3671,6 +3730,14 @@ font_object_ptr :: proc "contextless" (self: Font) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+curve2d_object_ptr :: proc "contextless" (self: Curve2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+path2d_object_ptr :: proc "contextless" (self: Path2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 theme_object_ptr :: proc "contextless" (self: Theme) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3797,6 +3864,16 @@ object_ptr_try_as_style_box :: proc "contextless" (
 object_ptr_try_as_font :: proc "contextless" (self: ObjectPtr) -> (value: Font, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_font(Object(self))
+}
+
+object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_path2d :: proc "contextless" (self: ObjectPtr) -> (value: Path2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_path2d(Object(self))
 }
 
 object_ptr_try_as_theme :: proc "contextless" (self: ObjectPtr) -> (value: Theme, ok: bool) {
