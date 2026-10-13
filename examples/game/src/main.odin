@@ -536,6 +536,175 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		}
 	}
 
+
+	circle_shape_object := gt.construct_object(circle_shape2d_class_name)
+	rectangle_shape_object := gt.construct_object(rectangle_shape2d_class_name)
+	if circle_shape, circle_shape_ok := gt.object_ptr_try_as_circle_shape2d(circle_shape_object);
+	   circle_shape_ok {
+		owned_circle_shape, owned_circle_shape_ok := gt.owned_resource_init_owned(
+			gt.circle_shape2d_as_resource(circle_shape),
+		)
+		if owned_circle_shape_ok {
+			gt.circle_shape2d_set_radius(circle_shape, 10)
+			_ = gt.circle_shape2d_get_radius(circle_shape)
+			circle_shape2d := gt.circle_shape2d_as_shape2d(circle_shape)
+			gt.shape2d_set_custom_solver_bias(circle_shape2d, 0.05)
+			_ = gt.shape2d_get_custom_solver_bias(circle_shape2d)
+			_ = gt.shape2d_get_rect(circle_shape2d)
+			if rectangle_shape, rectangle_shape_ok := gt.object_ptr_try_as_rectangle_shape2d(
+				rectangle_shape_object,
+			); rectangle_shape_ok {
+				owned_rectangle_shape, owned_rectangle_shape_ok := gt.owned_resource_init_owned(
+					gt.rectangle_shape2d_as_resource(rectangle_shape),
+				)
+				if owned_rectangle_shape_ok {
+					gt.rectangle_shape2d_set_size(rectangle_shape, gt.Vector2{18, 12})
+					_ = gt.rectangle_shape2d_get_size(rectangle_shape)
+					rectangle_shape2d := gt.rectangle_shape2d_as_shape2d(rectangle_shape)
+					shape_identity := gt.Transform2D {
+						x      = gt.Vector2{1, 0},
+						y      = gt.Vector2{0, 1},
+						origin = gt.Vector2{},
+					}
+					_ = gt.shape2d_collide(
+						circle_shape2d,
+						shape_identity,
+						rectangle_shape2d,
+						shape_identity,
+					)
+					_ = gt.shape2d_collide_with_motion(
+						circle_shape2d,
+						shape_identity,
+						gt.Vector2{},
+						rectangle_shape2d,
+						shape_identity,
+						gt.Vector2{},
+					)
+					shape_contacts := gt.shape2d_collide_and_get_contacts(
+						circle_shape2d,
+						shape_identity,
+						rectangle_shape2d,
+						shape_identity,
+					)
+					gt.packed_vector2_array_free(&shape_contacts)
+					motion_contacts := gt.shape2d_collide_with_motion_and_get_contacts(
+						circle_shape2d,
+						shape_identity,
+						gt.Vector2{},
+						rectangle_shape2d,
+						shape_identity,
+						gt.Vector2{},
+					)
+					gt.packed_vector2_array_free(&motion_contacts)
+					_ = gt.owned_resource_destroy(&owned_rectangle_shape)
+				} else {
+					_ = gt.object_destroy_checked(gt.rectangle_shape2d_object_ptr(rectangle_shape))
+				}
+			} else if rectangle_shape_object != nil {
+				_ = gt.object_destroy_checked(rectangle_shape_object)
+			}
+			_ = gt.owned_resource_destroy(&owned_circle_shape)
+		} else {
+			_ = gt.object_destroy_checked(gt.circle_shape2d_object_ptr(circle_shape))
+			if rectangle_shape_object != nil {
+				_ = gt.object_destroy_checked(rectangle_shape_object)
+			}
+		}
+	} else {
+		if circle_shape_object != nil {
+			_ = gt.object_destroy_checked(circle_shape_object)
+		}
+		if rectangle_shape_object != nil {
+			_ = gt.object_destroy_checked(rectangle_shape_object)
+		}
+	}
+
+	segment_shape_object := gt.construct_object(segment_shape2d_class_name)
+	if segment_shape, segment_shape_ok := gt.object_ptr_try_as_segment_shape2d(
+		segment_shape_object,
+	); segment_shape_ok {
+		owned_segment_shape, owned_segment_shape_ok := gt.owned_resource_init_owned(
+			gt.segment_shape2d_as_resource(segment_shape),
+		)
+		if owned_segment_shape_ok {
+			gt.segment_shape2d_set_a(segment_shape, gt.Vector2{-8, 0})
+			_ = gt.segment_shape2d_get_a(segment_shape)
+			gt.segment_shape2d_set_b(segment_shape, gt.Vector2{8, 0})
+			_ = gt.segment_shape2d_get_b(segment_shape)
+			_ = gt.owned_resource_destroy(&owned_segment_shape)
+		} else {
+			_ = gt.object_destroy_checked(gt.segment_shape2d_object_ptr(segment_shape))
+		}
+	} else if segment_shape_object != nil {
+		_ = gt.object_destroy_checked(segment_shape_object)
+	}
+
+	separation_ray_shape_object := gt.construct_object(separation_ray_shape2d_class_name)
+	if separation_ray_shape, separation_ray_shape_ok :=
+		gt.object_ptr_try_as_separation_ray_shape2d(separation_ray_shape_object);
+	separation_ray_shape_ok {
+		owned_separation_ray_shape, owned_separation_ray_shape_ok := gt.owned_resource_init_owned(
+			gt.separation_ray_shape2d_as_resource(separation_ray_shape),
+		)
+		if owned_separation_ray_shape_ok {
+			gt.separation_ray_shape2d_set_length(separation_ray_shape, 12)
+			_ = gt.separation_ray_shape2d_get_length(separation_ray_shape)
+			gt.separation_ray_shape2d_set_slide_on_slope(separation_ray_shape, true)
+			_ = gt.separation_ray_shape2d_get_slide_on_slope(separation_ray_shape)
+			_ = gt.owned_resource_destroy(&owned_separation_ray_shape)
+		} else {
+			_ = gt.object_destroy_checked(
+				gt.separation_ray_shape2d_object_ptr(separation_ray_shape),
+			)
+		}
+	} else if separation_ray_shape_object != nil {
+		_ = gt.object_destroy_checked(separation_ray_shape_object)
+	}
+
+	world_boundary_shape_object := gt.construct_object(world_boundary_shape2d_class_name)
+	if world_boundary_shape, world_boundary_shape_ok :=
+		gt.object_ptr_try_as_world_boundary_shape2d(world_boundary_shape_object);
+	world_boundary_shape_ok {
+		owned_world_boundary_shape, owned_world_boundary_shape_ok := gt.owned_resource_init_owned(
+			gt.world_boundary_shape2d_as_resource(world_boundary_shape),
+		)
+		if owned_world_boundary_shape_ok {
+			gt.world_boundary_shape2d_set_normal(world_boundary_shape, gt.Vector2{0, -1})
+			_ = gt.world_boundary_shape2d_get_normal(world_boundary_shape)
+			gt.world_boundary_shape2d_set_distance(world_boundary_shape, 32)
+			_ = gt.world_boundary_shape2d_get_distance(world_boundary_shape)
+			_ = gt.owned_resource_destroy(&owned_world_boundary_shape)
+		} else {
+			_ = gt.object_destroy_checked(
+				gt.world_boundary_shape2d_object_ptr(world_boundary_shape),
+			)
+		}
+	} else if world_boundary_shape_object != nil {
+		_ = gt.object_destroy_checked(world_boundary_shape_object)
+	}
+
+	capsule_shape_object := gt.construct_object(capsule_shape2d_class_name)
+	if capsule_shape, capsule_shape_ok := gt.object_ptr_try_as_capsule_shape2d(
+		capsule_shape_object,
+	); capsule_shape_ok {
+		owned_capsule_shape, owned_capsule_shape_ok := gt.owned_resource_init_owned(
+			gt.capsule_shape2d_as_resource(capsule_shape),
+		)
+		if owned_capsule_shape_ok {
+			gt.capsule_shape2d_set_radius(capsule_shape, 6)
+			_ = gt.capsule_shape2d_get_radius(capsule_shape)
+			gt.capsule_shape2d_set_height(capsule_shape, 18)
+			_ = gt.capsule_shape2d_get_height(capsule_shape)
+			gt.capsule_shape2d_set_mid_height(capsule_shape, 6)
+			_ = gt.capsule_shape2d_get_mid_height(capsule_shape)
+			_ = gt.owned_resource_destroy(&owned_capsule_shape)
+		} else {
+			_ = gt.object_destroy_checked(gt.capsule_shape2d_object_ptr(capsule_shape))
+		}
+	} else if capsule_shape_object != nil {
+		_ = gt.object_destroy_checked(capsule_shape_object)
+	}
+
 	canvas_modulate_object := gt.construct_object(canvas_modulate_class_name)
 	if canvas_modulate, canvas_modulate_ok := gt.object_ptr_try_as_canvas_modulate(
 		canvas_modulate_object,
@@ -1036,6 +1205,12 @@ navigation_agent2d_class_name_data: gt.ClassName
 theme_class_name_data: gt.ClassName
 curve2d_class_name_data: gt.ClassName
 path2d_class_name_data: gt.ClassName
+circle_shape2d_class_name_data: gt.ClassName
+rectangle_shape2d_class_name_data: gt.ClassName
+segment_shape2d_class_name_data: gt.ClassName
+separation_ray_shape2d_class_name_data: gt.ClassName
+world_boundary_shape2d_class_name_data: gt.ClassName
+capsule_shape2d_class_name_data: gt.ClassName
 canvas_modulate_class_name_data: gt.ClassName
 parallax2d_class_name_data: gt.ClassName
 font_file_class_name_data: gt.ClassName
@@ -1062,6 +1237,12 @@ navigation_agent2d_class_name: gt.ConstStringNamePtr
 theme_class_name: gt.ConstStringNamePtr
 curve2d_class_name: gt.ConstStringNamePtr
 path2d_class_name: gt.ConstStringNamePtr
+circle_shape2d_class_name: gt.ConstStringNamePtr
+rectangle_shape2d_class_name: gt.ConstStringNamePtr
+segment_shape2d_class_name: gt.ConstStringNamePtr
+separation_ray_shape2d_class_name: gt.ConstStringNamePtr
+world_boundary_shape2d_class_name: gt.ConstStringNamePtr
+capsule_shape2d_class_name: gt.ConstStringNamePtr
 canvas_modulate_class_name: gt.ConstStringNamePtr
 parallax2d_class_name: gt.ConstStringNamePtr
 font_file_class_name: gt.ConstStringNamePtr
@@ -1311,6 +1492,12 @@ register_classes :: proc() {
 	theme_class_name = gt.class_name_ptr(&theme_class_name_data)
 	curve2d_class_name = gt.class_name_ptr(&curve2d_class_name_data)
 	path2d_class_name = gt.class_name_ptr(&path2d_class_name_data)
+	circle_shape2d_class_name = gt.class_name_ptr(&circle_shape2d_class_name_data)
+	rectangle_shape2d_class_name = gt.class_name_ptr(&rectangle_shape2d_class_name_data)
+	segment_shape2d_class_name = gt.class_name_ptr(&segment_shape2d_class_name_data)
+	separation_ray_shape2d_class_name = gt.class_name_ptr(&separation_ray_shape2d_class_name_data)
+	world_boundary_shape2d_class_name = gt.class_name_ptr(&world_boundary_shape2d_class_name_data)
+	capsule_shape2d_class_name = gt.class_name_ptr(&capsule_shape2d_class_name_data)
 	canvas_modulate_class_name = gt.class_name_ptr(&canvas_modulate_class_name_data)
 	parallax2d_class_name = gt.class_name_ptr(&parallax2d_class_name_data)
 	font_file_class_name = gt.class_name_ptr(&font_file_class_name_data)
@@ -1349,6 +1536,21 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&theme_class_name_data, cstring("Theme"))
 	gt.class_name_init_latin1_cstring(&curve2d_class_name_data, cstring("Curve2D"))
 	gt.class_name_init_latin1_cstring(&path2d_class_name_data, cstring("Path2D"))
+	gt.class_name_init_latin1_cstring(&circle_shape2d_class_name_data, cstring("CircleShape2D"))
+	gt.class_name_init_latin1_cstring(
+		&rectangle_shape2d_class_name_data,
+		cstring("RectangleShape2D"),
+	)
+	gt.class_name_init_latin1_cstring(&segment_shape2d_class_name_data, cstring("SegmentShape2D"))
+	gt.class_name_init_latin1_cstring(
+		&separation_ray_shape2d_class_name_data,
+		cstring("SeparationRayShape2D"),
+	)
+	gt.class_name_init_latin1_cstring(
+		&world_boundary_shape2d_class_name_data,
+		cstring("WorldBoundaryShape2D"),
+	)
+	gt.class_name_init_latin1_cstring(&capsule_shape2d_class_name_data, cstring("CapsuleShape2D"))
 	gt.class_name_init_latin1_cstring(&canvas_modulate_class_name_data, cstring("CanvasModulate"))
 	gt.class_name_init_latin1_cstring(&parallax2d_class_name_data, cstring("Parallax2D"))
 	gt.class_name_init_latin1_cstring(&font_file_class_name_data, cstring("FontFile"))

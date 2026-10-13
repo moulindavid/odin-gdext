@@ -34,6 +34,10 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   coverage.
 - Added selected generated `CanvasModulate` and `Parallax2D` APIs with public
   facade exports, compile coverage, and examples/game runtime coverage.
+- Added selected generated 2D shape resource APIs for `Shape2D`,
+  `CircleShape2D`, `RectangleShape2D`, `SegmentShape2D`,
+  `SeparationRayShape2D`, `WorldBoundaryShape2D`, and `CapsuleShape2D`, with
+  public facade exports, compile coverage, and examples/game runtime coverage.
 
 ## Completed roadmap slices
 

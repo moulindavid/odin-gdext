@@ -116,6 +116,13 @@ class_facade_compile_smoke :: proc "contextless" (
 	style_box: gt.StyleBox,
 	font: gt.Font,
 	curve2d: gt.Curve2D,
+	shape2d: gt.Shape2D,
+	circle_shape2d: gt.CircleShape2D,
+	rectangle_shape2d: gt.RectangleShape2D,
+	segment_shape2d: gt.SegmentShape2D,
+	separation_ray_shape2d: gt.SeparationRayShape2D,
+	world_boundary_shape2d: gt.WorldBoundaryShape2D,
+	capsule_shape2d: gt.CapsuleShape2D,
 	theme: gt.Theme,
 	resource: gt.Resource,
 	ref_counted: gt.RefCounted,
@@ -1310,6 +1317,13 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.scene_tree_is_nil(scene_tree)
 	_ = gt.animation_player_is_nil(animation_player)
 	_ = gt.tween_is_nil(tween)
+	_ = gt.shape2d_is_nil(shape2d)
+	_ = gt.circle_shape2d_is_nil(circle_shape2d)
+	_ = gt.rectangle_shape2d_is_nil(rectangle_shape2d)
+	_ = gt.segment_shape2d_is_nil(segment_shape2d)
+	_ = gt.separation_ray_shape2d_is_nil(separation_ray_shape2d)
+	_ = gt.world_boundary_shape2d_is_nil(world_boundary_shape2d)
+	_ = gt.capsule_shape2d_is_nil(capsule_shape2d)
 	_ = gt.object_ptr_as_object(gt.node_object_ptr(node))
 	_ = gt.ref_counted_object_ptr(ref_counted)
 	_ = gt.resource_object_ptr(resource)
@@ -1338,6 +1352,13 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.style_box_object_ptr(style_box)
 	_ = gt.font_object_ptr(font)
 	_ = gt.curve2d_object_ptr(curve2d)
+	_ = gt.shape2d_object_ptr(shape2d)
+	_ = gt.circle_shape2d_object_ptr(circle_shape2d)
+	_ = gt.rectangle_shape2d_object_ptr(rectangle_shape2d)
+	_ = gt.segment_shape2d_object_ptr(segment_shape2d)
+	_ = gt.separation_ray_shape2d_object_ptr(separation_ray_shape2d)
+	_ = gt.world_boundary_shape2d_object_ptr(world_boundary_shape2d)
+	_ = gt.capsule_shape2d_object_ptr(capsule_shape2d)
 	_ = gt.path2d_object_ptr(path2d)
 	_ = gt.canvas_modulate_object_ptr(canvas_modulate)
 	_ = gt.parallax2d_object_ptr(parallax2d)
@@ -1358,6 +1379,19 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_style_box(gt.style_box_object_ptr(style_box))
 	_, _ = gt.object_ptr_try_as_font(gt.font_object_ptr(font))
 	_, _ = gt.object_ptr_try_as_curve2d(gt.curve2d_object_ptr(curve2d))
+	_, _ = gt.object_ptr_try_as_shape2d(gt.shape2d_object_ptr(shape2d))
+	_, _ = gt.object_ptr_try_as_circle_shape2d(gt.circle_shape2d_object_ptr(circle_shape2d))
+	_, _ = gt.object_ptr_try_as_rectangle_shape2d(
+		gt.rectangle_shape2d_object_ptr(rectangle_shape2d),
+	)
+	_, _ = gt.object_ptr_try_as_segment_shape2d(gt.segment_shape2d_object_ptr(segment_shape2d))
+	_, _ = gt.object_ptr_try_as_separation_ray_shape2d(
+		gt.separation_ray_shape2d_object_ptr(separation_ray_shape2d),
+	)
+	_, _ = gt.object_ptr_try_as_world_boundary_shape2d(
+		gt.world_boundary_shape2d_object_ptr(world_boundary_shape2d),
+	)
+	_, _ = gt.object_ptr_try_as_capsule_shape2d(gt.capsule_shape2d_object_ptr(capsule_shape2d))
 	_, _ = gt.object_ptr_try_as_path2d(gt.path2d_object_ptr(path2d))
 	_, _ = gt.object_ptr_try_as_canvas_modulate(gt.canvas_modulate_object_ptr(canvas_modulate))
 	_, _ = gt.object_ptr_try_as_parallax2d(gt.parallax2d_object_ptr(parallax2d))
@@ -1391,6 +1425,33 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.curve2d_as_resource(curve2d)
 	_ = gt.curve2d_as_ref_counted(curve2d)
 	_ = gt.curve2d_as_object(curve2d)
+	_ = gt.shape2d_as_resource(shape2d)
+	_ = gt.shape2d_as_ref_counted(shape2d)
+	_ = gt.shape2d_as_object(shape2d)
+	_ = gt.circle_shape2d_as_shape2d(circle_shape2d)
+	_ = gt.circle_shape2d_as_resource(circle_shape2d)
+	_ = gt.circle_shape2d_as_ref_counted(circle_shape2d)
+	_ = gt.circle_shape2d_as_object(circle_shape2d)
+	_ = gt.rectangle_shape2d_as_shape2d(rectangle_shape2d)
+	_ = gt.rectangle_shape2d_as_resource(rectangle_shape2d)
+	_ = gt.rectangle_shape2d_as_ref_counted(rectangle_shape2d)
+	_ = gt.rectangle_shape2d_as_object(rectangle_shape2d)
+	_ = gt.segment_shape2d_as_shape2d(segment_shape2d)
+	_ = gt.segment_shape2d_as_resource(segment_shape2d)
+	_ = gt.segment_shape2d_as_ref_counted(segment_shape2d)
+	_ = gt.segment_shape2d_as_object(segment_shape2d)
+	_ = gt.separation_ray_shape2d_as_shape2d(separation_ray_shape2d)
+	_ = gt.separation_ray_shape2d_as_resource(separation_ray_shape2d)
+	_ = gt.separation_ray_shape2d_as_ref_counted(separation_ray_shape2d)
+	_ = gt.separation_ray_shape2d_as_object(separation_ray_shape2d)
+	_ = gt.world_boundary_shape2d_as_shape2d(world_boundary_shape2d)
+	_ = gt.world_boundary_shape2d_as_resource(world_boundary_shape2d)
+	_ = gt.world_boundary_shape2d_as_ref_counted(world_boundary_shape2d)
+	_ = gt.world_boundary_shape2d_as_object(world_boundary_shape2d)
+	_ = gt.capsule_shape2d_as_shape2d(capsule_shape2d)
+	_ = gt.capsule_shape2d_as_resource(capsule_shape2d)
+	_ = gt.capsule_shape2d_as_ref_counted(capsule_shape2d)
+	_ = gt.capsule_shape2d_as_object(capsule_shape2d)
 	_ = gt.path2d_as_node2d(path2d)
 	_ = gt.path2d_as_canvas_item(path2d)
 	_ = gt.path2d_as_node(path2d)
@@ -1528,6 +1589,73 @@ class_facade_compile_smoke :: proc "contextless" (
 	supported_variations := gt.font_get_supported_variation_list(font)
 	gt.dictionary_free(&supported_variations)
 	_ = gt.font_get_face_count(font)
+	_ = gt.shape2d_is_circle_shape2d(shape2d)
+	_, _ = gt.shape2d_try_as_circle_shape2d(shape2d)
+	_ = gt.shape2d_is_rectangle_shape2d(shape2d)
+	_, _ = gt.shape2d_try_as_rectangle_shape2d(shape2d)
+	_ = gt.shape2d_is_segment_shape2d(shape2d)
+	_, _ = gt.shape2d_try_as_segment_shape2d(shape2d)
+	_ = gt.shape2d_is_separation_ray_shape2d(shape2d)
+	_, _ = gt.shape2d_try_as_separation_ray_shape2d(shape2d)
+	_ = gt.shape2d_is_world_boundary_shape2d(shape2d)
+	_, _ = gt.shape2d_try_as_world_boundary_shape2d(shape2d)
+	_ = gt.shape2d_is_capsule_shape2d(shape2d)
+	_, _ = gt.shape2d_try_as_capsule_shape2d(shape2d)
+	gt.shape2d_set_custom_solver_bias(shape2d, 0.1)
+	_ = gt.shape2d_get_custom_solver_bias(shape2d)
+	_ = gt.shape2d_collide(
+		shape2d,
+		gt.Transform2D{},
+		gt.circle_shape2d_as_shape2d(circle_shape2d),
+		gt.Transform2D{},
+	)
+	_ = gt.shape2d_collide_with_motion(
+		shape2d,
+		gt.Transform2D{},
+		gt.Vector2{},
+		gt.circle_shape2d_as_shape2d(circle_shape2d),
+		gt.Transform2D{},
+		gt.Vector2{},
+	)
+	shape_contacts := gt.shape2d_collide_and_get_contacts(
+		shape2d,
+		gt.Transform2D{},
+		gt.circle_shape2d_as_shape2d(circle_shape2d),
+		gt.Transform2D{},
+	)
+	gt.packed_vector2_array_free(&shape_contacts)
+	motion_contacts := gt.shape2d_collide_with_motion_and_get_contacts(
+		shape2d,
+		gt.Transform2D{},
+		gt.Vector2{},
+		gt.circle_shape2d_as_shape2d(circle_shape2d),
+		gt.Transform2D{},
+		gt.Vector2{},
+	)
+	gt.packed_vector2_array_free(&motion_contacts)
+	_ = gt.shape2d_get_rect(shape2d)
+	gt.circle_shape2d_set_radius(circle_shape2d, 8)
+	_ = gt.circle_shape2d_get_radius(circle_shape2d)
+	gt.rectangle_shape2d_set_size(rectangle_shape2d, gt.Vector2{16, 24})
+	_ = gt.rectangle_shape2d_get_size(rectangle_shape2d)
+	gt.segment_shape2d_set_a(segment_shape2d, gt.Vector2{-4, 0})
+	_ = gt.segment_shape2d_get_a(segment_shape2d)
+	gt.segment_shape2d_set_b(segment_shape2d, gt.Vector2{4, 0})
+	_ = gt.segment_shape2d_get_b(segment_shape2d)
+	gt.separation_ray_shape2d_set_length(separation_ray_shape2d, 12)
+	_ = gt.separation_ray_shape2d_get_length(separation_ray_shape2d)
+	gt.separation_ray_shape2d_set_slide_on_slope(separation_ray_shape2d, true)
+	_ = gt.separation_ray_shape2d_get_slide_on_slope(separation_ray_shape2d)
+	gt.world_boundary_shape2d_set_normal(world_boundary_shape2d, gt.Vector2{0, -1})
+	_ = gt.world_boundary_shape2d_get_normal(world_boundary_shape2d)
+	gt.world_boundary_shape2d_set_distance(world_boundary_shape2d, 32)
+	_ = gt.world_boundary_shape2d_get_distance(world_boundary_shape2d)
+	gt.capsule_shape2d_set_radius(capsule_shape2d, 6)
+	_ = gt.capsule_shape2d_get_radius(capsule_shape2d)
+	gt.capsule_shape2d_set_height(capsule_shape2d, 18)
+	_ = gt.capsule_shape2d_get_height(capsule_shape2d)
+	gt.capsule_shape2d_set_mid_height(capsule_shape2d, 6)
+	_ = gt.capsule_shape2d_get_mid_height(capsule_shape2d)
 	gt.curve2d_set_point_count(curve2d, 2)
 	gt.curve2d_add_point(curve2d, gt.Vector2{0, 0}, gt.Vector2{}, gt.Vector2{}, -1)
 	_ = gt.curve2d_get_point_count(curve2d)
@@ -1850,6 +1978,20 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_style_box(object)
 	_ = gt.object_is_font(object)
 	_, _ = gt.object_try_as_font(object)
+	_ = gt.object_is_shape2d(object)
+	_, _ = gt.object_try_as_shape2d(object)
+	_ = gt.object_is_circle_shape2d(object)
+	_, _ = gt.object_try_as_circle_shape2d(object)
+	_ = gt.object_is_rectangle_shape2d(object)
+	_, _ = gt.object_try_as_rectangle_shape2d(object)
+	_ = gt.object_is_segment_shape2d(object)
+	_, _ = gt.object_try_as_segment_shape2d(object)
+	_ = gt.object_is_separation_ray_shape2d(object)
+	_, _ = gt.object_try_as_separation_ray_shape2d(object)
+	_ = gt.object_is_world_boundary_shape2d(object)
+	_, _ = gt.object_try_as_world_boundary_shape2d(object)
+	_ = gt.object_is_capsule_shape2d(object)
+	_, _ = gt.object_try_as_capsule_shape2d(object)
 	_ = gt.object_is_curve2d(object)
 	_, _ = gt.object_try_as_curve2d(object)
 	_ = gt.object_is_path2d(object)
@@ -2522,6 +2664,10 @@ ref_counted_resource_borrowed_policy_compile_smoke :: proc "contextless" (
 	_, _ = gt.resource_try_as_font(resource)
 	_ = gt.resource_is_curve2d(resource)
 	_, _ = gt.resource_try_as_curve2d(resource)
+	_ = gt.ref_counted_is_shape2d(ref_counted)
+	_, _ = gt.ref_counted_try_as_shape2d(ref_counted)
+	_ = gt.resource_is_shape2d(resource)
+	_, _ = gt.resource_try_as_shape2d(resource)
 	_ = gt.ref_counted_is_curve2d(ref_counted)
 	_, _ = gt.ref_counted_try_as_curve2d(ref_counted)
 	_ = gt.resource_is_theme(resource)
