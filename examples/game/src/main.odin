@@ -537,6 +537,56 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 	}
 
 
+	back_buffer_copy_object := gt.construct_object(back_buffer_copy_class_name)
+	if back_buffer_copy, back_buffer_copy_ok := gt.object_ptr_try_as_back_buffer_copy(
+		back_buffer_copy_object,
+	); back_buffer_copy_ok {
+		gt.back_buffer_copy_set_rect(
+			back_buffer_copy,
+			gt.Rect2{position = gt.Vector2{-16, -16}, size = gt.Vector2{32, 32}},
+		)
+		_ = gt.back_buffer_copy_get_rect(back_buffer_copy)
+		gt.back_buffer_copy_set_copy_mode(back_buffer_copy, gt.BackBufferCopyCopyMode(0))
+		_ = gt.back_buffer_copy_get_copy_mode(back_buffer_copy)
+		if !gt.node_add_child_checked(parent, gt.back_buffer_copy_as_node(back_buffer_copy)) {
+			_ = gt.object_destroy_checked(gt.back_buffer_copy_object_ptr(back_buffer_copy))
+		}
+	} else if back_buffer_copy_object != nil {
+		_ = gt.object_destroy_checked(back_buffer_copy_object)
+	}
+
+	collision_polygon_object := gt.construct_object(collision_polygon2d_class_name)
+	if collision_polygon, collision_polygon_ok := gt.object_ptr_try_as_collision_polygon2d(
+		collision_polygon_object,
+	); collision_polygon_ok {
+		polygon := gt.packed_vector2_array_new()
+		gt.packed_vector2_array_push(&polygon, gt.Vector2{0, 0})
+		gt.packed_vector2_array_push(&polygon, gt.Vector2{24, 0})
+		gt.packed_vector2_array_push(&polygon, gt.Vector2{0, 24})
+		gt.collision_polygon2d_set_polygon(collision_polygon, &polygon)
+		polygon_copy := gt.collision_polygon2d_get_polygon(collision_polygon)
+		gt.packed_vector2_array_free(&polygon_copy)
+		gt.packed_vector2_array_free(&polygon)
+		gt.collision_polygon2d_set_build_mode(collision_polygon, gt.CollisionPolygon2DBuildMode(0))
+		_ = gt.collision_polygon2d_get_build_mode(collision_polygon)
+		gt.collision_polygon2d_set_disabled(collision_polygon, false)
+		_ = gt.collision_polygon2d_is_disabled(collision_polygon)
+		gt.collision_polygon2d_set_one_way_collision(collision_polygon, true)
+		_ = gt.collision_polygon2d_is_one_way_collision_enabled(collision_polygon)
+		gt.collision_polygon2d_set_one_way_collision_margin(collision_polygon, 2)
+		_ = gt.collision_polygon2d_get_one_way_collision_margin(collision_polygon)
+		gt.collision_polygon2d_set_one_way_collision_direction(
+			collision_polygon,
+			gt.Vector2{0, -1},
+		)
+		_ = gt.collision_polygon2d_get_one_way_collision_direction(collision_polygon)
+		if !gt.node_add_child_checked(parent, gt.collision_polygon2d_as_node(collision_polygon)) {
+			_ = gt.object_destroy_checked(gt.collision_polygon2d_object_ptr(collision_polygon))
+		}
+	} else if collision_polygon_object != nil {
+		_ = gt.object_destroy_checked(collision_polygon_object)
+	}
+
 	circle_shape_object := gt.construct_object(circle_shape2d_class_name)
 	rectangle_shape_object := gt.construct_object(rectangle_shape2d_class_name)
 	if circle_shape, circle_shape_ok := gt.object_ptr_try_as_circle_shape2d(circle_shape_object);
@@ -1205,6 +1255,8 @@ navigation_agent2d_class_name_data: gt.ClassName
 theme_class_name_data: gt.ClassName
 curve2d_class_name_data: gt.ClassName
 path2d_class_name_data: gt.ClassName
+back_buffer_copy_class_name_data: gt.ClassName
+collision_polygon2d_class_name_data: gt.ClassName
 circle_shape2d_class_name_data: gt.ClassName
 rectangle_shape2d_class_name_data: gt.ClassName
 segment_shape2d_class_name_data: gt.ClassName
@@ -1237,6 +1289,8 @@ navigation_agent2d_class_name: gt.ConstStringNamePtr
 theme_class_name: gt.ConstStringNamePtr
 curve2d_class_name: gt.ConstStringNamePtr
 path2d_class_name: gt.ConstStringNamePtr
+back_buffer_copy_class_name: gt.ConstStringNamePtr
+collision_polygon2d_class_name: gt.ConstStringNamePtr
 circle_shape2d_class_name: gt.ConstStringNamePtr
 rectangle_shape2d_class_name: gt.ConstStringNamePtr
 segment_shape2d_class_name: gt.ConstStringNamePtr
@@ -1492,6 +1546,8 @@ register_classes :: proc() {
 	theme_class_name = gt.class_name_ptr(&theme_class_name_data)
 	curve2d_class_name = gt.class_name_ptr(&curve2d_class_name_data)
 	path2d_class_name = gt.class_name_ptr(&path2d_class_name_data)
+	back_buffer_copy_class_name = gt.class_name_ptr(&back_buffer_copy_class_name_data)
+	collision_polygon2d_class_name = gt.class_name_ptr(&collision_polygon2d_class_name_data)
 	circle_shape2d_class_name = gt.class_name_ptr(&circle_shape2d_class_name_data)
 	rectangle_shape2d_class_name = gt.class_name_ptr(&rectangle_shape2d_class_name_data)
 	segment_shape2d_class_name = gt.class_name_ptr(&segment_shape2d_class_name_data)
@@ -1536,6 +1592,11 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&theme_class_name_data, cstring("Theme"))
 	gt.class_name_init_latin1_cstring(&curve2d_class_name_data, cstring("Curve2D"))
 	gt.class_name_init_latin1_cstring(&path2d_class_name_data, cstring("Path2D"))
+	gt.class_name_init_latin1_cstring(&back_buffer_copy_class_name_data, cstring("BackBufferCopy"))
+	gt.class_name_init_latin1_cstring(
+		&collision_polygon2d_class_name_data,
+		cstring("CollisionPolygon2D"),
+	)
 	gt.class_name_init_latin1_cstring(&circle_shape2d_class_name_data, cstring("CircleShape2D"))
 	gt.class_name_init_latin1_cstring(
 		&rectangle_shape2d_class_name_data,

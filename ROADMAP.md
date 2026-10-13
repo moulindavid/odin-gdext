@@ -253,6 +253,14 @@ These slices are complete and were validated with make ci when merged:
      coverage in examples/game with explicit owned resource cleanup, updated
      generated reporting and CHANGELOG, and validated with full make ci.
 
+33. BackBufferCopy and CollisionPolygon2D generated APIs.
+   - Added selected generated `BackBufferCopy` and `CollisionPolygon2D` handles,
+     enums, casts, upcasts, copy rect/mode, polygon, build mode, disabled,
+     one-way collision, margin, and direction methods. Exposed the selected
+     surface through `godot:godot`, added facade compile coverage, exercised
+     concrete runtime coverage in examples/game, updated generated reporting and
+     CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
