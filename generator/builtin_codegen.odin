@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 67
+Max_Selected_Class_Count :: 69
 
 selected_class_names := []string {
 	"Object",
@@ -1021,6 +1021,8 @@ selected_class_names := []string {
 	"CanvasItem",
 	"Node2D",
 	"Path2D",
+	"BackBufferCopy",
+	"CollisionPolygon2D",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1414,6 +1416,22 @@ selected_class_methods := []Selected_Class_Method {
 	{"ProgressBar", "is_indeterminate"},
 	{"ProgressBar", "set_editor_preview_indeterminate"},
 	{"ProgressBar", "is_editor_preview_indeterminate_enabled"},
+	{"BackBufferCopy", "set_rect"},
+	{"BackBufferCopy", "get_rect"},
+	{"BackBufferCopy", "set_copy_mode"},
+	{"BackBufferCopy", "get_copy_mode"},
+	{"CollisionPolygon2D", "set_polygon"},
+	{"CollisionPolygon2D", "get_polygon"},
+	{"CollisionPolygon2D", "set_build_mode"},
+	{"CollisionPolygon2D", "get_build_mode"},
+	{"CollisionPolygon2D", "set_disabled"},
+	{"CollisionPolygon2D", "is_disabled"},
+	{"CollisionPolygon2D", "set_one_way_collision"},
+	{"CollisionPolygon2D", "is_one_way_collision_enabled"},
+	{"CollisionPolygon2D", "set_one_way_collision_margin"},
+	{"CollisionPolygon2D", "get_one_way_collision_margin"},
+	{"CollisionPolygon2D", "set_one_way_collision_direction"},
+	{"CollisionPolygon2D", "get_one_way_collision_direction"},
 	{"Shape2D", "set_custom_solver_bias"},
 	{"Shape2D", "get_custom_solver_bias"},
 	{"Shape2D", "collide"},

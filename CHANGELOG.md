@@ -38,6 +38,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   `CircleShape2D`, `RectangleShape2D`, `SegmentShape2D`,
   `SeparationRayShape2D`, `WorldBoundaryShape2D`, and `CapsuleShape2D`, with
   public facade exports, compile coverage, and examples/game runtime coverage.
+- Added selected generated `BackBufferCopy` and `CollisionPolygon2D` APIs with
+  public facade exports, compile coverage, and examples/game runtime coverage.
 
 ## Completed roadmap slices
 
