@@ -536,6 +536,48 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		}
 	}
 
+	canvas_modulate_object := gt.construct_object(canvas_modulate_class_name)
+	if canvas_modulate, canvas_modulate_ok := gt.object_ptr_try_as_canvas_modulate(
+		canvas_modulate_object,
+	); canvas_modulate_ok {
+		gt.canvas_modulate_set_color(canvas_modulate, gt.Color{0.9, 0.95, 1.0, 1.0})
+		_ = gt.canvas_modulate_get_color(canvas_modulate)
+		if !gt.node_add_child_checked(parent, gt.canvas_modulate_as_node(canvas_modulate)) {
+			_ = gt.object_destroy_checked(gt.canvas_modulate_object_ptr(canvas_modulate))
+		}
+	} else if canvas_modulate_object != nil {
+		_ = gt.object_destroy_checked(canvas_modulate_object)
+	}
+
+	parallax_object := gt.construct_object(parallax2d_class_name)
+	if parallax, parallax_ok := gt.object_ptr_try_as_parallax2d(parallax_object); parallax_ok {
+		gt.parallax2d_set_scroll_scale(parallax, gt.Vector2{0.5, 0.5})
+		gt.parallax2d_set_repeat_size(parallax, gt.Vector2{256, 128})
+		gt.parallax2d_set_repeat_times(parallax, 2)
+		gt.parallax2d_set_autoscroll(parallax, gt.Vector2{4, 0})
+		gt.parallax2d_set_scroll_offset(parallax, gt.Vector2{8, 4})
+		gt.parallax2d_set_screen_offset(parallax, gt.Vector2{1, 2})
+		gt.parallax2d_set_limit_begin(parallax, gt.Vector2{-128, -128})
+		gt.parallax2d_set_limit_end(parallax, gt.Vector2{128, 128})
+		gt.parallax2d_set_follow_viewport(parallax, true)
+		gt.parallax2d_set_ignore_camera_scroll(parallax, false)
+		_ = gt.parallax2d_get_scroll_scale(parallax)
+		_ = gt.parallax2d_get_repeat_size(parallax)
+		_ = gt.parallax2d_get_repeat_times(parallax)
+		_ = gt.parallax2d_get_autoscroll(parallax)
+		_ = gt.parallax2d_get_scroll_offset(parallax)
+		_ = gt.parallax2d_get_screen_offset(parallax)
+		_ = gt.parallax2d_get_limit_begin(parallax)
+		_ = gt.parallax2d_get_limit_end(parallax)
+		_ = gt.parallax2d_get_follow_viewport(parallax)
+		_ = gt.parallax2d_is_ignore_camera_scroll(parallax)
+		if !gt.node_add_child_checked(parent, gt.parallax2d_as_node(parallax)) {
+			_ = gt.object_destroy_checked(gt.parallax2d_object_ptr(parallax))
+		}
+	} else if parallax_object != nil {
+		_ = gt.object_destroy_checked(parallax_object)
+	}
+
 	path_follow_object := gt.construct_object(path_follow2d_class_name)
 	if path_follow, path_follow_ok := gt.object_ptr_try_as_path_follow2d(path_follow_object);
 	   path_follow_ok {
@@ -994,6 +1036,8 @@ navigation_agent2d_class_name_data: gt.ClassName
 theme_class_name_data: gt.ClassName
 curve2d_class_name_data: gt.ClassName
 path2d_class_name_data: gt.ClassName
+canvas_modulate_class_name_data: gt.ClassName
+parallax2d_class_name_data: gt.ClassName
 font_file_class_name_data: gt.ClassName
 tile_map_layer_class_name_data: gt.ClassName
 tile_map_class_name_data: gt.ClassName
@@ -1018,6 +1062,8 @@ navigation_agent2d_class_name: gt.ConstStringNamePtr
 theme_class_name: gt.ConstStringNamePtr
 curve2d_class_name: gt.ConstStringNamePtr
 path2d_class_name: gt.ConstStringNamePtr
+canvas_modulate_class_name: gt.ConstStringNamePtr
+parallax2d_class_name: gt.ConstStringNamePtr
 font_file_class_name: gt.ConstStringNamePtr
 tile_map_layer_class_name: gt.ConstStringNamePtr
 tile_map_class_name: gt.ConstStringNamePtr
@@ -1265,6 +1311,8 @@ register_classes :: proc() {
 	theme_class_name = gt.class_name_ptr(&theme_class_name_data)
 	curve2d_class_name = gt.class_name_ptr(&curve2d_class_name_data)
 	path2d_class_name = gt.class_name_ptr(&path2d_class_name_data)
+	canvas_modulate_class_name = gt.class_name_ptr(&canvas_modulate_class_name_data)
+	parallax2d_class_name = gt.class_name_ptr(&parallax2d_class_name_data)
 	font_file_class_name = gt.class_name_ptr(&font_file_class_name_data)
 	tile_map_layer_class_name = gt.class_name_ptr(&tile_map_layer_class_name_data)
 	tile_map_class_name = gt.class_name_ptr(&tile_map_class_name_data)
@@ -1301,6 +1349,8 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(&theme_class_name_data, cstring("Theme"))
 	gt.class_name_init_latin1_cstring(&curve2d_class_name_data, cstring("Curve2D"))
 	gt.class_name_init_latin1_cstring(&path2d_class_name_data, cstring("Path2D"))
+	gt.class_name_init_latin1_cstring(&canvas_modulate_class_name_data, cstring("CanvasModulate"))
+	gt.class_name_init_latin1_cstring(&parallax2d_class_name_data, cstring("Parallax2D"))
 	gt.class_name_init_latin1_cstring(&font_file_class_name_data, cstring("FontFile"))
 	gt.class_name_init_latin1_cstring(&tile_map_layer_class_name_data, cstring("TileMapLayer"))
 	gt.class_name_init_latin1_cstring(&tile_map_class_name_data, cstring("TileMap"))

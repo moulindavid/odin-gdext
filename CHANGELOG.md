@@ -32,6 +32,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
 - Added selected generated `Curve2D` APIs and safe `Path2D.set_curve` coverage
   with public facade exports, compile coverage, and examples/game runtime
   coverage.
+- Added selected generated `CanvasModulate` and `Parallax2D` APIs with public
+  facade exports, compile coverage, and examples/game runtime coverage.
 
 ## Completed roadmap slices
 
