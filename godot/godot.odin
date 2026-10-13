@@ -172,6 +172,13 @@ AudioStream :: gclass.AudioStream
 StyleBox :: gclass.StyleBox
 Font :: gclass.Font
 Curve2D :: gclass.Curve2D
+Shape2D :: gclass.Shape2D
+CircleShape2D :: gclass.CircleShape2D
+RectangleShape2D :: gclass.RectangleShape2D
+SegmentShape2D :: gclass.SegmentShape2D
+SeparationRayShape2D :: gclass.SeparationRayShape2D
+WorldBoundaryShape2D :: gclass.WorldBoundaryShape2D
+CapsuleShape2D :: gclass.CapsuleShape2D
 Theme :: gclass.Theme
 // Resource loading policy: ResourceLoader.load returns a Resource through a
 // Variant call in focused helpers. The helper retains the borrowed Resource into
@@ -574,6 +581,74 @@ parallax2d_set_follow_viewport :: gclass.parallax2d_set_follow_viewport
 parallax2d_get_follow_viewport :: gclass.parallax2d_get_follow_viewport
 parallax2d_set_ignore_camera_scroll :: gclass.parallax2d_set_ignore_camera_scroll
 parallax2d_is_ignore_camera_scroll :: gclass.parallax2d_is_ignore_camera_scroll
+shape2d_as_resource :: gclass.shape2d_as_resource
+shape2d_as_ref_counted :: gclass.shape2d_as_ref_counted
+shape2d_as_object :: gclass.shape2d_as_object
+circle_shape2d_as_shape2d :: gclass.circle_shape2d_as_shape2d
+circle_shape2d_as_resource :: gclass.circle_shape2d_as_resource
+circle_shape2d_as_ref_counted :: gclass.circle_shape2d_as_ref_counted
+circle_shape2d_as_object :: gclass.circle_shape2d_as_object
+rectangle_shape2d_as_shape2d :: gclass.rectangle_shape2d_as_shape2d
+rectangle_shape2d_as_resource :: gclass.rectangle_shape2d_as_resource
+rectangle_shape2d_as_ref_counted :: gclass.rectangle_shape2d_as_ref_counted
+rectangle_shape2d_as_object :: gclass.rectangle_shape2d_as_object
+segment_shape2d_as_shape2d :: gclass.segment_shape2d_as_shape2d
+segment_shape2d_as_resource :: gclass.segment_shape2d_as_resource
+segment_shape2d_as_ref_counted :: gclass.segment_shape2d_as_ref_counted
+segment_shape2d_as_object :: gclass.segment_shape2d_as_object
+separation_ray_shape2d_as_shape2d :: gclass.separation_ray_shape2d_as_shape2d
+separation_ray_shape2d_as_resource :: gclass.separation_ray_shape2d_as_resource
+separation_ray_shape2d_as_ref_counted :: gclass.separation_ray_shape2d_as_ref_counted
+separation_ray_shape2d_as_object :: gclass.separation_ray_shape2d_as_object
+world_boundary_shape2d_as_shape2d :: gclass.world_boundary_shape2d_as_shape2d
+world_boundary_shape2d_as_resource :: gclass.world_boundary_shape2d_as_resource
+world_boundary_shape2d_as_ref_counted :: gclass.world_boundary_shape2d_as_ref_counted
+world_boundary_shape2d_as_object :: gclass.world_boundary_shape2d_as_object
+capsule_shape2d_as_shape2d :: gclass.capsule_shape2d_as_shape2d
+capsule_shape2d_as_resource :: gclass.capsule_shape2d_as_resource
+capsule_shape2d_as_ref_counted :: gclass.capsule_shape2d_as_ref_counted
+capsule_shape2d_as_object :: gclass.capsule_shape2d_as_object
+shape2d_is_circle_shape2d :: gclass.shape2d_is_circle_shape2d
+shape2d_try_as_circle_shape2d :: gclass.shape2d_try_as_circle_shape2d
+shape2d_is_rectangle_shape2d :: gclass.shape2d_is_rectangle_shape2d
+shape2d_try_as_rectangle_shape2d :: gclass.shape2d_try_as_rectangle_shape2d
+shape2d_is_segment_shape2d :: gclass.shape2d_is_segment_shape2d
+shape2d_try_as_segment_shape2d :: gclass.shape2d_try_as_segment_shape2d
+shape2d_is_separation_ray_shape2d :: gclass.shape2d_is_separation_ray_shape2d
+shape2d_try_as_separation_ray_shape2d :: gclass.shape2d_try_as_separation_ray_shape2d
+shape2d_is_world_boundary_shape2d :: gclass.shape2d_is_world_boundary_shape2d
+shape2d_try_as_world_boundary_shape2d :: gclass.shape2d_try_as_world_boundary_shape2d
+shape2d_is_capsule_shape2d :: gclass.shape2d_is_capsule_shape2d
+shape2d_try_as_capsule_shape2d :: gclass.shape2d_try_as_capsule_shape2d
+shape2d_set_custom_solver_bias :: gclass.shape2d_set_custom_solver_bias
+shape2d_get_custom_solver_bias :: gclass.shape2d_get_custom_solver_bias
+shape2d_collide :: gclass.shape2d_collide
+shape2d_collide_with_motion :: gclass.shape2d_collide_with_motion
+shape2d_collide_and_get_contacts :: gclass.shape2d_collide_and_get_contacts
+shape2d_collide_with_motion_and_get_contacts :: gclass.shape2d_collide_with_motion_and_get_contacts
+shape2d_get_rect :: gclass.shape2d_get_rect
+circle_shape2d_set_radius :: gclass.circle_shape2d_set_radius
+circle_shape2d_get_radius :: gclass.circle_shape2d_get_radius
+rectangle_shape2d_set_size :: gclass.rectangle_shape2d_set_size
+rectangle_shape2d_get_size :: gclass.rectangle_shape2d_get_size
+segment_shape2d_set_a :: gclass.segment_shape2d_set_a
+segment_shape2d_get_a :: gclass.segment_shape2d_get_a
+segment_shape2d_set_b :: gclass.segment_shape2d_set_b
+segment_shape2d_get_b :: gclass.segment_shape2d_get_b
+separation_ray_shape2d_set_length :: gclass.separation_ray_shape2d_set_length
+separation_ray_shape2d_get_length :: gclass.separation_ray_shape2d_get_length
+separation_ray_shape2d_set_slide_on_slope :: gclass.separation_ray_shape2d_set_slide_on_slope
+separation_ray_shape2d_get_slide_on_slope :: gclass.separation_ray_shape2d_get_slide_on_slope
+world_boundary_shape2d_set_normal :: gclass.world_boundary_shape2d_set_normal
+world_boundary_shape2d_get_normal :: gclass.world_boundary_shape2d_get_normal
+world_boundary_shape2d_set_distance :: gclass.world_boundary_shape2d_set_distance
+world_boundary_shape2d_get_distance :: gclass.world_boundary_shape2d_get_distance
+capsule_shape2d_set_radius :: gclass.capsule_shape2d_set_radius
+capsule_shape2d_get_radius :: gclass.capsule_shape2d_get_radius
+capsule_shape2d_set_height :: gclass.capsule_shape2d_set_height
+capsule_shape2d_get_height :: gclass.capsule_shape2d_get_height
+capsule_shape2d_set_mid_height :: gclass.capsule_shape2d_set_mid_height
+capsule_shape2d_get_mid_height :: gclass.capsule_shape2d_get_mid_height
 curve2d_as_resource :: gclass.curve2d_as_resource
 curve2d_as_ref_counted :: gclass.curve2d_as_ref_counted
 curve2d_as_object :: gclass.curve2d_as_object
@@ -1115,6 +1190,20 @@ object_is_style_box :: gclass.object_is_style_box
 object_try_as_style_box :: gclass.object_try_as_style_box
 object_is_font :: gclass.object_is_font
 object_try_as_font :: gclass.object_try_as_font
+object_is_shape2d :: gclass.object_is_shape2d
+object_try_as_shape2d :: gclass.object_try_as_shape2d
+object_is_circle_shape2d :: gclass.object_is_circle_shape2d
+object_try_as_circle_shape2d :: gclass.object_try_as_circle_shape2d
+object_is_rectangle_shape2d :: gclass.object_is_rectangle_shape2d
+object_try_as_rectangle_shape2d :: gclass.object_try_as_rectangle_shape2d
+object_is_segment_shape2d :: gclass.object_is_segment_shape2d
+object_try_as_segment_shape2d :: gclass.object_try_as_segment_shape2d
+object_is_separation_ray_shape2d :: gclass.object_is_separation_ray_shape2d
+object_try_as_separation_ray_shape2d :: gclass.object_try_as_separation_ray_shape2d
+object_is_world_boundary_shape2d :: gclass.object_is_world_boundary_shape2d
+object_try_as_world_boundary_shape2d :: gclass.object_try_as_world_boundary_shape2d
+object_is_capsule_shape2d :: gclass.object_is_capsule_shape2d
+object_try_as_capsule_shape2d :: gclass.object_try_as_capsule_shape2d
 object_is_curve2d :: gclass.object_is_curve2d
 object_try_as_curve2d :: gclass.object_try_as_curve2d
 object_is_path2d :: gclass.object_is_path2d
@@ -1135,6 +1224,20 @@ resource_is_style_box :: gclass.resource_is_style_box
 resource_try_as_style_box :: gclass.resource_try_as_style_box
 resource_is_font :: gclass.resource_is_font
 resource_try_as_font :: gclass.resource_try_as_font
+resource_is_shape2d :: gclass.resource_is_shape2d
+resource_try_as_shape2d :: gclass.resource_try_as_shape2d
+resource_is_circle_shape2d :: gclass.resource_is_circle_shape2d
+resource_try_as_circle_shape2d :: gclass.resource_try_as_circle_shape2d
+resource_is_rectangle_shape2d :: gclass.resource_is_rectangle_shape2d
+resource_try_as_rectangle_shape2d :: gclass.resource_try_as_rectangle_shape2d
+resource_is_segment_shape2d :: gclass.resource_is_segment_shape2d
+resource_try_as_segment_shape2d :: gclass.resource_try_as_segment_shape2d
+resource_is_separation_ray_shape2d :: gclass.resource_is_separation_ray_shape2d
+resource_try_as_separation_ray_shape2d :: gclass.resource_try_as_separation_ray_shape2d
+resource_is_world_boundary_shape2d :: gclass.resource_is_world_boundary_shape2d
+resource_try_as_world_boundary_shape2d :: gclass.resource_try_as_world_boundary_shape2d
+resource_is_capsule_shape2d :: gclass.resource_is_capsule_shape2d
+resource_try_as_capsule_shape2d :: gclass.resource_try_as_capsule_shape2d
 resource_is_curve2d :: gclass.resource_is_curve2d
 resource_try_as_curve2d :: gclass.resource_try_as_curve2d
 resource_is_theme :: gclass.resource_is_theme
@@ -1235,6 +1338,20 @@ ref_counted_is_resource :: gclass.ref_counted_is_resource
 ref_counted_try_as_resource :: gclass.ref_counted_try_as_resource
 ref_counted_is_packed_scene :: gclass.ref_counted_is_packed_scene
 ref_counted_try_as_packed_scene :: gclass.ref_counted_try_as_packed_scene
+ref_counted_is_shape2d :: gclass.ref_counted_is_shape2d
+ref_counted_try_as_shape2d :: gclass.ref_counted_try_as_shape2d
+ref_counted_is_circle_shape2d :: gclass.ref_counted_is_circle_shape2d
+ref_counted_try_as_circle_shape2d :: gclass.ref_counted_try_as_circle_shape2d
+ref_counted_is_rectangle_shape2d :: gclass.ref_counted_is_rectangle_shape2d
+ref_counted_try_as_rectangle_shape2d :: gclass.ref_counted_try_as_rectangle_shape2d
+ref_counted_is_segment_shape2d :: gclass.ref_counted_is_segment_shape2d
+ref_counted_try_as_segment_shape2d :: gclass.ref_counted_try_as_segment_shape2d
+ref_counted_is_separation_ray_shape2d :: gclass.ref_counted_is_separation_ray_shape2d
+ref_counted_try_as_separation_ray_shape2d :: gclass.ref_counted_try_as_separation_ray_shape2d
+ref_counted_is_world_boundary_shape2d :: gclass.ref_counted_is_world_boundary_shape2d
+ref_counted_try_as_world_boundary_shape2d :: gclass.ref_counted_try_as_world_boundary_shape2d
+ref_counted_is_capsule_shape2d :: gclass.ref_counted_is_capsule_shape2d
+ref_counted_try_as_capsule_shape2d :: gclass.ref_counted_try_as_capsule_shape2d
 ref_counted_is_curve2d :: gclass.ref_counted_is_curve2d
 ref_counted_try_as_curve2d :: gclass.ref_counted_try_as_curve2d
 ref_counted_is_theme :: gclass.ref_counted_is_theme
@@ -2367,6 +2484,32 @@ style_box_is_nil :: proc "contextless" (self: StyleBox) -> bool {
 font_is_nil :: proc "contextless" (self: Font) -> bool {
 	return ObjectPtr(self) == nil
 }
+
+shape2d_is_nil :: proc "contextless" (self: Shape2D) -> bool {return ObjectPtr(self) == nil}
+circle_shape2d_is_nil :: proc "contextless" (self: CircleShape2D) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
+rectangle_shape2d_is_nil :: proc "contextless" (self: RectangleShape2D) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
+segment_shape2d_is_nil :: proc "contextless" (self: SegmentShape2D) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
+separation_ray_shape2d_is_nil :: proc "contextless" (self: SeparationRayShape2D) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
+world_boundary_shape2d_is_nil :: proc "contextless" (self: WorldBoundaryShape2D) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
+capsule_shape2d_is_nil :: proc "contextless" (self: CapsuleShape2D) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
 
 curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
 	return ObjectPtr(self) == nil
@@ -3786,6 +3929,26 @@ font_object_ptr :: proc "contextless" (self: Font) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+shape2d_object_ptr :: proc "contextless" (self: Shape2D) -> ObjectPtr {return ObjectPtr(self)}
+circle_shape2d_object_ptr :: proc "contextless" (
+	self: CircleShape2D,
+) -> ObjectPtr {return ObjectPtr(self)}
+rectangle_shape2d_object_ptr :: proc "contextless" (
+	self: RectangleShape2D,
+) -> ObjectPtr {return ObjectPtr(self)}
+segment_shape2d_object_ptr :: proc "contextless" (
+	self: SegmentShape2D,
+) -> ObjectPtr {return ObjectPtr(self)}
+separation_ray_shape2d_object_ptr :: proc "contextless" (
+	self: SeparationRayShape2D,
+) -> ObjectPtr {return ObjectPtr(self)}
+world_boundary_shape2d_object_ptr :: proc "contextless" (
+	self: WorldBoundaryShape2D,
+) -> ObjectPtr {return ObjectPtr(self)}
+capsule_shape2d_object_ptr :: proc "contextless" (
+	self: CapsuleShape2D,
+) -> ObjectPtr {return ObjectPtr(self)}
+
 curve2d_object_ptr :: proc "contextless" (self: Curve2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3928,6 +4091,71 @@ object_ptr_try_as_style_box :: proc "contextless" (
 object_ptr_try_as_font :: proc "contextless" (self: ObjectPtr) -> (value: Font, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_font(Object(self))
+}
+
+object_ptr_try_as_shape2d :: proc "contextless" (self: ObjectPtr) -> (value: Shape2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_shape2d(Object(self))
+}
+
+object_ptr_try_as_circle_shape2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CircleShape2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_circle_shape2d(Object(self))
+}
+
+object_ptr_try_as_rectangle_shape2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: RectangleShape2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_rectangle_shape2d(Object(self))
+}
+
+object_ptr_try_as_segment_shape2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: SegmentShape2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_segment_shape2d(Object(self))
+}
+
+object_ptr_try_as_separation_ray_shape2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: SeparationRayShape2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_separation_ray_shape2d(Object(self))
+}
+
+object_ptr_try_as_world_boundary_shape2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: WorldBoundaryShape2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_world_boundary_shape2d(Object(self))
+}
+
+object_ptr_try_as_capsule_shape2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CapsuleShape2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_capsule_shape2d(Object(self))
 }
 
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
