@@ -80,6 +80,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	label: gt.Label,
 	timer: gt.Timer,
 	audio_stream_player: gt.AudioStreamPlayer,
+	audio_stream_player2d: gt.AudioStreamPlayer2D,
 	collision_object2d: gt.CollisionObject2D,
 	area2d: gt.Area2D,
 	physics_body2d: gt.PhysicsBody2D,
@@ -1368,6 +1369,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.parallax2d_object_ptr(parallax2d)
 	_ = gt.theme_object_ptr(theme)
 	_ = gt.audio_stream_player_object_ptr(audio_stream_player)
+	_ = gt.audio_stream_player2d_object_ptr(audio_stream_player2d)
 	_ = gt.packed_scene_object_ptr(packed_scene)
 	_ = gt.resource_loader_object_ptr(resource_loader)
 	_, _ = gt.object_ptr_try_as_ref_counted(gt.ref_counted_object_ptr(ref_counted))
@@ -1406,6 +1408,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_theme(gt.theme_object_ptr(theme))
 	_, _ = gt.object_ptr_try_as_audio_stream_player(
 		gt.audio_stream_player_object_ptr(audio_stream_player),
+	)
+	_, _ = gt.object_ptr_try_as_audio_stream_player2d(
+		gt.audio_stream_player2d_object_ptr(audio_stream_player2d),
 	)
 	_, _ = gt.object_ptr_try_as_collision_object2d(
 		gt.collision_object2d_object_ptr(collision_object2d),
@@ -1485,6 +1490,10 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.theme_as_object(theme)
 	_ = gt.audio_stream_player_as_node(audio_stream_player)
 	_ = gt.audio_stream_player_as_object(audio_stream_player)
+	_ = gt.audio_stream_player2d_as_node2d(audio_stream_player2d)
+	_ = gt.audio_stream_player2d_as_canvas_item(audio_stream_player2d)
+	_ = gt.audio_stream_player2d_as_node(audio_stream_player2d)
+	_ = gt.audio_stream_player2d_as_object(audio_stream_player2d)
 
 	_ = gt.timer_is_nil(timer)
 	_ = gt.audio_stream_is_nil(audio_stream)
@@ -1498,6 +1507,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.parallax2d_is_nil(parallax2d)
 	_ = gt.theme_is_nil(theme)
 	_ = gt.audio_stream_player_is_nil(audio_stream_player)
+	_ = gt.audio_stream_player2d_is_nil(audio_stream_player2d)
 	_ = gt.collision_object2d_is_nil(collision_object2d)
 	_ = gt.area2d_is_nil(area2d)
 	_ = gt.physics_body2d_is_nil(physics_body2d)
@@ -1887,6 +1897,39 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.area2d_as_canvas_item(area2d)
 	_ = gt.area2d_as_node(area2d)
 	_ = gt.area2d_as_object(area2d)
+	gt.audio_stream_player2d_set_stream(audio_stream_player2d, audio_stream)
+	_ = gt.audio_stream_player2d_get_stream(audio_stream_player2d)
+	gt.audio_stream_player2d_set_volume_db(audio_stream_player2d, -6)
+	_ = gt.audio_stream_player2d_get_volume_db(audio_stream_player2d)
+	gt.audio_stream_player2d_set_volume_linear(audio_stream_player2d, 0.5)
+	_ = gt.audio_stream_player2d_get_volume_linear(audio_stream_player2d)
+	gt.audio_stream_player2d_set_pitch_scale(audio_stream_player2d, 1)
+	_ = gt.audio_stream_player2d_get_pitch_scale(audio_stream_player2d)
+	gt.audio_stream_player2d_play(audio_stream_player2d, 0)
+	gt.audio_stream_player2d_play_default(audio_stream_player2d)
+	gt.audio_stream_player2d_seek(audio_stream_player2d, 0)
+	gt.audio_stream_player2d_stop(audio_stream_player2d)
+	_ = gt.audio_stream_player2d_is_playing(audio_stream_player2d)
+	_ = gt.audio_stream_player2d_get_playback_position(audio_stream_player2d)
+	gt.audio_stream_player2d_set_bus(audio_stream_player2d, meta_name)
+	bus2d := gt.audio_stream_player2d_get_bus(audio_stream_player2d)
+	gt.string_name_free(&bus2d)
+	gt.audio_stream_player2d_set_autoplay(audio_stream_player2d, false)
+	_ = gt.audio_stream_player2d_is_autoplay_enabled(audio_stream_player2d)
+	gt.audio_stream_player2d_set_playing(audio_stream_player2d, false)
+	gt.audio_stream_player2d_set_max_distance(audio_stream_player2d, 512)
+	_ = gt.audio_stream_player2d_get_max_distance(audio_stream_player2d)
+	gt.audio_stream_player2d_set_attenuation(audio_stream_player2d, 1)
+	_ = gt.audio_stream_player2d_get_attenuation(audio_stream_player2d)
+	gt.audio_stream_player2d_set_area_mask(audio_stream_player2d, 1)
+	_ = gt.audio_stream_player2d_get_area_mask(audio_stream_player2d)
+	gt.audio_stream_player2d_set_stream_paused(audio_stream_player2d, false)
+	_ = gt.audio_stream_player2d_get_stream_paused(audio_stream_player2d)
+	gt.audio_stream_player2d_set_max_polyphony(audio_stream_player2d, 1)
+	_ = gt.audio_stream_player2d_get_max_polyphony(audio_stream_player2d)
+	gt.audio_stream_player2d_set_panning_strength(audio_stream_player2d, 1)
+	_ = gt.audio_stream_player2d_get_panning_strength(audio_stream_player2d)
+	_ = gt.audio_stream_player2d_has_stream_playback(audio_stream_player2d)
 	gt.area2d_set_gravity_space_override_mode(area2d, .space_override_combine)
 	_ = gt.area2d_get_gravity_space_override_mode(area2d)
 	gt.area2d_set_gravity_is_point(area2d, false)
@@ -2051,6 +2094,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_theme(object)
 	_ = gt.object_is_audio_stream_player(object)
 	_, _ = gt.object_try_as_audio_stream_player(object)
+	_ = gt.object_is_audio_stream_player2d(object)
+	_, _ = gt.object_try_as_audio_stream_player2d(object)
 	_ = gt.object_is_collision_object2d(object)
 	_, _ = gt.object_try_as_collision_object2d(object)
 	_ = gt.object_is_area2d(object)
@@ -2432,6 +2477,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.canvas_item_try_as_parallax2d(canvas_item)
 	_ = gt.canvas_item_is_label(canvas_item)
 	_, _ = gt.canvas_item_try_as_label(canvas_item)
+	_ = gt.canvas_item_is_audio_stream_player2d(canvas_item)
+	_, _ = gt.canvas_item_try_as_audio_stream_player2d(canvas_item)
 	_ = gt.canvas_item_is_collision_object2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_collision_object2d(canvas_item)
 	_ = gt.canvas_item_is_area2d(canvas_item)
@@ -2448,6 +2495,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node2d_try_as_canvas_modulate(node2d)
 	_ = gt.node2d_is_parallax2d(node2d)
 	_, _ = gt.node2d_try_as_parallax2d(node2d)
+	_ = gt.node2d_is_audio_stream_player2d(node2d)
+	_, _ = gt.node2d_try_as_audio_stream_player2d(node2d)
 	_ = gt.node2d_is_collision_object2d(node2d)
 	_, _ = gt.node2d_try_as_collision_object2d(node2d)
 	_ = gt.node2d_is_area2d(node2d)

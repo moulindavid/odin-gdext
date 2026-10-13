@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 69
+Max_Selected_Class_Count :: 70
 
 selected_class_names := []string {
 	"Object",
@@ -1079,6 +1079,7 @@ selected_class_names := []string {
 	"PathFollow2D",
 	"VisibleOnScreenNotifier2D",
 	"AudioStreamPlayer",
+	"AudioStreamPlayer2D",
 }
 
 candidate_class_names := []string{}
@@ -1637,6 +1638,37 @@ selected_class_methods := []Selected_Class_Method {
 	{"StyleBox", "draw"},
 	{"StyleBox", "get_current_item_drawn"},
 	{"StyleBox", "test_mask"},
+	{"AudioStreamPlayer2D", "set_stream"},
+	{"AudioStreamPlayer2D", "get_stream"},
+	{"AudioStreamPlayer2D", "set_volume_db"},
+	{"AudioStreamPlayer2D", "get_volume_db"},
+	{"AudioStreamPlayer2D", "set_volume_linear"},
+	{"AudioStreamPlayer2D", "get_volume_linear"},
+	{"AudioStreamPlayer2D", "set_pitch_scale"},
+	{"AudioStreamPlayer2D", "get_pitch_scale"},
+	{"AudioStreamPlayer2D", "play"},
+	{"AudioStreamPlayer2D", "seek"},
+	{"AudioStreamPlayer2D", "stop"},
+	{"AudioStreamPlayer2D", "is_playing"},
+	{"AudioStreamPlayer2D", "get_playback_position"},
+	{"AudioStreamPlayer2D", "set_bus"},
+	{"AudioStreamPlayer2D", "get_bus"},
+	{"AudioStreamPlayer2D", "set_autoplay"},
+	{"AudioStreamPlayer2D", "is_autoplay_enabled"},
+	{"AudioStreamPlayer2D", "set_playing"},
+	{"AudioStreamPlayer2D", "set_max_distance"},
+	{"AudioStreamPlayer2D", "get_max_distance"},
+	{"AudioStreamPlayer2D", "set_attenuation"},
+	{"AudioStreamPlayer2D", "get_attenuation"},
+	{"AudioStreamPlayer2D", "set_area_mask"},
+	{"AudioStreamPlayer2D", "get_area_mask"},
+	{"AudioStreamPlayer2D", "set_stream_paused"},
+	{"AudioStreamPlayer2D", "get_stream_paused"},
+	{"AudioStreamPlayer2D", "set_max_polyphony"},
+	{"AudioStreamPlayer2D", "get_max_polyphony"},
+	{"AudioStreamPlayer2D", "set_panning_strength"},
+	{"AudioStreamPlayer2D", "get_panning_strength"},
+	{"AudioStreamPlayer2D", "has_stream_playback"},
 	{"AudioStreamPlayer", "set_stream"},
 	{"AudioStreamPlayer", "get_stream"},
 	{"AudioStreamPlayer", "set_volume_db"},

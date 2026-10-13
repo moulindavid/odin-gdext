@@ -211,6 +211,7 @@ Sprite2D :: gclass.Sprite2D
 Label :: gclass.Label
 Timer :: gclass.Timer
 AudioStreamPlayer :: gclass.AudioStreamPlayer
+AudioStreamPlayer2D :: gclass.AudioStreamPlayer2D
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PhysicsBody2D :: gclass.PhysicsBody2D
@@ -1313,6 +1314,8 @@ object_is_timer :: gclass.object_is_timer
 object_try_as_timer :: gclass.object_try_as_timer
 object_is_audio_stream_player :: gclass.object_is_audio_stream_player
 object_try_as_audio_stream_player :: gclass.object_try_as_audio_stream_player
+object_is_audio_stream_player2d :: gclass.object_is_audio_stream_player2d
+object_try_as_audio_stream_player2d :: gclass.object_try_as_audio_stream_player2d
 object_is_collision_object2d :: gclass.object_is_collision_object2d
 object_try_as_collision_object2d :: gclass.object_try_as_collision_object2d
 object_is_area2d :: gclass.object_is_area2d
@@ -1519,6 +1522,8 @@ node_is_timer :: gclass.node_is_timer
 node_try_as_timer :: gclass.node_try_as_timer
 node_is_audio_stream_player :: gclass.node_is_audio_stream_player
 node_try_as_audio_stream_player :: gclass.node_try_as_audio_stream_player
+node_is_audio_stream_player2d :: gclass.node_is_audio_stream_player2d
+node_try_as_audio_stream_player2d :: gclass.node_try_as_audio_stream_player2d
 node_is_collision_object2d :: gclass.node_is_collision_object2d
 node_try_as_collision_object2d :: gclass.node_try_as_collision_object2d
 node_is_area2d :: gclass.node_is_area2d
@@ -1575,6 +1580,8 @@ canvas_item_is_panel :: gclass.canvas_item_is_panel
 canvas_item_try_as_panel :: gclass.canvas_item_try_as_panel
 canvas_item_is_container :: gclass.canvas_item_is_container
 canvas_item_try_as_container :: gclass.canvas_item_try_as_container
+canvas_item_is_audio_stream_player2d :: gclass.canvas_item_is_audio_stream_player2d
+canvas_item_try_as_audio_stream_player2d :: gclass.canvas_item_try_as_audio_stream_player2d
 canvas_item_is_collision_object2d :: gclass.canvas_item_is_collision_object2d
 canvas_item_try_as_collision_object2d :: gclass.canvas_item_try_as_collision_object2d
 canvas_item_is_area2d :: gclass.canvas_item_is_area2d
@@ -1600,6 +1607,8 @@ node2d_is_canvas_modulate :: gclass.node2d_is_canvas_modulate
 node2d_try_as_canvas_modulate :: gclass.node2d_try_as_canvas_modulate
 node2d_is_parallax2d :: gclass.node2d_is_parallax2d
 node2d_try_as_parallax2d :: gclass.node2d_try_as_parallax2d
+node2d_is_audio_stream_player2d :: gclass.node2d_is_audio_stream_player2d
+node2d_try_as_audio_stream_player2d :: gclass.node2d_try_as_audio_stream_player2d
 node2d_is_collision_object2d :: gclass.node2d_is_collision_object2d
 node2d_try_as_collision_object2d :: gclass.node2d_try_as_collision_object2d
 node2d_is_area2d :: gclass.node2d_is_area2d
@@ -1693,6 +1702,42 @@ timer_is_stopped :: gclass.timer_is_stopped
 timer_get_time_left :: gclass.timer_get_time_left
 audio_stream_player_as_node :: gclass.audio_stream_player_as_node
 audio_stream_player_as_object :: gclass.audio_stream_player_as_object
+audio_stream_player2d_as_node2d :: gclass.audio_stream_player2d_as_node2d
+audio_stream_player2d_as_canvas_item :: gclass.audio_stream_player2d_as_canvas_item
+audio_stream_player2d_as_node :: gclass.audio_stream_player2d_as_node
+audio_stream_player2d_as_object :: gclass.audio_stream_player2d_as_object
+audio_stream_player2d_set_stream :: gclass.audio_stream_player2d_set_stream
+audio_stream_player2d_get_stream :: gclass.audio_stream_player2d_get_stream
+audio_stream_player2d_set_volume_db :: gclass.audio_stream_player2d_set_volume_db
+audio_stream_player2d_get_volume_db :: gclass.audio_stream_player2d_get_volume_db
+audio_stream_player2d_set_volume_linear :: gclass.audio_stream_player2d_set_volume_linear
+audio_stream_player2d_get_volume_linear :: gclass.audio_stream_player2d_get_volume_linear
+audio_stream_player2d_set_pitch_scale :: gclass.audio_stream_player2d_set_pitch_scale
+audio_stream_player2d_get_pitch_scale :: gclass.audio_stream_player2d_get_pitch_scale
+audio_stream_player2d_play :: gclass.audio_stream_player2d_play
+audio_stream_player2d_play_default :: gclass.audio_stream_player2d_play_default
+audio_stream_player2d_seek :: gclass.audio_stream_player2d_seek
+audio_stream_player2d_stop :: gclass.audio_stream_player2d_stop
+audio_stream_player2d_is_playing :: gclass.audio_stream_player2d_is_playing
+audio_stream_player2d_get_playback_position :: gclass.audio_stream_player2d_get_playback_position
+audio_stream_player2d_set_bus :: gclass.audio_stream_player2d_set_bus
+audio_stream_player2d_get_bus :: gclass.audio_stream_player2d_get_bus
+audio_stream_player2d_set_autoplay :: gclass.audio_stream_player2d_set_autoplay
+audio_stream_player2d_is_autoplay_enabled :: gclass.audio_stream_player2d_is_autoplay_enabled
+audio_stream_player2d_set_playing :: gclass.audio_stream_player2d_set_playing
+audio_stream_player2d_set_max_distance :: gclass.audio_stream_player2d_set_max_distance
+audio_stream_player2d_get_max_distance :: gclass.audio_stream_player2d_get_max_distance
+audio_stream_player2d_set_attenuation :: gclass.audio_stream_player2d_set_attenuation
+audio_stream_player2d_get_attenuation :: gclass.audio_stream_player2d_get_attenuation
+audio_stream_player2d_set_area_mask :: gclass.audio_stream_player2d_set_area_mask
+audio_stream_player2d_get_area_mask :: gclass.audio_stream_player2d_get_area_mask
+audio_stream_player2d_set_stream_paused :: gclass.audio_stream_player2d_set_stream_paused
+audio_stream_player2d_get_stream_paused :: gclass.audio_stream_player2d_get_stream_paused
+audio_stream_player2d_set_max_polyphony :: gclass.audio_stream_player2d_set_max_polyphony
+audio_stream_player2d_get_max_polyphony :: gclass.audio_stream_player2d_get_max_polyphony
+audio_stream_player2d_set_panning_strength :: gclass.audio_stream_player2d_set_panning_strength
+audio_stream_player2d_get_panning_strength :: gclass.audio_stream_player2d_get_panning_strength
+audio_stream_player2d_has_stream_playback :: gclass.audio_stream_player2d_has_stream_playback
 audio_stream_player_set_stream :: gclass.audio_stream_player_set_stream
 audio_stream_player_get_stream :: gclass.audio_stream_player_get_stream
 audio_stream_player_set_volume_db :: gclass.audio_stream_player_set_volume_db
@@ -2650,6 +2695,11 @@ label_is_nil :: proc "contextless" (self: Label) -> bool {
 timer_is_nil :: proc "contextless" (self: Timer) -> bool {
 	return ObjectPtr(self) == nil
 }
+
+audio_stream_player2d_is_nil :: proc "contextless" (self: AudioStreamPlayer2D) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
 
 audio_stream_player_is_nil :: proc "contextless" (self: AudioStreamPlayer) -> bool {
 	return ObjectPtr(self) == nil
@@ -3895,6 +3945,10 @@ timer_object_ptr :: proc "contextless" (self: Timer) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+audio_stream_player2d_object_ptr :: proc "contextless" (
+	self: AudioStreamPlayer2D,
+) -> ObjectPtr {return ObjectPtr(self)}
+
 audio_stream_player_object_ptr :: proc "contextless" (self: AudioStreamPlayer) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4602,6 +4656,16 @@ object_ptr_try_as_texture_progress_bar :: proc "contextless" (
 object_ptr_try_as_timer :: proc "contextless" (self: ObjectPtr) -> (value: Timer, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_timer(Object(self))
+}
+
+object_ptr_try_as_audio_stream_player2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: AudioStreamPlayer2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_audio_stream_player2d(Object(self))
 }
 
 object_ptr_try_as_audio_stream_player :: proc "contextless" (

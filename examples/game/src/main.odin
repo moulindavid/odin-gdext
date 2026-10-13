@@ -882,6 +882,47 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(audio_object)
 	}
 
+
+	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
+	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
+	   audio_2d_ok {
+		gt.audio_stream_player2d_set_volume_db(audio_2d, -8)
+		gt.audio_stream_player2d_set_volume_linear(audio_2d, 0.4)
+		gt.audio_stream_player2d_set_pitch_scale(audio_2d, 1.0)
+		gt.audio_stream_player2d_set_autoplay(audio_2d, false)
+		gt.audio_stream_player2d_set_playing(audio_2d, false)
+		gt.audio_stream_player2d_set_stream_paused(audio_2d, true)
+		gt.audio_stream_player2d_set_max_polyphony(audio_2d, 1)
+		gt.audio_stream_player2d_set_max_distance(audio_2d, 512)
+		gt.audio_stream_player2d_set_attenuation(audio_2d, 1)
+		gt.audio_stream_player2d_set_area_mask(audio_2d, 1)
+		gt.audio_stream_player2d_set_panning_strength(audio_2d, 1)
+		master_bus := gt.string_name_from_utf8_cstring(cstring("Master"))
+		gt.audio_stream_player2d_set_bus(audio_2d, &master_bus)
+		gt.string_name_free(&master_bus)
+		_ = gt.audio_stream_player2d_get_volume_db(audio_2d)
+		_ = gt.audio_stream_player2d_get_volume_linear(audio_2d)
+		_ = gt.audio_stream_player2d_get_pitch_scale(audio_2d)
+		_ = gt.audio_stream_player2d_is_autoplay_enabled(audio_2d)
+		_ = gt.audio_stream_player2d_get_stream_paused(audio_2d)
+		_ = gt.audio_stream_player2d_get_max_polyphony(audio_2d)
+		_ = gt.audio_stream_player2d_get_max_distance(audio_2d)
+		_ = gt.audio_stream_player2d_get_attenuation(audio_2d)
+		_ = gt.audio_stream_player2d_get_area_mask(audio_2d)
+		_ = gt.audio_stream_player2d_get_panning_strength(audio_2d)
+		_ = gt.audio_stream_player2d_is_playing(audio_2d)
+		_ = gt.audio_stream_player2d_get_playback_position(audio_2d)
+		_ = gt.audio_stream_player2d_has_stream_playback(audio_2d)
+		bus := gt.audio_stream_player2d_get_bus(audio_2d)
+		gt.string_name_free(&bus)
+		gt.audio_stream_player2d_stop(audio_2d)
+		if !gt.node_add_child_checked(parent, gt.audio_stream_player2d_as_node(audio_2d)) {
+			_ = gt.object_destroy_checked(gt.audio_stream_player2d_object_ptr(audio_2d))
+		}
+	} else if audio_2d_object != nil {
+		_ = gt.object_destroy_checked(audio_2d_object)
+	}
+
 	if !gt.scene_tree_is_nil(gt.node_get_tree(parent)) {
 		nil_tween := gt.Tween(nil)
 		_, _ = gt.tween_running_checked(nil_tween)
@@ -1275,6 +1316,7 @@ progress_bar_class_name_data: gt.ClassName
 texture_progress_bar_class_name_data: gt.ClassName
 style_box_class_name_data: gt.ClassName
 audio_stream_player_class_name_data: gt.ClassName
+audio_stream_player2d_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name: gt.ConstStringNamePtr
 game_parent_name: gt.ConstStringNamePtr
@@ -1309,6 +1351,7 @@ progress_bar_class_name: gt.ConstStringNamePtr
 texture_progress_bar_class_name: gt.ConstStringNamePtr
 style_box_class_name: gt.ConstStringNamePtr
 audio_stream_player_class_name: gt.ConstStringNamePtr
+audio_stream_player2d_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
@@ -1568,6 +1611,7 @@ register_classes :: proc() {
 	texture_progress_bar_class_name = gt.class_name_ptr(&texture_progress_bar_class_name_data)
 	style_box_class_name = gt.class_name_ptr(&style_box_class_name_data)
 	audio_stream_player_class_name = gt.class_name_ptr(&audio_stream_player_class_name_data)
+	audio_stream_player2d_class_name = gt.class_name_ptr(&audio_stream_player2d_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
 
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
@@ -1632,6 +1676,10 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(
 		&audio_stream_player_class_name_data,
 		cstring("AudioStreamPlayer"),
+	)
+	gt.class_name_init_latin1_cstring(
+		&audio_stream_player2d_class_name_data,
+		cstring("AudioStreamPlayer2D"),
 	)
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,

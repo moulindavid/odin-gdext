@@ -261,6 +261,16 @@ These slices are complete and were validated with make ci when merged:
      concrete runtime coverage in examples/game, updated generated reporting and
      CHANGELOG, and validated with full make ci.
 
+34. AudioStreamPlayer2D generated APIs.
+   - Added selected generated `AudioStreamPlayer2D` handle, casts, upcasts,
+     stream assignment/query, volume, pitch, playback control/query, bus,
+     autoplay, distance, attenuation, area mask, pause, polyphony, panning, and
+     stream-playback presence methods while leaving playback resource/result
+     enum APIs skipped. Exposed the selected surface through `godot:godot`, added
+     facade compile coverage, exercised non-playing runtime configuration in
+     examples/game, updated generated reporting and CHANGELOG, and validated with
+     full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
