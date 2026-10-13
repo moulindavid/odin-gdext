@@ -184,6 +184,8 @@ Node :: gclass.Node
 CanvasItem :: gclass.CanvasItem
 Node2D :: gclass.Node2D
 Path2D :: gclass.Path2D
+CanvasModulate :: gclass.CanvasModulate
+Parallax2D :: gclass.Parallax2D
 Control :: gclass.Control
 BaseButton :: gclass.BaseButton
 Button :: gclass.Button
@@ -542,6 +544,36 @@ path2d_as_node2d :: gclass.path2d_as_node2d
 path2d_as_canvas_item :: gclass.path2d_as_canvas_item
 path2d_as_node :: gclass.path2d_as_node
 path2d_as_object :: gclass.path2d_as_object
+canvas_modulate_as_node2d :: gclass.canvas_modulate_as_node2d
+canvas_modulate_as_canvas_item :: gclass.canvas_modulate_as_canvas_item
+canvas_modulate_as_node :: gclass.canvas_modulate_as_node
+canvas_modulate_as_object :: gclass.canvas_modulate_as_object
+parallax2d_as_node2d :: gclass.parallax2d_as_node2d
+parallax2d_as_canvas_item :: gclass.parallax2d_as_canvas_item
+parallax2d_as_node :: gclass.parallax2d_as_node
+parallax2d_as_object :: gclass.parallax2d_as_object
+canvas_modulate_set_color :: gclass.canvas_modulate_set_color
+canvas_modulate_get_color :: gclass.canvas_modulate_get_color
+parallax2d_set_scroll_scale :: gclass.parallax2d_set_scroll_scale
+parallax2d_get_scroll_scale :: gclass.parallax2d_get_scroll_scale
+parallax2d_set_repeat_size :: gclass.parallax2d_set_repeat_size
+parallax2d_get_repeat_size :: gclass.parallax2d_get_repeat_size
+parallax2d_set_repeat_times :: gclass.parallax2d_set_repeat_times
+parallax2d_get_repeat_times :: gclass.parallax2d_get_repeat_times
+parallax2d_set_autoscroll :: gclass.parallax2d_set_autoscroll
+parallax2d_get_autoscroll :: gclass.parallax2d_get_autoscroll
+parallax2d_set_scroll_offset :: gclass.parallax2d_set_scroll_offset
+parallax2d_get_scroll_offset :: gclass.parallax2d_get_scroll_offset
+parallax2d_set_screen_offset :: gclass.parallax2d_set_screen_offset
+parallax2d_get_screen_offset :: gclass.parallax2d_get_screen_offset
+parallax2d_set_limit_begin :: gclass.parallax2d_set_limit_begin
+parallax2d_get_limit_begin :: gclass.parallax2d_get_limit_begin
+parallax2d_set_limit_end :: gclass.parallax2d_set_limit_end
+parallax2d_get_limit_end :: gclass.parallax2d_get_limit_end
+parallax2d_set_follow_viewport :: gclass.parallax2d_set_follow_viewport
+parallax2d_get_follow_viewport :: gclass.parallax2d_get_follow_viewport
+parallax2d_set_ignore_camera_scroll :: gclass.parallax2d_set_ignore_camera_scroll
+parallax2d_is_ignore_camera_scroll :: gclass.parallax2d_is_ignore_camera_scroll
 curve2d_as_resource :: gclass.curve2d_as_resource
 curve2d_as_ref_counted :: gclass.curve2d_as_ref_counted
 curve2d_as_object :: gclass.curve2d_as_object
@@ -1087,6 +1119,10 @@ object_is_curve2d :: gclass.object_is_curve2d
 object_try_as_curve2d :: gclass.object_try_as_curve2d
 object_is_path2d :: gclass.object_is_path2d
 object_try_as_path2d :: gclass.object_try_as_path2d
+object_is_canvas_modulate :: gclass.object_is_canvas_modulate
+object_try_as_canvas_modulate :: gclass.object_try_as_canvas_modulate
+object_is_parallax2d :: gclass.object_is_parallax2d
+object_try_as_parallax2d :: gclass.object_try_as_parallax2d
 object_is_theme :: gclass.object_is_theme
 object_try_as_theme :: gclass.object_try_as_theme
 resource_is_texture2d :: gclass.resource_is_texture2d
@@ -1299,6 +1335,10 @@ node_is_sprite2d :: gclass.node_is_sprite2d
 node_try_as_sprite2d :: gclass.node_try_as_sprite2d
 node_is_path2d :: gclass.node_is_path2d
 node_try_as_path2d :: gclass.node_try_as_path2d
+node_is_canvas_modulate :: gclass.node_is_canvas_modulate
+node_try_as_canvas_modulate :: gclass.node_try_as_canvas_modulate
+node_is_parallax2d :: gclass.node_is_parallax2d
+node_try_as_parallax2d :: gclass.node_try_as_parallax2d
 node_is_label :: gclass.node_is_label
 node_try_as_label :: gclass.node_try_as_label
 node_is_base_button :: gclass.node_is_base_button
@@ -1351,6 +1391,10 @@ canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
 canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
 canvas_item_is_path2d :: gclass.canvas_item_is_path2d
 canvas_item_try_as_path2d :: gclass.canvas_item_try_as_path2d
+canvas_item_is_canvas_modulate :: gclass.canvas_item_is_canvas_modulate
+canvas_item_try_as_canvas_modulate :: gclass.canvas_item_try_as_canvas_modulate
+canvas_item_is_parallax2d :: gclass.canvas_item_is_parallax2d
+canvas_item_try_as_parallax2d :: gclass.canvas_item_try_as_parallax2d
 canvas_item_is_label :: gclass.canvas_item_is_label
 canvas_item_try_as_label :: gclass.canvas_item_try_as_label
 canvas_item_is_base_button :: gclass.canvas_item_is_base_button
@@ -1388,6 +1432,10 @@ node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
 node2d_is_path2d :: gclass.node2d_is_path2d
 node2d_try_as_path2d :: gclass.node2d_try_as_path2d
+node2d_is_canvas_modulate :: gclass.node2d_is_canvas_modulate
+node2d_try_as_canvas_modulate :: gclass.node2d_try_as_canvas_modulate
+node2d_is_parallax2d :: gclass.node2d_is_parallax2d
+node2d_try_as_parallax2d :: gclass.node2d_try_as_parallax2d
 node2d_is_collision_object2d :: gclass.node2d_is_collision_object2d
 node2d_try_as_collision_object2d :: gclass.node2d_try_as_collision_object2d
 node2d_is_area2d :: gclass.node2d_is_area2d
@@ -2325,6 +2373,14 @@ curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
 }
 
 path2d_is_nil :: proc "contextless" (self: Path2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+canvas_modulate_is_nil :: proc "contextless" (self: CanvasModulate) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+parallax2d_is_nil :: proc "contextless" (self: Parallax2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -3738,6 +3794,14 @@ path2d_object_ptr :: proc "contextless" (self: Path2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+canvas_modulate_object_ptr :: proc "contextless" (self: CanvasModulate) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+parallax2d_object_ptr :: proc "contextless" (self: Parallax2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 theme_object_ptr :: proc "contextless" (self: Theme) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -3874,6 +3938,26 @@ object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Cur
 object_ptr_try_as_path2d :: proc "contextless" (self: ObjectPtr) -> (value: Path2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_path2d(Object(self))
+}
+
+object_ptr_try_as_canvas_modulate :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CanvasModulate,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_canvas_modulate(Object(self))
+}
+
+object_ptr_try_as_parallax2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: Parallax2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_parallax2d(Object(self))
 }
 
 object_ptr_try_as_theme :: proc "contextless" (self: ObjectPtr) -> (value: Theme, ok: bool) {

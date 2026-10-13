@@ -236,6 +236,14 @@ These slices are complete and were validated with make ci when merged:
      resource cleanup, updated generated reporting and CHANGELOG, and validated
      with full make ci.
 
+31. CanvasModulate and Parallax2D generated APIs.
+   - Added selected generated `CanvasModulate` and `Parallax2D` handles, casts,
+     upcasts, scene tint, scroll scale, repeat, autoscroll, offset, limit,
+     viewport-follow, and camera-scroll methods. Exposed the selected surface
+     through `godot:godot`, added facade compile coverage, exercised concrete
+     runtime coverage in examples/game, updated generated reporting and
+     CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

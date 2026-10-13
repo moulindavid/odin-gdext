@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 58
+Max_Selected_Class_Count :: 60
 
 selected_class_names := []string {
 	"Object",
@@ -1021,6 +1021,8 @@ selected_class_names := []string {
 	"CanvasItem",
 	"Node2D",
 	"Path2D",
+	"CanvasModulate",
+	"Parallax2D",
 	"Control",
 	"BaseButton",
 	"Button",
@@ -1405,6 +1407,28 @@ selected_class_methods := []Selected_Class_Method {
 	{"ProgressBar", "is_indeterminate"},
 	{"ProgressBar", "set_editor_preview_indeterminate"},
 	{"ProgressBar", "is_editor_preview_indeterminate_enabled"},
+	{"CanvasModulate", "set_color"},
+	{"CanvasModulate", "get_color"},
+	{"Parallax2D", "set_scroll_scale"},
+	{"Parallax2D", "get_scroll_scale"},
+	{"Parallax2D", "set_repeat_size"},
+	{"Parallax2D", "get_repeat_size"},
+	{"Parallax2D", "set_repeat_times"},
+	{"Parallax2D", "get_repeat_times"},
+	{"Parallax2D", "set_autoscroll"},
+	{"Parallax2D", "get_autoscroll"},
+	{"Parallax2D", "set_scroll_offset"},
+	{"Parallax2D", "get_scroll_offset"},
+	{"Parallax2D", "set_screen_offset"},
+	{"Parallax2D", "get_screen_offset"},
+	{"Parallax2D", "set_limit_begin"},
+	{"Parallax2D", "get_limit_begin"},
+	{"Parallax2D", "set_limit_end"},
+	{"Parallax2D", "get_limit_end"},
+	{"Parallax2D", "set_follow_viewport"},
+	{"Parallax2D", "get_follow_viewport"},
+	{"Parallax2D", "set_ignore_camera_scroll"},
+	{"Parallax2D", "is_ignore_camera_scroll"},
 	{"Curve2D", "get_point_count"},
 	{"Curve2D", "set_point_count"},
 	{"Curve2D", "add_point"},
