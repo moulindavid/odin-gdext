@@ -537,6 +537,92 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 	}
 
 
+	polygon2d_object := gt.construct_object(polygon2d_class_name)
+	if polygon2d, polygon2d_ok := gt.object_ptr_try_as_polygon2d(polygon2d_object); polygon2d_ok {
+		points := gt.packed_vector2_array_new()
+		gt.packed_vector2_array_push(&points, gt.Vector2{0, 0})
+		gt.packed_vector2_array_push(&points, gt.Vector2{32, 0})
+		gt.packed_vector2_array_push(&points, gt.Vector2{0, 32})
+		gt.polygon2d_set_polygon(polygon2d, &points)
+		points_copy := gt.polygon2d_get_polygon(polygon2d)
+		gt.packed_vector2_array_free(&points_copy)
+		gt.polygon2d_set_uv(polygon2d, &points)
+		uv_copy := gt.polygon2d_get_uv(polygon2d)
+		gt.packed_vector2_array_free(&uv_copy)
+		gt.packed_vector2_array_free(&points)
+		vertex_colors := gt.packed_color_array_new()
+		gt.polygon2d_set_vertex_colors(polygon2d, &vertex_colors)
+		vertex_colors_copy := gt.polygon2d_get_vertex_colors(polygon2d)
+		gt.packed_color_array_free(&vertex_colors_copy)
+		gt.packed_color_array_free(&vertex_colors)
+		gt.polygon2d_set_color(polygon2d, gt.Color{1, 0.5, 0.25, 1})
+		gt.polygon2d_set_texture_offset(polygon2d, gt.Vector2{1, 2})
+		gt.polygon2d_set_texture_rotation(polygon2d, 0.25)
+		gt.polygon2d_set_texture_scale(polygon2d, gt.Vector2{1, 1})
+		gt.polygon2d_set_invert_enabled(polygon2d, false)
+		gt.polygon2d_set_antialiased(polygon2d, true)
+		gt.polygon2d_set_invert_border(polygon2d, 4)
+		gt.polygon2d_set_offset(polygon2d, gt.Vector2{2, 3})
+		gt.polygon2d_clear_bones(polygon2d)
+		gt.polygon2d_set_internal_vertex_count(polygon2d, 0)
+		_ = gt.polygon2d_get_color(polygon2d)
+		_ = gt.polygon2d_get_texture_offset(polygon2d)
+		_ = gt.polygon2d_get_texture_rotation(polygon2d)
+		_ = gt.polygon2d_get_texture_scale(polygon2d)
+		_ = gt.polygon2d_get_invert_enabled(polygon2d)
+		_ = gt.polygon2d_get_antialiased(polygon2d)
+		_ = gt.polygon2d_get_invert_border(polygon2d)
+		_ = gt.polygon2d_get_offset(polygon2d)
+		_ = gt.polygon2d_get_bone_count(polygon2d)
+		_ = gt.polygon2d_get_internal_vertex_count(polygon2d)
+		if !gt.node_add_child_checked(parent, gt.polygon2d_as_node(polygon2d)) {
+			_ = gt.object_destroy_checked(gt.polygon2d_object_ptr(polygon2d))
+		}
+	} else if polygon2d_object != nil {
+		_ = gt.object_destroy_checked(polygon2d_object)
+	}
+
+	line2d_object := gt.construct_object(line2d_class_name)
+	if line2d, line2d_ok := gt.object_ptr_try_as_line2d(line2d_object); line2d_ok {
+		points := gt.packed_vector2_array_new()
+		gt.packed_vector2_array_push(&points, gt.Vector2{0, 0})
+		gt.packed_vector2_array_push(&points, gt.Vector2{32, 12})
+		gt.line2d_set_points(line2d, &points)
+		line_points_copy := gt.line2d_get_points(line2d)
+		gt.packed_vector2_array_free(&line_points_copy)
+		gt.packed_vector2_array_free(&points)
+		gt.line2d_add_point(line2d, gt.Vector2{40, 16}, -1)
+		gt.line2d_add_point_default(line2d, gt.Vector2{48, 24})
+		gt.line2d_set_point_position(line2d, 0, gt.Vector2{1, 1})
+		_ = gt.line2d_get_point_position(line2d, 0)
+		_ = gt.line2d_get_point_count(line2d)
+		gt.line2d_set_closed(line2d, false)
+		gt.line2d_set_width(line2d, 2)
+		gt.line2d_set_default_color(line2d, gt.Color{0.2, 0.6, 1, 1})
+		gt.line2d_set_texture_mode(line2d, gt.Line2DLineTextureMode(0))
+		gt.line2d_set_joint_mode(line2d, gt.Line2DLineJointMode(0))
+		gt.line2d_set_begin_cap_mode(line2d, gt.Line2DLineCapMode(0))
+		gt.line2d_set_end_cap_mode(line2d, gt.Line2DLineCapMode(0))
+		gt.line2d_set_sharp_limit(line2d, 2)
+		gt.line2d_set_round_precision(line2d, 4)
+		gt.line2d_set_antialiased(line2d, true)
+		_ = gt.line2d_is_closed(line2d)
+		_ = gt.line2d_get_width(line2d)
+		_ = gt.line2d_get_default_color(line2d)
+		_ = gt.line2d_get_texture_mode(line2d)
+		_ = gt.line2d_get_joint_mode(line2d)
+		_ = gt.line2d_get_begin_cap_mode(line2d)
+		_ = gt.line2d_get_end_cap_mode(line2d)
+		_ = gt.line2d_get_sharp_limit(line2d)
+		_ = gt.line2d_get_round_precision(line2d)
+		_ = gt.line2d_get_antialiased(line2d)
+		if !gt.node_add_child_checked(parent, gt.line2d_as_node(line2d)) {
+			_ = gt.object_destroy_checked(gt.line2d_object_ptr(line2d))
+		}
+	} else if line2d_object != nil {
+		_ = gt.object_destroy_checked(line2d_object)
+	}
+
 	back_buffer_copy_object := gt.construct_object(back_buffer_copy_class_name)
 	if back_buffer_copy, back_buffer_copy_ok := gt.object_ptr_try_as_back_buffer_copy(
 		back_buffer_copy_object,
@@ -1298,6 +1384,8 @@ curve2d_class_name_data: gt.ClassName
 path2d_class_name_data: gt.ClassName
 back_buffer_copy_class_name_data: gt.ClassName
 collision_polygon2d_class_name_data: gt.ClassName
+polygon2d_class_name_data: gt.ClassName
+line2d_class_name_data: gt.ClassName
 circle_shape2d_class_name_data: gt.ClassName
 rectangle_shape2d_class_name_data: gt.ClassName
 segment_shape2d_class_name_data: gt.ClassName
@@ -1333,6 +1421,8 @@ curve2d_class_name: gt.ConstStringNamePtr
 path2d_class_name: gt.ConstStringNamePtr
 back_buffer_copy_class_name: gt.ConstStringNamePtr
 collision_polygon2d_class_name: gt.ConstStringNamePtr
+polygon2d_class_name: gt.ConstStringNamePtr
+line2d_class_name: gt.ConstStringNamePtr
 circle_shape2d_class_name: gt.ConstStringNamePtr
 rectangle_shape2d_class_name: gt.ConstStringNamePtr
 segment_shape2d_class_name: gt.ConstStringNamePtr
@@ -1591,6 +1681,8 @@ register_classes :: proc() {
 	path2d_class_name = gt.class_name_ptr(&path2d_class_name_data)
 	back_buffer_copy_class_name = gt.class_name_ptr(&back_buffer_copy_class_name_data)
 	collision_polygon2d_class_name = gt.class_name_ptr(&collision_polygon2d_class_name_data)
+	polygon2d_class_name = gt.class_name_ptr(&polygon2d_class_name_data)
+	line2d_class_name = gt.class_name_ptr(&line2d_class_name_data)
 	circle_shape2d_class_name = gt.class_name_ptr(&circle_shape2d_class_name_data)
 	rectangle_shape2d_class_name = gt.class_name_ptr(&rectangle_shape2d_class_name_data)
 	segment_shape2d_class_name = gt.class_name_ptr(&segment_shape2d_class_name_data)
@@ -1641,6 +1733,8 @@ register_classes :: proc() {
 		&collision_polygon2d_class_name_data,
 		cstring("CollisionPolygon2D"),
 	)
+	gt.class_name_init_latin1_cstring(&polygon2d_class_name_data, cstring("Polygon2D"))
+	gt.class_name_init_latin1_cstring(&line2d_class_name_data, cstring("Line2D"))
 	gt.class_name_init_latin1_cstring(&circle_shape2d_class_name_data, cstring("CircleShape2D"))
 	gt.class_name_init_latin1_cstring(
 		&rectangle_shape2d_class_name_data,

@@ -271,6 +271,15 @@ These slices are complete and were validated with make ci when merged:
      examples/game, updated generated reporting and CHANGELOG, and validated with
      full make ci.
 
+35. Polygon2D and Line2D generated APIs.
+   - Added selected generated `Polygon2D` and `Line2D` handles, enums, casts,
+     upcasts, packed-point arrays, colors, offsets, texture transform settings,
+     line shape/style settings, and simple polygon skeleton counters while
+     leaving texture/Curve/Gradient/ref-counted ownership-sensitive APIs skipped.
+     Exposed the selected surface through `godot:godot`, added facade compile
+     coverage, exercised concrete runtime coverage in examples/game, updated
+     generated reporting and CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

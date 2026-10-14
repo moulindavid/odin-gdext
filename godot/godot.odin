@@ -193,6 +193,8 @@ Node2D :: gclass.Node2D
 Path2D :: gclass.Path2D
 BackBufferCopy :: gclass.BackBufferCopy
 CollisionPolygon2D :: gclass.CollisionPolygon2D
+Polygon2D :: gclass.Polygon2D
+Line2D :: gclass.Line2D
 CanvasModulate :: gclass.CanvasModulate
 Parallax2D :: gclass.Parallax2D
 Control :: gclass.Control
@@ -584,6 +586,72 @@ parallax2d_set_follow_viewport :: gclass.parallax2d_set_follow_viewport
 parallax2d_get_follow_viewport :: gclass.parallax2d_get_follow_viewport
 parallax2d_set_ignore_camera_scroll :: gclass.parallax2d_set_ignore_camera_scroll
 parallax2d_is_ignore_camera_scroll :: gclass.parallax2d_is_ignore_camera_scroll
+polygon2d_as_node2d :: gclass.polygon2d_as_node2d
+polygon2d_as_canvas_item :: gclass.polygon2d_as_canvas_item
+polygon2d_as_node :: gclass.polygon2d_as_node
+polygon2d_as_object :: gclass.polygon2d_as_object
+line2d_as_node2d :: gclass.line2d_as_node2d
+line2d_as_canvas_item :: gclass.line2d_as_canvas_item
+line2d_as_node :: gclass.line2d_as_node
+line2d_as_object :: gclass.line2d_as_object
+polygon2d_set_polygon :: gclass.polygon2d_set_polygon
+polygon2d_get_polygon :: gclass.polygon2d_get_polygon
+polygon2d_set_uv :: gclass.polygon2d_set_uv
+polygon2d_get_uv :: gclass.polygon2d_get_uv
+polygon2d_set_color :: gclass.polygon2d_set_color
+polygon2d_get_color :: gclass.polygon2d_get_color
+polygon2d_set_vertex_colors :: gclass.polygon2d_set_vertex_colors
+polygon2d_get_vertex_colors :: gclass.polygon2d_get_vertex_colors
+polygon2d_set_texture_offset :: gclass.polygon2d_set_texture_offset
+polygon2d_get_texture_offset :: gclass.polygon2d_get_texture_offset
+polygon2d_set_texture_rotation :: gclass.polygon2d_set_texture_rotation
+polygon2d_get_texture_rotation :: gclass.polygon2d_get_texture_rotation
+polygon2d_set_texture_scale :: gclass.polygon2d_set_texture_scale
+polygon2d_get_texture_scale :: gclass.polygon2d_get_texture_scale
+polygon2d_set_invert_enabled :: gclass.polygon2d_set_invert_enabled
+polygon2d_get_invert_enabled :: gclass.polygon2d_get_invert_enabled
+polygon2d_set_antialiased :: gclass.polygon2d_set_antialiased
+polygon2d_get_antialiased :: gclass.polygon2d_get_antialiased
+polygon2d_set_invert_border :: gclass.polygon2d_set_invert_border
+polygon2d_get_invert_border :: gclass.polygon2d_get_invert_border
+polygon2d_set_offset :: gclass.polygon2d_set_offset
+polygon2d_get_offset :: gclass.polygon2d_get_offset
+polygon2d_get_bone_count :: gclass.polygon2d_get_bone_count
+polygon2d_erase_bone :: gclass.polygon2d_erase_bone
+polygon2d_clear_bones :: gclass.polygon2d_clear_bones
+polygon2d_set_skeleton :: gclass.polygon2d_set_skeleton
+polygon2d_get_skeleton :: gclass.polygon2d_get_skeleton
+polygon2d_set_internal_vertex_count :: gclass.polygon2d_set_internal_vertex_count
+polygon2d_get_internal_vertex_count :: gclass.polygon2d_get_internal_vertex_count
+line2d_set_points :: gclass.line2d_set_points
+line2d_get_points :: gclass.line2d_get_points
+line2d_set_point_position :: gclass.line2d_set_point_position
+line2d_get_point_position :: gclass.line2d_get_point_position
+line2d_get_point_count :: gclass.line2d_get_point_count
+line2d_add_point :: gclass.line2d_add_point
+line2d_add_point_default :: gclass.line2d_add_point_default
+line2d_remove_point :: gclass.line2d_remove_point
+line2d_clear_points :: gclass.line2d_clear_points
+line2d_set_closed :: gclass.line2d_set_closed
+line2d_is_closed :: gclass.line2d_is_closed
+line2d_set_width :: gclass.line2d_set_width
+line2d_get_width :: gclass.line2d_get_width
+line2d_set_default_color :: gclass.line2d_set_default_color
+line2d_get_default_color :: gclass.line2d_get_default_color
+line2d_set_texture_mode :: gclass.line2d_set_texture_mode
+line2d_get_texture_mode :: gclass.line2d_get_texture_mode
+line2d_set_joint_mode :: gclass.line2d_set_joint_mode
+line2d_get_joint_mode :: gclass.line2d_get_joint_mode
+line2d_set_begin_cap_mode :: gclass.line2d_set_begin_cap_mode
+line2d_get_begin_cap_mode :: gclass.line2d_get_begin_cap_mode
+line2d_set_end_cap_mode :: gclass.line2d_set_end_cap_mode
+line2d_get_end_cap_mode :: gclass.line2d_get_end_cap_mode
+line2d_set_sharp_limit :: gclass.line2d_set_sharp_limit
+line2d_get_sharp_limit :: gclass.line2d_get_sharp_limit
+line2d_set_round_precision :: gclass.line2d_set_round_precision
+line2d_get_round_precision :: gclass.line2d_get_round_precision
+line2d_set_antialiased :: gclass.line2d_set_antialiased
+line2d_get_antialiased :: gclass.line2d_get_antialiased
 back_buffer_copy_as_node2d :: gclass.back_buffer_copy_as_node2d
 back_buffer_copy_as_canvas_item :: gclass.back_buffer_copy_as_canvas_item
 back_buffer_copy_as_node :: gclass.back_buffer_copy_as_node
@@ -1222,6 +1290,10 @@ object_is_style_box :: gclass.object_is_style_box
 object_try_as_style_box :: gclass.object_try_as_style_box
 object_is_font :: gclass.object_is_font
 object_try_as_font :: gclass.object_try_as_font
+object_is_polygon2d :: gclass.object_is_polygon2d
+object_try_as_polygon2d :: gclass.object_try_as_polygon2d
+object_is_line2d :: gclass.object_is_line2d
+object_try_as_line2d :: gclass.object_try_as_line2d
 object_is_back_buffer_copy :: gclass.object_is_back_buffer_copy
 object_try_as_back_buffer_copy :: gclass.object_try_as_back_buffer_copy
 object_is_collision_polygon2d :: gclass.object_is_collision_polygon2d
@@ -1490,6 +1562,10 @@ node_is_sprite2d :: gclass.node_is_sprite2d
 node_try_as_sprite2d :: gclass.node_try_as_sprite2d
 node_is_path2d :: gclass.node_is_path2d
 node_try_as_path2d :: gclass.node_try_as_path2d
+node_is_polygon2d :: gclass.node_is_polygon2d
+node_try_as_polygon2d :: gclass.node_try_as_polygon2d
+node_is_line2d :: gclass.node_is_line2d
+node_try_as_line2d :: gclass.node_try_as_line2d
 node_is_back_buffer_copy :: gclass.node_is_back_buffer_copy
 node_try_as_back_buffer_copy :: gclass.node_try_as_back_buffer_copy
 node_is_collision_polygon2d :: gclass.node_is_collision_polygon2d
@@ -1552,6 +1628,10 @@ canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
 canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
 canvas_item_is_path2d :: gclass.canvas_item_is_path2d
 canvas_item_try_as_path2d :: gclass.canvas_item_try_as_path2d
+canvas_item_is_polygon2d :: gclass.canvas_item_is_polygon2d
+canvas_item_try_as_polygon2d :: gclass.canvas_item_try_as_polygon2d
+canvas_item_is_line2d :: gclass.canvas_item_is_line2d
+canvas_item_try_as_line2d :: gclass.canvas_item_try_as_line2d
 canvas_item_is_back_buffer_copy :: gclass.canvas_item_is_back_buffer_copy
 canvas_item_try_as_back_buffer_copy :: gclass.canvas_item_try_as_back_buffer_copy
 canvas_item_is_collision_polygon2d :: gclass.canvas_item_is_collision_polygon2d
@@ -1599,6 +1679,10 @@ node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
 node2d_is_path2d :: gclass.node2d_is_path2d
 node2d_try_as_path2d :: gclass.node2d_try_as_path2d
+node2d_is_polygon2d :: gclass.node2d_is_polygon2d
+node2d_try_as_polygon2d :: gclass.node2d_try_as_polygon2d
+node2d_is_line2d :: gclass.node2d_is_line2d
+node2d_try_as_line2d :: gclass.node2d_try_as_line2d
 node2d_is_back_buffer_copy :: gclass.node2d_is_back_buffer_copy
 node2d_try_as_back_buffer_copy :: gclass.node2d_try_as_back_buffer_copy
 node2d_is_collision_polygon2d :: gclass.node2d_is_collision_polygon2d
@@ -2606,6 +2690,9 @@ capsule_shape2d_is_nil :: proc "contextless" (self: CapsuleShape2D) -> bool {ret
 curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
 	return ObjectPtr(self) == nil
 }
+
+polygon2d_is_nil :: proc "contextless" (self: Polygon2D) -> bool {return ObjectPtr(self) == nil}
+line2d_is_nil :: proc "contextless" (self: Line2D) -> bool {return ObjectPtr(self) == nil}
 
 back_buffer_copy_is_nil :: proc "contextless" (self: BackBufferCopy) -> bool {return(
 		ObjectPtr(self) ==
@@ -4063,6 +4150,9 @@ curve2d_object_ptr :: proc "contextless" (self: Curve2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+polygon2d_object_ptr :: proc "contextless" (self: Polygon2D) -> ObjectPtr {return ObjectPtr(self)}
+line2d_object_ptr :: proc "contextless" (self: Line2D) -> ObjectPtr {return ObjectPtr(self)}
+
 back_buffer_copy_object_ptr :: proc "contextless" (
 	self: BackBufferCopy,
 ) -> ObjectPtr {return ObjectPtr(self)}
@@ -4278,6 +4368,21 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_polygon2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: Polygon2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_polygon2d(Object(self))
+}
+
+object_ptr_try_as_line2d :: proc "contextless" (self: ObjectPtr) -> (value: Line2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_line2d(Object(self))
 }
 
 object_ptr_try_as_back_buffer_copy :: proc "contextless" (
@@ -4942,6 +5047,9 @@ TextureRectExpandMode :: gclass.TextureRectExpandMode
 TextureRectStretchMode :: gclass.TextureRectStretchMode
 BackBufferCopyCopyMode :: gclass.BackBufferCopyCopyMode
 CollisionPolygon2DBuildMode :: gclass.CollisionPolygon2DBuildMode
+Line2DLineJointMode :: gclass.Line2DLineJointMode
+Line2DLineCapMode :: gclass.Line2DLineCapMode
+Line2DLineTextureMode :: gclass.Line2DLineTextureMode
 TimerTimerProcessCallback :: gclass.TimerTimerProcessCallback
 ControlFocusBehaviorRecursive :: gclass.ControlFocusBehaviorRecursive
 ControlMouseBehaviorRecursive :: gclass.ControlMouseBehaviorRecursive
