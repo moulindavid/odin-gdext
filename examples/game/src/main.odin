@@ -537,6 +537,43 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 	}
 
 
+	canvas_layer_object := gt.construct_object(canvas_layer_class_name)
+	if canvas_layer, canvas_layer_ok := gt.object_ptr_try_as_canvas_layer(canvas_layer_object);
+	   canvas_layer_ok {
+		gt.canvas_layer_set_layer(canvas_layer, 2)
+		_ = gt.canvas_layer_get_layer(canvas_layer)
+		gt.canvas_layer_set_visible(canvas_layer, true)
+		_ = gt.canvas_layer_is_visible(canvas_layer)
+		gt.canvas_layer_hide(canvas_layer)
+		gt.canvas_layer_show(canvas_layer)
+		identity := gt.Transform2D {
+			x      = gt.Vector2{1, 0},
+			y      = gt.Vector2{0, 1},
+			origin = gt.Vector2{},
+		}
+		gt.canvas_layer_set_transform(canvas_layer, identity)
+		_ = gt.canvas_layer_get_transform(canvas_layer)
+		_ = gt.canvas_layer_get_final_transform(canvas_layer)
+		gt.canvas_layer_set_offset(canvas_layer, gt.Vector2{4, 8})
+		_ = gt.canvas_layer_get_offset(canvas_layer)
+		gt.canvas_layer_set_rotation(canvas_layer, 0.25)
+		_ = gt.canvas_layer_get_rotation(canvas_layer)
+		gt.canvas_layer_set_scale(canvas_layer, gt.Vector2{1, 1})
+		_ = gt.canvas_layer_get_scale(canvas_layer)
+		gt.canvas_layer_set_follow_viewport(canvas_layer, false)
+		_ = gt.canvas_layer_is_following_viewport(canvas_layer)
+		gt.canvas_layer_set_follow_viewport_scale(canvas_layer, 1)
+		_ = gt.canvas_layer_get_follow_viewport_scale(canvas_layer)
+		_ = gt.canvas_layer_get_custom_viewport(canvas_layer)
+		canvas_rid := gt.canvas_layer_get_canvas(canvas_layer)
+		gt.rid_free(&canvas_rid)
+		if !gt.node_add_child_checked(parent, gt.canvas_layer_as_node(canvas_layer)) {
+			_ = gt.object_destroy_checked(gt.canvas_layer_object_ptr(canvas_layer))
+		}
+	} else if canvas_layer_object != nil {
+		_ = gt.object_destroy_checked(canvas_layer_object)
+	}
+
 	polygon2d_object := gt.construct_object(polygon2d_class_name)
 	if polygon2d, polygon2d_ok := gt.object_ptr_try_as_polygon2d(polygon2d_object); polygon2d_ok {
 		points := gt.packed_vector2_array_new()
@@ -1384,6 +1421,7 @@ curve2d_class_name_data: gt.ClassName
 path2d_class_name_data: gt.ClassName
 back_buffer_copy_class_name_data: gt.ClassName
 collision_polygon2d_class_name_data: gt.ClassName
+canvas_layer_class_name_data: gt.ClassName
 polygon2d_class_name_data: gt.ClassName
 line2d_class_name_data: gt.ClassName
 circle_shape2d_class_name_data: gt.ClassName
@@ -1421,6 +1459,7 @@ curve2d_class_name: gt.ConstStringNamePtr
 path2d_class_name: gt.ConstStringNamePtr
 back_buffer_copy_class_name: gt.ConstStringNamePtr
 collision_polygon2d_class_name: gt.ConstStringNamePtr
+canvas_layer_class_name: gt.ConstStringNamePtr
 polygon2d_class_name: gt.ConstStringNamePtr
 line2d_class_name: gt.ConstStringNamePtr
 circle_shape2d_class_name: gt.ConstStringNamePtr
@@ -1681,6 +1720,7 @@ register_classes :: proc() {
 	path2d_class_name = gt.class_name_ptr(&path2d_class_name_data)
 	back_buffer_copy_class_name = gt.class_name_ptr(&back_buffer_copy_class_name_data)
 	collision_polygon2d_class_name = gt.class_name_ptr(&collision_polygon2d_class_name_data)
+	canvas_layer_class_name = gt.class_name_ptr(&canvas_layer_class_name_data)
 	polygon2d_class_name = gt.class_name_ptr(&polygon2d_class_name_data)
 	line2d_class_name = gt.class_name_ptr(&line2d_class_name_data)
 	circle_shape2d_class_name = gt.class_name_ptr(&circle_shape2d_class_name_data)
@@ -1733,6 +1773,7 @@ register_classes :: proc() {
 		&collision_polygon2d_class_name_data,
 		cstring("CollisionPolygon2D"),
 	)
+	gt.class_name_init_latin1_cstring(&canvas_layer_class_name_data, cstring("CanvasLayer"))
 	gt.class_name_init_latin1_cstring(&polygon2d_class_name_data, cstring("Polygon2D"))
 	gt.class_name_init_latin1_cstring(&line2d_class_name_data, cstring("Line2D"))
 	gt.class_name_init_latin1_cstring(&circle_shape2d_class_name_data, cstring("CircleShape2D"))

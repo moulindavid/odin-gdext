@@ -188,6 +188,7 @@ OwnedResource :: struct {
 	ref: OwnedRefCounted,
 }
 Node :: gclass.Node
+CanvasLayer :: gclass.CanvasLayer
 CanvasItem :: gclass.CanvasItem
 Node2D :: gclass.Node2D
 Path2D :: gclass.Path2D
@@ -586,6 +587,30 @@ parallax2d_set_follow_viewport :: gclass.parallax2d_set_follow_viewport
 parallax2d_get_follow_viewport :: gclass.parallax2d_get_follow_viewport
 parallax2d_set_ignore_camera_scroll :: gclass.parallax2d_set_ignore_camera_scroll
 parallax2d_is_ignore_camera_scroll :: gclass.parallax2d_is_ignore_camera_scroll
+canvas_layer_as_node :: gclass.canvas_layer_as_node
+canvas_layer_as_object :: gclass.canvas_layer_as_object
+canvas_layer_set_layer :: gclass.canvas_layer_set_layer
+canvas_layer_get_layer :: gclass.canvas_layer_get_layer
+canvas_layer_set_visible :: gclass.canvas_layer_set_visible
+canvas_layer_is_visible :: gclass.canvas_layer_is_visible
+canvas_layer_show :: gclass.canvas_layer_show
+canvas_layer_hide :: gclass.canvas_layer_hide
+canvas_layer_set_transform :: gclass.canvas_layer_set_transform
+canvas_layer_get_transform :: gclass.canvas_layer_get_transform
+canvas_layer_get_final_transform :: gclass.canvas_layer_get_final_transform
+canvas_layer_set_offset :: gclass.canvas_layer_set_offset
+canvas_layer_get_offset :: gclass.canvas_layer_get_offset
+canvas_layer_set_rotation :: gclass.canvas_layer_set_rotation
+canvas_layer_get_rotation :: gclass.canvas_layer_get_rotation
+canvas_layer_set_scale :: gclass.canvas_layer_set_scale
+canvas_layer_get_scale :: gclass.canvas_layer_get_scale
+canvas_layer_set_follow_viewport :: gclass.canvas_layer_set_follow_viewport
+canvas_layer_is_following_viewport :: gclass.canvas_layer_is_following_viewport
+canvas_layer_set_follow_viewport_scale :: gclass.canvas_layer_set_follow_viewport_scale
+canvas_layer_get_follow_viewport_scale :: gclass.canvas_layer_get_follow_viewport_scale
+canvas_layer_set_custom_viewport :: gclass.canvas_layer_set_custom_viewport
+canvas_layer_get_custom_viewport :: gclass.canvas_layer_get_custom_viewport
+canvas_layer_get_canvas :: gclass.canvas_layer_get_canvas
 polygon2d_as_node2d :: gclass.polygon2d_as_node2d
 polygon2d_as_canvas_item :: gclass.polygon2d_as_canvas_item
 polygon2d_as_node :: gclass.polygon2d_as_node
@@ -1290,6 +1315,8 @@ object_is_style_box :: gclass.object_is_style_box
 object_try_as_style_box :: gclass.object_try_as_style_box
 object_is_font :: gclass.object_is_font
 object_try_as_font :: gclass.object_try_as_font
+object_is_canvas_layer :: gclass.object_is_canvas_layer
+object_try_as_canvas_layer :: gclass.object_try_as_canvas_layer
 object_is_polygon2d :: gclass.object_is_polygon2d
 object_try_as_polygon2d :: gclass.object_try_as_polygon2d
 object_is_line2d :: gclass.object_is_line2d
@@ -1562,6 +1589,8 @@ node_is_sprite2d :: gclass.node_is_sprite2d
 node_try_as_sprite2d :: gclass.node_try_as_sprite2d
 node_is_path2d :: gclass.node_is_path2d
 node_try_as_path2d :: gclass.node_try_as_path2d
+node_is_canvas_layer :: gclass.node_is_canvas_layer
+node_try_as_canvas_layer :: gclass.node_try_as_canvas_layer
 node_is_polygon2d :: gclass.node_is_polygon2d
 node_try_as_polygon2d :: gclass.node_try_as_polygon2d
 node_is_line2d :: gclass.node_is_line2d
@@ -2690,6 +2719,11 @@ capsule_shape2d_is_nil :: proc "contextless" (self: CapsuleShape2D) -> bool {ret
 curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
 	return ObjectPtr(self) == nil
 }
+
+canvas_layer_is_nil :: proc "contextless" (self: CanvasLayer) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
 
 polygon2d_is_nil :: proc "contextless" (self: Polygon2D) -> bool {return ObjectPtr(self) == nil}
 line2d_is_nil :: proc "contextless" (self: Line2D) -> bool {return ObjectPtr(self) == nil}
@@ -4150,6 +4184,10 @@ curve2d_object_ptr :: proc "contextless" (self: Curve2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+canvas_layer_object_ptr :: proc "contextless" (self: CanvasLayer) -> ObjectPtr {return ObjectPtr(
+		self,
+	)}
+
 polygon2d_object_ptr :: proc "contextless" (self: Polygon2D) -> ObjectPtr {return ObjectPtr(self)}
 line2d_object_ptr :: proc "contextless" (self: Line2D) -> ObjectPtr {return ObjectPtr(self)}
 
@@ -4368,6 +4406,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_canvas_layer :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: CanvasLayer,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_canvas_layer(Object(self))
 }
 
 object_ptr_try_as_polygon2d :: proc "contextless" (

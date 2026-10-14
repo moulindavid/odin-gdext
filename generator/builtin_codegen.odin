@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 72
+Max_Selected_Class_Count :: 73
 
 selected_class_names := []string {
 	"Object",
@@ -1025,6 +1025,7 @@ selected_class_names := []string {
 	"CollisionPolygon2D",
 	"Polygon2D",
 	"Line2D",
+	"CanvasLayer",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1435,6 +1436,28 @@ selected_class_methods := []Selected_Class_Method {
 	{"CollisionPolygon2D", "get_one_way_collision_margin"},
 	{"CollisionPolygon2D", "set_one_way_collision_direction"},
 	{"CollisionPolygon2D", "get_one_way_collision_direction"},
+	{"CanvasLayer", "set_layer"},
+	{"CanvasLayer", "get_layer"},
+	{"CanvasLayer", "set_visible"},
+	{"CanvasLayer", "is_visible"},
+	{"CanvasLayer", "show"},
+	{"CanvasLayer", "hide"},
+	{"CanvasLayer", "set_transform"},
+	{"CanvasLayer", "get_transform"},
+	{"CanvasLayer", "get_final_transform"},
+	{"CanvasLayer", "set_offset"},
+	{"CanvasLayer", "get_offset"},
+	{"CanvasLayer", "set_rotation"},
+	{"CanvasLayer", "get_rotation"},
+	{"CanvasLayer", "set_scale"},
+	{"CanvasLayer", "get_scale"},
+	{"CanvasLayer", "set_follow_viewport"},
+	{"CanvasLayer", "is_following_viewport"},
+	{"CanvasLayer", "set_follow_viewport_scale"},
+	{"CanvasLayer", "get_follow_viewport_scale"},
+	{"CanvasLayer", "set_custom_viewport"},
+	{"CanvasLayer", "get_custom_viewport"},
+	{"CanvasLayer", "get_canvas"},
 	{"Shape2D", "set_custom_solver_bias"},
 	{"Shape2D", "get_custom_solver_bias"},
 	{"Shape2D", "collide"},

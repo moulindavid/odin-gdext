@@ -44,6 +44,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   compile coverage, and examples/game runtime coverage.
 - Added selected generated `Polygon2D` and `Line2D` APIs with public facade
   exports, compile coverage, and examples/game runtime coverage.
+- Added selected generated `CanvasLayer` APIs with public facade exports,
+  compile coverage, and examples/game runtime coverage.
 
 ## Completed roadmap slices
 
