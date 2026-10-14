@@ -69,6 +69,7 @@ nil_method_set_string :: proc "contextless" (
 class_facade_compile_smoke :: proc "contextless" (
 	object: gt.Object,
 	node2d: gt.Node2D,
+	canvas_layer: gt.CanvasLayer,
 	path2d: gt.Path2D,
 	back_buffer_copy: gt.BackBufferCopy,
 	collision_polygon2d: gt.CollisionPolygon2D,
@@ -1306,6 +1307,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.node_is_nil(node)
 	_ = gt.canvas_item_is_nil(canvas_item)
 	_ = gt.node2d_is_nil(node2d)
+	_ = gt.canvas_layer_is_nil(canvas_layer)
 	_ = gt.camera2d_is_nil(camera2d)
 	_ = gt.marker2d_is_nil(marker2d)
 	_ = gt.ray_cast2d_is_nil(ray_cast2d)
@@ -1333,6 +1335,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.ref_counted_object_ptr(ref_counted)
 	_ = gt.resource_object_ptr(resource)
 	_ = gt.canvas_item_object_ptr(canvas_item)
+	_ = gt.canvas_layer_object_ptr(canvas_layer)
 	_ = gt.control_object_ptr(control)
 	_ = gt.sprite2d_object_ptr(sprite2d)
 	_ = gt.label_object_ptr(label)
@@ -1380,6 +1383,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_resource(gt.resource_object_ptr(resource))
 	_, _ = gt.object_ptr_try_as_node(gt.node_object_ptr(node))
 	_, _ = gt.object_ptr_try_as_canvas_item(gt.canvas_item_object_ptr(canvas_item))
+	_, _ = gt.object_ptr_try_as_canvas_layer(gt.canvas_layer_object_ptr(canvas_layer))
 	_, _ = gt.object_ptr_try_as_node2d(gt.node2d_object_ptr(node2d))
 	_, _ = gt.object_ptr_try_as_control(gt.control_object_ptr(control))
 	_, _ = gt.object_ptr_try_as_sprite2d(gt.sprite2d_object_ptr(sprite2d))
@@ -1422,6 +1426,8 @@ class_facade_compile_smoke :: proc "contextless" (
 		gt.collision_object2d_object_ptr(collision_object2d),
 	)
 
+	_ = gt.canvas_layer_as_node(canvas_layer)
+	_ = gt.canvas_layer_as_object(canvas_layer)
 	_ = gt.sprite2d_as_node2d(sprite2d)
 	_ = gt.sprite2d_as_canvas_item(sprite2d)
 	_ = gt.sprite2d_as_node(sprite2d)
@@ -1656,6 +1662,34 @@ class_facade_compile_smoke :: proc "contextless" (
 	gt.packed_vector2_array_push(&polygon, gt.Vector2{0, 0})
 	gt.packed_vector2_array_push(&polygon, gt.Vector2{16, 0})
 	gt.packed_vector2_array_push(&polygon, gt.Vector2{0, 16})
+	gt.canvas_layer_set_layer(canvas_layer, 2)
+	_ = gt.canvas_layer_get_layer(canvas_layer)
+	gt.canvas_layer_set_visible(canvas_layer, true)
+	_ = gt.canvas_layer_is_visible(canvas_layer)
+	gt.canvas_layer_hide(canvas_layer)
+	gt.canvas_layer_show(canvas_layer)
+	canvas_layer_transform := gt.Transform2D {
+		x      = gt.Vector2{1, 0},
+		y      = gt.Vector2{0, 1},
+		origin = gt.Vector2{},
+	}
+	gt.canvas_layer_set_transform(canvas_layer, canvas_layer_transform)
+	_ = gt.canvas_layer_get_transform(canvas_layer)
+	_ = gt.canvas_layer_get_final_transform(canvas_layer)
+	gt.canvas_layer_set_offset(canvas_layer, gt.Vector2{4, 8})
+	_ = gt.canvas_layer_get_offset(canvas_layer)
+	gt.canvas_layer_set_rotation(canvas_layer, 0.25)
+	_ = gt.canvas_layer_get_rotation(canvas_layer)
+	gt.canvas_layer_set_scale(canvas_layer, gt.Vector2{1, 1})
+	_ = gt.canvas_layer_get_scale(canvas_layer)
+	gt.canvas_layer_set_follow_viewport(canvas_layer, false)
+	_ = gt.canvas_layer_is_following_viewport(canvas_layer)
+	gt.canvas_layer_set_follow_viewport_scale(canvas_layer, 1)
+	_ = gt.canvas_layer_get_follow_viewport_scale(canvas_layer)
+	gt.canvas_layer_set_custom_viewport(canvas_layer, node)
+	_ = gt.canvas_layer_get_custom_viewport(canvas_layer)
+	canvas_layer_rid := gt.canvas_layer_get_canvas(canvas_layer)
+	gt.rid_free(&canvas_layer_rid)
 	poly_points := gt.packed_vector2_array_new()
 	gt.packed_vector2_array_push(&poly_points, gt.Vector2{0, 0})
 	gt.packed_vector2_array_push(&poly_points, gt.Vector2{16, 0})
@@ -2168,6 +2202,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_path2d(object)
 	_ = gt.object_is_back_buffer_copy(object)
 	_, _ = gt.object_try_as_back_buffer_copy(object)
+	_ = gt.object_is_canvas_layer(object)
+	_, _ = gt.object_try_as_canvas_layer(object)
 	_ = gt.object_is_polygon2d(object)
 	_, _ = gt.object_try_as_polygon2d(object)
 	_ = gt.object_is_line2d(object)
@@ -2539,6 +2575,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node_try_as_path2d(node)
 	_ = gt.node_is_back_buffer_copy(node)
 	_, _ = gt.node_try_as_back_buffer_copy(node)
+	_ = gt.node_is_canvas_layer(node)
+	_, _ = gt.node_try_as_canvas_layer(node)
 	_ = gt.node_is_polygon2d(node)
 	_, _ = gt.node_try_as_polygon2d(node)
 	_ = gt.node_is_line2d(node)

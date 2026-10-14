@@ -280,6 +280,14 @@ These slices are complete and were validated with make ci when merged:
      coverage, exercised concrete runtime coverage in examples/game, updated
      generated reporting and CHANGELOG, and validated with full make ci.
 
+36. CanvasLayer generated APIs.
+   - Added selected generated `CanvasLayer` handle, casts, upcasts, layer,
+     visibility, transform, offset, rotation, scale, viewport-follow,
+     custom-viewport, and canvas RID methods. Exposed the selected surface
+     through `godot:godot`, added facade compile coverage, exercised concrete
+     runtime coverage in examples/game, updated generated reporting and
+     CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
