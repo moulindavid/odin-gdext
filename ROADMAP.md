@@ -288,6 +288,13 @@ These slices are complete and were validated with make ci when merged:
      runtime coverage in examples/game, updated generated reporting and
      CHANGELOG, and validated with full make ci.
 
+37. AudioListener2D generated APIs.
+   - Added selected generated `AudioListener2D` handle, casts, upcasts,
+     make-current, clear-current, and current-state methods. Exposed the
+     selected surface through `godot:godot`, added facade compile coverage,
+     exercised concrete runtime coverage in examples/game, updated generated
+     reporting and CHANGELOG, and validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

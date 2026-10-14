@@ -84,6 +84,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	timer: gt.Timer,
 	audio_stream_player: gt.AudioStreamPlayer,
 	audio_stream_player2d: gt.AudioStreamPlayer2D,
+	audio_listener2d: gt.AudioListener2D,
 	collision_object2d: gt.CollisionObject2D,
 	area2d: gt.Area2D,
 	physics_body2d: gt.PhysicsBody2D,
@@ -1377,6 +1378,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.theme_object_ptr(theme)
 	_ = gt.audio_stream_player_object_ptr(audio_stream_player)
 	_ = gt.audio_stream_player2d_object_ptr(audio_stream_player2d)
+	_ = gt.audio_listener2d_object_ptr(audio_listener2d)
 	_ = gt.packed_scene_object_ptr(packed_scene)
 	_ = gt.resource_loader_object_ptr(resource_loader)
 	_, _ = gt.object_ptr_try_as_ref_counted(gt.ref_counted_object_ptr(ref_counted))
@@ -1422,6 +1424,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_audio_stream_player2d(
 		gt.audio_stream_player2d_object_ptr(audio_stream_player2d),
 	)
+	_, _ = gt.object_ptr_try_as_audio_listener2d(gt.audio_listener2d_object_ptr(audio_listener2d))
 	_, _ = gt.object_ptr_try_as_collision_object2d(
 		gt.collision_object2d_object_ptr(collision_object2d),
 	)
@@ -1511,6 +1514,10 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.audio_stream_player_as_node(audio_stream_player)
 	_ = gt.audio_stream_player_as_object(audio_stream_player)
 	_ = gt.audio_stream_player2d_as_node2d(audio_stream_player2d)
+	_ = gt.audio_listener2d_as_node2d(audio_listener2d)
+	_ = gt.audio_listener2d_as_canvas_item(audio_listener2d)
+	_ = gt.audio_listener2d_as_node(audio_listener2d)
+	_ = gt.audio_listener2d_as_object(audio_listener2d)
 	_ = gt.audio_stream_player2d_as_canvas_item(audio_stream_player2d)
 	_ = gt.audio_stream_player2d_as_node(audio_stream_player2d)
 	_ = gt.audio_stream_player2d_as_object(audio_stream_player2d)
@@ -1530,6 +1537,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.theme_is_nil(theme)
 	_ = gt.audio_stream_player_is_nil(audio_stream_player)
 	_ = gt.audio_stream_player2d_is_nil(audio_stream_player2d)
+	_ = gt.audio_listener2d_is_nil(audio_listener2d)
 	_ = gt.collision_object2d_is_nil(collision_object2d)
 	_ = gt.area2d_is_nil(area2d)
 	_ = gt.physics_body2d_is_nil(physics_body2d)
@@ -2015,6 +2023,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.area2d_as_canvas_item(area2d)
 	_ = gt.area2d_as_node(area2d)
 	_ = gt.area2d_as_object(area2d)
+	gt.audio_listener2d_make_current(audio_listener2d)
+	_ = gt.audio_listener2d_is_current(audio_listener2d)
+	gt.audio_listener2d_clear_current(audio_listener2d)
 	gt.audio_stream_player2d_set_stream(audio_stream_player2d, audio_stream)
 	_ = gt.audio_stream_player2d_get_stream(audio_stream_player2d)
 	gt.audio_stream_player2d_set_volume_db(audio_stream_player2d, -6)
@@ -2218,6 +2229,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_theme(object)
 	_ = gt.object_is_audio_stream_player(object)
 	_, _ = gt.object_try_as_audio_stream_player(object)
+	_ = gt.object_is_audio_listener2d(object)
+	_, _ = gt.object_try_as_audio_listener2d(object)
 	_ = gt.object_is_audio_stream_player2d(object)
 	_, _ = gt.object_try_as_audio_stream_player2d(object)
 	_ = gt.object_is_collision_object2d(object)
@@ -2611,6 +2624,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.canvas_item_try_as_parallax2d(canvas_item)
 	_ = gt.canvas_item_is_label(canvas_item)
 	_, _ = gt.canvas_item_try_as_label(canvas_item)
+	_ = gt.canvas_item_is_audio_listener2d(canvas_item)
+	_, _ = gt.canvas_item_try_as_audio_listener2d(canvas_item)
 	_ = gt.canvas_item_is_audio_stream_player2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_audio_stream_player2d(canvas_item)
 	_ = gt.canvas_item_is_collision_object2d(canvas_item)
@@ -2633,6 +2648,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node2d_try_as_canvas_modulate(node2d)
 	_ = gt.node2d_is_parallax2d(node2d)
 	_, _ = gt.node2d_try_as_parallax2d(node2d)
+	_ = gt.node2d_is_audio_listener2d(node2d)
+	_, _ = gt.node2d_try_as_audio_listener2d(node2d)
 	_ = gt.node2d_is_audio_stream_player2d(node2d)
 	_, _ = gt.node2d_try_as_audio_stream_player2d(node2d)
 	_ = gt.node2d_is_collision_object2d(node2d)

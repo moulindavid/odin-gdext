@@ -215,6 +215,7 @@ Label :: gclass.Label
 Timer :: gclass.Timer
 AudioStreamPlayer :: gclass.AudioStreamPlayer
 AudioStreamPlayer2D :: gclass.AudioStreamPlayer2D
+AudioListener2D :: gclass.AudioListener2D
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PhysicsBody2D :: gclass.PhysicsBody2D
@@ -587,6 +588,13 @@ parallax2d_set_follow_viewport :: gclass.parallax2d_set_follow_viewport
 parallax2d_get_follow_viewport :: gclass.parallax2d_get_follow_viewport
 parallax2d_set_ignore_camera_scroll :: gclass.parallax2d_set_ignore_camera_scroll
 parallax2d_is_ignore_camera_scroll :: gclass.parallax2d_is_ignore_camera_scroll
+audio_listener2d_as_node2d :: gclass.audio_listener2d_as_node2d
+audio_listener2d_as_canvas_item :: gclass.audio_listener2d_as_canvas_item
+audio_listener2d_as_node :: gclass.audio_listener2d_as_node
+audio_listener2d_as_object :: gclass.audio_listener2d_as_object
+audio_listener2d_make_current :: gclass.audio_listener2d_make_current
+audio_listener2d_clear_current :: gclass.audio_listener2d_clear_current
+audio_listener2d_is_current :: gclass.audio_listener2d_is_current
 canvas_layer_as_node :: gclass.canvas_layer_as_node
 canvas_layer_as_object :: gclass.canvas_layer_as_object
 canvas_layer_set_layer :: gclass.canvas_layer_set_layer
@@ -1315,6 +1323,8 @@ object_is_style_box :: gclass.object_is_style_box
 object_try_as_style_box :: gclass.object_try_as_style_box
 object_is_font :: gclass.object_is_font
 object_try_as_font :: gclass.object_try_as_font
+object_is_audio_listener2d :: gclass.object_is_audio_listener2d
+object_try_as_audio_listener2d :: gclass.object_try_as_audio_listener2d
 object_is_canvas_layer :: gclass.object_is_canvas_layer
 object_try_as_canvas_layer :: gclass.object_try_as_canvas_layer
 object_is_polygon2d :: gclass.object_is_polygon2d
@@ -1589,6 +1599,8 @@ node_is_sprite2d :: gclass.node_is_sprite2d
 node_try_as_sprite2d :: gclass.node_try_as_sprite2d
 node_is_path2d :: gclass.node_is_path2d
 node_try_as_path2d :: gclass.node_try_as_path2d
+node_is_audio_listener2d :: gclass.node_is_audio_listener2d
+node_try_as_audio_listener2d :: gclass.node_try_as_audio_listener2d
 node_is_canvas_layer :: gclass.node_is_canvas_layer
 node_try_as_canvas_layer :: gclass.node_try_as_canvas_layer
 node_is_polygon2d :: gclass.node_is_polygon2d
@@ -1657,6 +1669,8 @@ canvas_item_is_sprite2d :: gclass.canvas_item_is_sprite2d
 canvas_item_try_as_sprite2d :: gclass.canvas_item_try_as_sprite2d
 canvas_item_is_path2d :: gclass.canvas_item_is_path2d
 canvas_item_try_as_path2d :: gclass.canvas_item_try_as_path2d
+canvas_item_is_audio_listener2d :: gclass.canvas_item_is_audio_listener2d
+canvas_item_try_as_audio_listener2d :: gclass.canvas_item_try_as_audio_listener2d
 canvas_item_is_polygon2d :: gclass.canvas_item_is_polygon2d
 canvas_item_try_as_polygon2d :: gclass.canvas_item_try_as_polygon2d
 canvas_item_is_line2d :: gclass.canvas_item_is_line2d
@@ -1708,6 +1722,8 @@ node2d_is_sprite2d :: gclass.node2d_is_sprite2d
 node2d_try_as_sprite2d :: gclass.node2d_try_as_sprite2d
 node2d_is_path2d :: gclass.node2d_is_path2d
 node2d_try_as_path2d :: gclass.node2d_try_as_path2d
+node2d_is_audio_listener2d :: gclass.node2d_is_audio_listener2d
+node2d_try_as_audio_listener2d :: gclass.node2d_try_as_audio_listener2d
 node2d_is_polygon2d :: gclass.node2d_is_polygon2d
 node2d_try_as_polygon2d :: gclass.node2d_try_as_polygon2d
 node2d_is_line2d :: gclass.node2d_is_line2d
@@ -2719,6 +2735,11 @@ capsule_shape2d_is_nil :: proc "contextless" (self: CapsuleShape2D) -> bool {ret
 curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
 	return ObjectPtr(self) == nil
 }
+
+audio_listener2d_is_nil :: proc "contextless" (self: AudioListener2D) -> bool {return(
+		ObjectPtr(self) ==
+		nil \
+	)}
 
 canvas_layer_is_nil :: proc "contextless" (self: CanvasLayer) -> bool {return(
 		ObjectPtr(self) ==
@@ -4184,6 +4205,10 @@ curve2d_object_ptr :: proc "contextless" (self: Curve2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+audio_listener2d_object_ptr :: proc "contextless" (
+	self: AudioListener2D,
+) -> ObjectPtr {return ObjectPtr(self)}
+
 canvas_layer_object_ptr :: proc "contextless" (self: CanvasLayer) -> ObjectPtr {return ObjectPtr(
 		self,
 	)}
@@ -4406,6 +4431,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_audio_listener2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: AudioListener2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_audio_listener2d(Object(self))
 }
 
 object_ptr_try_as_canvas_layer :: proc "contextless" (
