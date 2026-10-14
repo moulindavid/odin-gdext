@@ -1006,6 +1006,20 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 	}
 
 
+	audio_listener_object := gt.construct_object(audio_listener2d_class_name)
+	if audio_listener, audio_listener_ok := gt.object_ptr_try_as_audio_listener2d(
+		audio_listener_object,
+	); audio_listener_ok {
+		gt.audio_listener2d_make_current(audio_listener)
+		_ = gt.audio_listener2d_is_current(audio_listener)
+		gt.audio_listener2d_clear_current(audio_listener)
+		if !gt.node_add_child_checked(parent, gt.audio_listener2d_as_node(audio_listener)) {
+			_ = gt.object_destroy_checked(gt.audio_listener2d_object_ptr(audio_listener))
+		}
+	} else if audio_listener_object != nil {
+		_ = gt.object_destroy_checked(audio_listener_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1443,6 +1457,7 @@ texture_progress_bar_class_name_data: gt.ClassName
 style_box_class_name_data: gt.ClassName
 audio_stream_player_class_name_data: gt.ClassName
 audio_stream_player2d_class_name_data: gt.ClassName
+audio_listener2d_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name: gt.ConstStringNamePtr
 game_parent_name: gt.ConstStringNamePtr
@@ -1481,6 +1496,7 @@ texture_progress_bar_class_name: gt.ConstStringNamePtr
 style_box_class_name: gt.ConstStringNamePtr
 audio_stream_player_class_name: gt.ConstStringNamePtr
 audio_stream_player2d_class_name: gt.ConstStringNamePtr
+audio_listener2d_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
@@ -1744,6 +1760,7 @@ register_classes :: proc() {
 	style_box_class_name = gt.class_name_ptr(&style_box_class_name_data)
 	audio_stream_player_class_name = gt.class_name_ptr(&audio_stream_player_class_name_data)
 	audio_stream_player2d_class_name = gt.class_name_ptr(&audio_stream_player2d_class_name_data)
+	audio_listener2d_class_name = gt.class_name_ptr(&audio_listener2d_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
 
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
@@ -1815,6 +1832,10 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(
 		&audio_stream_player2d_class_name_data,
 		cstring("AudioStreamPlayer2D"),
+	)
+	gt.class_name_init_latin1_cstring(
+		&audio_listener2d_class_name_data,
+		cstring("AudioListener2D"),
 	)
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,

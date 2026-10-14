@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 73
+Max_Selected_Class_Count :: 74
 
 selected_class_names := []string {
 	"Object",
@@ -1026,6 +1026,7 @@ selected_class_names := []string {
 	"Polygon2D",
 	"Line2D",
 	"CanvasLayer",
+	"AudioListener2D",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1436,6 +1437,9 @@ selected_class_methods := []Selected_Class_Method {
 	{"CollisionPolygon2D", "get_one_way_collision_margin"},
 	{"CollisionPolygon2D", "set_one_way_collision_direction"},
 	{"CollisionPolygon2D", "get_one_way_collision_direction"},
+	{"AudioListener2D", "make_current"},
+	{"AudioListener2D", "clear_current"},
+	{"AudioListener2D", "is_current"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},
