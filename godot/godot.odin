@@ -218,6 +218,8 @@ AudioStreamPlayer2D :: gclass.AudioStreamPlayer2D
 AudioListener2D :: gclass.AudioListener2D
 RemoteTransform2D :: gclass.RemoteTransform2D
 NavigationLink2D :: gclass.NavigationLink2D
+Joint2D :: gclass.Joint2D
+PinJoint2D :: gclass.PinJoint2D
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PhysicsBody2D :: gclass.PhysicsBody2D
@@ -637,6 +639,38 @@ navigation_link2d_set_enter_cost :: gclass.navigation_link2d_set_enter_cost
 navigation_link2d_get_enter_cost :: gclass.navigation_link2d_get_enter_cost
 navigation_link2d_set_travel_cost :: gclass.navigation_link2d_set_travel_cost
 navigation_link2d_get_travel_cost :: gclass.navigation_link2d_get_travel_cost
+joint2d_as_node2d :: gclass.joint2d_as_node2d
+joint2d_as_canvas_item :: gclass.joint2d_as_canvas_item
+joint2d_as_node :: gclass.joint2d_as_node
+joint2d_as_object :: gclass.joint2d_as_object
+pin_joint2d_as_joint2d :: gclass.pin_joint2d_as_joint2d
+pin_joint2d_as_node2d :: gclass.pin_joint2d_as_node2d
+pin_joint2d_as_canvas_item :: gclass.pin_joint2d_as_canvas_item
+pin_joint2d_as_node :: gclass.pin_joint2d_as_node
+pin_joint2d_as_object :: gclass.pin_joint2d_as_object
+joint2d_is_pin_joint2d :: gclass.joint2d_is_pin_joint2d
+joint2d_try_as_pin_joint2d :: gclass.joint2d_try_as_pin_joint2d
+joint2d_set_node_a :: gclass.joint2d_set_node_a
+joint2d_get_node_a :: gclass.joint2d_get_node_a
+joint2d_set_node_b :: gclass.joint2d_set_node_b
+joint2d_get_node_b :: gclass.joint2d_get_node_b
+joint2d_set_bias :: gclass.joint2d_set_bias
+joint2d_get_bias :: gclass.joint2d_get_bias
+joint2d_set_exclude_nodes_from_collision :: gclass.joint2d_set_exclude_nodes_from_collision
+joint2d_get_exclude_nodes_from_collision :: gclass.joint2d_get_exclude_nodes_from_collision
+joint2d_get_rid :: gclass.joint2d_get_rid
+pin_joint2d_set_softness :: gclass.pin_joint2d_set_softness
+pin_joint2d_get_softness :: gclass.pin_joint2d_get_softness
+pin_joint2d_set_angular_limit_lower :: gclass.pin_joint2d_set_angular_limit_lower
+pin_joint2d_get_angular_limit_lower :: gclass.pin_joint2d_get_angular_limit_lower
+pin_joint2d_set_angular_limit_upper :: gclass.pin_joint2d_set_angular_limit_upper
+pin_joint2d_get_angular_limit_upper :: gclass.pin_joint2d_get_angular_limit_upper
+pin_joint2d_set_motor_target_velocity :: gclass.pin_joint2d_set_motor_target_velocity
+pin_joint2d_get_motor_target_velocity :: gclass.pin_joint2d_get_motor_target_velocity
+pin_joint2d_set_motor_enabled :: gclass.pin_joint2d_set_motor_enabled
+pin_joint2d_is_motor_enabled :: gclass.pin_joint2d_is_motor_enabled
+pin_joint2d_set_angular_limit_enabled :: gclass.pin_joint2d_set_angular_limit_enabled
+pin_joint2d_is_angular_limit_enabled :: gclass.pin_joint2d_is_angular_limit_enabled
 canvas_layer_as_node :: gclass.canvas_layer_as_node
 canvas_layer_as_object :: gclass.canvas_layer_as_object
 canvas_layer_set_layer :: gclass.canvas_layer_set_layer
@@ -1371,6 +1405,10 @@ object_is_remote_transform2d :: gclass.object_is_remote_transform2d
 object_try_as_remote_transform2d :: gclass.object_try_as_remote_transform2d
 object_is_navigation_link2d :: gclass.object_is_navigation_link2d
 object_try_as_navigation_link2d :: gclass.object_try_as_navigation_link2d
+object_is_joint2d :: gclass.object_is_joint2d
+object_try_as_joint2d :: gclass.object_try_as_joint2d
+object_is_pin_joint2d :: gclass.object_is_pin_joint2d
+object_try_as_pin_joint2d :: gclass.object_try_as_pin_joint2d
 object_is_canvas_layer :: gclass.object_is_canvas_layer
 object_try_as_canvas_layer :: gclass.object_try_as_canvas_layer
 object_is_polygon2d :: gclass.object_is_polygon2d
@@ -1651,6 +1689,10 @@ node_is_remote_transform2d :: gclass.node_is_remote_transform2d
 node_try_as_remote_transform2d :: gclass.node_try_as_remote_transform2d
 node_is_navigation_link2d :: gclass.node_is_navigation_link2d
 node_try_as_navigation_link2d :: gclass.node_try_as_navigation_link2d
+node_is_joint2d :: gclass.node_is_joint2d
+node_try_as_joint2d :: gclass.node_try_as_joint2d
+node_is_pin_joint2d :: gclass.node_is_pin_joint2d
+node_try_as_pin_joint2d :: gclass.node_try_as_pin_joint2d
 node_is_canvas_layer :: gclass.node_is_canvas_layer
 node_try_as_canvas_layer :: gclass.node_try_as_canvas_layer
 node_is_polygon2d :: gclass.node_is_polygon2d
@@ -1725,6 +1767,10 @@ canvas_item_is_remote_transform2d :: gclass.canvas_item_is_remote_transform2d
 canvas_item_try_as_remote_transform2d :: gclass.canvas_item_try_as_remote_transform2d
 canvas_item_is_navigation_link2d :: gclass.canvas_item_is_navigation_link2d
 canvas_item_try_as_navigation_link2d :: gclass.canvas_item_try_as_navigation_link2d
+canvas_item_is_joint2d :: gclass.canvas_item_is_joint2d
+canvas_item_try_as_joint2d :: gclass.canvas_item_try_as_joint2d
+canvas_item_is_pin_joint2d :: gclass.canvas_item_is_pin_joint2d
+canvas_item_try_as_pin_joint2d :: gclass.canvas_item_try_as_pin_joint2d
 canvas_item_is_polygon2d :: gclass.canvas_item_is_polygon2d
 canvas_item_try_as_polygon2d :: gclass.canvas_item_try_as_polygon2d
 canvas_item_is_line2d :: gclass.canvas_item_is_line2d
@@ -1782,6 +1828,10 @@ node2d_is_remote_transform2d :: gclass.node2d_is_remote_transform2d
 node2d_try_as_remote_transform2d :: gclass.node2d_try_as_remote_transform2d
 node2d_is_navigation_link2d :: gclass.node2d_is_navigation_link2d
 node2d_try_as_navigation_link2d :: gclass.node2d_try_as_navigation_link2d
+node2d_is_joint2d :: gclass.node2d_is_joint2d
+node2d_try_as_joint2d :: gclass.node2d_try_as_joint2d
+node2d_is_pin_joint2d :: gclass.node2d_is_pin_joint2d
+node2d_try_as_pin_joint2d :: gclass.node2d_try_as_pin_joint2d
 node2d_is_polygon2d :: gclass.node2d_is_polygon2d
 node2d_try_as_polygon2d :: gclass.node2d_try_as_polygon2d
 node2d_is_line2d :: gclass.node2d_is_line2d
@@ -2791,6 +2841,14 @@ capsule_shape2d_is_nil :: proc "contextless" (self: CapsuleShape2D) -> bool {ret
 	)}
 
 curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+joint2d_is_nil :: proc "contextless" (self: Joint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+pin_joint2d_is_nil :: proc "contextless" (self: PinJoint2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4271,6 +4329,14 @@ curve2d_object_ptr :: proc "contextless" (self: Curve2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+joint2d_object_ptr :: proc "contextless" (self: Joint2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+pin_joint2d_object_ptr :: proc "contextless" (self: PinJoint2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 navigation_link2d_object_ptr :: proc "contextless" (self: NavigationLink2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4515,6 +4581,21 @@ object_ptr_try_as_navigation_link2d :: proc "contextless" (
 ) {
 	if self == nil do return {}, false
 	return object_try_as_navigation_link2d(Object(self))
+}
+
+object_ptr_try_as_joint2d :: proc "contextless" (self: ObjectPtr) -> (value: Joint2D, ok: bool) {
+	if self == nil do return {}, false
+	return object_try_as_joint2d(Object(self))
+}
+
+object_ptr_try_as_pin_joint2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: PinJoint2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_pin_joint2d(Object(self))
 }
 
 object_ptr_try_as_remote_transform2d :: proc "contextless" (

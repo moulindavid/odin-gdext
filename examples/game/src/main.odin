@@ -1069,6 +1069,39 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(link_object)
 	}
 
+	// Keep the joint detached: attaching it without configured physics bodies
+	// causes missing-node warnings in Godot.
+	pin_joint_object := gt.construct_object(pin_joint2d_class_name)
+	if pin_joint, pin_joint_ok := gt.object_ptr_try_as_pin_joint2d(pin_joint_object);
+	   pin_joint_ok {
+		joint := gt.pin_joint2d_as_joint2d(pin_joint)
+		gt.joint2d_set_bias(joint, 0.2)
+		_ = gt.joint2d_get_bias(joint)
+		gt.joint2d_set_exclude_nodes_from_collision(joint, true)
+		_ = gt.joint2d_get_exclude_nodes_from_collision(joint)
+		path_a := gt.joint2d_get_node_a(joint)
+		gt.node_path_free(&path_a)
+		path_b := gt.joint2d_get_node_b(joint)
+		gt.node_path_free(&path_b)
+		joint_rid := gt.joint2d_get_rid(joint)
+		gt.rid_free(&joint_rid)
+		gt.pin_joint2d_set_softness(pin_joint, 0.2)
+		_ = gt.pin_joint2d_get_softness(pin_joint)
+		gt.pin_joint2d_set_angular_limit_lower(pin_joint, -0.5)
+		_ = gt.pin_joint2d_get_angular_limit_lower(pin_joint)
+		gt.pin_joint2d_set_angular_limit_upper(pin_joint, 0.5)
+		_ = gt.pin_joint2d_get_angular_limit_upper(pin_joint)
+		gt.pin_joint2d_set_motor_target_velocity(pin_joint, 1)
+		_ = gt.pin_joint2d_get_motor_target_velocity(pin_joint)
+		gt.pin_joint2d_set_motor_enabled(pin_joint, true)
+		_ = gt.pin_joint2d_is_motor_enabled(pin_joint)
+		gt.pin_joint2d_set_angular_limit_enabled(pin_joint, true)
+		_ = gt.pin_joint2d_is_angular_limit_enabled(pin_joint)
+		_ = gt.object_destroy_checked(gt.pin_joint2d_object_ptr(pin_joint))
+	} else if pin_joint_object != nil {
+		_ = gt.object_destroy_checked(pin_joint_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1509,6 +1542,7 @@ audio_stream_player2d_class_name_data: gt.ClassName
 audio_listener2d_class_name_data: gt.ClassName
 remote_transform2d_class_name_data: gt.ClassName
 navigation_link2d_class_name_data: gt.ClassName
+pin_joint2d_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name: gt.ConstStringNamePtr
 game_parent_name: gt.ConstStringNamePtr
@@ -1550,6 +1584,7 @@ audio_stream_player2d_class_name: gt.ConstStringNamePtr
 audio_listener2d_class_name: gt.ConstStringNamePtr
 remote_transform2d_class_name: gt.ConstStringNamePtr
 navigation_link2d_class_name: gt.ConstStringNamePtr
+pin_joint2d_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
@@ -1816,6 +1851,7 @@ register_classes :: proc() {
 	audio_listener2d_class_name = gt.class_name_ptr(&audio_listener2d_class_name_data)
 	remote_transform2d_class_name = gt.class_name_ptr(&remote_transform2d_class_name_data)
 	navigation_link2d_class_name = gt.class_name_ptr(&navigation_link2d_class_name_data)
+	pin_joint2d_class_name = gt.class_name_ptr(&pin_joint2d_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
 
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
@@ -1896,6 +1932,7 @@ register_classes :: proc() {
 		&remote_transform2d_class_name_data,
 		cstring("RemoteTransform2D"),
 	)
+	gt.class_name_init_latin1_cstring(&pin_joint2d_class_name_data, cstring("PinJoint2D"))
 	gt.class_name_init_latin1_cstring(
 		&navigation_link2d_class_name_data,
 		cstring("NavigationLink2D"),
