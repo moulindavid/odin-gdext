@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 74
+Max_Selected_Class_Count :: 75
 
 selected_class_names := []string {
 	"Object",
@@ -1027,6 +1027,7 @@ selected_class_names := []string {
 	"Line2D",
 	"CanvasLayer",
 	"AudioListener2D",
+	"RemoteTransform2D",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1440,6 +1441,17 @@ selected_class_methods := []Selected_Class_Method {
 	{"AudioListener2D", "make_current"},
 	{"AudioListener2D", "clear_current"},
 	{"AudioListener2D", "is_current"},
+	{"RemoteTransform2D", "set_remote_node"},
+	{"RemoteTransform2D", "get_remote_node"},
+	{"RemoteTransform2D", "force_update_cache"},
+	{"RemoteTransform2D", "set_use_global_coordinates"},
+	{"RemoteTransform2D", "get_use_global_coordinates"},
+	{"RemoteTransform2D", "set_update_position"},
+	{"RemoteTransform2D", "get_update_position"},
+	{"RemoteTransform2D", "set_update_rotation"},
+	{"RemoteTransform2D", "get_update_rotation"},
+	{"RemoteTransform2D", "set_update_scale"},
+	{"RemoteTransform2D", "get_update_scale"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},

@@ -216,6 +216,7 @@ Timer :: gclass.Timer
 AudioStreamPlayer :: gclass.AudioStreamPlayer
 AudioStreamPlayer2D :: gclass.AudioStreamPlayer2D
 AudioListener2D :: gclass.AudioListener2D
+RemoteTransform2D :: gclass.RemoteTransform2D
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PhysicsBody2D :: gclass.PhysicsBody2D
@@ -595,6 +596,23 @@ audio_listener2d_as_object :: gclass.audio_listener2d_as_object
 audio_listener2d_make_current :: gclass.audio_listener2d_make_current
 audio_listener2d_clear_current :: gclass.audio_listener2d_clear_current
 audio_listener2d_is_current :: gclass.audio_listener2d_is_current
+remote_transform2d_as_node2d :: gclass.remote_transform2d_as_node2d
+remote_transform2d_as_canvas_item :: gclass.remote_transform2d_as_canvas_item
+remote_transform2d_as_node :: gclass.remote_transform2d_as_node
+remote_transform2d_as_object :: gclass.remote_transform2d_as_object
+remote_transform2d_set_remote_node :: gclass.remote_transform2d_set_remote_node
+remote_transform2d_get_remote_node :: gclass.remote_transform2d_get_remote_node
+remote_transform2d_force_update_cache :: gclass.remote_transform2d_force_update_cache
+remote_transform2d_set_use_global_coordinates ::
+	gclass.remote_transform2d_set_use_global_coordinates
+remote_transform2d_get_use_global_coordinates ::
+	gclass.remote_transform2d_get_use_global_coordinates
+remote_transform2d_set_update_position :: gclass.remote_transform2d_set_update_position
+remote_transform2d_get_update_position :: gclass.remote_transform2d_get_update_position
+remote_transform2d_set_update_rotation :: gclass.remote_transform2d_set_update_rotation
+remote_transform2d_get_update_rotation :: gclass.remote_transform2d_get_update_rotation
+remote_transform2d_set_update_scale :: gclass.remote_transform2d_set_update_scale
+remote_transform2d_get_update_scale :: gclass.remote_transform2d_get_update_scale
 canvas_layer_as_node :: gclass.canvas_layer_as_node
 canvas_layer_as_object :: gclass.canvas_layer_as_object
 canvas_layer_set_layer :: gclass.canvas_layer_set_layer
@@ -1325,6 +1343,8 @@ object_is_font :: gclass.object_is_font
 object_try_as_font :: gclass.object_try_as_font
 object_is_audio_listener2d :: gclass.object_is_audio_listener2d
 object_try_as_audio_listener2d :: gclass.object_try_as_audio_listener2d
+object_is_remote_transform2d :: gclass.object_is_remote_transform2d
+object_try_as_remote_transform2d :: gclass.object_try_as_remote_transform2d
 object_is_canvas_layer :: gclass.object_is_canvas_layer
 object_try_as_canvas_layer :: gclass.object_try_as_canvas_layer
 object_is_polygon2d :: gclass.object_is_polygon2d
@@ -1601,6 +1621,8 @@ node_is_path2d :: gclass.node_is_path2d
 node_try_as_path2d :: gclass.node_try_as_path2d
 node_is_audio_listener2d :: gclass.node_is_audio_listener2d
 node_try_as_audio_listener2d :: gclass.node_try_as_audio_listener2d
+node_is_remote_transform2d :: gclass.node_is_remote_transform2d
+node_try_as_remote_transform2d :: gclass.node_try_as_remote_transform2d
 node_is_canvas_layer :: gclass.node_is_canvas_layer
 node_try_as_canvas_layer :: gclass.node_try_as_canvas_layer
 node_is_polygon2d :: gclass.node_is_polygon2d
@@ -1671,6 +1693,8 @@ canvas_item_is_path2d :: gclass.canvas_item_is_path2d
 canvas_item_try_as_path2d :: gclass.canvas_item_try_as_path2d
 canvas_item_is_audio_listener2d :: gclass.canvas_item_is_audio_listener2d
 canvas_item_try_as_audio_listener2d :: gclass.canvas_item_try_as_audio_listener2d
+canvas_item_is_remote_transform2d :: gclass.canvas_item_is_remote_transform2d
+canvas_item_try_as_remote_transform2d :: gclass.canvas_item_try_as_remote_transform2d
 canvas_item_is_polygon2d :: gclass.canvas_item_is_polygon2d
 canvas_item_try_as_polygon2d :: gclass.canvas_item_try_as_polygon2d
 canvas_item_is_line2d :: gclass.canvas_item_is_line2d
@@ -1724,6 +1748,8 @@ node2d_is_path2d :: gclass.node2d_is_path2d
 node2d_try_as_path2d :: gclass.node2d_try_as_path2d
 node2d_is_audio_listener2d :: gclass.node2d_is_audio_listener2d
 node2d_try_as_audio_listener2d :: gclass.node2d_try_as_audio_listener2d
+node2d_is_remote_transform2d :: gclass.node2d_is_remote_transform2d
+node2d_try_as_remote_transform2d :: gclass.node2d_try_as_remote_transform2d
 node2d_is_polygon2d :: gclass.node2d_is_polygon2d
 node2d_try_as_polygon2d :: gclass.node2d_try_as_polygon2d
 node2d_is_line2d :: gclass.node2d_is_line2d
@@ -2733,6 +2759,10 @@ capsule_shape2d_is_nil :: proc "contextless" (self: CapsuleShape2D) -> bool {ret
 	)}
 
 curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+remote_transform2d_is_nil :: proc "contextless" (self: RemoteTransform2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4205,6 +4235,10 @@ curve2d_object_ptr :: proc "contextless" (self: Curve2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+remote_transform2d_object_ptr :: proc "contextless" (self: RemoteTransform2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 audio_listener2d_object_ptr :: proc "contextless" (
 	self: AudioListener2D,
 ) -> ObjectPtr {return ObjectPtr(self)}
@@ -4431,6 +4465,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_remote_transform2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: RemoteTransform2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_remote_transform2d(Object(self))
 }
 
 object_ptr_try_as_audio_listener2d :: proc "contextless" (
