@@ -295,6 +295,13 @@ These slices are complete and were validated with make ci when merged:
      exercised concrete runtime coverage in examples/game, updated generated
      reporting and CHANGELOG, and validated with full make ci.
 
+38. RemoteTransform2D generated APIs.
+   - Added selected generated `RemoteTransform2D` handle, checked casts,
+     upcasts, remote NodePath and coordinate/update configuration methods.
+     Exposed the selected surface through `godot:godot`, added facade compile
+     coverage, and exercised target-free configuration in examples/game to
+     avoid missing-target warnings. Validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
