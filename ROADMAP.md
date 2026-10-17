@@ -308,6 +308,13 @@ These slices are complete and were validated with make ci when merged:
      Exposed the surface through `godot:godot`, added facade compile coverage,
      and exercised detached configuration in examples/game without navigation
      map warnings. Validated with full make ci.
+40. Joint2D and PinJoint2D generated APIs.
+   - Added selected generated `Joint2D` and `PinJoint2D` handles, checked
+     casts/upcasts, borrowed NodePath endpoints, bias, collision exclusion,
+     RID, softness, angular limits, and motor configuration. Exposed the
+     surface through `godot:godot`, added facade compile coverage, and
+     exercised a detached pin joint in examples/game without missing-body
+     warnings. Validated with full make ci.
 
 ## Current goal: Awaiting next generated API slice
 

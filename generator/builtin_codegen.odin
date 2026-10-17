@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 76
+Max_Selected_Class_Count :: 78
 
 selected_class_names := []string {
 	"Object",
@@ -1029,6 +1029,8 @@ selected_class_names := []string {
 	"AudioListener2D",
 	"RemoteTransform2D",
 	"NavigationLink2D",
+	"Joint2D",
+	"PinJoint2D",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1472,6 +1474,27 @@ selected_class_methods := []Selected_Class_Method {
 	{"NavigationLink2D", "get_enter_cost"},
 	{"NavigationLink2D", "set_travel_cost"},
 	{"NavigationLink2D", "get_travel_cost"},
+	{"Joint2D", "set_node_a"},
+	{"Joint2D", "get_node_a"},
+	{"Joint2D", "set_node_b"},
+	{"Joint2D", "get_node_b"},
+	{"Joint2D", "set_bias"},
+	{"Joint2D", "get_bias"},
+	{"Joint2D", "set_exclude_nodes_from_collision"},
+	{"Joint2D", "get_exclude_nodes_from_collision"},
+	{"Joint2D", "get_rid"},
+	{"PinJoint2D", "set_softness"},
+	{"PinJoint2D", "get_softness"},
+	{"PinJoint2D", "set_angular_limit_lower"},
+	{"PinJoint2D", "get_angular_limit_lower"},
+	{"PinJoint2D", "set_angular_limit_upper"},
+	{"PinJoint2D", "get_angular_limit_upper"},
+	{"PinJoint2D", "set_motor_target_velocity"},
+	{"PinJoint2D", "get_motor_target_velocity"},
+	{"PinJoint2D", "set_motor_enabled"},
+	{"PinJoint2D", "is_motor_enabled"},
+	{"PinJoint2D", "set_angular_limit_enabled"},
+	{"PinJoint2D", "is_angular_limit_enabled"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},
