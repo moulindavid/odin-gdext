@@ -220,6 +220,8 @@ RemoteTransform2D :: gclass.RemoteTransform2D
 NavigationLink2D :: gclass.NavigationLink2D
 Joint2D :: gclass.Joint2D
 PinJoint2D :: gclass.PinJoint2D
+DampedSpringJoint2D :: gclass.DampedSpringJoint2D
+GrooveJoint2D :: gclass.GrooveJoint2D
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PhysicsBody2D :: gclass.PhysicsBody2D
@@ -671,6 +673,32 @@ pin_joint2d_set_motor_enabled :: gclass.pin_joint2d_set_motor_enabled
 pin_joint2d_is_motor_enabled :: gclass.pin_joint2d_is_motor_enabled
 pin_joint2d_set_angular_limit_enabled :: gclass.pin_joint2d_set_angular_limit_enabled
 pin_joint2d_is_angular_limit_enabled :: gclass.pin_joint2d_is_angular_limit_enabled
+damped_spring_joint2d_as_joint2d :: gclass.damped_spring_joint2d_as_joint2d
+damped_spring_joint2d_as_node2d :: gclass.damped_spring_joint2d_as_node2d
+damped_spring_joint2d_as_canvas_item :: gclass.damped_spring_joint2d_as_canvas_item
+damped_spring_joint2d_as_node :: gclass.damped_spring_joint2d_as_node
+damped_spring_joint2d_as_object :: gclass.damped_spring_joint2d_as_object
+groove_joint2d_as_joint2d :: gclass.groove_joint2d_as_joint2d
+groove_joint2d_as_node2d :: gclass.groove_joint2d_as_node2d
+groove_joint2d_as_canvas_item :: gclass.groove_joint2d_as_canvas_item
+groove_joint2d_as_node :: gclass.groove_joint2d_as_node
+groove_joint2d_as_object :: gclass.groove_joint2d_as_object
+joint2d_is_damped_spring_joint2d :: gclass.joint2d_is_damped_spring_joint2d
+joint2d_try_as_damped_spring_joint2d :: gclass.joint2d_try_as_damped_spring_joint2d
+joint2d_is_groove_joint2d :: gclass.joint2d_is_groove_joint2d
+joint2d_try_as_groove_joint2d :: gclass.joint2d_try_as_groove_joint2d
+damped_spring_joint2d_set_length :: gclass.damped_spring_joint2d_set_length
+damped_spring_joint2d_get_length :: gclass.damped_spring_joint2d_get_length
+damped_spring_joint2d_set_rest_length :: gclass.damped_spring_joint2d_set_rest_length
+damped_spring_joint2d_get_rest_length :: gclass.damped_spring_joint2d_get_rest_length
+damped_spring_joint2d_set_stiffness :: gclass.damped_spring_joint2d_set_stiffness
+damped_spring_joint2d_get_stiffness :: gclass.damped_spring_joint2d_get_stiffness
+damped_spring_joint2d_set_damping :: gclass.damped_spring_joint2d_set_damping
+damped_spring_joint2d_get_damping :: gclass.damped_spring_joint2d_get_damping
+groove_joint2d_set_length :: gclass.groove_joint2d_set_length
+groove_joint2d_get_length :: gclass.groove_joint2d_get_length
+groove_joint2d_set_initial_offset :: gclass.groove_joint2d_set_initial_offset
+groove_joint2d_get_initial_offset :: gclass.groove_joint2d_get_initial_offset
 canvas_layer_as_node :: gclass.canvas_layer_as_node
 canvas_layer_as_object :: gclass.canvas_layer_as_object
 canvas_layer_set_layer :: gclass.canvas_layer_set_layer
@@ -1409,6 +1437,10 @@ object_is_joint2d :: gclass.object_is_joint2d
 object_try_as_joint2d :: gclass.object_try_as_joint2d
 object_is_pin_joint2d :: gclass.object_is_pin_joint2d
 object_try_as_pin_joint2d :: gclass.object_try_as_pin_joint2d
+object_is_damped_spring_joint2d :: gclass.object_is_damped_spring_joint2d
+object_try_as_damped_spring_joint2d :: gclass.object_try_as_damped_spring_joint2d
+object_is_groove_joint2d :: gclass.object_is_groove_joint2d
+object_try_as_groove_joint2d :: gclass.object_try_as_groove_joint2d
 object_is_canvas_layer :: gclass.object_is_canvas_layer
 object_try_as_canvas_layer :: gclass.object_try_as_canvas_layer
 object_is_polygon2d :: gclass.object_is_polygon2d
@@ -1693,6 +1725,10 @@ node_is_joint2d :: gclass.node_is_joint2d
 node_try_as_joint2d :: gclass.node_try_as_joint2d
 node_is_pin_joint2d :: gclass.node_is_pin_joint2d
 node_try_as_pin_joint2d :: gclass.node_try_as_pin_joint2d
+node_is_damped_spring_joint2d :: gclass.node_is_damped_spring_joint2d
+node_try_as_damped_spring_joint2d :: gclass.node_try_as_damped_spring_joint2d
+node_is_groove_joint2d :: gclass.node_is_groove_joint2d
+node_try_as_groove_joint2d :: gclass.node_try_as_groove_joint2d
 node_is_canvas_layer :: gclass.node_is_canvas_layer
 node_try_as_canvas_layer :: gclass.node_try_as_canvas_layer
 node_is_polygon2d :: gclass.node_is_polygon2d
@@ -1771,6 +1807,10 @@ canvas_item_is_joint2d :: gclass.canvas_item_is_joint2d
 canvas_item_try_as_joint2d :: gclass.canvas_item_try_as_joint2d
 canvas_item_is_pin_joint2d :: gclass.canvas_item_is_pin_joint2d
 canvas_item_try_as_pin_joint2d :: gclass.canvas_item_try_as_pin_joint2d
+canvas_item_is_damped_spring_joint2d :: gclass.canvas_item_is_damped_spring_joint2d
+canvas_item_try_as_damped_spring_joint2d :: gclass.canvas_item_try_as_damped_spring_joint2d
+canvas_item_is_groove_joint2d :: gclass.canvas_item_is_groove_joint2d
+canvas_item_try_as_groove_joint2d :: gclass.canvas_item_try_as_groove_joint2d
 canvas_item_is_polygon2d :: gclass.canvas_item_is_polygon2d
 canvas_item_try_as_polygon2d :: gclass.canvas_item_try_as_polygon2d
 canvas_item_is_line2d :: gclass.canvas_item_is_line2d
@@ -1832,6 +1872,10 @@ node2d_is_joint2d :: gclass.node2d_is_joint2d
 node2d_try_as_joint2d :: gclass.node2d_try_as_joint2d
 node2d_is_pin_joint2d :: gclass.node2d_is_pin_joint2d
 node2d_try_as_pin_joint2d :: gclass.node2d_try_as_pin_joint2d
+node2d_is_damped_spring_joint2d :: gclass.node2d_is_damped_spring_joint2d
+node2d_try_as_damped_spring_joint2d :: gclass.node2d_try_as_damped_spring_joint2d
+node2d_is_groove_joint2d :: gclass.node2d_is_groove_joint2d
+node2d_try_as_groove_joint2d :: gclass.node2d_try_as_groove_joint2d
 node2d_is_polygon2d :: gclass.node2d_is_polygon2d
 node2d_try_as_polygon2d :: gclass.node2d_try_as_polygon2d
 node2d_is_line2d :: gclass.node2d_is_line2d
@@ -2845,6 +2889,14 @@ curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
 }
 
 joint2d_is_nil :: proc "contextless" (self: Joint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+damped_spring_joint2d_is_nil :: proc "contextless" (self: DampedSpringJoint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+groove_joint2d_is_nil :: proc "contextless" (self: GrooveJoint2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4333,6 +4385,14 @@ joint2d_object_ptr :: proc "contextless" (self: Joint2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+damped_spring_joint2d_object_ptr :: proc "contextless" (self: DampedSpringJoint2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
+groove_joint2d_object_ptr :: proc "contextless" (self: GrooveJoint2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 pin_joint2d_object_ptr :: proc "contextless" (self: PinJoint2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4586,6 +4646,26 @@ object_ptr_try_as_navigation_link2d :: proc "contextless" (
 object_ptr_try_as_joint2d :: proc "contextless" (self: ObjectPtr) -> (value: Joint2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_joint2d(Object(self))
+}
+
+object_ptr_try_as_damped_spring_joint2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: DampedSpringJoint2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_damped_spring_joint2d(Object(self))
+}
+
+object_ptr_try_as_groove_joint2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: GrooveJoint2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_groove_joint2d(Object(self))
 }
 
 object_ptr_try_as_pin_joint2d :: proc "contextless" (

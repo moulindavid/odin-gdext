@@ -54,6 +54,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   compile coverage, and detached-node examples/game runtime coverage.
 - Added selected generated `Joint2D` and `PinJoint2D` APIs with public facade
   exports, compile coverage, and detached-node examples/game runtime coverage.
+- Added selected generated `DampedSpringJoint2D` and `GrooveJoint2D` APIs with
+  public facade exports, compile coverage, and detached-node runtime coverage.
 
 ## Completed roadmap slices
 
