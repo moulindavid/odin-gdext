@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 75
+Max_Selected_Class_Count :: 76
 
 selected_class_names := []string {
 	"Object",
@@ -1028,6 +1028,7 @@ selected_class_names := []string {
 	"CanvasLayer",
 	"AudioListener2D",
 	"RemoteTransform2D",
+	"NavigationLink2D",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1452,6 +1453,25 @@ selected_class_methods := []Selected_Class_Method {
 	{"RemoteTransform2D", "get_update_rotation"},
 	{"RemoteTransform2D", "set_update_scale"},
 	{"RemoteTransform2D", "get_update_scale"},
+	{"NavigationLink2D", "get_rid"},
+	{"NavigationLink2D", "set_enabled"},
+	{"NavigationLink2D", "is_enabled"},
+	{"NavigationLink2D", "set_navigation_map"},
+	{"NavigationLink2D", "get_navigation_map"},
+	{"NavigationLink2D", "set_bidirectional"},
+	{"NavigationLink2D", "is_bidirectional"},
+	{"NavigationLink2D", "set_navigation_layers"},
+	{"NavigationLink2D", "get_navigation_layers"},
+	{"NavigationLink2D", "set_navigation_layer_value"},
+	{"NavigationLink2D", "get_navigation_layer_value"},
+	{"NavigationLink2D", "set_start_position"},
+	{"NavigationLink2D", "get_start_position"},
+	{"NavigationLink2D", "set_end_position"},
+	{"NavigationLink2D", "get_end_position"},
+	{"NavigationLink2D", "set_enter_cost"},
+	{"NavigationLink2D", "get_enter_cost"},
+	{"NavigationLink2D", "set_travel_cost"},
+	{"NavigationLink2D", "get_travel_cost"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},

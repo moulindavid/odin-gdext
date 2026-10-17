@@ -50,6 +50,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   compile coverage, and examples/game runtime coverage.
 - Added selected generated `RemoteTransform2D` APIs with public facade exports,
   compile coverage, and warning-free examples/game runtime coverage.
+- Added selected generated `NavigationLink2D` APIs with public facade exports,
+  compile coverage, and detached-node examples/game runtime coverage.
 
 ## Completed roadmap slices
 

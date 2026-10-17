@@ -1043,6 +1043,32 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(remote_object)
 	}
 
+	// Configure the link while detached so the smoke test needs no navigation map.
+	link_object := gt.construct_object(navigation_link2d_class_name)
+	if link, link_ok := gt.object_ptr_try_as_navigation_link2d(link_object); link_ok {
+		gt.navigation_link2d_set_enabled(link, true)
+		_ = gt.navigation_link2d_is_enabled(link)
+		gt.navigation_link2d_set_bidirectional(link, false)
+		_ = gt.navigation_link2d_is_bidirectional(link)
+		gt.navigation_link2d_set_navigation_layers(link, 1)
+		_ = gt.navigation_link2d_get_navigation_layers(link)
+		gt.navigation_link2d_set_navigation_layer_value(link, 1, true)
+		_ = gt.navigation_link2d_get_navigation_layer_value(link, 1)
+		gt.navigation_link2d_set_start_position(link, {0, 0})
+		_ = gt.navigation_link2d_get_start_position(link)
+		gt.navigation_link2d_set_end_position(link, {16, 0})
+		_ = gt.navigation_link2d_get_end_position(link)
+		gt.navigation_link2d_set_enter_cost(link, 1.5)
+		_ = gt.navigation_link2d_get_enter_cost(link)
+		gt.navigation_link2d_set_travel_cost(link, 2)
+		_ = gt.navigation_link2d_get_travel_cost(link)
+		link_rid := gt.navigation_link2d_get_rid(link)
+		gt.rid_free(&link_rid)
+		_ = gt.object_destroy_checked(gt.navigation_link2d_object_ptr(link))
+	} else if link_object != nil {
+		_ = gt.object_destroy_checked(link_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1482,6 +1508,7 @@ audio_stream_player_class_name_data: gt.ClassName
 audio_stream_player2d_class_name_data: gt.ClassName
 audio_listener2d_class_name_data: gt.ClassName
 remote_transform2d_class_name_data: gt.ClassName
+navigation_link2d_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name: gt.ConstStringNamePtr
 game_parent_name: gt.ConstStringNamePtr
@@ -1522,6 +1549,7 @@ audio_stream_player_class_name: gt.ConstStringNamePtr
 audio_stream_player2d_class_name: gt.ConstStringNamePtr
 audio_listener2d_class_name: gt.ConstStringNamePtr
 remote_transform2d_class_name: gt.ConstStringNamePtr
+navigation_link2d_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
@@ -1787,6 +1815,7 @@ register_classes :: proc() {
 	audio_stream_player2d_class_name = gt.class_name_ptr(&audio_stream_player2d_class_name_data)
 	audio_listener2d_class_name = gt.class_name_ptr(&audio_listener2d_class_name_data)
 	remote_transform2d_class_name = gt.class_name_ptr(&remote_transform2d_class_name_data)
+	navigation_link2d_class_name = gt.class_name_ptr(&navigation_link2d_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
 
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
@@ -1866,6 +1895,10 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(
 		&remote_transform2d_class_name_data,
 		cstring("RemoteTransform2D"),
+	)
+	gt.class_name_init_latin1_cstring(
+		&navigation_link2d_class_name_data,
+		cstring("NavigationLink2D"),
 	)
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,

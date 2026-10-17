@@ -217,6 +217,7 @@ AudioStreamPlayer :: gclass.AudioStreamPlayer
 AudioStreamPlayer2D :: gclass.AudioStreamPlayer2D
 AudioListener2D :: gclass.AudioListener2D
 RemoteTransform2D :: gclass.RemoteTransform2D
+NavigationLink2D :: gclass.NavigationLink2D
 CollisionObject2D :: gclass.CollisionObject2D
 Area2D :: gclass.Area2D
 PhysicsBody2D :: gclass.PhysicsBody2D
@@ -613,6 +614,29 @@ remote_transform2d_set_update_rotation :: gclass.remote_transform2d_set_update_r
 remote_transform2d_get_update_rotation :: gclass.remote_transform2d_get_update_rotation
 remote_transform2d_set_update_scale :: gclass.remote_transform2d_set_update_scale
 remote_transform2d_get_update_scale :: gclass.remote_transform2d_get_update_scale
+navigation_link2d_as_node2d :: gclass.navigation_link2d_as_node2d
+navigation_link2d_as_canvas_item :: gclass.navigation_link2d_as_canvas_item
+navigation_link2d_as_node :: gclass.navigation_link2d_as_node
+navigation_link2d_as_object :: gclass.navigation_link2d_as_object
+navigation_link2d_get_rid :: gclass.navigation_link2d_get_rid
+navigation_link2d_set_enabled :: gclass.navigation_link2d_set_enabled
+navigation_link2d_is_enabled :: gclass.navigation_link2d_is_enabled
+navigation_link2d_set_navigation_map :: gclass.navigation_link2d_set_navigation_map
+navigation_link2d_get_navigation_map :: gclass.navigation_link2d_get_navigation_map
+navigation_link2d_set_bidirectional :: gclass.navigation_link2d_set_bidirectional
+navigation_link2d_is_bidirectional :: gclass.navigation_link2d_is_bidirectional
+navigation_link2d_set_navigation_layers :: gclass.navigation_link2d_set_navigation_layers
+navigation_link2d_get_navigation_layers :: gclass.navigation_link2d_get_navigation_layers
+navigation_link2d_set_navigation_layer_value :: gclass.navigation_link2d_set_navigation_layer_value
+navigation_link2d_get_navigation_layer_value :: gclass.navigation_link2d_get_navigation_layer_value
+navigation_link2d_set_start_position :: gclass.navigation_link2d_set_start_position
+navigation_link2d_get_start_position :: gclass.navigation_link2d_get_start_position
+navigation_link2d_set_end_position :: gclass.navigation_link2d_set_end_position
+navigation_link2d_get_end_position :: gclass.navigation_link2d_get_end_position
+navigation_link2d_set_enter_cost :: gclass.navigation_link2d_set_enter_cost
+navigation_link2d_get_enter_cost :: gclass.navigation_link2d_get_enter_cost
+navigation_link2d_set_travel_cost :: gclass.navigation_link2d_set_travel_cost
+navigation_link2d_get_travel_cost :: gclass.navigation_link2d_get_travel_cost
 canvas_layer_as_node :: gclass.canvas_layer_as_node
 canvas_layer_as_object :: gclass.canvas_layer_as_object
 canvas_layer_set_layer :: gclass.canvas_layer_set_layer
@@ -1345,6 +1369,8 @@ object_is_audio_listener2d :: gclass.object_is_audio_listener2d
 object_try_as_audio_listener2d :: gclass.object_try_as_audio_listener2d
 object_is_remote_transform2d :: gclass.object_is_remote_transform2d
 object_try_as_remote_transform2d :: gclass.object_try_as_remote_transform2d
+object_is_navigation_link2d :: gclass.object_is_navigation_link2d
+object_try_as_navigation_link2d :: gclass.object_try_as_navigation_link2d
 object_is_canvas_layer :: gclass.object_is_canvas_layer
 object_try_as_canvas_layer :: gclass.object_try_as_canvas_layer
 object_is_polygon2d :: gclass.object_is_polygon2d
@@ -1623,6 +1649,8 @@ node_is_audio_listener2d :: gclass.node_is_audio_listener2d
 node_try_as_audio_listener2d :: gclass.node_try_as_audio_listener2d
 node_is_remote_transform2d :: gclass.node_is_remote_transform2d
 node_try_as_remote_transform2d :: gclass.node_try_as_remote_transform2d
+node_is_navigation_link2d :: gclass.node_is_navigation_link2d
+node_try_as_navigation_link2d :: gclass.node_try_as_navigation_link2d
 node_is_canvas_layer :: gclass.node_is_canvas_layer
 node_try_as_canvas_layer :: gclass.node_try_as_canvas_layer
 node_is_polygon2d :: gclass.node_is_polygon2d
@@ -1695,6 +1723,8 @@ canvas_item_is_audio_listener2d :: gclass.canvas_item_is_audio_listener2d
 canvas_item_try_as_audio_listener2d :: gclass.canvas_item_try_as_audio_listener2d
 canvas_item_is_remote_transform2d :: gclass.canvas_item_is_remote_transform2d
 canvas_item_try_as_remote_transform2d :: gclass.canvas_item_try_as_remote_transform2d
+canvas_item_is_navigation_link2d :: gclass.canvas_item_is_navigation_link2d
+canvas_item_try_as_navigation_link2d :: gclass.canvas_item_try_as_navigation_link2d
 canvas_item_is_polygon2d :: gclass.canvas_item_is_polygon2d
 canvas_item_try_as_polygon2d :: gclass.canvas_item_try_as_polygon2d
 canvas_item_is_line2d :: gclass.canvas_item_is_line2d
@@ -1750,6 +1780,8 @@ node2d_is_audio_listener2d :: gclass.node2d_is_audio_listener2d
 node2d_try_as_audio_listener2d :: gclass.node2d_try_as_audio_listener2d
 node2d_is_remote_transform2d :: gclass.node2d_is_remote_transform2d
 node2d_try_as_remote_transform2d :: gclass.node2d_try_as_remote_transform2d
+node2d_is_navigation_link2d :: gclass.node2d_is_navigation_link2d
+node2d_try_as_navigation_link2d :: gclass.node2d_try_as_navigation_link2d
 node2d_is_polygon2d :: gclass.node2d_is_polygon2d
 node2d_try_as_polygon2d :: gclass.node2d_try_as_polygon2d
 node2d_is_line2d :: gclass.node2d_is_line2d
@@ -2759,6 +2791,10 @@ capsule_shape2d_is_nil :: proc "contextless" (self: CapsuleShape2D) -> bool {ret
 	)}
 
 curve2d_is_nil :: proc "contextless" (self: Curve2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+navigation_link2d_is_nil :: proc "contextless" (self: NavigationLink2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4235,6 +4271,10 @@ curve2d_object_ptr :: proc "contextless" (self: Curve2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+navigation_link2d_object_ptr :: proc "contextless" (self: NavigationLink2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 remote_transform2d_object_ptr :: proc "contextless" (self: RemoteTransform2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4465,6 +4505,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_navigation_link2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: NavigationLink2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_navigation_link2d(Object(self))
 }
 
 object_ptr_try_as_remote_transform2d :: proc "contextless" (
