@@ -302,6 +302,13 @@ These slices are complete and were validated with make ci when merged:
      coverage, and exercised target-free configuration in examples/game to
      avoid missing-target warnings. Validated with full make ci.
 
+39. NavigationLink2D generated APIs.
+   - Added the `NavigationLink2D` handle, checked casts/upcasts, RID, enabled,
+     bidirectional, navigation map/layers, local endpoints, and cost methods.
+     Exposed the surface through `godot:godot`, added facade compile coverage,
+     and exercised detached configuration in examples/game without navigation
+     map warnings. Validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
