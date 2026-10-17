@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 78
+Max_Selected_Class_Count :: 80
 
 selected_class_names := []string {
 	"Object",
@@ -1031,6 +1031,8 @@ selected_class_names := []string {
 	"NavigationLink2D",
 	"Joint2D",
 	"PinJoint2D",
+	"DampedSpringJoint2D",
+	"GrooveJoint2D",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1495,6 +1497,18 @@ selected_class_methods := []Selected_Class_Method {
 	{"PinJoint2D", "is_motor_enabled"},
 	{"PinJoint2D", "set_angular_limit_enabled"},
 	{"PinJoint2D", "is_angular_limit_enabled"},
+	{"DampedSpringJoint2D", "set_length"},
+	{"DampedSpringJoint2D", "get_length"},
+	{"DampedSpringJoint2D", "set_rest_length"},
+	{"DampedSpringJoint2D", "get_rest_length"},
+	{"DampedSpringJoint2D", "set_stiffness"},
+	{"DampedSpringJoint2D", "get_stiffness"},
+	{"DampedSpringJoint2D", "set_damping"},
+	{"DampedSpringJoint2D", "get_damping"},
+	{"GrooveJoint2D", "set_length"},
+	{"GrooveJoint2D", "get_length"},
+	{"GrooveJoint2D", "set_initial_offset"},
+	{"GrooveJoint2D", "get_initial_offset"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},

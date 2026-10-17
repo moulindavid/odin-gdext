@@ -1102,6 +1102,34 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(pin_joint_object)
 	}
 
+	// Joint subclasses can be configured without attaching missing bodies.
+	spring_object := gt.construct_object(damped_spring_joint2d_class_name)
+	if spring, spring_ok := gt.object_ptr_try_as_damped_spring_joint2d(spring_object); spring_ok {
+		gt.damped_spring_joint2d_set_length(spring, 32)
+		_ = gt.damped_spring_joint2d_get_length(spring)
+		gt.damped_spring_joint2d_set_rest_length(spring, 16)
+		_ = gt.damped_spring_joint2d_get_rest_length(spring)
+		gt.damped_spring_joint2d_set_stiffness(spring, 20)
+		_ = gt.damped_spring_joint2d_get_stiffness(spring)
+		gt.damped_spring_joint2d_set_damping(spring, 1)
+		_ = gt.damped_spring_joint2d_get_damping(spring)
+		_ = gt.joint2d_is_damped_spring_joint2d(gt.damped_spring_joint2d_as_joint2d(spring))
+		_ = gt.object_destroy_checked(gt.damped_spring_joint2d_object_ptr(spring))
+	} else if spring_object != nil {
+		_ = gt.object_destroy_checked(spring_object)
+	}
+	groove_object := gt.construct_object(groove_joint2d_class_name)
+	if groove, groove_ok := gt.object_ptr_try_as_groove_joint2d(groove_object); groove_ok {
+		gt.groove_joint2d_set_length(groove, 32)
+		_ = gt.groove_joint2d_get_length(groove)
+		gt.groove_joint2d_set_initial_offset(groove, 8)
+		_ = gt.groove_joint2d_get_initial_offset(groove)
+		_ = gt.joint2d_is_groove_joint2d(gt.groove_joint2d_as_joint2d(groove))
+		_ = gt.object_destroy_checked(gt.groove_joint2d_object_ptr(groove))
+	} else if groove_object != nil {
+		_ = gt.object_destroy_checked(groove_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1543,6 +1571,8 @@ audio_listener2d_class_name_data: gt.ClassName
 remote_transform2d_class_name_data: gt.ClassName
 navigation_link2d_class_name_data: gt.ClassName
 pin_joint2d_class_name_data: gt.ClassName
+damped_spring_joint2d_class_name_data: gt.ClassName
+groove_joint2d_class_name_data: gt.ClassName
 animation_player_class_name_data: gt.ClassName
 game_class_name: gt.ConstStringNamePtr
 game_parent_name: gt.ConstStringNamePtr
@@ -1585,6 +1615,8 @@ audio_listener2d_class_name: gt.ConstStringNamePtr
 remote_transform2d_class_name: gt.ConstStringNamePtr
 navigation_link2d_class_name: gt.ConstStringNamePtr
 pin_joint2d_class_name: gt.ConstStringNamePtr
+damped_spring_joint2d_class_name: gt.ConstStringNamePtr
+groove_joint2d_class_name: gt.ConstStringNamePtr
 animation_player_class_name: gt.ConstStringNamePtr
 
 empty_name_data: gt.StaticStringName
@@ -1852,6 +1884,8 @@ register_classes :: proc() {
 	remote_transform2d_class_name = gt.class_name_ptr(&remote_transform2d_class_name_data)
 	navigation_link2d_class_name = gt.class_name_ptr(&navigation_link2d_class_name_data)
 	pin_joint2d_class_name = gt.class_name_ptr(&pin_joint2d_class_name_data)
+	damped_spring_joint2d_class_name = gt.class_name_ptr(&damped_spring_joint2d_class_name_data)
+	groove_joint2d_class_name = gt.class_name_ptr(&groove_joint2d_class_name_data)
 	animation_player_class_name = gt.class_name_ptr(&animation_player_class_name_data)
 
 	gt.class_name_init_latin1_cstring(&game_name_data, cstring("GameBrain"))
@@ -1933,6 +1967,11 @@ register_classes :: proc() {
 		cstring("RemoteTransform2D"),
 	)
 	gt.class_name_init_latin1_cstring(&pin_joint2d_class_name_data, cstring("PinJoint2D"))
+	gt.class_name_init_latin1_cstring(
+		&damped_spring_joint2d_class_name_data,
+		cstring("DampedSpringJoint2D"),
+	)
+	gt.class_name_init_latin1_cstring(&groove_joint2d_class_name_data, cstring("GrooveJoint2D"))
 	gt.class_name_init_latin1_cstring(
 		&navigation_link2d_class_name_data,
 		cstring("NavigationLink2D"),
