@@ -324,6 +324,14 @@ These slices are complete and were validated with make ci when merged:
      coverage, and exercised detached-node configuration in examples/game
      without missing-body warnings. Validated with full make ci.
 
+42. NavigationObstacle2D generated APIs.
+   - Added its handle, checked casts/upcasts, RID, avoidance configuration,
+     navigation map/layers, radius, velocity, packed polygon vertices, and
+     navigation mesh/carving switches. Exposed the selected surface through
+     `godot:godot`, added facade compile coverage, and exercised a detached
+     obstacle in examples/game without navigation warnings. Validated with
+     full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

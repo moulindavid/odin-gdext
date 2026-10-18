@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 80
+Max_Selected_Class_Count :: 81
 
 selected_class_names := []string {
 	"Object",
@@ -1033,6 +1033,7 @@ selected_class_names := []string {
 	"PinJoint2D",
 	"DampedSpringJoint2D",
 	"GrooveJoint2D",
+	"NavigationObstacle2D",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1509,6 +1510,25 @@ selected_class_methods := []Selected_Class_Method {
 	{"GrooveJoint2D", "get_length"},
 	{"GrooveJoint2D", "set_initial_offset"},
 	{"GrooveJoint2D", "get_initial_offset"},
+	{"NavigationObstacle2D", "get_rid"},
+	{"NavigationObstacle2D", "set_avoidance_enabled"},
+	{"NavigationObstacle2D", "get_avoidance_enabled"},
+	{"NavigationObstacle2D", "set_navigation_map"},
+	{"NavigationObstacle2D", "get_navigation_map"},
+	{"NavigationObstacle2D", "set_radius"},
+	{"NavigationObstacle2D", "get_radius"},
+	{"NavigationObstacle2D", "set_velocity"},
+	{"NavigationObstacle2D", "get_velocity"},
+	{"NavigationObstacle2D", "set_vertices"},
+	{"NavigationObstacle2D", "get_vertices"},
+	{"NavigationObstacle2D", "set_avoidance_layers"},
+	{"NavigationObstacle2D", "get_avoidance_layers"},
+	{"NavigationObstacle2D", "set_avoidance_layer_value"},
+	{"NavigationObstacle2D", "get_avoidance_layer_value"},
+	{"NavigationObstacle2D", "set_affect_navigation_mesh"},
+	{"NavigationObstacle2D", "get_affect_navigation_mesh"},
+	{"NavigationObstacle2D", "set_carve_navigation_mesh"},
+	{"NavigationObstacle2D", "get_carve_navigation_mesh"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},

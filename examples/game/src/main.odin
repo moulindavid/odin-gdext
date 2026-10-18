@@ -1130,6 +1130,40 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(groove_object)
 	}
 
+	// Configure the obstacle without attaching it to a navigation map.
+	obstacle_object := gt.construct_object(navigation_obstacle2d_class_name)
+	if obstacle, obstacle_ok := gt.object_ptr_try_as_navigation_obstacle2d(obstacle_object);
+	   obstacle_ok {
+		gt.navigation_obstacle2d_set_avoidance_enabled(obstacle, true)
+		_ = gt.navigation_obstacle2d_get_avoidance_enabled(obstacle)
+		gt.navigation_obstacle2d_set_radius(obstacle, 8)
+		_ = gt.navigation_obstacle2d_get_radius(obstacle)
+		gt.navigation_obstacle2d_set_velocity(obstacle, {1, 0})
+		_ = gt.navigation_obstacle2d_get_velocity(obstacle)
+		vertices := gt.packed_vector2_array_new()
+		gt.packed_vector2_array_push(&vertices, {-8, -8})
+		gt.packed_vector2_array_push(&vertices, {8, -8})
+		gt.packed_vector2_array_push(&vertices, {0, 8})
+		gt.navigation_obstacle2d_set_vertices(obstacle, &vertices)
+		gt.packed_vector2_array_free(&vertices)
+		returned_vertices := gt.navigation_obstacle2d_get_vertices(obstacle)
+		_ = gt.packed_vector2_array_size(&returned_vertices)
+		gt.packed_vector2_array_free(&returned_vertices)
+		gt.navigation_obstacle2d_set_avoidance_layers(obstacle, 1)
+		_ = gt.navigation_obstacle2d_get_avoidance_layers(obstacle)
+		gt.navigation_obstacle2d_set_avoidance_layer_value(obstacle, 1, true)
+		_ = gt.navigation_obstacle2d_get_avoidance_layer_value(obstacle, 1)
+		gt.navigation_obstacle2d_set_affect_navigation_mesh(obstacle, false)
+		_ = gt.navigation_obstacle2d_get_affect_navigation_mesh(obstacle)
+		gt.navigation_obstacle2d_set_carve_navigation_mesh(obstacle, false)
+		_ = gt.navigation_obstacle2d_get_carve_navigation_mesh(obstacle)
+		obstacle_rid := gt.navigation_obstacle2d_get_rid(obstacle)
+		gt.rid_free(&obstacle_rid)
+		_ = gt.object_destroy_checked(gt.navigation_obstacle2d_object_ptr(obstacle))
+	} else if obstacle_object != nil {
+		_ = gt.object_destroy_checked(obstacle_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1570,6 +1604,7 @@ audio_stream_player2d_class_name_data: gt.ClassName
 audio_listener2d_class_name_data: gt.ClassName
 remote_transform2d_class_name_data: gt.ClassName
 navigation_link2d_class_name_data: gt.ClassName
+navigation_obstacle2d_class_name_data: gt.ClassName
 pin_joint2d_class_name_data: gt.ClassName
 damped_spring_joint2d_class_name_data: gt.ClassName
 groove_joint2d_class_name_data: gt.ClassName
@@ -1614,6 +1649,7 @@ audio_stream_player2d_class_name: gt.ConstStringNamePtr
 audio_listener2d_class_name: gt.ConstStringNamePtr
 remote_transform2d_class_name: gt.ConstStringNamePtr
 navigation_link2d_class_name: gt.ConstStringNamePtr
+navigation_obstacle2d_class_name: gt.ConstStringNamePtr
 pin_joint2d_class_name: gt.ConstStringNamePtr
 damped_spring_joint2d_class_name: gt.ConstStringNamePtr
 groove_joint2d_class_name: gt.ConstStringNamePtr
@@ -1883,6 +1919,7 @@ register_classes :: proc() {
 	audio_listener2d_class_name = gt.class_name_ptr(&audio_listener2d_class_name_data)
 	remote_transform2d_class_name = gt.class_name_ptr(&remote_transform2d_class_name_data)
 	navigation_link2d_class_name = gt.class_name_ptr(&navigation_link2d_class_name_data)
+	navigation_obstacle2d_class_name = gt.class_name_ptr(&navigation_obstacle2d_class_name_data)
 	pin_joint2d_class_name = gt.class_name_ptr(&pin_joint2d_class_name_data)
 	damped_spring_joint2d_class_name = gt.class_name_ptr(&damped_spring_joint2d_class_name_data)
 	groove_joint2d_class_name = gt.class_name_ptr(&groove_joint2d_class_name_data)
@@ -1975,6 +2012,10 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(
 		&navigation_link2d_class_name_data,
 		cstring("NavigationLink2D"),
+	)
+	gt.class_name_init_latin1_cstring(
+		&navigation_obstacle2d_class_name_data,
+		cstring("NavigationObstacle2D"),
 	)
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,
