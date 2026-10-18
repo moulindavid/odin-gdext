@@ -218,6 +218,7 @@ AudioStreamPlayer2D :: gclass.AudioStreamPlayer2D
 AudioListener2D :: gclass.AudioListener2D
 RemoteTransform2D :: gclass.RemoteTransform2D
 NavigationLink2D :: gclass.NavigationLink2D
+NavigationObstacle2D :: gclass.NavigationObstacle2D
 Joint2D :: gclass.Joint2D
 PinJoint2D :: gclass.PinJoint2D
 DampedSpringJoint2D :: gclass.DampedSpringJoint2D
@@ -641,6 +642,35 @@ navigation_link2d_set_enter_cost :: gclass.navigation_link2d_set_enter_cost
 navigation_link2d_get_enter_cost :: gclass.navigation_link2d_get_enter_cost
 navigation_link2d_set_travel_cost :: gclass.navigation_link2d_set_travel_cost
 navigation_link2d_get_travel_cost :: gclass.navigation_link2d_get_travel_cost
+navigation_obstacle2d_as_node2d :: gclass.navigation_obstacle2d_as_node2d
+navigation_obstacle2d_as_canvas_item :: gclass.navigation_obstacle2d_as_canvas_item
+navigation_obstacle2d_as_node :: gclass.navigation_obstacle2d_as_node
+navigation_obstacle2d_as_object :: gclass.navigation_obstacle2d_as_object
+navigation_obstacle2d_get_rid :: gclass.navigation_obstacle2d_get_rid
+navigation_obstacle2d_set_avoidance_enabled :: gclass.navigation_obstacle2d_set_avoidance_enabled
+navigation_obstacle2d_get_avoidance_enabled :: gclass.navigation_obstacle2d_get_avoidance_enabled
+navigation_obstacle2d_set_navigation_map :: gclass.navigation_obstacle2d_set_navigation_map
+navigation_obstacle2d_get_navigation_map :: gclass.navigation_obstacle2d_get_navigation_map
+navigation_obstacle2d_set_radius :: gclass.navigation_obstacle2d_set_radius
+navigation_obstacle2d_get_radius :: gclass.navigation_obstacle2d_get_radius
+navigation_obstacle2d_set_velocity :: gclass.navigation_obstacle2d_set_velocity
+navigation_obstacle2d_get_velocity :: gclass.navigation_obstacle2d_get_velocity
+navigation_obstacle2d_set_vertices :: gclass.navigation_obstacle2d_set_vertices
+navigation_obstacle2d_get_vertices :: gclass.navigation_obstacle2d_get_vertices
+navigation_obstacle2d_set_avoidance_layers :: gclass.navigation_obstacle2d_set_avoidance_layers
+navigation_obstacle2d_get_avoidance_layers :: gclass.navigation_obstacle2d_get_avoidance_layers
+navigation_obstacle2d_set_avoidance_layer_value ::
+	gclass.navigation_obstacle2d_set_avoidance_layer_value
+navigation_obstacle2d_get_avoidance_layer_value ::
+	gclass.navigation_obstacle2d_get_avoidance_layer_value
+navigation_obstacle2d_set_affect_navigation_mesh ::
+	gclass.navigation_obstacle2d_set_affect_navigation_mesh
+navigation_obstacle2d_get_affect_navigation_mesh ::
+	gclass.navigation_obstacle2d_get_affect_navigation_mesh
+navigation_obstacle2d_set_carve_navigation_mesh ::
+	gclass.navigation_obstacle2d_set_carve_navigation_mesh
+navigation_obstacle2d_get_carve_navigation_mesh ::
+	gclass.navigation_obstacle2d_get_carve_navigation_mesh
 joint2d_as_node2d :: gclass.joint2d_as_node2d
 joint2d_as_canvas_item :: gclass.joint2d_as_canvas_item
 joint2d_as_node :: gclass.joint2d_as_node
@@ -1433,6 +1463,8 @@ object_is_remote_transform2d :: gclass.object_is_remote_transform2d
 object_try_as_remote_transform2d :: gclass.object_try_as_remote_transform2d
 object_is_navigation_link2d :: gclass.object_is_navigation_link2d
 object_try_as_navigation_link2d :: gclass.object_try_as_navigation_link2d
+object_is_navigation_obstacle2d :: gclass.object_is_navigation_obstacle2d
+object_try_as_navigation_obstacle2d :: gclass.object_try_as_navigation_obstacle2d
 object_is_joint2d :: gclass.object_is_joint2d
 object_try_as_joint2d :: gclass.object_try_as_joint2d
 object_is_pin_joint2d :: gclass.object_is_pin_joint2d
@@ -1721,6 +1753,8 @@ node_is_remote_transform2d :: gclass.node_is_remote_transform2d
 node_try_as_remote_transform2d :: gclass.node_try_as_remote_transform2d
 node_is_navigation_link2d :: gclass.node_is_navigation_link2d
 node_try_as_navigation_link2d :: gclass.node_try_as_navigation_link2d
+node_is_navigation_obstacle2d :: gclass.node_is_navigation_obstacle2d
+node_try_as_navigation_obstacle2d :: gclass.node_try_as_navigation_obstacle2d
 node_is_joint2d :: gclass.node_is_joint2d
 node_try_as_joint2d :: gclass.node_try_as_joint2d
 node_is_pin_joint2d :: gclass.node_is_pin_joint2d
@@ -1803,6 +1837,8 @@ canvas_item_is_remote_transform2d :: gclass.canvas_item_is_remote_transform2d
 canvas_item_try_as_remote_transform2d :: gclass.canvas_item_try_as_remote_transform2d
 canvas_item_is_navigation_link2d :: gclass.canvas_item_is_navigation_link2d
 canvas_item_try_as_navigation_link2d :: gclass.canvas_item_try_as_navigation_link2d
+canvas_item_is_navigation_obstacle2d :: gclass.canvas_item_is_navigation_obstacle2d
+canvas_item_try_as_navigation_obstacle2d :: gclass.canvas_item_try_as_navigation_obstacle2d
 canvas_item_is_joint2d :: gclass.canvas_item_is_joint2d
 canvas_item_try_as_joint2d :: gclass.canvas_item_try_as_joint2d
 canvas_item_is_pin_joint2d :: gclass.canvas_item_is_pin_joint2d
@@ -1868,6 +1904,8 @@ node2d_is_remote_transform2d :: gclass.node2d_is_remote_transform2d
 node2d_try_as_remote_transform2d :: gclass.node2d_try_as_remote_transform2d
 node2d_is_navigation_link2d :: gclass.node2d_is_navigation_link2d
 node2d_try_as_navigation_link2d :: gclass.node2d_try_as_navigation_link2d
+node2d_is_navigation_obstacle2d :: gclass.node2d_is_navigation_obstacle2d
+node2d_try_as_navigation_obstacle2d :: gclass.node2d_try_as_navigation_obstacle2d
 node2d_is_joint2d :: gclass.node2d_is_joint2d
 node2d_try_as_joint2d :: gclass.node2d_try_as_joint2d
 node2d_is_pin_joint2d :: gclass.node2d_is_pin_joint2d
@@ -2901,6 +2939,10 @@ groove_joint2d_is_nil :: proc "contextless" (self: GrooveJoint2D) -> bool {
 }
 
 pin_joint2d_is_nil :: proc "contextless" (self: PinJoint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+navigation_obstacle2d_is_nil :: proc "contextless" (self: NavigationObstacle2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4397,6 +4439,10 @@ pin_joint2d_object_ptr :: proc "contextless" (self: PinJoint2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+navigation_obstacle2d_object_ptr :: proc "contextless" (self: NavigationObstacle2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 navigation_link2d_object_ptr :: proc "contextless" (self: NavigationLink2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4631,6 +4677,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_navigation_obstacle2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: NavigationObstacle2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_navigation_obstacle2d(Object(self))
 }
 
 object_ptr_try_as_navigation_link2d :: proc "contextless" (

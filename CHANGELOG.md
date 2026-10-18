@@ -56,6 +56,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   exports, compile coverage, and detached-node examples/game runtime coverage.
 - Added selected generated `DampedSpringJoint2D` and `GrooveJoint2D` APIs with
   public facade exports, compile coverage, and detached-node runtime coverage.
+- Added selected generated `NavigationObstacle2D` APIs with public facade
+  exports, compile coverage, and detached-node runtime coverage.
 
 ## Completed roadmap slices
 
