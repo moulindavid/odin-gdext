@@ -219,6 +219,7 @@ AudioListener2D :: gclass.AudioListener2D
 RemoteTransform2D :: gclass.RemoteTransform2D
 NavigationLink2D :: gclass.NavigationLink2D
 NavigationObstacle2D :: gclass.NavigationObstacle2D
+NavigationRegion2D :: gclass.NavigationRegion2D
 Joint2D :: gclass.Joint2D
 PinJoint2D :: gclass.PinJoint2D
 DampedSpringJoint2D :: gclass.DampedSpringJoint2D
@@ -671,6 +672,30 @@ navigation_obstacle2d_set_carve_navigation_mesh ::
 	gclass.navigation_obstacle2d_set_carve_navigation_mesh
 navigation_obstacle2d_get_carve_navigation_mesh ::
 	gclass.navigation_obstacle2d_get_carve_navigation_mesh
+navigation_region2d_as_node2d :: gclass.navigation_region2d_as_node2d
+navigation_region2d_as_canvas_item :: gclass.navigation_region2d_as_canvas_item
+navigation_region2d_as_node :: gclass.navigation_region2d_as_node
+navigation_region2d_as_object :: gclass.navigation_region2d_as_object
+navigation_region2d_get_rid :: gclass.navigation_region2d_get_rid
+navigation_region2d_set_enabled :: gclass.navigation_region2d_set_enabled
+navigation_region2d_is_enabled :: gclass.navigation_region2d_is_enabled
+navigation_region2d_set_navigation_map :: gclass.navigation_region2d_set_navigation_map
+navigation_region2d_get_navigation_map :: gclass.navigation_region2d_get_navigation_map
+navigation_region2d_set_use_edge_connections :: gclass.navigation_region2d_set_use_edge_connections
+navigation_region2d_get_use_edge_connections :: gclass.navigation_region2d_get_use_edge_connections
+navigation_region2d_set_navigation_layers :: gclass.navigation_region2d_set_navigation_layers
+navigation_region2d_get_navigation_layers :: gclass.navigation_region2d_get_navigation_layers
+navigation_region2d_set_navigation_layer_value ::
+	gclass.navigation_region2d_set_navigation_layer_value
+navigation_region2d_get_navigation_layer_value ::
+	gclass.navigation_region2d_get_navigation_layer_value
+navigation_region2d_get_region_rid :: gclass.navigation_region2d_get_region_rid
+navigation_region2d_set_enter_cost :: gclass.navigation_region2d_set_enter_cost
+navigation_region2d_get_enter_cost :: gclass.navigation_region2d_get_enter_cost
+navigation_region2d_set_travel_cost :: gclass.navigation_region2d_set_travel_cost
+navigation_region2d_get_travel_cost :: gclass.navigation_region2d_get_travel_cost
+navigation_region2d_is_baking :: gclass.navigation_region2d_is_baking
+navigation_region2d_get_bounds :: gclass.navigation_region2d_get_bounds
 joint2d_as_node2d :: gclass.joint2d_as_node2d
 joint2d_as_canvas_item :: gclass.joint2d_as_canvas_item
 joint2d_as_node :: gclass.joint2d_as_node
@@ -1465,6 +1490,8 @@ object_is_navigation_link2d :: gclass.object_is_navigation_link2d
 object_try_as_navigation_link2d :: gclass.object_try_as_navigation_link2d
 object_is_navigation_obstacle2d :: gclass.object_is_navigation_obstacle2d
 object_try_as_navigation_obstacle2d :: gclass.object_try_as_navigation_obstacle2d
+object_is_navigation_region2d :: gclass.object_is_navigation_region2d
+object_try_as_navigation_region2d :: gclass.object_try_as_navigation_region2d
 object_is_joint2d :: gclass.object_is_joint2d
 object_try_as_joint2d :: gclass.object_try_as_joint2d
 object_is_pin_joint2d :: gclass.object_is_pin_joint2d
@@ -1755,6 +1782,8 @@ node_is_navigation_link2d :: gclass.node_is_navigation_link2d
 node_try_as_navigation_link2d :: gclass.node_try_as_navigation_link2d
 node_is_navigation_obstacle2d :: gclass.node_is_navigation_obstacle2d
 node_try_as_navigation_obstacle2d :: gclass.node_try_as_navigation_obstacle2d
+node_is_navigation_region2d :: gclass.node_is_navigation_region2d
+node_try_as_navigation_region2d :: gclass.node_try_as_navigation_region2d
 node_is_joint2d :: gclass.node_is_joint2d
 node_try_as_joint2d :: gclass.node_try_as_joint2d
 node_is_pin_joint2d :: gclass.node_is_pin_joint2d
@@ -1839,6 +1868,8 @@ canvas_item_is_navigation_link2d :: gclass.canvas_item_is_navigation_link2d
 canvas_item_try_as_navigation_link2d :: gclass.canvas_item_try_as_navigation_link2d
 canvas_item_is_navigation_obstacle2d :: gclass.canvas_item_is_navigation_obstacle2d
 canvas_item_try_as_navigation_obstacle2d :: gclass.canvas_item_try_as_navigation_obstacle2d
+canvas_item_is_navigation_region2d :: gclass.canvas_item_is_navigation_region2d
+canvas_item_try_as_navigation_region2d :: gclass.canvas_item_try_as_navigation_region2d
 canvas_item_is_joint2d :: gclass.canvas_item_is_joint2d
 canvas_item_try_as_joint2d :: gclass.canvas_item_try_as_joint2d
 canvas_item_is_pin_joint2d :: gclass.canvas_item_is_pin_joint2d
@@ -1906,6 +1937,8 @@ node2d_is_navigation_link2d :: gclass.node2d_is_navigation_link2d
 node2d_try_as_navigation_link2d :: gclass.node2d_try_as_navigation_link2d
 node2d_is_navigation_obstacle2d :: gclass.node2d_is_navigation_obstacle2d
 node2d_try_as_navigation_obstacle2d :: gclass.node2d_try_as_navigation_obstacle2d
+node2d_is_navigation_region2d :: gclass.node2d_is_navigation_region2d
+node2d_try_as_navigation_region2d :: gclass.node2d_try_as_navigation_region2d
 node2d_is_joint2d :: gclass.node2d_is_joint2d
 node2d_try_as_joint2d :: gclass.node2d_try_as_joint2d
 node2d_is_pin_joint2d :: gclass.node2d_is_pin_joint2d
@@ -2939,6 +2972,10 @@ groove_joint2d_is_nil :: proc "contextless" (self: GrooveJoint2D) -> bool {
 }
 
 pin_joint2d_is_nil :: proc "contextless" (self: PinJoint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+navigation_region2d_is_nil :: proc "contextless" (self: NavigationRegion2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4439,6 +4476,10 @@ pin_joint2d_object_ptr :: proc "contextless" (self: PinJoint2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+navigation_region2d_object_ptr :: proc "contextless" (self: NavigationRegion2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 navigation_obstacle2d_object_ptr :: proc "contextless" (self: NavigationObstacle2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4677,6 +4718,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_navigation_region2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: NavigationRegion2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_navigation_region2d(Object(self))
 }
 
 object_ptr_try_as_navigation_obstacle2d :: proc "contextless" (

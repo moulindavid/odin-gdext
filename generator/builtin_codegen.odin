@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 81
+Max_Selected_Class_Count :: 82
 
 selected_class_names := []string {
 	"Object",
@@ -1034,6 +1034,7 @@ selected_class_names := []string {
 	"DampedSpringJoint2D",
 	"GrooveJoint2D",
 	"NavigationObstacle2D",
+	"NavigationRegion2D",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1529,6 +1530,24 @@ selected_class_methods := []Selected_Class_Method {
 	{"NavigationObstacle2D", "get_affect_navigation_mesh"},
 	{"NavigationObstacle2D", "set_carve_navigation_mesh"},
 	{"NavigationObstacle2D", "get_carve_navigation_mesh"},
+	{"NavigationRegion2D", "get_rid"},
+	{"NavigationRegion2D", "set_enabled"},
+	{"NavigationRegion2D", "is_enabled"},
+	{"NavigationRegion2D", "set_navigation_map"},
+	{"NavigationRegion2D", "get_navigation_map"},
+	{"NavigationRegion2D", "set_use_edge_connections"},
+	{"NavigationRegion2D", "get_use_edge_connections"},
+	{"NavigationRegion2D", "set_navigation_layers"},
+	{"NavigationRegion2D", "get_navigation_layers"},
+	{"NavigationRegion2D", "set_navigation_layer_value"},
+	{"NavigationRegion2D", "get_navigation_layer_value"},
+	{"NavigationRegion2D", "get_region_rid"},
+	{"NavigationRegion2D", "set_enter_cost"},
+	{"NavigationRegion2D", "get_enter_cost"},
+	{"NavigationRegion2D", "set_travel_cost"},
+	{"NavigationRegion2D", "get_travel_cost"},
+	{"NavigationRegion2D", "is_baking"},
+	{"NavigationRegion2D", "get_bounds"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},
