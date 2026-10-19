@@ -88,6 +88,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	remote_transform2d: gt.RemoteTransform2D,
 	navigation_link2d: gt.NavigationLink2D,
 	navigation_obstacle2d: gt.NavigationObstacle2D,
+	navigation_region2d: gt.NavigationRegion2D,
 	joint2d: gt.Joint2D,
 	pin_joint2d: gt.PinJoint2D,
 	damped_spring_joint2d: gt.DampedSpringJoint2D,
@@ -1389,6 +1390,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.remote_transform2d_object_ptr(remote_transform2d)
 	_ = gt.navigation_link2d_object_ptr(navigation_link2d)
 	_ = gt.navigation_obstacle2d_object_ptr(navigation_obstacle2d)
+	_ = gt.navigation_region2d_object_ptr(navigation_region2d)
 	_ = gt.joint2d_object_ptr(joint2d)
 	_ = gt.pin_joint2d_object_ptr(pin_joint2d)
 	_ = gt.damped_spring_joint2d_object_ptr(damped_spring_joint2d)
@@ -1447,6 +1449,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	)
 	_, _ = gt.object_ptr_try_as_navigation_obstacle2d(
 		gt.navigation_obstacle2d_object_ptr(navigation_obstacle2d),
+	)
+	_, _ = gt.object_ptr_try_as_navigation_region2d(
+		gt.navigation_region2d_object_ptr(navigation_region2d),
 	)
 	_, _ = gt.object_ptr_try_as_joint2d(gt.joint2d_object_ptr(joint2d))
 	_, _ = gt.object_ptr_try_as_pin_joint2d(gt.pin_joint2d_object_ptr(pin_joint2d))
@@ -1559,6 +1564,10 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.navigation_obstacle2d_as_canvas_item(navigation_obstacle2d)
 	_ = gt.navigation_obstacle2d_as_node(navigation_obstacle2d)
 	_ = gt.navigation_obstacle2d_as_object(navigation_obstacle2d)
+	_ = gt.navigation_region2d_as_node2d(navigation_region2d)
+	_ = gt.navigation_region2d_as_canvas_item(navigation_region2d)
+	_ = gt.navigation_region2d_as_node(navigation_region2d)
+	_ = gt.navigation_region2d_as_object(navigation_region2d)
 	_ = gt.joint2d_as_node2d(joint2d)
 	_ = gt.joint2d_as_canvas_item(joint2d)
 	_ = gt.joint2d_as_node(joint2d)
@@ -1601,6 +1610,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.remote_transform2d_is_nil(remote_transform2d)
 	_ = gt.navigation_link2d_is_nil(navigation_link2d)
 	_ = gt.navigation_obstacle2d_is_nil(navigation_obstacle2d)
+	_ = gt.navigation_region2d_is_nil(navigation_region2d)
 	_ = gt.joint2d_is_nil(joint2d)
 	_ = gt.pin_joint2d_is_nil(pin_joint2d)
 	_ = gt.damped_spring_joint2d_is_nil(damped_spring_joint2d)
@@ -2152,6 +2162,27 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.navigation_obstacle2d_get_affect_navigation_mesh(navigation_obstacle2d)
 	gt.navigation_obstacle2d_set_carve_navigation_mesh(navigation_obstacle2d, true)
 	_ = gt.navigation_obstacle2d_get_carve_navigation_mesh(navigation_obstacle2d)
+	region_rid := gt.navigation_region2d_get_rid(navigation_region2d)
+	gt.rid_free(&region_rid)
+	gt.navigation_region2d_set_enabled(navigation_region2d, true)
+	_ = gt.navigation_region2d_is_enabled(navigation_region2d)
+	region_map := gt.navigation_region2d_get_navigation_map(navigation_region2d)
+	gt.navigation_region2d_set_navigation_map(navigation_region2d, &region_map)
+	gt.rid_free(&region_map)
+	gt.navigation_region2d_set_use_edge_connections(navigation_region2d, false)
+	_ = gt.navigation_region2d_get_use_edge_connections(navigation_region2d)
+	gt.navigation_region2d_set_navigation_layers(navigation_region2d, 1)
+	_ = gt.navigation_region2d_get_navigation_layers(navigation_region2d)
+	gt.navigation_region2d_set_navigation_layer_value(navigation_region2d, 1, true)
+	_ = gt.navigation_region2d_get_navigation_layer_value(navigation_region2d, 1)
+	region_server_rid := gt.navigation_region2d_get_region_rid(navigation_region2d)
+	gt.rid_free(&region_server_rid)
+	gt.navigation_region2d_set_enter_cost(navigation_region2d, 1)
+	_ = gt.navigation_region2d_get_enter_cost(navigation_region2d)
+	gt.navigation_region2d_set_travel_cost(navigation_region2d, 2)
+	_ = gt.navigation_region2d_get_travel_cost(navigation_region2d)
+	_ = gt.navigation_region2d_is_baking(navigation_region2d)
+	_ = gt.navigation_region2d_get_bounds(navigation_region2d)
 	_ = gt.joint2d_is_pin_joint2d(joint2d)
 	_, _ = gt.joint2d_try_as_pin_joint2d(joint2d)
 	joint_a := gt.node_path_from_utf8("BodyA")
@@ -2409,6 +2440,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_navigation_link2d(object)
 	_ = gt.object_is_navigation_obstacle2d(object)
 	_, _ = gt.object_try_as_navigation_obstacle2d(object)
+	_ = gt.object_is_navigation_region2d(object)
+	_, _ = gt.object_try_as_navigation_region2d(object)
 	_ = gt.object_is_joint2d(object)
 	_, _ = gt.object_try_as_joint2d(object)
 	_ = gt.object_is_pin_joint2d(object)
@@ -2780,6 +2813,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node_try_as_navigation_link2d(node)
 	_ = gt.node_is_navigation_obstacle2d(node)
 	_, _ = gt.node_try_as_navigation_obstacle2d(node)
+	_ = gt.node_is_navigation_region2d(node)
+	_, _ = gt.node_try_as_navigation_region2d(node)
 	_ = gt.node_is_joint2d(node)
 	_, _ = gt.node_try_as_joint2d(node)
 	_ = gt.node_is_pin_joint2d(node)
@@ -2832,6 +2867,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.canvas_item_try_as_navigation_link2d(canvas_item)
 	_ = gt.canvas_item_is_navigation_obstacle2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_navigation_obstacle2d(canvas_item)
+	_ = gt.canvas_item_is_navigation_region2d(canvas_item)
+	_, _ = gt.canvas_item_try_as_navigation_region2d(canvas_item)
 	_ = gt.canvas_item_is_joint2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_joint2d(canvas_item)
 	_ = gt.canvas_item_is_pin_joint2d(canvas_item)
@@ -2870,6 +2907,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node2d_try_as_navigation_link2d(node2d)
 	_ = gt.node2d_is_navigation_obstacle2d(node2d)
 	_, _ = gt.node2d_try_as_navigation_obstacle2d(node2d)
+	_ = gt.node2d_is_navigation_region2d(node2d)
+	_, _ = gt.node2d_try_as_navigation_region2d(node2d)
 	_ = gt.node2d_is_joint2d(node2d)
 	_, _ = gt.node2d_try_as_joint2d(node2d)
 	_ = gt.node2d_is_pin_joint2d(node2d)

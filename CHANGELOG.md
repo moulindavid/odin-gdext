@@ -58,6 +58,9 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   public facade exports, compile coverage, and detached-node runtime coverage.
 - Added selected generated `NavigationObstacle2D` APIs with public facade
   exports, compile coverage, and detached-node runtime coverage.
+- Added selected generated `NavigationRegion2D` APIs with public facade exports,
+  compile coverage, and detached-node runtime coverage. NavigationPolygon
+  ownership and baking remain deferred.
 
 ## Completed roadmap slices
 

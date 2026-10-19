@@ -1164,6 +1164,32 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(obstacle_object)
 	}
 
+	// A detached region needs no NavigationPolygon or active navigation map.
+	region_object := gt.construct_object(navigation_region2d_class_name)
+	if region, region_ok := gt.object_ptr_try_as_navigation_region2d(region_object); region_ok {
+		gt.navigation_region2d_set_enabled(region, false)
+		_ = gt.navigation_region2d_is_enabled(region)
+		gt.navigation_region2d_set_use_edge_connections(region, false)
+		_ = gt.navigation_region2d_get_use_edge_connections(region)
+		gt.navigation_region2d_set_navigation_layers(region, 1)
+		_ = gt.navigation_region2d_get_navigation_layers(region)
+		gt.navigation_region2d_set_navigation_layer_value(region, 1, true)
+		_ = gt.navigation_region2d_get_navigation_layer_value(region, 1)
+		gt.navigation_region2d_set_enter_cost(region, 1.5)
+		_ = gt.navigation_region2d_get_enter_cost(region)
+		gt.navigation_region2d_set_travel_cost(region, 2)
+		_ = gt.navigation_region2d_get_travel_cost(region)
+		_ = gt.navigation_region2d_is_baking(region)
+		_ = gt.navigation_region2d_get_bounds(region)
+		region_rid := gt.navigation_region2d_get_rid(region)
+		gt.rid_free(&region_rid)
+		region_server_rid := gt.navigation_region2d_get_region_rid(region)
+		gt.rid_free(&region_server_rid)
+		_ = gt.object_destroy_checked(gt.navigation_region2d_object_ptr(region))
+	} else if region_object != nil {
+		_ = gt.object_destroy_checked(region_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1605,6 +1631,7 @@ audio_listener2d_class_name_data: gt.ClassName
 remote_transform2d_class_name_data: gt.ClassName
 navigation_link2d_class_name_data: gt.ClassName
 navigation_obstacle2d_class_name_data: gt.ClassName
+navigation_region2d_class_name_data: gt.ClassName
 pin_joint2d_class_name_data: gt.ClassName
 damped_spring_joint2d_class_name_data: gt.ClassName
 groove_joint2d_class_name_data: gt.ClassName
@@ -1650,6 +1677,7 @@ audio_listener2d_class_name: gt.ConstStringNamePtr
 remote_transform2d_class_name: gt.ConstStringNamePtr
 navigation_link2d_class_name: gt.ConstStringNamePtr
 navigation_obstacle2d_class_name: gt.ConstStringNamePtr
+navigation_region2d_class_name: gt.ConstStringNamePtr
 pin_joint2d_class_name: gt.ConstStringNamePtr
 damped_spring_joint2d_class_name: gt.ConstStringNamePtr
 groove_joint2d_class_name: gt.ConstStringNamePtr
@@ -1920,6 +1948,7 @@ register_classes :: proc() {
 	remote_transform2d_class_name = gt.class_name_ptr(&remote_transform2d_class_name_data)
 	navigation_link2d_class_name = gt.class_name_ptr(&navigation_link2d_class_name_data)
 	navigation_obstacle2d_class_name = gt.class_name_ptr(&navigation_obstacle2d_class_name_data)
+	navigation_region2d_class_name = gt.class_name_ptr(&navigation_region2d_class_name_data)
 	pin_joint2d_class_name = gt.class_name_ptr(&pin_joint2d_class_name_data)
 	damped_spring_joint2d_class_name = gt.class_name_ptr(&damped_spring_joint2d_class_name_data)
 	groove_joint2d_class_name = gt.class_name_ptr(&groove_joint2d_class_name_data)
@@ -2016,6 +2045,10 @@ register_classes :: proc() {
 	gt.class_name_init_latin1_cstring(
 		&navigation_obstacle2d_class_name_data,
 		cstring("NavigationObstacle2D"),
+	)
+	gt.class_name_init_latin1_cstring(
+		&navigation_region2d_class_name_data,
+		cstring("NavigationRegion2D"),
 	)
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,

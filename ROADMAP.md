@@ -332,6 +332,13 @@ These slices are complete and were validated with make ci when merged:
      obstacle in examples/game without navigation warnings. Validated with
      full make ci.
 
+43. NavigationRegion2D generated APIs.
+   - Added its handle, checked casts/upcasts, navigation map/layers, enabled
+     state, edge connections, region RIDs, costs, baking state, and bounds.
+     Exposed the selected surface through `godot:godot`, added facade compile
+     coverage, and exercised a detached region in examples/game. Deferred
+     NavigationPolygon ownership and baking; validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
