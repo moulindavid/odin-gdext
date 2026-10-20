@@ -61,6 +61,9 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
 - Added selected generated `NavigationRegion2D` APIs with public facade exports,
   compile coverage, and detached-node runtime coverage. NavigationPolygon
   ownership and baking remain deferred.
+- Added selected generated `AStarGrid2D` APIs with public facade exports,
+  compile coverage, and owned RefCounted grid pathfinding runtime coverage.
+  Typed-array ID paths and point-data returns remain deferred.
 
 ## Completed roadmap slices
 

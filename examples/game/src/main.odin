@@ -379,6 +379,55 @@ configure_2d_gameplay_nodes :: proc "contextless" (parent: gt.Node, damage: gt.G
 		_ = gt.object_destroy_checked(navigation_agent_object)
 	}
 
+	grid_object := gt.construct_object(astar_grid2d_class_name)
+	if grid, grid_ok := gt.object_ptr_try_as_astar_grid2d(grid_object); grid_ok {
+		owned_grid, owned_grid_ok := gt.owned_ref_counted_init_owned(
+			gt.astar_grid2d_as_ref_counted(grid),
+		)
+		if owned_grid_ok {
+			gt.astar_grid2d_set_region(grid, {{0, 0}, {4, 4}})
+			_ = gt.astar_grid2d_get_region(grid)
+			gt.astar_grid2d_set_cell_size(grid, {16, 16})
+			_ = gt.astar_grid2d_get_cell_size(grid)
+			gt.astar_grid2d_set_offset(grid, {0, 0})
+			_ = gt.astar_grid2d_get_offset(grid)
+			gt.astar_grid2d_set_cell_shape(grid, gt.AstarGrid2DCellShape.cell_shape_square)
+			_ = gt.astar_grid2d_get_cell_shape(grid)
+			gt.astar_grid2d_set_diagonal_mode(grid, gt.AstarGrid2DDiagonalMode.diagonal_mode_never)
+			_ = gt.astar_grid2d_get_diagonal_mode(grid)
+			gt.astar_grid2d_set_default_compute_heuristic(
+				grid,
+				gt.AstarGrid2DHeuristic.heuristic_manhattan,
+			)
+			_ = gt.astar_grid2d_get_default_compute_heuristic(grid)
+			gt.astar_grid2d_set_default_estimate_heuristic(
+				grid,
+				gt.AstarGrid2DHeuristic.heuristic_manhattan,
+			)
+			_ = gt.astar_grid2d_get_default_estimate_heuristic(grid)
+			gt.astar_grid2d_set_jumping_enabled(grid, false)
+			_ = gt.astar_grid2d_is_jumping_enabled(grid)
+			_ = gt.astar_grid2d_is_dirty(grid)
+			gt.astar_grid2d_update(grid)
+			_ = gt.astar_grid2d_is_in_boundsv(grid, {3, 3})
+			gt.astar_grid2d_set_point_solid_default(grid, {1, 1})
+			_ = gt.astar_grid2d_is_point_solid(grid, {1, 1})
+			gt.astar_grid2d_fill_solid_region(grid, {{1, 1}, {1, 1}}, false)
+			gt.astar_grid2d_set_point_weight_scale(grid, {2, 1}, 1.5)
+			_ = gt.astar_grid2d_get_point_weight_scale(grid, {2, 1})
+			_ = gt.astar_grid2d_get_point_position(grid, {2, 1})
+			path := gt.astar_grid2d_get_point_path_default(grid, {0, 0}, {3, 3})
+			_ = gt.packed_vector2_array_size(&path)
+			gt.packed_vector2_array_free(&path)
+			gt.astar_grid2d_clear(grid)
+			_ = gt.owned_ref_counted_destroy(&owned_grid)
+		} else {
+			_ = gt.object_destroy_checked(gt.astar_grid2d_object_ptr(grid))
+		}
+	} else if grid_object != nil {
+		_ = gt.object_destroy_checked(grid_object)
+	}
+
 	theme_object := gt.construct_object(theme_class_name)
 	if theme, theme_ok := gt.object_ptr_try_as_theme(theme_object); theme_ok {
 		owned_theme, owned_theme_ok := gt.owned_resource_init_owned(gt.theme_as_resource(theme))
@@ -1632,6 +1681,7 @@ remote_transform2d_class_name_data: gt.ClassName
 navigation_link2d_class_name_data: gt.ClassName
 navigation_obstacle2d_class_name_data: gt.ClassName
 navigation_region2d_class_name_data: gt.ClassName
+astar_grid2d_class_name_data: gt.ClassName
 pin_joint2d_class_name_data: gt.ClassName
 damped_spring_joint2d_class_name_data: gt.ClassName
 groove_joint2d_class_name_data: gt.ClassName
@@ -1678,6 +1728,7 @@ remote_transform2d_class_name: gt.ConstStringNamePtr
 navigation_link2d_class_name: gt.ConstStringNamePtr
 navigation_obstacle2d_class_name: gt.ConstStringNamePtr
 navigation_region2d_class_name: gt.ConstStringNamePtr
+astar_grid2d_class_name: gt.ConstStringNamePtr
 pin_joint2d_class_name: gt.ConstStringNamePtr
 damped_spring_joint2d_class_name: gt.ConstStringNamePtr
 groove_joint2d_class_name: gt.ConstStringNamePtr
@@ -1949,6 +2000,7 @@ register_classes :: proc() {
 	navigation_link2d_class_name = gt.class_name_ptr(&navigation_link2d_class_name_data)
 	navigation_obstacle2d_class_name = gt.class_name_ptr(&navigation_obstacle2d_class_name_data)
 	navigation_region2d_class_name = gt.class_name_ptr(&navigation_region2d_class_name_data)
+	astar_grid2d_class_name = gt.class_name_ptr(&astar_grid2d_class_name_data)
 	pin_joint2d_class_name = gt.class_name_ptr(&pin_joint2d_class_name_data)
 	damped_spring_joint2d_class_name = gt.class_name_ptr(&damped_spring_joint2d_class_name_data)
 	groove_joint2d_class_name = gt.class_name_ptr(&groove_joint2d_class_name_data)
@@ -2050,6 +2102,7 @@ register_classes :: proc() {
 		&navigation_region2d_class_name_data,
 		cstring("NavigationRegion2D"),
 	)
+	gt.class_name_init_latin1_cstring(&astar_grid2d_class_name_data, cstring("AStarGrid2D"))
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,
 		cstring("AnimationPlayer"),

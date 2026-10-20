@@ -89,6 +89,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	navigation_link2d: gt.NavigationLink2D,
 	navigation_obstacle2d: gt.NavigationObstacle2D,
 	navigation_region2d: gt.NavigationRegion2D,
+	astar_grid2d: gt.AStarGrid2D,
 	joint2d: gt.Joint2D,
 	pin_joint2d: gt.PinJoint2D,
 	damped_spring_joint2d: gt.DampedSpringJoint2D,
@@ -1391,6 +1392,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.navigation_link2d_object_ptr(navigation_link2d)
 	_ = gt.navigation_obstacle2d_object_ptr(navigation_obstacle2d)
 	_ = gt.navigation_region2d_object_ptr(navigation_region2d)
+	_ = gt.astar_grid2d_object_ptr(astar_grid2d)
 	_ = gt.joint2d_object_ptr(joint2d)
 	_ = gt.pin_joint2d_object_ptr(pin_joint2d)
 	_ = gt.damped_spring_joint2d_object_ptr(damped_spring_joint2d)
@@ -1453,6 +1455,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_navigation_region2d(
 		gt.navigation_region2d_object_ptr(navigation_region2d),
 	)
+	_, _ = gt.object_ptr_try_as_astar_grid2d(gt.astar_grid2d_object_ptr(astar_grid2d))
 	_, _ = gt.object_ptr_try_as_joint2d(gt.joint2d_object_ptr(joint2d))
 	_, _ = gt.object_ptr_try_as_pin_joint2d(gt.pin_joint2d_object_ptr(pin_joint2d))
 	_, _ = gt.object_ptr_try_as_damped_spring_joint2d(
@@ -1568,6 +1571,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.navigation_region2d_as_canvas_item(navigation_region2d)
 	_ = gt.navigation_region2d_as_node(navigation_region2d)
 	_ = gt.navigation_region2d_as_object(navigation_region2d)
+	_ = gt.astar_grid2d_as_ref_counted(astar_grid2d)
+	_ = gt.astar_grid2d_as_object(astar_grid2d)
 	_ = gt.joint2d_as_node2d(joint2d)
 	_ = gt.joint2d_as_canvas_item(joint2d)
 	_ = gt.joint2d_as_node(joint2d)
@@ -1611,6 +1616,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.navigation_link2d_is_nil(navigation_link2d)
 	_ = gt.navigation_obstacle2d_is_nil(navigation_obstacle2d)
 	_ = gt.navigation_region2d_is_nil(navigation_region2d)
+	_ = gt.astar_grid2d_is_nil(astar_grid2d)
 	_ = gt.joint2d_is_nil(joint2d)
 	_ = gt.pin_joint2d_is_nil(pin_joint2d)
 	_ = gt.damped_spring_joint2d_is_nil(damped_spring_joint2d)
@@ -2183,6 +2189,48 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.navigation_region2d_get_travel_cost(navigation_region2d)
 	_ = gt.navigation_region2d_is_baking(navigation_region2d)
 	_ = gt.navigation_region2d_get_bounds(navigation_region2d)
+	gt.astar_grid2d_set_region(astar_grid2d, {{0, 0}, {4, 4}})
+	_ = gt.astar_grid2d_get_region(astar_grid2d)
+	gt.astar_grid2d_set_size(astar_grid2d, {4, 4})
+	_ = gt.astar_grid2d_get_size(astar_grid2d)
+	gt.astar_grid2d_set_offset(astar_grid2d, {0, 0})
+	_ = gt.astar_grid2d_get_offset(astar_grid2d)
+	gt.astar_grid2d_set_cell_size(astar_grid2d, {16, 16})
+	_ = gt.astar_grid2d_get_cell_size(astar_grid2d)
+	gt.astar_grid2d_set_cell_shape(astar_grid2d, gt.AstarGrid2DCellShape.cell_shape_square)
+	_ = gt.astar_grid2d_get_cell_shape(astar_grid2d)
+	_ = gt.astar_grid2d_is_in_bounds(astar_grid2d, 0, 0)
+	_ = gt.astar_grid2d_is_in_boundsv(astar_grid2d, {0, 0})
+	_ = gt.astar_grid2d_is_dirty(astar_grid2d)
+	gt.astar_grid2d_update(astar_grid2d)
+	gt.astar_grid2d_set_jumping_enabled(astar_grid2d, false)
+	_ = gt.astar_grid2d_is_jumping_enabled(astar_grid2d)
+	gt.astar_grid2d_set_diagonal_mode(astar_grid2d, gt.AstarGrid2DDiagonalMode.diagonal_mode_never)
+	_ = gt.astar_grid2d_get_diagonal_mode(astar_grid2d)
+	gt.astar_grid2d_set_default_compute_heuristic(
+		astar_grid2d,
+		gt.AstarGrid2DHeuristic.heuristic_manhattan,
+	)
+	_ = gt.astar_grid2d_get_default_compute_heuristic(astar_grid2d)
+	gt.astar_grid2d_set_default_estimate_heuristic(
+		astar_grid2d,
+		gt.AstarGrid2DHeuristic.heuristic_manhattan,
+	)
+	_ = gt.astar_grid2d_get_default_estimate_heuristic(astar_grid2d)
+	gt.astar_grid2d_set_point_solid(astar_grid2d, {1, 1}, false)
+	gt.astar_grid2d_set_point_solid_default(astar_grid2d, {1, 1})
+	_ = gt.astar_grid2d_is_point_solid(astar_grid2d, {1, 1})
+	gt.astar_grid2d_set_point_weight_scale(astar_grid2d, {1, 1}, 2)
+	_ = gt.astar_grid2d_get_point_weight_scale(astar_grid2d, {1, 1})
+	gt.astar_grid2d_fill_solid_region(astar_grid2d, {{0, 0}, {1, 1}}, false)
+	gt.astar_grid2d_fill_solid_region_default(astar_grid2d, {{0, 0}, {1, 1}})
+	gt.astar_grid2d_fill_weight_scale_region(astar_grid2d, {{0, 0}, {1, 1}}, 1)
+	_ = gt.astar_grid2d_get_point_position(astar_grid2d, {1, 1})
+	grid_path := gt.astar_grid2d_get_point_path(astar_grid2d, {0, 0}, {1, 1}, false)
+	gt.packed_vector2_array_free(&grid_path)
+	grid_path_default := gt.astar_grid2d_get_point_path_default(astar_grid2d, {0, 0}, {1, 1})
+	gt.packed_vector2_array_free(&grid_path_default)
+	gt.astar_grid2d_clear(astar_grid2d)
 	_ = gt.joint2d_is_pin_joint2d(joint2d)
 	_, _ = gt.joint2d_try_as_pin_joint2d(joint2d)
 	joint_a := gt.node_path_from_utf8("BodyA")
@@ -2442,6 +2490,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_navigation_obstacle2d(object)
 	_ = gt.object_is_navigation_region2d(object)
 	_, _ = gt.object_try_as_navigation_region2d(object)
+	_ = gt.object_is_astar_grid2d(object)
+	_, _ = gt.object_try_as_astar_grid2d(object)
 	_ = gt.object_is_joint2d(object)
 	_, _ = gt.object_try_as_joint2d(object)
 	_ = gt.object_is_pin_joint2d(object)
@@ -3182,6 +3232,8 @@ ref_counted_resource_borrowed_policy_compile_smoke :: proc "contextless" (
 	_, _ = gt.owned_resource_release(&moved_resource)
 	_ = gt.owned_resource_destroy(&owned_resource)
 	_, _ = gt.ref_counted_try_as_resource(ref_counted)
+	_ = gt.ref_counted_is_astar_grid2d(ref_counted)
+	_, _ = gt.ref_counted_try_as_astar_grid2d(ref_counted)
 	_ = gt.ref_counted_is_packed_scene(ref_counted)
 	_, _ = gt.ref_counted_try_as_packed_scene(ref_counted)
 	_ = gt.resource_is_packed_scene(resource)
