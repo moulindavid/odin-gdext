@@ -220,6 +220,7 @@ RemoteTransform2D :: gclass.RemoteTransform2D
 NavigationLink2D :: gclass.NavigationLink2D
 NavigationObstacle2D :: gclass.NavigationObstacle2D
 NavigationRegion2D :: gclass.NavigationRegion2D
+AStarGrid2D :: gclass.AStarGrid2D
 Joint2D :: gclass.Joint2D
 PinJoint2D :: gclass.PinJoint2D
 DampedSpringJoint2D :: gclass.DampedSpringJoint2D
@@ -501,6 +502,8 @@ collision_object2d_emit_mouse_exited :: gclass.collision_object2d_emit_mouse_exi
 godot_context :: gcore.godot_context
 init_class_bindings :: gclass.init_class_bindings
 ref_counted_as_object :: gclass.ref_counted_as_object
+ref_counted_is_astar_grid2d :: gclass.ref_counted_is_astar_grid2d
+ref_counted_try_as_astar_grid2d :: gclass.ref_counted_try_as_astar_grid2d
 resource_as_ref_counted :: gclass.resource_as_ref_counted
 resource_as_object :: gclass.resource_as_object
 texture2d_as_resource :: gclass.texture2d_as_resource
@@ -696,6 +699,45 @@ navigation_region2d_set_travel_cost :: gclass.navigation_region2d_set_travel_cos
 navigation_region2d_get_travel_cost :: gclass.navigation_region2d_get_travel_cost
 navigation_region2d_is_baking :: gclass.navigation_region2d_is_baking
 navigation_region2d_get_bounds :: gclass.navigation_region2d_get_bounds
+AstarGrid2DHeuristic :: gclass.AstarGrid2DHeuristic
+AstarGrid2DDiagonalMode :: gclass.AstarGrid2DDiagonalMode
+AstarGrid2DCellShape :: gclass.AstarGrid2DCellShape
+astar_grid2d_as_ref_counted :: gclass.astar_grid2d_as_ref_counted
+astar_grid2d_as_object :: gclass.astar_grid2d_as_object
+astar_grid2d_set_region :: gclass.astar_grid2d_set_region
+astar_grid2d_get_region :: gclass.astar_grid2d_get_region
+astar_grid2d_set_size :: gclass.astar_grid2d_set_size
+astar_grid2d_get_size :: gclass.astar_grid2d_get_size
+astar_grid2d_set_offset :: gclass.astar_grid2d_set_offset
+astar_grid2d_get_offset :: gclass.astar_grid2d_get_offset
+astar_grid2d_set_cell_size :: gclass.astar_grid2d_set_cell_size
+astar_grid2d_get_cell_size :: gclass.astar_grid2d_get_cell_size
+astar_grid2d_set_cell_shape :: gclass.astar_grid2d_set_cell_shape
+astar_grid2d_get_cell_shape :: gclass.astar_grid2d_get_cell_shape
+astar_grid2d_is_in_bounds :: gclass.astar_grid2d_is_in_bounds
+astar_grid2d_is_in_boundsv :: gclass.astar_grid2d_is_in_boundsv
+astar_grid2d_is_dirty :: gclass.astar_grid2d_is_dirty
+astar_grid2d_update :: gclass.astar_grid2d_update
+astar_grid2d_set_jumping_enabled :: gclass.astar_grid2d_set_jumping_enabled
+astar_grid2d_is_jumping_enabled :: gclass.astar_grid2d_is_jumping_enabled
+astar_grid2d_set_diagonal_mode :: gclass.astar_grid2d_set_diagonal_mode
+astar_grid2d_get_diagonal_mode :: gclass.astar_grid2d_get_diagonal_mode
+astar_grid2d_set_default_compute_heuristic :: gclass.astar_grid2d_set_default_compute_heuristic
+astar_grid2d_get_default_compute_heuristic :: gclass.astar_grid2d_get_default_compute_heuristic
+astar_grid2d_set_default_estimate_heuristic :: gclass.astar_grid2d_set_default_estimate_heuristic
+astar_grid2d_get_default_estimate_heuristic :: gclass.astar_grid2d_get_default_estimate_heuristic
+astar_grid2d_set_point_solid :: gclass.astar_grid2d_set_point_solid
+astar_grid2d_set_point_solid_default :: gclass.astar_grid2d_set_point_solid_default
+astar_grid2d_is_point_solid :: gclass.astar_grid2d_is_point_solid
+astar_grid2d_set_point_weight_scale :: gclass.astar_grid2d_set_point_weight_scale
+astar_grid2d_get_point_weight_scale :: gclass.astar_grid2d_get_point_weight_scale
+astar_grid2d_fill_solid_region :: gclass.astar_grid2d_fill_solid_region
+astar_grid2d_fill_solid_region_default :: gclass.astar_grid2d_fill_solid_region_default
+astar_grid2d_fill_weight_scale_region :: gclass.astar_grid2d_fill_weight_scale_region
+astar_grid2d_clear :: gclass.astar_grid2d_clear
+astar_grid2d_get_point_position :: gclass.astar_grid2d_get_point_position
+astar_grid2d_get_point_path :: gclass.astar_grid2d_get_point_path
+astar_grid2d_get_point_path_default :: gclass.astar_grid2d_get_point_path_default
 joint2d_as_node2d :: gclass.joint2d_as_node2d
 joint2d_as_canvas_item :: gclass.joint2d_as_canvas_item
 joint2d_as_node :: gclass.joint2d_as_node
@@ -1492,6 +1534,8 @@ object_is_navigation_obstacle2d :: gclass.object_is_navigation_obstacle2d
 object_try_as_navigation_obstacle2d :: gclass.object_try_as_navigation_obstacle2d
 object_is_navigation_region2d :: gclass.object_is_navigation_region2d
 object_try_as_navigation_region2d :: gclass.object_try_as_navigation_region2d
+object_is_astar_grid2d :: gclass.object_is_astar_grid2d
+object_try_as_astar_grid2d :: gclass.object_try_as_astar_grid2d
 object_is_joint2d :: gclass.object_is_joint2d
 object_try_as_joint2d :: gclass.object_try_as_joint2d
 object_is_pin_joint2d :: gclass.object_is_pin_joint2d
@@ -2972,6 +3016,10 @@ groove_joint2d_is_nil :: proc "contextless" (self: GrooveJoint2D) -> bool {
 }
 
 pin_joint2d_is_nil :: proc "contextless" (self: PinJoint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+astar_grid2d_is_nil :: proc "contextless" (self: AStarGrid2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4476,6 +4524,10 @@ pin_joint2d_object_ptr :: proc "contextless" (self: PinJoint2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+astar_grid2d_object_ptr :: proc "contextless" (self: AStarGrid2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 navigation_region2d_object_ptr :: proc "contextless" (self: NavigationRegion2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4718,6 +4770,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_astar_grid2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: AStarGrid2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_astar_grid2d(Object(self))
 }
 
 object_ptr_try_as_navigation_region2d :: proc "contextless" (

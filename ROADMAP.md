@@ -339,6 +339,14 @@ These slices are complete and were validated with make ci when merged:
      coverage, and exercised a detached region in examples/game. Deferred
      NavigationPolygon ownership and baking; validated with full make ci.
 
+44. AStarGrid2D generated APIs.
+   - Added the ref-counted grid handle, checked casts/upcasts, region, cell,
+     heuristic, traversal, and point configuration, and packed point paths.
+     Exposed the surface through `godot:godot`, added facade compile coverage,
+     and exercised grid pathfinding with `OwnedRefCounted` cleanup in
+     examples/game. Typed-array ID paths and point-data returns remain
+     deferred; validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
