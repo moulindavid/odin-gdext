@@ -66,6 +66,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   Typed-array ID paths and point-data returns remain deferred.
 - Added selected generated `CPUParticles2D` emitter configuration APIs with
   facade exports, compile coverage, and non-emitting scene runtime coverage.
+- Added selected generated `GPUParticles2D` emitter configuration APIs with
+  facade exports, compile coverage, and non-emitting scene runtime coverage.
 
 ## Completed roadmap slices
 

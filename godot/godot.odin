@@ -222,6 +222,7 @@ NavigationObstacle2D :: gclass.NavigationObstacle2D
 NavigationRegion2D :: gclass.NavigationRegion2D
 AStarGrid2D :: gclass.AStarGrid2D
 CPUParticles2D :: gclass.CPUParticles2D
+GPUParticles2D :: gclass.GPUParticles2D
 Joint2D :: gclass.Joint2D
 PinJoint2D :: gclass.PinJoint2D
 DampedSpringJoint2D :: gclass.DampedSpringJoint2D
@@ -778,6 +779,45 @@ cpuparticles2d_set_color :: gclass.cpuparticles2d_set_color
 cpuparticles2d_get_color :: gclass.cpuparticles2d_get_color
 cpuparticles2d_set_gravity :: gclass.cpuparticles2d_set_gravity
 cpuparticles2d_get_gravity :: gclass.cpuparticles2d_get_gravity
+Gpuparticles2DDrawOrder :: gclass.Gpuparticles2DDrawOrder
+gpuparticles2d_as_node2d :: gclass.gpuparticles2d_as_node2d
+gpuparticles2d_as_canvas_item :: gclass.gpuparticles2d_as_canvas_item
+gpuparticles2d_as_node :: gclass.gpuparticles2d_as_node
+gpuparticles2d_as_object :: gclass.gpuparticles2d_as_object
+gpuparticles2d_set_emitting :: gclass.gpuparticles2d_set_emitting
+gpuparticles2d_is_emitting :: gclass.gpuparticles2d_is_emitting
+gpuparticles2d_set_amount :: gclass.gpuparticles2d_set_amount
+gpuparticles2d_get_amount :: gclass.gpuparticles2d_get_amount
+gpuparticles2d_set_lifetime :: gclass.gpuparticles2d_set_lifetime
+gpuparticles2d_get_lifetime :: gclass.gpuparticles2d_get_lifetime
+gpuparticles2d_set_one_shot :: gclass.gpuparticles2d_set_one_shot
+gpuparticles2d_get_one_shot :: gclass.gpuparticles2d_get_one_shot
+gpuparticles2d_set_pre_process_time :: gclass.gpuparticles2d_set_pre_process_time
+gpuparticles2d_get_pre_process_time :: gclass.gpuparticles2d_get_pre_process_time
+gpuparticles2d_set_explosiveness_ratio :: gclass.gpuparticles2d_set_explosiveness_ratio
+gpuparticles2d_get_explosiveness_ratio :: gclass.gpuparticles2d_get_explosiveness_ratio
+gpuparticles2d_set_randomness_ratio :: gclass.gpuparticles2d_set_randomness_ratio
+gpuparticles2d_get_randomness_ratio :: gclass.gpuparticles2d_get_randomness_ratio
+gpuparticles2d_set_visibility_rect :: gclass.gpuparticles2d_set_visibility_rect
+gpuparticles2d_get_visibility_rect :: gclass.gpuparticles2d_get_visibility_rect
+gpuparticles2d_set_use_local_coordinates :: gclass.gpuparticles2d_set_use_local_coordinates
+gpuparticles2d_get_use_local_coordinates :: gclass.gpuparticles2d_get_use_local_coordinates
+gpuparticles2d_set_fixed_fps :: gclass.gpuparticles2d_set_fixed_fps
+gpuparticles2d_get_fixed_fps :: gclass.gpuparticles2d_get_fixed_fps
+gpuparticles2d_set_fractional_delta :: gclass.gpuparticles2d_set_fractional_delta
+gpuparticles2d_get_fractional_delta :: gclass.gpuparticles2d_get_fractional_delta
+gpuparticles2d_set_interpolate :: gclass.gpuparticles2d_set_interpolate
+gpuparticles2d_get_interpolate :: gclass.gpuparticles2d_get_interpolate
+gpuparticles2d_set_speed_scale :: gclass.gpuparticles2d_set_speed_scale
+gpuparticles2d_get_speed_scale :: gclass.gpuparticles2d_get_speed_scale
+gpuparticles2d_set_draw_order :: gclass.gpuparticles2d_set_draw_order
+gpuparticles2d_get_draw_order :: gclass.gpuparticles2d_get_draw_order
+gpuparticles2d_set_amount_ratio :: gclass.gpuparticles2d_set_amount_ratio
+gpuparticles2d_get_amount_ratio :: gclass.gpuparticles2d_get_amount_ratio
+gpuparticles2d_set_use_fixed_seed :: gclass.gpuparticles2d_set_use_fixed_seed
+gpuparticles2d_get_use_fixed_seed :: gclass.gpuparticles2d_get_use_fixed_seed
+gpuparticles2d_set_seed :: gclass.gpuparticles2d_set_seed
+gpuparticles2d_get_seed :: gclass.gpuparticles2d_get_seed
 joint2d_as_node2d :: gclass.joint2d_as_node2d
 joint2d_as_canvas_item :: gclass.joint2d_as_canvas_item
 joint2d_as_node :: gclass.joint2d_as_node
@@ -1578,6 +1618,8 @@ object_is_astar_grid2d :: gclass.object_is_astar_grid2d
 object_try_as_astar_grid2d :: gclass.object_try_as_astar_grid2d
 object_is_cpuparticles2d :: gclass.object_is_cpuparticles2d
 object_try_as_cpuparticles2d :: gclass.object_try_as_cpuparticles2d
+object_is_gpuparticles2d :: gclass.object_is_gpuparticles2d
+object_try_as_gpuparticles2d :: gclass.object_try_as_gpuparticles2d
 object_is_joint2d :: gclass.object_is_joint2d
 object_try_as_joint2d :: gclass.object_try_as_joint2d
 object_is_pin_joint2d :: gclass.object_is_pin_joint2d
@@ -1872,6 +1914,8 @@ node_is_navigation_region2d :: gclass.node_is_navigation_region2d
 node_try_as_navigation_region2d :: gclass.node_try_as_navigation_region2d
 node_is_cpuparticles2d :: gclass.node_is_cpuparticles2d
 node_try_as_cpuparticles2d :: gclass.node_try_as_cpuparticles2d
+node_is_gpuparticles2d :: gclass.node_is_gpuparticles2d
+node_try_as_gpuparticles2d :: gclass.node_try_as_gpuparticles2d
 node_is_joint2d :: gclass.node_is_joint2d
 node_try_as_joint2d :: gclass.node_try_as_joint2d
 node_is_pin_joint2d :: gclass.node_is_pin_joint2d
@@ -1960,6 +2004,8 @@ canvas_item_is_navigation_region2d :: gclass.canvas_item_is_navigation_region2d
 canvas_item_try_as_navigation_region2d :: gclass.canvas_item_try_as_navigation_region2d
 canvas_item_is_cpuparticles2d :: gclass.canvas_item_is_cpuparticles2d
 canvas_item_try_as_cpuparticles2d :: gclass.canvas_item_try_as_cpuparticles2d
+canvas_item_is_gpuparticles2d :: gclass.canvas_item_is_gpuparticles2d
+canvas_item_try_as_gpuparticles2d :: gclass.canvas_item_try_as_gpuparticles2d
 canvas_item_is_joint2d :: gclass.canvas_item_is_joint2d
 canvas_item_try_as_joint2d :: gclass.canvas_item_try_as_joint2d
 canvas_item_is_pin_joint2d :: gclass.canvas_item_is_pin_joint2d
@@ -2031,6 +2077,8 @@ node2d_is_navigation_region2d :: gclass.node2d_is_navigation_region2d
 node2d_try_as_navigation_region2d :: gclass.node2d_try_as_navigation_region2d
 node2d_is_cpuparticles2d :: gclass.node2d_is_cpuparticles2d
 node2d_try_as_cpuparticles2d :: gclass.node2d_try_as_cpuparticles2d
+node2d_is_gpuparticles2d :: gclass.node2d_is_gpuparticles2d
+node2d_try_as_gpuparticles2d :: gclass.node2d_try_as_gpuparticles2d
 node2d_is_joint2d :: gclass.node2d_is_joint2d
 node2d_try_as_joint2d :: gclass.node2d_try_as_joint2d
 node2d_is_pin_joint2d :: gclass.node2d_is_pin_joint2d
@@ -3064,6 +3112,10 @@ groove_joint2d_is_nil :: proc "contextless" (self: GrooveJoint2D) -> bool {
 }
 
 pin_joint2d_is_nil :: proc "contextless" (self: PinJoint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+gpuparticles2d_is_nil :: proc "contextless" (self: GPUParticles2D) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4576,6 +4628,10 @@ pin_joint2d_object_ptr :: proc "contextless" (self: PinJoint2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+gpuparticles2d_object_ptr :: proc "contextless" (self: GPUParticles2D) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 cpuparticles2d_object_ptr :: proc "contextless" (self: CPUParticles2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4826,6 +4882,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_gpuparticles2d :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: GPUParticles2D,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_gpuparticles2d(Object(self))
 }
 
 object_ptr_try_as_cpuparticles2d :: proc "contextless" (

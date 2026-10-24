@@ -355,6 +355,14 @@ These slices are complete and were validated with make ci when merged:
      Deferred texture, Curve, Gradient, and advanced emission resources;
      validated with full make ci.
 
+46. GPUParticles2D generated APIs.
+   - Added its handle, checked casts/upcasts, emitter timing, visibility,
+     amount, seed, draw order, interpolation, and coordinate settings. Exposed
+     the selected surface through `godot:godot`, added facade compile coverage,
+     and exercised a non-emitting particle node in examples/game. Deferred
+     texture and process Material ownership-sensitive APIs; validated with
+     full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
