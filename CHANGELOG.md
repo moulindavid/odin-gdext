@@ -64,6 +64,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
 - Added selected generated `AStarGrid2D` APIs with public facade exports,
   compile coverage, and owned RefCounted grid pathfinding runtime coverage.
   Typed-array ID paths and point-data returns remain deferred.
+- Added selected generated `CPUParticles2D` emitter configuration APIs with
+  facade exports, compile coverage, and non-emitting scene runtime coverage.
 
 ## Completed roadmap slices
 
