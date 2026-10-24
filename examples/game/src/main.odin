@@ -1284,6 +1284,55 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(particles_object)
 	}
 
+	gpu_particles_object := gt.construct_object(gpuparticles2d_class_name)
+	if gpu_particles, gpu_particles_ok := gt.object_ptr_try_as_gpuparticles2d(
+		gpu_particles_object,
+	); gpu_particles_ok {
+		// A non-emitting node needs no process material or texture in headless mode.
+		gt.gpuparticles2d_set_emitting(gpu_particles, false)
+		_ = gt.gpuparticles2d_is_emitting(gpu_particles)
+		gt.gpuparticles2d_set_amount(gpu_particles, 8)
+		_ = gt.gpuparticles2d_get_amount(gpu_particles)
+		gt.gpuparticles2d_set_lifetime(gpu_particles, 1)
+		_ = gt.gpuparticles2d_get_lifetime(gpu_particles)
+		gt.gpuparticles2d_set_one_shot(gpu_particles, true)
+		_ = gt.gpuparticles2d_get_one_shot(gpu_particles)
+		gt.gpuparticles2d_set_pre_process_time(gpu_particles, 0)
+		_ = gt.gpuparticles2d_get_pre_process_time(gpu_particles)
+		gt.gpuparticles2d_set_explosiveness_ratio(gpu_particles, 0.5)
+		_ = gt.gpuparticles2d_get_explosiveness_ratio(gpu_particles)
+		gt.gpuparticles2d_set_randomness_ratio(gpu_particles, 0.25)
+		_ = gt.gpuparticles2d_get_randomness_ratio(gpu_particles)
+		gt.gpuparticles2d_set_visibility_rect(gpu_particles, {{-16, -16}, {32, 32}})
+		_ = gt.gpuparticles2d_get_visibility_rect(gpu_particles)
+		gt.gpuparticles2d_set_use_local_coordinates(gpu_particles, true)
+		_ = gt.gpuparticles2d_get_use_local_coordinates(gpu_particles)
+		gt.gpuparticles2d_set_fixed_fps(gpu_particles, 30)
+		_ = gt.gpuparticles2d_get_fixed_fps(gpu_particles)
+		gt.gpuparticles2d_set_fractional_delta(gpu_particles, true)
+		_ = gt.gpuparticles2d_get_fractional_delta(gpu_particles)
+		gt.gpuparticles2d_set_interpolate(gpu_particles, true)
+		_ = gt.gpuparticles2d_get_interpolate(gpu_particles)
+		gt.gpuparticles2d_set_speed_scale(gpu_particles, 1)
+		_ = gt.gpuparticles2d_get_speed_scale(gpu_particles)
+		gt.gpuparticles2d_set_draw_order(
+			gpu_particles,
+			gt.Gpuparticles2DDrawOrder.draw_order_index,
+		)
+		_ = gt.gpuparticles2d_get_draw_order(gpu_particles)
+		gt.gpuparticles2d_set_amount_ratio(gpu_particles, 1)
+		_ = gt.gpuparticles2d_get_amount_ratio(gpu_particles)
+		gt.gpuparticles2d_set_use_fixed_seed(gpu_particles, true)
+		_ = gt.gpuparticles2d_get_use_fixed_seed(gpu_particles)
+		gt.gpuparticles2d_set_seed(gpu_particles, 42)
+		_ = gt.gpuparticles2d_get_seed(gpu_particles)
+		if !gt.node_add_child_checked(parent, gt.gpuparticles2d_as_node(gpu_particles)) {
+			_ = gt.object_destroy_checked(gt.gpuparticles2d_object_ptr(gpu_particles))
+		}
+	} else if gpu_particles_object != nil {
+		_ = gt.object_destroy_checked(gpu_particles_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1727,6 +1776,7 @@ navigation_link2d_class_name_data: gt.ClassName
 navigation_obstacle2d_class_name_data: gt.ClassName
 navigation_region2d_class_name_data: gt.ClassName
 cpuparticles2d_class_name_data: gt.ClassName
+gpuparticles2d_class_name_data: gt.ClassName
 astar_grid2d_class_name_data: gt.ClassName
 pin_joint2d_class_name_data: gt.ClassName
 damped_spring_joint2d_class_name_data: gt.ClassName
@@ -1775,6 +1825,7 @@ navigation_link2d_class_name: gt.ConstStringNamePtr
 navigation_obstacle2d_class_name: gt.ConstStringNamePtr
 navigation_region2d_class_name: gt.ConstStringNamePtr
 cpuparticles2d_class_name: gt.ConstStringNamePtr
+gpuparticles2d_class_name: gt.ConstStringNamePtr
 astar_grid2d_class_name: gt.ConstStringNamePtr
 pin_joint2d_class_name: gt.ConstStringNamePtr
 damped_spring_joint2d_class_name: gt.ConstStringNamePtr
@@ -2048,6 +2099,7 @@ register_classes :: proc() {
 	navigation_obstacle2d_class_name = gt.class_name_ptr(&navigation_obstacle2d_class_name_data)
 	navigation_region2d_class_name = gt.class_name_ptr(&navigation_region2d_class_name_data)
 	cpuparticles2d_class_name = gt.class_name_ptr(&cpuparticles2d_class_name_data)
+	gpuparticles2d_class_name = gt.class_name_ptr(&gpuparticles2d_class_name_data)
 	astar_grid2d_class_name = gt.class_name_ptr(&astar_grid2d_class_name_data)
 	pin_joint2d_class_name = gt.class_name_ptr(&pin_joint2d_class_name_data)
 	damped_spring_joint2d_class_name = gt.class_name_ptr(&damped_spring_joint2d_class_name_data)
@@ -2151,6 +2203,7 @@ register_classes :: proc() {
 		cstring("NavigationRegion2D"),
 	)
 	gt.class_name_init_latin1_cstring(&cpuparticles2d_class_name_data, cstring("CPUParticles2D"))
+	gt.class_name_init_latin1_cstring(&gpuparticles2d_class_name_data, cstring("GPUParticles2D"))
 	gt.class_name_init_latin1_cstring(&astar_grid2d_class_name_data, cstring("AStarGrid2D"))
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,
