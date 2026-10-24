@@ -347,6 +347,14 @@ These slices are complete and were validated with make ci when merged:
      examples/game. Typed-array ID paths and point-data returns remain
      deferred; validated with full make ci.
 
+45. CPUParticles2D generated APIs.
+   - Added its handle, checked casts/upcasts, emitter timing, amount, seed,
+     coordinate, draw order, direction, spread, color, and gravity settings.
+     Exposed the selected surface through `godot:godot`, added facade compile
+     coverage, and exercised a non-emitting particle node in examples/game.
+     Deferred texture, Curve, Gradient, and advanced emission resources;
+     validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue
