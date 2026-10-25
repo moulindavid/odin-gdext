@@ -223,6 +223,7 @@ NavigationRegion2D :: gclass.NavigationRegion2D
 AStarGrid2D :: gclass.AStarGrid2D
 CPUParticles2D :: gclass.CPUParticles2D
 GPUParticles2D :: gclass.GPUParticles2D
+TouchScreenButton :: gclass.TouchScreenButton
 Joint2D :: gclass.Joint2D
 PinJoint2D :: gclass.PinJoint2D
 DampedSpringJoint2D :: gclass.DampedSpringJoint2D
@@ -818,6 +819,22 @@ gpuparticles2d_set_use_fixed_seed :: gclass.gpuparticles2d_set_use_fixed_seed
 gpuparticles2d_get_use_fixed_seed :: gclass.gpuparticles2d_get_use_fixed_seed
 gpuparticles2d_set_seed :: gclass.gpuparticles2d_set_seed
 gpuparticles2d_get_seed :: gclass.gpuparticles2d_get_seed
+TouchScreenButtonVisibilityMode :: gclass.TouchScreenButtonVisibilityMode
+touch_screen_button_as_node2d :: gclass.touch_screen_button_as_node2d
+touch_screen_button_as_canvas_item :: gclass.touch_screen_button_as_canvas_item
+touch_screen_button_as_node :: gclass.touch_screen_button_as_node
+touch_screen_button_as_object :: gclass.touch_screen_button_as_object
+touch_screen_button_set_shape_centered :: gclass.touch_screen_button_set_shape_centered
+touch_screen_button_is_shape_centered :: gclass.touch_screen_button_is_shape_centered
+touch_screen_button_set_shape_visible :: gclass.touch_screen_button_set_shape_visible
+touch_screen_button_is_shape_visible :: gclass.touch_screen_button_is_shape_visible
+touch_screen_button_set_action :: gclass.touch_screen_button_set_action
+touch_screen_button_get_action :: gclass.touch_screen_button_get_action
+touch_screen_button_set_visibility_mode :: gclass.touch_screen_button_set_visibility_mode
+touch_screen_button_get_visibility_mode :: gclass.touch_screen_button_get_visibility_mode
+touch_screen_button_set_passby_press :: gclass.touch_screen_button_set_passby_press
+touch_screen_button_is_passby_press_enabled :: gclass.touch_screen_button_is_passby_press_enabled
+touch_screen_button_is_pressed :: gclass.touch_screen_button_is_pressed
 joint2d_as_node2d :: gclass.joint2d_as_node2d
 joint2d_as_canvas_item :: gclass.joint2d_as_canvas_item
 joint2d_as_node :: gclass.joint2d_as_node
@@ -1620,6 +1637,8 @@ object_is_cpuparticles2d :: gclass.object_is_cpuparticles2d
 object_try_as_cpuparticles2d :: gclass.object_try_as_cpuparticles2d
 object_is_gpuparticles2d :: gclass.object_is_gpuparticles2d
 object_try_as_gpuparticles2d :: gclass.object_try_as_gpuparticles2d
+object_is_touch_screen_button :: gclass.object_is_touch_screen_button
+object_try_as_touch_screen_button :: gclass.object_try_as_touch_screen_button
 object_is_joint2d :: gclass.object_is_joint2d
 object_try_as_joint2d :: gclass.object_try_as_joint2d
 object_is_pin_joint2d :: gclass.object_is_pin_joint2d
@@ -1916,6 +1935,8 @@ node_is_cpuparticles2d :: gclass.node_is_cpuparticles2d
 node_try_as_cpuparticles2d :: gclass.node_try_as_cpuparticles2d
 node_is_gpuparticles2d :: gclass.node_is_gpuparticles2d
 node_try_as_gpuparticles2d :: gclass.node_try_as_gpuparticles2d
+node_is_touch_screen_button :: gclass.node_is_touch_screen_button
+node_try_as_touch_screen_button :: gclass.node_try_as_touch_screen_button
 node_is_joint2d :: gclass.node_is_joint2d
 node_try_as_joint2d :: gclass.node_try_as_joint2d
 node_is_pin_joint2d :: gclass.node_is_pin_joint2d
@@ -2006,6 +2027,8 @@ canvas_item_is_cpuparticles2d :: gclass.canvas_item_is_cpuparticles2d
 canvas_item_try_as_cpuparticles2d :: gclass.canvas_item_try_as_cpuparticles2d
 canvas_item_is_gpuparticles2d :: gclass.canvas_item_is_gpuparticles2d
 canvas_item_try_as_gpuparticles2d :: gclass.canvas_item_try_as_gpuparticles2d
+canvas_item_is_touch_screen_button :: gclass.canvas_item_is_touch_screen_button
+canvas_item_try_as_touch_screen_button :: gclass.canvas_item_try_as_touch_screen_button
 canvas_item_is_joint2d :: gclass.canvas_item_is_joint2d
 canvas_item_try_as_joint2d :: gclass.canvas_item_try_as_joint2d
 canvas_item_is_pin_joint2d :: gclass.canvas_item_is_pin_joint2d
@@ -2079,6 +2102,8 @@ node2d_is_cpuparticles2d :: gclass.node2d_is_cpuparticles2d
 node2d_try_as_cpuparticles2d :: gclass.node2d_try_as_cpuparticles2d
 node2d_is_gpuparticles2d :: gclass.node2d_is_gpuparticles2d
 node2d_try_as_gpuparticles2d :: gclass.node2d_try_as_gpuparticles2d
+node2d_is_touch_screen_button :: gclass.node2d_is_touch_screen_button
+node2d_try_as_touch_screen_button :: gclass.node2d_try_as_touch_screen_button
 node2d_is_joint2d :: gclass.node2d_is_joint2d
 node2d_try_as_joint2d :: gclass.node2d_try_as_joint2d
 node2d_is_pin_joint2d :: gclass.node2d_is_pin_joint2d
@@ -3112,6 +3137,10 @@ groove_joint2d_is_nil :: proc "contextless" (self: GrooveJoint2D) -> bool {
 }
 
 pin_joint2d_is_nil :: proc "contextless" (self: PinJoint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+touch_screen_button_is_nil :: proc "contextless" (self: TouchScreenButton) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4628,6 +4657,10 @@ pin_joint2d_object_ptr :: proc "contextless" (self: PinJoint2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+touch_screen_button_object_ptr :: proc "contextless" (self: TouchScreenButton) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 gpuparticles2d_object_ptr :: proc "contextless" (self: GPUParticles2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4882,6 +4915,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_touch_screen_button :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: TouchScreenButton,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_touch_screen_button(Object(self))
 }
 
 object_ptr_try_as_gpuparticles2d :: proc "contextless" (

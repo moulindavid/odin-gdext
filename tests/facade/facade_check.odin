@@ -92,6 +92,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	astar_grid2d: gt.AStarGrid2D,
 	cpuparticles2d: gt.CPUParticles2D,
 	gpuparticles2d: gt.GPUParticles2D,
+	touch_screen_button: gt.TouchScreenButton,
 	joint2d: gt.Joint2D,
 	pin_joint2d: gt.PinJoint2D,
 	damped_spring_joint2d: gt.DampedSpringJoint2D,
@@ -1397,6 +1398,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.astar_grid2d_object_ptr(astar_grid2d)
 	_ = gt.cpuparticles2d_object_ptr(cpuparticles2d)
 	_ = gt.gpuparticles2d_object_ptr(gpuparticles2d)
+	_ = gt.touch_screen_button_object_ptr(touch_screen_button)
 	_ = gt.joint2d_object_ptr(joint2d)
 	_ = gt.pin_joint2d_object_ptr(pin_joint2d)
 	_ = gt.damped_spring_joint2d_object_ptr(damped_spring_joint2d)
@@ -1462,6 +1464,9 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_ptr_try_as_astar_grid2d(gt.astar_grid2d_object_ptr(astar_grid2d))
 	_, _ = gt.object_ptr_try_as_cpuparticles2d(gt.cpuparticles2d_object_ptr(cpuparticles2d))
 	_, _ = gt.object_ptr_try_as_gpuparticles2d(gt.gpuparticles2d_object_ptr(gpuparticles2d))
+	_, _ = gt.object_ptr_try_as_touch_screen_button(
+		gt.touch_screen_button_object_ptr(touch_screen_button),
+	)
 	_, _ = gt.object_ptr_try_as_joint2d(gt.joint2d_object_ptr(joint2d))
 	_, _ = gt.object_ptr_try_as_pin_joint2d(gt.pin_joint2d_object_ptr(pin_joint2d))
 	_, _ = gt.object_ptr_try_as_damped_spring_joint2d(
@@ -1587,6 +1592,10 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.gpuparticles2d_as_canvas_item(gpuparticles2d)
 	_ = gt.gpuparticles2d_as_node(gpuparticles2d)
 	_ = gt.gpuparticles2d_as_object(gpuparticles2d)
+	_ = gt.touch_screen_button_as_node2d(touch_screen_button)
+	_ = gt.touch_screen_button_as_canvas_item(touch_screen_button)
+	_ = gt.touch_screen_button_as_node(touch_screen_button)
+	_ = gt.touch_screen_button_as_object(touch_screen_button)
 	_ = gt.joint2d_as_node2d(joint2d)
 	_ = gt.joint2d_as_canvas_item(joint2d)
 	_ = gt.joint2d_as_node(joint2d)
@@ -1633,6 +1642,7 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.astar_grid2d_is_nil(astar_grid2d)
 	_ = gt.cpuparticles2d_is_nil(cpuparticles2d)
 	_ = gt.gpuparticles2d_is_nil(gpuparticles2d)
+	_ = gt.touch_screen_button_is_nil(touch_screen_button)
 	_ = gt.joint2d_is_nil(joint2d)
 	_ = gt.pin_joint2d_is_nil(pin_joint2d)
 	_ = gt.damped_spring_joint2d_is_nil(damped_spring_joint2d)
@@ -2315,6 +2325,23 @@ class_facade_compile_smoke :: proc "contextless" (
 	_ = gt.gpuparticles2d_get_use_fixed_seed(gpuparticles2d)
 	gt.gpuparticles2d_set_seed(gpuparticles2d, 42)
 	_ = gt.gpuparticles2d_get_seed(gpuparticles2d)
+	gt.touch_screen_button_set_shape_centered(touch_screen_button, true)
+	_ = gt.touch_screen_button_is_shape_centered(touch_screen_button)
+	gt.touch_screen_button_set_shape_visible(touch_screen_button, false)
+	_ = gt.touch_screen_button_is_shape_visible(touch_screen_button)
+	touch_action := gt.string_from_utf8("ui_accept")
+	gt.touch_screen_button_set_action(touch_screen_button, &touch_action)
+	gt.string_free(&touch_action)
+	touch_action_result := gt.touch_screen_button_get_action(touch_screen_button)
+	gt.string_free(&touch_action_result)
+	gt.touch_screen_button_set_visibility_mode(
+		touch_screen_button,
+		gt.TouchScreenButtonVisibilityMode.visibility_always,
+	)
+	_ = gt.touch_screen_button_get_visibility_mode(touch_screen_button)
+	gt.touch_screen_button_set_passby_press(touch_screen_button, false)
+	_ = gt.touch_screen_button_is_passby_press_enabled(touch_screen_button)
+	_ = gt.touch_screen_button_is_pressed(touch_screen_button)
 	_ = gt.joint2d_is_pin_joint2d(joint2d)
 	_, _ = gt.joint2d_try_as_pin_joint2d(joint2d)
 	joint_a := gt.node_path_from_utf8("BodyA")
@@ -2580,6 +2607,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.object_try_as_cpuparticles2d(object)
 	_ = gt.object_is_gpuparticles2d(object)
 	_, _ = gt.object_try_as_gpuparticles2d(object)
+	_ = gt.object_is_touch_screen_button(object)
+	_, _ = gt.object_try_as_touch_screen_button(object)
 	_ = gt.object_is_joint2d(object)
 	_, _ = gt.object_try_as_joint2d(object)
 	_ = gt.object_is_pin_joint2d(object)
@@ -2957,6 +2986,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node_try_as_cpuparticles2d(node)
 	_ = gt.node_is_gpuparticles2d(node)
 	_, _ = gt.node_try_as_gpuparticles2d(node)
+	_ = gt.node_is_touch_screen_button(node)
+	_, _ = gt.node_try_as_touch_screen_button(node)
 	_ = gt.node_is_joint2d(node)
 	_, _ = gt.node_try_as_joint2d(node)
 	_ = gt.node_is_pin_joint2d(node)
@@ -3015,6 +3046,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.canvas_item_try_as_cpuparticles2d(canvas_item)
 	_ = gt.canvas_item_is_gpuparticles2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_gpuparticles2d(canvas_item)
+	_ = gt.canvas_item_is_touch_screen_button(canvas_item)
+	_, _ = gt.canvas_item_try_as_touch_screen_button(canvas_item)
 	_ = gt.canvas_item_is_joint2d(canvas_item)
 	_, _ = gt.canvas_item_try_as_joint2d(canvas_item)
 	_ = gt.canvas_item_is_pin_joint2d(canvas_item)
@@ -3059,6 +3092,8 @@ class_facade_compile_smoke :: proc "contextless" (
 	_, _ = gt.node2d_try_as_cpuparticles2d(node2d)
 	_ = gt.node2d_is_gpuparticles2d(node2d)
 	_, _ = gt.node2d_try_as_gpuparticles2d(node2d)
+	_ = gt.node2d_is_touch_screen_button(node2d)
+	_, _ = gt.node2d_try_as_touch_screen_button(node2d)
 	_ = gt.node2d_is_joint2d(node2d)
 	_, _ = gt.node2d_try_as_joint2d(node2d)
 	_ = gt.node2d_is_pin_joint2d(node2d)
