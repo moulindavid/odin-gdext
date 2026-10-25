@@ -363,6 +363,14 @@ These slices are complete and were validated with make ci when merged:
      texture and process Material ownership-sensitive APIs; validated with
      full make ci.
 
+47. TouchScreenButton generated APIs.
+   - Added its handle, checked casts/upcasts, action String ownership, shape
+     display, visibility mode, pass-by-press, and pressed-state methods.
+     Exposed the surface through `godot:godot`, added facade compile coverage,
+     and exercised an untextured touchscreen-only node in examples/game.
+     Deferred texture/BitMap/Shape2D return ownership; validated with full
+     make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

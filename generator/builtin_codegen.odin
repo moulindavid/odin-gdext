@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 85
+Max_Selected_Class_Count :: 86
 
 selected_class_names := []string {
 	"Object",
@@ -1038,6 +1038,7 @@ selected_class_names := []string {
 	"AStarGrid2D",
 	"CPUParticles2D",
 	"GPUParticles2D",
+	"TouchScreenButton",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1650,6 +1651,17 @@ selected_class_methods := []Selected_Class_Method {
 	{"GPUParticles2D", "get_use_fixed_seed"},
 	{"GPUParticles2D", "set_seed"},
 	{"GPUParticles2D", "get_seed"},
+	{"TouchScreenButton", "set_shape_centered"},
+	{"TouchScreenButton", "is_shape_centered"},
+	{"TouchScreenButton", "set_shape_visible"},
+	{"TouchScreenButton", "is_shape_visible"},
+	{"TouchScreenButton", "set_action"},
+	{"TouchScreenButton", "get_action"},
+	{"TouchScreenButton", "set_visibility_mode"},
+	{"TouchScreenButton", "get_visibility_mode"},
+	{"TouchScreenButton", "set_passby_press"},
+	{"TouchScreenButton", "is_passby_press_enabled"},
+	{"TouchScreenButton", "is_pressed"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},

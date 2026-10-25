@@ -68,6 +68,8 @@ by merged roadmap slices and should call out compatibility-sensitive changes.
   facade exports, compile coverage, and non-emitting scene runtime coverage.
 - Added selected generated `GPUParticles2D` emitter configuration APIs with
   facade exports, compile coverage, and non-emitting scene runtime coverage.
+- Added selected generated `TouchScreenButton` action and visibility APIs with
+  facade exports, compile coverage, and headless scene runtime coverage.
 
 ## Completed roadmap slices
 

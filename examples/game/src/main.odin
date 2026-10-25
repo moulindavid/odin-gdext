@@ -1333,6 +1333,34 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(gpu_particles_object)
 	}
 
+	touch_button_object := gt.construct_object(touch_screen_button_class_name)
+	if touch_button, touch_button_ok := gt.object_ptr_try_as_touch_screen_button(
+		touch_button_object,
+	); touch_button_ok {
+		touch_action := gt.string_from_utf8("ui_accept")
+		gt.touch_screen_button_set_action(touch_button, &touch_action)
+		gt.string_free(&touch_action)
+		action_result := gt.touch_screen_button_get_action(touch_button)
+		gt.string_free(&action_result)
+		gt.touch_screen_button_set_shape_centered(touch_button, true)
+		_ = gt.touch_screen_button_is_shape_centered(touch_button)
+		gt.touch_screen_button_set_shape_visible(touch_button, false)
+		_ = gt.touch_screen_button_is_shape_visible(touch_button)
+		gt.touch_screen_button_set_visibility_mode(
+			touch_button,
+			gt.TouchScreenButtonVisibilityMode.visibility_touchscreen_only,
+		)
+		_ = gt.touch_screen_button_get_visibility_mode(touch_button)
+		gt.touch_screen_button_set_passby_press(touch_button, false)
+		_ = gt.touch_screen_button_is_passby_press_enabled(touch_button)
+		_ = gt.touch_screen_button_is_pressed(touch_button)
+		if !gt.node_add_child_checked(parent, gt.touch_screen_button_as_node(touch_button)) {
+			_ = gt.object_destroy_checked(gt.touch_screen_button_object_ptr(touch_button))
+		}
+	} else if touch_button_object != nil {
+		_ = gt.object_destroy_checked(touch_button_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1777,6 +1805,7 @@ navigation_obstacle2d_class_name_data: gt.ClassName
 navigation_region2d_class_name_data: gt.ClassName
 cpuparticles2d_class_name_data: gt.ClassName
 gpuparticles2d_class_name_data: gt.ClassName
+touch_screen_button_class_name_data: gt.ClassName
 astar_grid2d_class_name_data: gt.ClassName
 pin_joint2d_class_name_data: gt.ClassName
 damped_spring_joint2d_class_name_data: gt.ClassName
@@ -1826,6 +1855,7 @@ navigation_obstacle2d_class_name: gt.ConstStringNamePtr
 navigation_region2d_class_name: gt.ConstStringNamePtr
 cpuparticles2d_class_name: gt.ConstStringNamePtr
 gpuparticles2d_class_name: gt.ConstStringNamePtr
+touch_screen_button_class_name: gt.ConstStringNamePtr
 astar_grid2d_class_name: gt.ConstStringNamePtr
 pin_joint2d_class_name: gt.ConstStringNamePtr
 damped_spring_joint2d_class_name: gt.ConstStringNamePtr
@@ -2100,6 +2130,7 @@ register_classes :: proc() {
 	navigation_region2d_class_name = gt.class_name_ptr(&navigation_region2d_class_name_data)
 	cpuparticles2d_class_name = gt.class_name_ptr(&cpuparticles2d_class_name_data)
 	gpuparticles2d_class_name = gt.class_name_ptr(&gpuparticles2d_class_name_data)
+	touch_screen_button_class_name = gt.class_name_ptr(&touch_screen_button_class_name_data)
 	astar_grid2d_class_name = gt.class_name_ptr(&astar_grid2d_class_name_data)
 	pin_joint2d_class_name = gt.class_name_ptr(&pin_joint2d_class_name_data)
 	damped_spring_joint2d_class_name = gt.class_name_ptr(&damped_spring_joint2d_class_name_data)
@@ -2204,6 +2235,10 @@ register_classes :: proc() {
 	)
 	gt.class_name_init_latin1_cstring(&cpuparticles2d_class_name_data, cstring("CPUParticles2D"))
 	gt.class_name_init_latin1_cstring(&gpuparticles2d_class_name_data, cstring("GPUParticles2D"))
+	gt.class_name_init_latin1_cstring(
+		&touch_screen_button_class_name_data,
+		cstring("TouchScreenButton"),
+	)
 	gt.class_name_init_latin1_cstring(&astar_grid2d_class_name_data, cstring("AStarGrid2D"))
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,
