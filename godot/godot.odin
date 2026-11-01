@@ -224,6 +224,7 @@ AStarGrid2D :: gclass.AStarGrid2D
 CPUParticles2D :: gclass.CPUParticles2D
 GPUParticles2D :: gclass.GPUParticles2D
 TouchScreenButton :: gclass.TouchScreenButton
+NinePatchRect :: gclass.NinePatchRect
 Joint2D :: gclass.Joint2D
 PinJoint2D :: gclass.PinJoint2D
 DampedSpringJoint2D :: gclass.DampedSpringJoint2D
@@ -835,6 +836,21 @@ touch_screen_button_get_visibility_mode :: gclass.touch_screen_button_get_visibi
 touch_screen_button_set_passby_press :: gclass.touch_screen_button_set_passby_press
 touch_screen_button_is_passby_press_enabled :: gclass.touch_screen_button_is_passby_press_enabled
 touch_screen_button_is_pressed :: gclass.touch_screen_button_is_pressed
+NinePatchRectAxisStretchMode :: gclass.NinePatchRectAxisStretchMode
+nine_patch_rect_as_control :: gclass.nine_patch_rect_as_control
+nine_patch_rect_as_canvas_item :: gclass.nine_patch_rect_as_canvas_item
+nine_patch_rect_as_node :: gclass.nine_patch_rect_as_node
+nine_patch_rect_as_object :: gclass.nine_patch_rect_as_object
+nine_patch_rect_set_patch_margin :: gclass.nine_patch_rect_set_patch_margin
+nine_patch_rect_get_patch_margin :: gclass.nine_patch_rect_get_patch_margin
+nine_patch_rect_set_region_rect :: gclass.nine_patch_rect_set_region_rect
+nine_patch_rect_get_region_rect :: gclass.nine_patch_rect_get_region_rect
+nine_patch_rect_set_draw_center :: gclass.nine_patch_rect_set_draw_center
+nine_patch_rect_is_draw_center_enabled :: gclass.nine_patch_rect_is_draw_center_enabled
+nine_patch_rect_set_h_axis_stretch_mode :: gclass.nine_patch_rect_set_h_axis_stretch_mode
+nine_patch_rect_get_h_axis_stretch_mode :: gclass.nine_patch_rect_get_h_axis_stretch_mode
+nine_patch_rect_set_v_axis_stretch_mode :: gclass.nine_patch_rect_set_v_axis_stretch_mode
+nine_patch_rect_get_v_axis_stretch_mode :: gclass.nine_patch_rect_get_v_axis_stretch_mode
 joint2d_as_node2d :: gclass.joint2d_as_node2d
 joint2d_as_canvas_item :: gclass.joint2d_as_canvas_item
 joint2d_as_node :: gclass.joint2d_as_node
@@ -1639,6 +1655,8 @@ object_is_gpuparticles2d :: gclass.object_is_gpuparticles2d
 object_try_as_gpuparticles2d :: gclass.object_try_as_gpuparticles2d
 object_is_touch_screen_button :: gclass.object_is_touch_screen_button
 object_try_as_touch_screen_button :: gclass.object_try_as_touch_screen_button
+object_is_nine_patch_rect :: gclass.object_is_nine_patch_rect
+object_try_as_nine_patch_rect :: gclass.object_try_as_nine_patch_rect
 object_is_joint2d :: gclass.object_is_joint2d
 object_try_as_joint2d :: gclass.object_try_as_joint2d
 object_is_pin_joint2d :: gclass.object_is_pin_joint2d
@@ -1937,6 +1955,8 @@ node_is_gpuparticles2d :: gclass.node_is_gpuparticles2d
 node_try_as_gpuparticles2d :: gclass.node_try_as_gpuparticles2d
 node_is_touch_screen_button :: gclass.node_is_touch_screen_button
 node_try_as_touch_screen_button :: gclass.node_try_as_touch_screen_button
+node_is_nine_patch_rect :: gclass.node_is_nine_patch_rect
+node_try_as_nine_patch_rect :: gclass.node_try_as_nine_patch_rect
 node_is_joint2d :: gclass.node_is_joint2d
 node_try_as_joint2d :: gclass.node_try_as_joint2d
 node_is_pin_joint2d :: gclass.node_is_pin_joint2d
@@ -2029,6 +2049,8 @@ canvas_item_is_gpuparticles2d :: gclass.canvas_item_is_gpuparticles2d
 canvas_item_try_as_gpuparticles2d :: gclass.canvas_item_try_as_gpuparticles2d
 canvas_item_is_touch_screen_button :: gclass.canvas_item_is_touch_screen_button
 canvas_item_try_as_touch_screen_button :: gclass.canvas_item_try_as_touch_screen_button
+canvas_item_is_nine_patch_rect :: gclass.canvas_item_is_nine_patch_rect
+canvas_item_try_as_nine_patch_rect :: gclass.canvas_item_try_as_nine_patch_rect
 canvas_item_is_joint2d :: gclass.canvas_item_is_joint2d
 canvas_item_try_as_joint2d :: gclass.canvas_item_try_as_joint2d
 canvas_item_is_pin_joint2d :: gclass.canvas_item_is_pin_joint2d
@@ -2190,6 +2212,8 @@ control_is_texture_rect :: gclass.control_is_texture_rect
 control_try_as_texture_rect :: gclass.control_try_as_texture_rect
 control_is_panel :: gclass.control_is_panel
 control_try_as_panel :: gclass.control_try_as_panel
+control_is_nine_patch_rect :: gclass.control_is_nine_patch_rect
+control_try_as_nine_patch_rect :: gclass.control_try_as_nine_patch_rect
 control_is_container :: gclass.control_is_container
 control_try_as_container :: gclass.control_try_as_container
 base_button_is_button :: gclass.base_button_is_button
@@ -3137,6 +3161,10 @@ groove_joint2d_is_nil :: proc "contextless" (self: GrooveJoint2D) -> bool {
 }
 
 pin_joint2d_is_nil :: proc "contextless" (self: PinJoint2D) -> bool {
+	return ObjectPtr(self) == nil
+}
+
+nine_patch_rect_is_nil :: proc "contextless" (self: NinePatchRect) -> bool {
 	return ObjectPtr(self) == nil
 }
 
@@ -4657,6 +4685,10 @@ pin_joint2d_object_ptr :: proc "contextless" (self: PinJoint2D) -> ObjectPtr {
 	return ObjectPtr(self)
 }
 
+nine_patch_rect_object_ptr :: proc "contextless" (self: NinePatchRect) -> ObjectPtr {
+	return ObjectPtr(self)
+}
+
 touch_screen_button_object_ptr :: proc "contextless" (self: TouchScreenButton) -> ObjectPtr {
 	return ObjectPtr(self)
 }
@@ -4915,6 +4947,16 @@ object_ptr_try_as_capsule_shape2d :: proc "contextless" (
 object_ptr_try_as_curve2d :: proc "contextless" (self: ObjectPtr) -> (value: Curve2D, ok: bool) {
 	if self == nil do return {}, false
 	return object_try_as_curve2d(Object(self))
+}
+
+object_ptr_try_as_nine_patch_rect :: proc "contextless" (
+	self: ObjectPtr,
+) -> (
+	value: NinePatchRect,
+	ok: bool,
+) {
+	if self == nil do return {}, false
+	return object_try_as_nine_patch_rect(Object(self))
 }
 
 object_ptr_try_as_touch_screen_button :: proc "contextless" (

@@ -371,6 +371,13 @@ These slices are complete and were validated with make ci when merged:
      Deferred texture/BitMap/Shape2D return ownership; validated with full
      make ci.
 
+48. NinePatchRect generated APIs.
+   - Added its Control handle, checked casts/upcasts, patch margins, region
+     rect, center visibility, and horizontal/vertical stretch modes. Exposed
+     the selected surface through `godot:godot`, added facade compile coverage,
+     and exercised an untextured control in examples/game. Deferred texture
+     ownership; validated with full make ci.
+
 ## Current goal: Awaiting next generated API slice
 
 Pick the next small generated API batch from concrete gameplay needs. Continue

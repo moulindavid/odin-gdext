@@ -1361,6 +1361,34 @@ configure_animation_tween_nodes :: proc "contextless" (parent: gt.Node, damage: 
 		_ = gt.object_destroy_checked(touch_button_object)
 	}
 
+	nine_patch_object := gt.construct_object(nine_patch_rect_class_name)
+	if nine_patch, nine_patch_ok := gt.object_ptr_try_as_nine_patch_rect(nine_patch_object);
+	   nine_patch_ok {
+		gt.nine_patch_rect_set_patch_margin(nine_patch, gt.Side.side_left, 8)
+		_ = gt.nine_patch_rect_get_patch_margin(nine_patch, gt.Side.side_left)
+		gt.nine_patch_rect_set_patch_margin(nine_patch, gt.Side.side_right, 8)
+		_ = gt.nine_patch_rect_get_patch_margin(nine_patch, gt.Side.side_right)
+		gt.nine_patch_rect_set_region_rect(nine_patch, {{0, 0}, {64, 64}})
+		_ = gt.nine_patch_rect_get_region_rect(nine_patch)
+		gt.nine_patch_rect_set_draw_center(nine_patch, true)
+		_ = gt.nine_patch_rect_is_draw_center_enabled(nine_patch)
+		gt.nine_patch_rect_set_h_axis_stretch_mode(
+			nine_patch,
+			gt.NinePatchRectAxisStretchMode.axis_stretch_mode_stretch,
+		)
+		_ = gt.nine_patch_rect_get_h_axis_stretch_mode(nine_patch)
+		gt.nine_patch_rect_set_v_axis_stretch_mode(
+			nine_patch,
+			gt.NinePatchRectAxisStretchMode.axis_stretch_mode_tile_fit,
+		)
+		_ = gt.nine_patch_rect_get_v_axis_stretch_mode(nine_patch)
+		if !gt.node_add_child_checked(parent, gt.nine_patch_rect_as_node(nine_patch)) {
+			_ = gt.object_destroy_checked(gt.nine_patch_rect_object_ptr(nine_patch))
+		}
+	} else if nine_patch_object != nil {
+		_ = gt.object_destroy_checked(nine_patch_object)
+	}
+
 	audio_2d_object := gt.construct_object(audio_stream_player2d_class_name)
 	if audio_2d, audio_2d_ok := gt.object_ptr_try_as_audio_stream_player2d(audio_2d_object);
 	   audio_2d_ok {
@@ -1806,6 +1834,7 @@ navigation_region2d_class_name_data: gt.ClassName
 cpuparticles2d_class_name_data: gt.ClassName
 gpuparticles2d_class_name_data: gt.ClassName
 touch_screen_button_class_name_data: gt.ClassName
+nine_patch_rect_class_name_data: gt.ClassName
 astar_grid2d_class_name_data: gt.ClassName
 pin_joint2d_class_name_data: gt.ClassName
 damped_spring_joint2d_class_name_data: gt.ClassName
@@ -1856,6 +1885,7 @@ navigation_region2d_class_name: gt.ConstStringNamePtr
 cpuparticles2d_class_name: gt.ConstStringNamePtr
 gpuparticles2d_class_name: gt.ConstStringNamePtr
 touch_screen_button_class_name: gt.ConstStringNamePtr
+nine_patch_rect_class_name: gt.ConstStringNamePtr
 astar_grid2d_class_name: gt.ConstStringNamePtr
 pin_joint2d_class_name: gt.ConstStringNamePtr
 damped_spring_joint2d_class_name: gt.ConstStringNamePtr
@@ -2131,6 +2161,7 @@ register_classes :: proc() {
 	cpuparticles2d_class_name = gt.class_name_ptr(&cpuparticles2d_class_name_data)
 	gpuparticles2d_class_name = gt.class_name_ptr(&gpuparticles2d_class_name_data)
 	touch_screen_button_class_name = gt.class_name_ptr(&touch_screen_button_class_name_data)
+	nine_patch_rect_class_name = gt.class_name_ptr(&nine_patch_rect_class_name_data)
 	astar_grid2d_class_name = gt.class_name_ptr(&astar_grid2d_class_name_data)
 	pin_joint2d_class_name = gt.class_name_ptr(&pin_joint2d_class_name_data)
 	damped_spring_joint2d_class_name = gt.class_name_ptr(&damped_spring_joint2d_class_name_data)
@@ -2239,6 +2270,7 @@ register_classes :: proc() {
 		&touch_screen_button_class_name_data,
 		cstring("TouchScreenButton"),
 	)
+	gt.class_name_init_latin1_cstring(&nine_patch_rect_class_name_data, cstring("NinePatchRect"))
 	gt.class_name_init_latin1_cstring(&astar_grid2d_class_name_data, cstring("AStarGrid2D"))
 	gt.class_name_init_latin1_cstring(
 		&animation_player_class_name_data,
