@@ -1007,7 +1007,7 @@ generate_utility_bindings :: proc(root: ^ExtensionApiRoot) -> bool {
 
 // Class handle generation.
 
-Max_Selected_Class_Count :: 86
+Max_Selected_Class_Count :: 87
 
 selected_class_names := []string {
 	"Object",
@@ -1039,6 +1039,7 @@ selected_class_names := []string {
 	"CPUParticles2D",
 	"GPUParticles2D",
 	"TouchScreenButton",
+	"NinePatchRect",
 	"Shape2D",
 	"CircleShape2D",
 	"RectangleShape2D",
@@ -1662,6 +1663,16 @@ selected_class_methods := []Selected_Class_Method {
 	{"TouchScreenButton", "set_passby_press"},
 	{"TouchScreenButton", "is_passby_press_enabled"},
 	{"TouchScreenButton", "is_pressed"},
+	{"NinePatchRect", "set_patch_margin"},
+	{"NinePatchRect", "get_patch_margin"},
+	{"NinePatchRect", "set_region_rect"},
+	{"NinePatchRect", "get_region_rect"},
+	{"NinePatchRect", "set_draw_center"},
+	{"NinePatchRect", "is_draw_center_enabled"},
+	{"NinePatchRect", "set_h_axis_stretch_mode"},
+	{"NinePatchRect", "get_h_axis_stretch_mode"},
+	{"NinePatchRect", "set_v_axis_stretch_mode"},
+	{"NinePatchRect", "get_v_axis_stretch_mode"},
 	{"CanvasLayer", "set_layer"},
 	{"CanvasLayer", "get_layer"},
 	{"CanvasLayer", "set_visible"},
